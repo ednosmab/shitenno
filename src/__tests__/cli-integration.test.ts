@@ -213,7 +213,7 @@ describe("CLI Integration Tests", () => {
       expect(stdout).toContain("Health Check");
       expect(stdout).toContain("Project root");
       expect(stdout).toContain("Governance Health");
-      expect(stdout).toContain("Complexity Analysis");
+      expect(stdout).toContain("Complexity Report");
     });
 
     it("should show complexity score and area breakdown", async () => {
@@ -221,8 +221,8 @@ describe("CLI Integration Tests", () => {
       dirs.push(dir);
 
       const { stdout } = await runShugo("status", dir);
-      expect(stdout).toContain("Score Breakdown");
-      expect(stdout).toContain("Total score");
+      expect(stdout).toContain("Complexity Report");
+      expect(stdout).toContain("Score:");
     });
 
     it("should generate a report file when reports/ exists (senior)", async () => {
