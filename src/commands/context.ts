@@ -12,6 +12,7 @@ import { generateForecast } from "../trend-engine.js";
 import { logger } from "../logger.js";
 import { join } from "node:path";
 import { SHITENNO_DIR_NAME } from "../constants.js";
+import chalk from "chalk";
 import { output, outputBlank } from "../output.js";
 import { Command } from "commander";
 import { queryDaemon, isDaemonRunning } from "../daemon-client.js";
@@ -199,7 +200,8 @@ export async function executeContextCommand(options: { json?: boolean; forAgent?
   }
 
   if (options.json) {
-    output(JSON.stringify(context, null, 2));
+    // Use force:true to bypass global JSON mode gate
+    output(JSON.stringify(context, null, 2), { force: true });
   } else {
     printContext(context);
   }
@@ -213,17 +215,23 @@ function printContext(context: ContextOutput): void {
   output(`Root: ${context.project.root}`);
   outputBlank();
 
+  const es = context.engineeringState;
+  if (!es) {
+    output(chalk.yellow("⚠️  Engineering state not available"));
+    return;
+  }
+
   output("📊 Engineering State");
   output("====================");
-  output(`Lifecycle: ${context.engineeringState.lifecycle}`);
-  output(`Health: ${context.engineeringState.healthScores.overall}/100`);
-  output(`Knowledge Debt: ${context.engineeringState.healthScores.knowledgeDebt}/100`);
-  output(`Knowledge Graph: ${context.engineeringState.healthScores.knowledgeGraph}/100`);
-  output(`Entropy: ${context.engineeringState.entropy.score}/100`);
-  output(`Capabilities: ${context.engineeringState.capabilities.join(", ")}`);
-  output(`Assets: ${context.engineeringState.assets.length}`);
-  output(`Rules: ${context.engineeringState.rules}`);
-  output(`Policies: ${context.engineeringState.policies}`);
+  output(`Lifecycle: ${es.lifecycle ?? "N/A"}`);
+  output(`Health: ${es.healthScores?.overall ?? "N/A"}/100`);
+  output(`Knowledge Debt: ${es.healthScores?.knowledgeDebt ?? "N/A"}/100`);
+  output(`Knowledge Graph: ${es.healthScores?.knowledgeGraph ?? "N/A"}/100`);
+  output(`Entropy: ${es.entropy?.score ?? "N/A"}/100`);
+  output(`Capabilities: ${es.capabilities?.join(", ") ?? "N/A"}`);
+  output(`Assets: ${es.assets?.length ?? 0}`);
+  output(`Rules: ${es.rules ?? "N/A"}`);
+  output(`Policies: ${es.policies ?? "N/A"}`);
   outputBlank();
 
   if (context.trend) {

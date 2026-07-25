@@ -69,7 +69,7 @@ export function miniBar(score: number, max: number = 10): string {
  * Output JSON to stdout when --json flag is used.
  */
 export function outputJson(data: Record<string, unknown>): void {
-  output(JSON.stringify(data, null, 2));
+  output(JSON.stringify(data, null, 2), { force: true });
 }
 
 /**

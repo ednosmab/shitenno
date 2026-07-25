@@ -1,5 +1,5 @@
 # Pre-Session Briefing
-*Generated: 2026-07-22T13:05:05.149Z*
+*Generated: 2026-07-25T05:50:49.880Z*
 
 ---
 
@@ -40,8 +40,12 @@
 - This is a monorepo. When modifying shared packages, ensure backward compatibility.
 
 ## Dynamic Rules (From History)
-- [high] This project has 137 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
-- [medium] This project has 6 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
+- [high] This project has 145 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
+- [medium] This project has 7 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
+
+
+## Daemon Status
+- **Running:** No
 
 ## Recommended Next Steps
 1. Address critical risk areas: src, apps
@@ -52,3 +56,15 @@
 - **Context rules:** 8
 - **Dynamic rules:** 2
 - **Cache hit:** No
+
+## Semantic Analysis
+### Patterns (1)
+- **30 alterações vs 0 melhorias de qualidade**
+  - Domain: governance | Type: tech_debt_accumulation | Confidence: 85%
+  - → Dedicar tempo a testes e documentação
+  - → Rever dívida técnica acumulada
+### Insights (1)
+- **Dívida técnica a acumular — padrões de degradação detectados** (medium)
+  - Domains: testing, documentation
+  - → Dedicar sprint de qualidade
+  - → Rever e actualizar documentação

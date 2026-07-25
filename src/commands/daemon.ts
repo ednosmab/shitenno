@@ -287,6 +287,21 @@ async function handleLogsAction(opts: Record<string, unknown>): Promise<void> {
     return;
   }
 
+  // Non-interactive environments: just dump recent lines and exit
+  if (!process.stdin.isTTY) {
+    const numLines = Number(opts.lines) || 20;
+    try {
+      const content = readFileSync(logPath, "utf-8");
+      const lines = content.split("\n").filter(Boolean);
+      for (const line of lines.slice(-numLines)) {
+        output(colorizeLogLine(line));
+      }
+    } catch {
+      output(chalk.red(`  ✗ Failed to read log file: ${logPath}`));
+    }
+    return;
+  }
+
   const numLines = Number(opts.lines) || 50;
   await attachToDaemonLog(logPath, numLines);
 }

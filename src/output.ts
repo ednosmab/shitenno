@@ -40,8 +40,8 @@ function isQuiet(): boolean {
  * @param msg - The message to output.
  * @param opts - Options: { quiet: true } suppresses in quiet mode.
  */
-export function output(msg: string, opts?: { quiet?: boolean }): void {
-  if (globalJsonMode || (opts?.quiet && isQuiet())) return;
+export function output(msg: string, opts?: { quiet?: boolean; force?: boolean }): void {
+  if (!opts?.force && (globalJsonMode || (opts?.quiet && isQuiet()))) return;
   process.stdout.write(msg + "\n");
 }
 

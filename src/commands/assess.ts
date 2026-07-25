@@ -185,7 +185,19 @@ function calculateProfileInJsonMode(actx: AssessContext, previousProfile: Maturi
 }
 
 async function calculateProfileInteractively(actx: AssessContext, options: { answersFile?: string }, analysis: ProjectAnalysis): Promise<MaturityProfile> {
-  if (!guardInteractive(options, actx.isJson)) throw new Error("Non-interactive");
+  if (!guardInteractive(options, actx.isJson)) {
+    // Non-interactive mode without --answers-file: use synthetic answers
+    // This allows 'shugo assess' to work in CI/daemon/non-TTY environments
+    if (!actx.isJson) output(chalk.gray("  Non-interactive mode — using synthetic answers from project analysis"));
+    const calcSpinner = ora("Calculating maturity profile...").start();
+    const existingProfile = loadMaturityProfile(actx.shitennoDir);
+    const answers = existingProfile
+      ? buildSyntheticAnswersFromProfile(existingProfile, analysis)
+      : buildDefaultSyntheticAnswers(analysis);
+    const profile = calculateMaturityProfile(answers, analysis, actx.shitennoDir);
+    calcSpinner.succeed("Maturity profile calculated");
+    return profile;
+  }
   output(chalk.bold("  Re-evaluate your maturity profile:"));
   outputBlank();
   let answers: Awaited<ReturnType<typeof askQuestions>>;
