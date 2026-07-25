@@ -371,30 +371,39 @@ export function appendBacklogSection(
   date: string
 ): BacklogWriteResult {
   const dir = dirname(backlogPath);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
-  const existingContent = existsSync(backlogPath) ? readFileSync(backlogPath, "utf-8") : "";
+  let existingContent = "";
+  try {
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    existingContent = existsSync(backlogPath) ? readFileSync(backlogPath, "utf-8") : "";
+  } catch (err) {
+    logger.warn("backlog-writer", `Could not access ${backlogPath}: ${(err as Error).message}`);
+    return { itemsAdded: 0, itemsSkipped: items.length, sectionInserted: false, message: "Backlog path not accessible" };
+  }
+
   const newItems = items.filter((item) => !isDuplicate(existingContent, item));
-
   if (newItems.length === 0) {
     return { itemsAdded: 0, itemsSkipped: items.length, sectionInserted: false, message: "All items are duplicates" };
   }
 
   const section = formatBacklogSection(newItems, date);
   let content = existingContent;
-
   if (content.length === 0) {
     content = `# BACKLOG\n\n${section}`;
   } else {
     const insertionIdx = findInsertionPoint(content);
-    if (insertionIdx >= 0) {
-      content = content.slice(0, insertionIdx) + section + "\n\n" + content.slice(insertionIdx);
-    } else {
-      content += `\n${section}`;
-    }
+    content = insertionIdx >= 0
+      ? content.slice(0, insertionIdx) + section + "\n\n" + content.slice(insertionIdx)
+      : content + `\n${section}`;
   }
 
-  writeFileSync(backlogPath, content, "utf-8");
+  try {
+    writeFileSync(backlogPath, content, "utf-8");
+  } catch (err) {
+    logger.warn("backlog-writer", `Failed to write ${backlogPath}: ${(err as Error).message}`);
+    return { itemsAdded: 0, itemsSkipped: items.length, sectionInserted: false, message: "Failed to write backlog file" };
+  }
+
   logger.info("backlog-writer", `Appended ${newItems.length} items to ${backlogPath}`);
   return {
     itemsAdded: newItems.length,
