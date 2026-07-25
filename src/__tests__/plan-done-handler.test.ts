@@ -31,12 +31,12 @@ describe("handlePlanDone (in-process, no subprocess)", () => {
   it("blocks when there is no test script", () => {
     const result = handlePlanDone(join(dir, ".shitenno"), dir, "PLAN-A");
     expect(result.passed).toBe(false);
-    expect(result.checks.find((c) => c.name === "TESTS")?.message).toMatch(/No 'test' script/);
+    expect(result.checks.find((c) => c.name === "TESTS")?.message).toMatch(/No 'test'/);
   });
 
-  it("returns checks array with BUILD, TESTS, LINT, GATE_SELF_TEST", () => {
+  it("returns checks array with BUILD, TESTS, LINT, GATE_SELF_TEST, DOCS", () => {
     const result = handlePlanDone(join(dir, ".shitenno"), dir, "PLAN-A");
     const names = result.checks.map((c) => c.name);
-    expect(names).toEqual(expect.arrayContaining(["BUILD", "TESTS", "LINT", "GATE_SELF_TEST"]));
+    expect(names).toEqual(expect.arrayContaining(["BUILD", "TESTS", "LINT", "GATE_SELF_TEST", "DOCS"]));
   });
 });

@@ -6,7 +6,10 @@
 
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import type { CompletionCheck, VerificationRecord } from "../plan-lifecycle.js";
+import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
 import { checkBuild, checkTests, checkLint, checkGateIntegrity, checkDocumentation } from "./checks.js";
 
 export function computeDiffHash(projectRoot: string): string {
@@ -19,7 +22,7 @@ export function computeDiffHash(projectRoot: string): string {
 }
 
 export function runAutoVerification(
-  _shitennoDir: string,
+  shitennoDir: string,
   projectRoot: string,
   planId: string,
 ): VerificationRecord {
@@ -38,5 +41,18 @@ export function runAutoVerification(
     verifiedAt: new Date().toISOString(),
     diffHash: computeDiffHash(projectRoot),
   };
+
+  // Update plan status — engine.updateStatus("done") already calls moveToDone()
+  const engine = new MarkdownPlanEngine(shitennoDir);
+  if (passed) {
+    engine.updateStatus(planId, "done");
+    // Write verification.json sidecar in done/
+    const doneDir = join(shitennoDir, "governance", "plans", "done");
+    if (!existsSync(doneDir)) mkdirSync(doneDir, { recursive: true });
+    writeFileSync(join(doneDir, `${planId}.verification.json`), JSON.stringify(record, null, 2), "utf-8");
+  } else {
+    engine.updateStatus(planId, "refused");
+  }
+
   return record;
 }

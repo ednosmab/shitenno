@@ -41,13 +41,9 @@ export async function executePlanAction(ctx: LifecycleActionContext): Promise<vo
 }
 
 export function handleAutoMode(ctx: LifecycleActionContext): boolean {
-  const engine = new MarkdownPlanEngine(ctx.shitennoDir);
   const record = runAutoVerification(ctx.shitennoDir, ctx.projectRoot, ctx.planId);
-  if (record.passed) {
-    engine.updateStatus(ctx.planId, "done");
-    return true;
-  }
-  return false;
+  // runAutoVerification already handles status update + archiving
+  return record.passed;
 }
 
 export async function handleInteractiveMode(ctx: LifecycleActionContext): Promise<void> {
@@ -77,9 +73,9 @@ export async function runLifecycleReview(
   const archivedIds: string[] = [];
   for (const plan of plans) {
     checked++;
+    // runAutoVerification already handles status update + archiving
     const record = runAutoVerification(shitennoDir, projectRoot, plan.id);
     if (record.passed) {
-      engine.updateStatus(plan.id, "done");
       archived++;
       archivedIds.push(plan.id);
     }

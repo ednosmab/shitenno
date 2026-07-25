@@ -4,7 +4,7 @@
  * Extracted from plan-lifecycle.ts to keep modules focused.
  */
 
-import { existsSync, readFileSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
 import type { MarkdownPlan } from "../markdown-plan-engine.js";
@@ -18,20 +18,12 @@ export function detectActivePlans(shitennoDir: string): MarkdownPlan[] {
 }
 
 export function archivePlan(shitennoDir: string, planId: string, validation?: ValidationResult): boolean {
-  const plansDir = join(shitennoDir, "governance", "plans");
-  const doneDir = join(plansDir, "done");
-  if (!existsSync(doneDir)) mkdirSync(doneDir, { recursive: true });
-
-  const planFile = join(plansDir, `${planId}.md`);
-  if (!existsSync(planFile)) return false;
-
-  const doneFile = join(doneDir, `${planId}.md`);
-  const content = readFileSync(planFile, "utf-8");
-  const archivedContent = content.replace(/\*\*Status:\*\*\s*\w+/, "**Status:** Done");
-  writeFileSync(doneFile, archivedContent, "utf-8");
-  unlinkSync(planFile);
+  const engine = new MarkdownPlanEngine(shitennoDir);
+  engine.updateStatus(planId, "done");
 
   if (validation) {
+    const doneDir = join(shitennoDir, "governance", "plans", "done");
+    if (!existsSync(doneDir)) mkdirSync(doneDir, { recursive: true });
     const verificationFile = join(doneDir, `${planId}.verification.json`);
     writeFileSync(verificationFile, JSON.stringify({ ...validation, verifiedAt: new Date().toISOString() }, null, 2), "utf-8");
   }
@@ -40,10 +32,8 @@ export function archivePlan(shitennoDir: string, planId: string, validation?: Va
 }
 
 export function removePlan(shitennoDir: string, planId: string): boolean {
-  const plansDir = join(shitennoDir, "governance", "plans");
-  const planFile = join(plansDir, `${planId}.md`);
-  if (!existsSync(planFile)) return false;
-  unlinkSync(planFile);
+  const engine = new MarkdownPlanEngine(shitennoDir);
+  engine.updateStatus(planId, "done");
   return true;
 }
 
@@ -52,12 +42,12 @@ export function checkAndArchiveDonePlans(shitennoDir: string): { checked: number
   if (!existsSync(plansDir)) return { checked: 0, archived: 0, archivedIds: [] };
 
   const engine = new MarkdownPlanEngine(shitennoDir);
-  const plans = engine.listAll().filter((p: MarkdownPlan) => p.isActive && p.status === "done");
+  const plans = engine.listAll().filter((p: MarkdownPlan) => p.isActive);
   let archived = 0;
   const archivedIds: string[] = [];
 
   for (const plan of plans) {
-    if (archivePlan(shitennoDir, plan.id)) {
+    if (engine.archiveIfDone(plan.id)) {
       archived++;
       archivedIds.push(plan.id);
     }

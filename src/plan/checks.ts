@@ -51,13 +51,15 @@ export function checkBuild(projectRoot: string): CompletionCheck {
 
 export function checkTests(projectRoot: string): CompletionCheck {
   const pkg = readPackageJsonSafe(projectRoot);
-  if (!pkg?.scripts?.["test:unit"]) return { name: "TESTS", passed: true, message: "No test:unit script — skipped" };
+  // Prefer test:unit (fast suite) over test (full suite) when both exist
+  const scriptName = pkg?.scripts?.["test:unit"] ? "test:unit" : pkg?.scripts?.["test"] ? "test" : null;
+  if (!scriptName) return { name: "TESTS", passed: false, message: "No 'test' or 'test:unit' script in package.json" };
   const { run } = resolveRunner(projectRoot);
   try {
-    execSync(`${run("test:unit")}`, { cwd: projectRoot, encoding: "utf-8", timeout: 120_000, stdio: ["pipe", "pipe", "pipe"] });
-    return { name: "TESTS", passed: true, message: "Unit tests passed" };
+    execSync(`${run(scriptName)}`, { cwd: projectRoot, encoding: "utf-8", timeout: 120_000, stdio: ["pipe", "pipe", "pipe"] });
+    return { name: "TESTS", passed: true, message: `${scriptName} passed` };
   } catch (err) {
-    return { name: "TESTS", passed: false, message: `Unit tests failed: ${extractExecError(err).slice(0, 300)}` };
+    return { name: "TESTS", passed: false, message: `${scriptName} failed: ${extractExecError(err).slice(0, 300)}` };
   }
 }
 
@@ -77,9 +79,9 @@ export function checkGateIntegrity(projectRoot: string): CompletionCheck {
   const { run } = resolveRunner(projectRoot);
   try {
     execSync(`${run("validate")}`, { cwd: projectRoot, encoding: "utf-8", timeout: 30_000, stdio: ["pipe", "pipe", "pipe"] });
-    return { name: "GATE", passed: true, message: "Gate integrity check passed" };
+    return { name: "GATE_SELF_TEST", passed: true, message: "Gate integrity check passed" };
   } catch (err) {
-    return { name: "GATE", passed: false, message: `Gate integrity check failed: ${extractExecError(err).slice(0, 300)}` };
+    return { name: "GATE_SELF_TEST", passed: false, message: `Gate integrity check failed: ${extractExecError(err).slice(0, 300)}` };
   }
 }
 
