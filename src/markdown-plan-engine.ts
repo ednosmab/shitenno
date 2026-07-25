@@ -450,6 +450,9 @@ export class MarkdownPlanEngine {
       throw new Error(`Plan file not found: ${sourcePath}`);
     }
 
+    if (!existsSync(this.doneDir)) {
+      mkdirSync(this.doneDir, { recursive: true });
+    }
     renameSync(sourcePath, destPath);
 
     // Arrasta o .verification.json junto, se existir. Cobre os dois

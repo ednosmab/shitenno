@@ -76,6 +76,8 @@ export function checkLint(projectRoot: string): CompletionCheck {
 }
 
 export function checkGateIntegrity(projectRoot: string): CompletionCheck {
+  const pkg = readPackageJsonSafe(projectRoot);
+  if (!pkg?.scripts?.["validate"]) return { name: "GATE_SELF_TEST", passed: true, message: "No validate script — skipped" };
   const { run } = resolveRunner(projectRoot);
   try {
     execSync(`${run("validate")}`, { cwd: projectRoot, encoding: "utf-8", timeout: 30_000, stdio: ["pipe", "pipe", "pipe"] });

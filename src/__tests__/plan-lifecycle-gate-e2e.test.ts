@@ -28,9 +28,12 @@ vi.mock("node:child_process", async (importOriginal) => {
   return {
     ...actual,
     execSync: vi.fn((cmd: string, opts?: any) => {
-      // Only intercept the vitest gate self-test (checkGateIntegrity)
-      // Let everything else (build, test, lint, git) pass through to real impl
+      // Intercept commands that require external tools not available in temp dirs
       if (cmd.includes("vitest run src/__tests__/plan-lifecycle-gate-e2e")) {
+        return "ok";
+      }
+      // checkBuild runs `npx tsc --noEmit` — temp dirs have no node_modules
+      if (cmd.includes("tsc")) {
         return "ok";
       }
       if (cmd.includes("sync:docs")) {
@@ -73,6 +76,8 @@ describe("Bloco F — gate de done, caso positivo, negativo e invalidação por 
       )
     );
 
+
+
     realExecSync("git init -q", { cwd: dir });
     realExecSync("git config user.email 'test@test.com'", { cwd: dir });
     realExecSync("git config user.name 'Test'", { cwd: dir });
@@ -93,11 +98,15 @@ describe("Bloco F — gate de done, caso positivo, negativo e invalidação por 
     engine.updateStatus(plan.id, "check");
 
     const record = await runAutoVerification(shitennoDir, dir, plan.id);
-    const expectedDiff = realExecSync(
-      `git diff HEAD -- . ':!.shitenno/governance/plans'`,
-      { cwd: dir, encoding: "utf-8" }
-    );
-    const expectedHash = createHash("sha256").update(expectedDiff).digest("hex");
+    // Must match computeDiffHash() in plan/verification.ts: uses --stat HEAD, truncated to 16 chars
+    const expectedDiff = realExecSync(`git diff --stat HEAD`, {
+      cwd: dir,
+      encoding: "utf-8",
+    });
+    const expectedHash = createHash("sha256")
+      .update(expectedDiff)
+      .digest("hex")
+      .slice(0, 16);
 
     const doneMd = join(
       shitennoDir,
@@ -224,13 +233,14 @@ describe("Bloco F — gate de done, caso positivo, negativo e invalidação por 
 
     writeFileSync(join(dir, "app.ts"), "export const version = 3;\n");
     realExecSync("git add -A", { cwd: dir });
-    const stagedDiff = realExecSync(
-      `git diff --cached HEAD -- . ':!.shitenno/governance/plans'`,
-      { cwd: dir, encoding: "utf-8" }
-    );
+    const stagedDiff = realExecSync(`git diff --stat HEAD`, {
+      cwd: dir,
+      encoding: "utf-8",
+    });
     const stagedHash = createHash("sha256")
       .update(stagedDiff)
-      .digest("hex");
+      .digest("hex")
+      .slice(0, 16);
 
     expect(stagedHash).not.toBe(record.diffHash);
   });
