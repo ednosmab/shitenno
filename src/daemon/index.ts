@@ -319,6 +319,20 @@ function createVerifyAllPendingPlans(
   };
 }
 
+function runSafeScanStep(
+  ctx: DaemonContext,
+  stepName: string,
+  eventName: string,
+  fn: () => void,
+): void {
+  try {
+    fn();
+    recordEvent(ctx.state, eventName);
+  } catch (err) {
+    daemonLog(ctx.logPath, "ERROR", `Startup scan: ${stepName} failed: ${err}`);
+  }
+}
+
 function runStartupScan(
   ctx: DaemonContext,
   verifyAllPendingPlans: () => Promise<void>,
@@ -326,55 +340,40 @@ function runStartupScan(
   daemonLog(ctx.logPath, "INFO", "Running initial startup scan...");
   const scanStartTime = Date.now();
 
-  try {
+  runSafeScanStep(ctx, "checkAndArchiveDonePlans", "startup_scan.archive_plans", () => {
     const archiveResult = checkAndArchiveDonePlans(ctx.shitennoDir);
     if (archiveResult.archived > 0) {
       daemonLog(ctx.logPath, "INFO", `Startup scan: archived ${archiveResult.archived} plan(s): ${archiveResult.archivedIds.join(", ")}`);
     }
-    recordEvent(ctx.state, "startup_scan.archive_plans");
-  } catch (err) {
-    daemonLog(ctx.logPath, "ERROR", `Startup scan: checkAndArchiveDonePlans failed: ${err}`);
-  }
+  });
 
-  try {
+  runSafeScanStep(ctx, "checkInconsistencies", "startup_scan.check_inconsistencies", () => {
     const inconsistencies = checkInconsistencies(ctx.shitennoDir);
     if (inconsistencies.inconsistencies > 0) {
       daemonLog(ctx.logPath, "WARN", `Startup scan: found ${inconsistencies.inconsistencies} inconsistent plan(s)`);
     }
-    recordEvent(ctx.state, "startup_scan.check_inconsistencies");
-  } catch (err) {
-    daemonLog(ctx.logPath, "ERROR", `Startup scan: checkInconsistencies failed: ${err}`);
-  }
+  });
 
-  try {
+  runSafeScanStep(ctx, "recoverOrphanSidecars", "startup_scan.recover_orphans", () => {
     const orphans = recoverOrphanSidecars(ctx.shitennoDir);
     if (orphans.removed > 0) {
       daemonLog(ctx.logPath, "INFO", `Startup scan: removed ${orphans.removed} orphan sidecar(s)`);
     }
-    recordEvent(ctx.state, "startup_scan.recover_orphans");
-  } catch (err) {
-    daemonLog(ctx.logPath, "ERROR", `Startup scan: recoverOrphanSidecars failed: ${err}`);
-  }
+  });
 
-  try {
+  runSafeScanStep(ctx, "validateReminders", "startup_scan.validate_reminders", () => {
     const reminders = validateReminders(ctx.shitennoDir);
     if (reminders.removed > 0) {
       daemonLog(ctx.logPath, "INFO", `Startup scan: removed ${reminders.removed} stale reminder(s)`);
     }
-    recordEvent(ctx.state, "startup_scan.validate_reminders");
-  } catch (err) {
-    daemonLog(ctx.logPath, "ERROR", `Startup scan: validateReminders failed: ${err}`);
-  }
+  });
 
-  try {
+  runSafeScanStep(ctx, "moveCompletedBacklogToDone", "startup_scan.move_backlog", () => {
     const backlog = moveCompletedBacklogToDone(ctx.shitennoDir, ctx.shitennoDir);
     if (backlog.moved > 0) {
       daemonLog(ctx.logPath, "INFO", `Startup scan: moved ${backlog.moved} completed backlog item(s)`);
     }
-    recordEvent(ctx.state, "startup_scan.move_backlog");
-  } catch (err) {
-    daemonLog(ctx.logPath, "ERROR", `Startup scan: moveCompletedBacklogToDone failed: ${err}`);
-  }
+  });
 
   finalizeStartupScan(ctx, scanStartTime, verifyAllPendingPlans);
 }
@@ -848,54 +847,60 @@ function scheduleCheckNag(ctx: DaemonContext): NodeJS.Timeout {
   }, 30 * 60 * 1000);
 }
 
-function setupShutdown(
-  ctx: DaemonContext,
-  timers: {
-    stableTimer: NodeJS.Timeout;
-    checkNagTimer: NodeJS.Timeout;
-    persistTimer: NodeJS.Timeout;
-    auditTimer: NodeJS.Timeout;
-    largeCommitTimer: NodeJS.Timeout;
-    consolidationTimer: NodeJS.Timeout;
-    cleanupAudit: () => void;
-  },
-): void {
-  const shutdown = (signal: string) => {
-    daemonLog(ctx.logPath, "INFO", `Received ${signal} — shutting down`);
-    clearTimeout(timers.stableTimer);
-    clearTimeout(timers.checkNagTimer);
-    clearInterval(timers.persistTimer);
-    clearInterval(timers.auditTimer);
-    clearInterval(timers.largeCommitTimer);
-    clearInterval(timers.consolidationTimer);
-    timers.cleanupAudit();
-    killActiveProcesses();
-    releaseVerificationLock(ctx.shitennoDir);
-    persistState(ctx.state, ctx.statePath);
-    ctx.stopProactive();
-    ctx.stopWatcher();
-    // Semantic Layer cleanup
-    try {
-      resetChangeJournal();
-      resetPatternMatcher();
-      resetSemanticReasoner();
-      resetSemanticCorrelator();
-    } catch {
-      // Cleanup failure should not prevent shutdown
-    }
-    ctx.socket.close(() => {
-      cleanup(ctx.pidPath, ctx.sockPath);
-      daemonLog(ctx.logPath, "INFO", "Daemon stopped cleanly");
-      process.exit(0);
-    });
-    setTimeout(() => {
-      cleanup(ctx.pidPath, ctx.sockPath);
-      process.exit(1);
-    }, 5_000).unref();
-  };
+type ShutdownTimers = {
+  stableTimer: NodeJS.Timeout;
+  checkNagTimer: NodeJS.Timeout;
+  persistTimer: NodeJS.Timeout;
+  auditTimer: NodeJS.Timeout;
+  largeCommitTimer: NodeJS.Timeout;
+  consolidationTimer: NodeJS.Timeout;
+  cleanupAudit: () => void;
+};
 
-  process.on("SIGTERM", () => shutdown("SIGTERM"));
-  process.on("SIGINT", () => shutdown("SIGINT"));
+function clearAllTimers(timers: ShutdownTimers): void {
+  clearTimeout(timers.stableTimer);
+  clearTimeout(timers.checkNagTimer);
+  clearInterval(timers.persistTimer);
+  clearInterval(timers.auditTimer);
+  clearInterval(timers.largeCommitTimer);
+  clearInterval(timers.consolidationTimer);
+  timers.cleanupAudit();
+}
+
+function cleanupSemanticLayer(): void {
+  try {
+    resetChangeJournal();
+    resetPatternMatcher();
+    resetSemanticReasoner();
+    resetSemanticCorrelator();
+  } catch {
+    // Cleanup failure should not prevent shutdown
+  }
+}
+
+function gracefulShutdown(ctx: DaemonContext, timers: ShutdownTimers, signal: string): void {
+  daemonLog(ctx.logPath, "INFO", `Received ${signal} — shutting down`);
+  clearAllTimers(timers);
+  killActiveProcesses();
+  releaseVerificationLock(ctx.shitennoDir);
+  persistState(ctx.state, ctx.statePath);
+  ctx.stopProactive();
+  ctx.stopWatcher();
+  cleanupSemanticLayer();
+  ctx.socket.close(() => {
+    cleanup(ctx.pidPath, ctx.sockPath);
+    daemonLog(ctx.logPath, "INFO", "Daemon stopped cleanly");
+    process.exit(0);
+  });
+  setTimeout(() => {
+    cleanup(ctx.pidPath, ctx.sockPath);
+    process.exit(1);
+  }, 5_000).unref();
+}
+
+function setupShutdown(ctx: DaemonContext, timers: ShutdownTimers): void {
+  process.on("SIGTERM", () => gracefulShutdown(ctx, timers, "SIGTERM"));
+  process.on("SIGINT", () => gracefulShutdown(ctx, timers, "SIGINT"));
 
   process.on("uncaughtException", (err) => {
     daemonLog(ctx.logPath, "FATAL", `Uncaught exception — daemon crashing: ${err.stack ?? err.message}`);
@@ -910,15 +915,12 @@ function setupShutdown(
   });
 }
 
-export async function runDaemon(shitennoDir: string, projectRoot?: string): Promise<void> {
-  const paths = getPaths(shitennoDir);
-  const resolvedProjectRoot = projectRoot ?? join(shitennoDir, "..");
-
+function buildDaemonContext(shitennoDir: string, resolvedProjectRoot: string, paths: ReturnType<typeof getPaths>): DaemonContext {
   const state = loadState(paths.statePath) ?? createDaemonState();
   state.startedAt = new Date().toISOString();
   daemonLog(paths.logPath, "INFO", `State loaded — ${state.events.length} historical events`);
 
-  const ctx: DaemonContext = {
+  return {
     shitennoDir,
     projectRoot: resolvedProjectRoot,
     daemonDir: paths.daemonDir,
@@ -932,17 +934,18 @@ export async function runDaemon(shitennoDir: string, projectRoot?: string): Prom
     stopProactive: () => {},
     stopWatcher: () => {},
   };
+}
 
+function initializeDaemonInfrastructure(ctx: DaemonContext): void {
   ensureDaemonDir(ctx);
   checkDuplicateDaemon(ctx);
   writePidAtomically(ctx);
   markApproved(ctx);
   cleanupStaleSocket(ctx);
+}
 
-  const startedAt = Date.now();
-  setupIpcServer(ctx, startedAt);
-
-  ctx.stopWatcher = startWatching(shitennoDir, {
+function initializeDaemonEngines(ctx: DaemonContext, resolvedProjectRoot: string): void {
+  ctx.stopWatcher = startWatching(ctx.shitennoDir, {
     watchSourceCode: process.env.SHITENNO_WATCH_SOURCE === "1",
     projectRoot: resolvedProjectRoot,
     watchGitEvents: process.env.SHITENNO_WATCH_GIT === "1",
@@ -950,13 +953,24 @@ export async function runDaemon(shitennoDir: string, projectRoot?: string): Prom
   const { stopProactive } = initEngines(ctx);
   ctx.stopProactive = stopProactive;
 
-  // Initialize knowledge graph persistence
   try {
     initializeKnowledgeGraph(ctx.shitennoDir);
     daemonLog(ctx.logPath, "INFO", "Knowledge graph initialized — subscribed to adr/skill/capability events");
   } catch (err) {
     daemonLog(ctx.logPath, "ERROR", `Knowledge graph init failed: ${err}`);
   }
+}
+
+export async function runDaemon(shitennoDir: string, projectRoot?: string): Promise<void> {
+  const resolvedProjectRoot = projectRoot ?? join(shitennoDir, "..");
+  const paths = getPaths(shitennoDir);
+
+  const ctx = buildDaemonContext(shitennoDir, resolvedProjectRoot, paths);
+  initializeDaemonInfrastructure(ctx);
+
+  const startedAt = Date.now();
+  setupIpcServer(ctx, startedAt);
+  initializeDaemonEngines(ctx, resolvedProjectRoot);
 
   const verifyAllPendingPlans = createVerifyAllPendingPlans(shitennoDir, resolvedProjectRoot, paths.logPath);
   setImmediate(() => runStartupScan(ctx, verifyAllPendingPlans));
