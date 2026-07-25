@@ -33,19 +33,31 @@ vi.mock("node:child_process", async (importOriginal) => {
       if (cmd.includes("vitest run src/__tests__/plan-lifecycle-gate-e2e")) {
         return "ok";
       }
+      if (cmd.includes("sync:docs")) {
+        syncDocsCallCount++;
+        if (syncDocsCallCount <= syncDocsFailCount) {
+          throw new Error("Documentation sync failed");
+        }
+      }
       return realFn(cmd, opts);
     }),
   };
 });
 
 import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
-import { runAutoVerification } from "../plan-lifecycle.js";
+import { runAutoVerification, checkDocumentation } from "../plan-lifecycle.js";
+
+// Track sync:docs call behavior for auto-fix tests
+let syncDocsFailCount = 0;
+let syncDocsCallCount = 0;
 
 describe("Bloco F — gate de done, caso positivo, negativo e invalidação por diffHash", () => {
   let dir: string;
   let shitennoDir: string;
 
   beforeEach(() => {
+    syncDocsFailCount = 0;
+    syncDocsCallCount = 0;
     vi.spyOn(console, "warn").mockImplementation(() => {});
     dir = join(tmpdir(), `shugo-gate-e2e-${Date.now()}`);
     shitennoDir = join(dir, ".shitenno");
@@ -145,6 +157,59 @@ describe("Bloco F — gate de done, caso positivo, negativo e invalidação por 
         )
       )
     ).toBe(false);
+  });
+
+  it("auto-fix: sync:docs fails first time → runs --fix → re-verifies → passes", () => {
+    syncDocsFailCount = 1; // 1st sync:docs call fails, 2nd (re-verify) passes
+    syncDocsCallCount = 0;
+
+    writeFileSync(
+      join(dir, "package.json"),
+      JSON.stringify(
+        { scripts: { build: "echo ok", test: "echo ok", lint: "echo ok", "sync:docs": "echo ok" } },
+        null,
+        2
+      )
+    );
+
+    const result = checkDocumentation(dir);
+    expect(result.passed).toBe(true);
+    expect(result.message).toBe("Documentation auto-fixed");
+    expect(syncDocsCallCount).toBe(3); // validate + fix + re-verify
+  });
+
+  it("auto-fix: sync:docs fails always → refuses with auto-fix attempted message", () => {
+    syncDocsFailCount = 10; // All sync:docs calls fail
+    syncDocsCallCount = 0;
+
+    writeFileSync(
+      join(dir, "package.json"),
+      JSON.stringify(
+        { scripts: { build: "echo ok", test: "echo ok", lint: "echo ok", "sync:docs": "echo ok" } },
+        null,
+        2
+      )
+    );
+
+    const result = checkDocumentation(dir);
+    expect(result.passed).toBe(false);
+    expect(result.message).toContain("auto-fix attempted");
+  });
+
+  it("auto-fix: no sync:docs script → skips (no auto-fix needed)", () => {
+    // package.json without sync:docs script
+    writeFileSync(
+      join(dir, "package.json"),
+      JSON.stringify(
+        { scripts: { build: "echo ok", test: "echo ok", lint: "echo ok" } },
+        null,
+        2
+      )
+    );
+
+    const result = checkDocumentation(dir);
+    expect(result.passed).toBe(true);
+    expect(result.message).toContain("No sync:docs script");
   });
 
   it("caso de invalidação: código muda depois da verificação → diffHash não bate", async () => {

@@ -260,6 +260,7 @@ export function checkDocumentation(projectRoot: string): CompletionCheck {
     return { name: "DOCS", passed: true, message: "No sync:docs script — skipped" };
   }
   const { run } = resolveRunner(projectRoot);
+  // 1st attempt: validate only
   try {
     execSync(`${run("sync:docs")} --quiet`, {
       encoding: "utf-8",
@@ -270,7 +271,27 @@ export function checkDocumentation(projectRoot: string): CompletionCheck {
     return { name: "DOCS", passed: true, message: "Documentation in sync" };
   } catch (err) {
     const detail = extractExecError(err);
-    return { name: "DOCS", passed: false, message: `Documentation sync failed: ${String(detail).slice(0, 300)}` };
+
+    // Auto-fix: attempt once before refusing
+    logger.info("plan-lifecycle", "DOCS check failed — attempting auto-fix (sync:docs --fix)");
+    try {
+      execSync(`${run("sync:docs")} --fix --quiet`, {
+        encoding: "utf-8",
+        cwd: projectRoot,
+        timeout: 60000,
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      // Re-verify after fix
+      execSync(`${run("sync:docs")} --quiet`, {
+        encoding: "utf-8",
+        cwd: projectRoot,
+        timeout: 60000,
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      return { name: "DOCS", passed: true, message: "Documentation auto-fixed" };
+    } catch {
+      return { name: "DOCS", passed: false, message: `Documentation sync failed (auto-fix attempted): ${String(detail).slice(0, 300)}` };
+    }
   }
 }
 
