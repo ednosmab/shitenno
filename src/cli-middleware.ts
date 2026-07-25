@@ -72,8 +72,12 @@ export async function ensurePluginsLoaded(projectRoot: string): Promise<void> {
  * 4. Publish analysis.complete events
  */
 function handlePreAction(ctx: MiddlewareContext, resolvedSessionId: string, sessionStartedRef: { value: boolean }) {
-  return async (thisCommand: Command) => {
-    const commandName = thisCommand.name();
+  // NOTE: Commander.js v13 preAction hook signature is (thisCommand, actionCommand)
+  // where thisCommand = the command the hook is installed on (root program),
+  // and actionCommand = the command whose action is actually being executed.
+  // We MUST use actionCommand for command identification and daemon guard.
+  return async (_thisCommand: Command, actionCommand: Command) => {
+    const commandName = actionCommand.name();
     if (ctx.sessionId) trackCommand(ctx.shitennoDir, ctx.sessionId, commandName);
     if (!sessionStartedRef.value) {
       sessionStartedRef.value = true;
@@ -86,10 +90,10 @@ function handlePreAction(ctx: MiddlewareContext, resolvedSessionId: string, sess
       }
     }
     await ensurePluginsLoaded(ctx.projectRoot);
-    if (isSensitiveCommand(commandName, thisCommand.args)) {
-      getEventBus().publish("action.pre_sensitive", { command: commandName, args: thisCommand.args, reminder: "MANDATORY RULES: Consult FORBIDDEN_OPERATIONS.md before proceeding. G-01: No commit without explicit authorization." });
+    if (isSensitiveCommand(commandName, actionCommand.args)) {
+      getEventBus().publish("action.pre_sensitive", { command: commandName, args: actionCommand.args, reminder: "MANDATORY RULES: Consult FORBIDDEN_OPERATIONS.md before proceeding. G-01: No commit without explicit authorization." });
     }
-    tryAutoStartDaemon(ctx.shitennoDir, thisCommand);
+    tryAutoStartDaemon(ctx.shitennoDir, actionCommand);
     await getHookBus().executeHook("pre-analysis", { command: commandName, projectRoot: ctx.projectRoot }, (_plugin, input) => input);
   };
 }

@@ -58,10 +58,11 @@ describe("installMiddleware", () => {
 
     installMiddleware(program, ctx);
 
-    // Call first preAction handler with mock thisCommand
-    const mockThisCommand = { name: vi.fn().mockReturnValue("status") };
+    // Call first preAction handler with mock (thisCommand=program, actionCommand=executed)
+    const mockProgram = { name: vi.fn().mockReturnValue("shugo") };
+    const mockActionCommand = { name: vi.fn().mockReturnValue("status"), args: [] };
     for (const handler of handlers["preAction"] || []) {
-      await handler.call(mockThisCommand, mockThisCommand);
+      await handler.call(mockProgram, mockProgram, mockActionCommand);
     }
 
     const { trackCommand } = await import("../session-tracker.js");
@@ -87,9 +88,10 @@ describe("installMiddleware", () => {
 
     installMiddleware(program, ctx);
 
-    const mockThisCommand = { name: vi.fn().mockReturnValue("status") };
+    const mockProgram = { name: vi.fn().mockReturnValue("shugo") };
+    const mockActionCommand = { name: vi.fn().mockReturnValue("status"), args: [] };
     for (const handler of handlers["preAction"] || []) {
-      await handler.call(mockThisCommand, mockThisCommand);
+      await handler.call(mockProgram, mockProgram, mockActionCommand);
     }
 
     const { trackCommand } = await import("../session-tracker.js");

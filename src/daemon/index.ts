@@ -816,7 +816,7 @@ function getAuditLevel(ctx: DaemonContext): "quick" | "standard" | "code-review"
 async function runPeriodicAudit(ctx: DaemonContext): Promise<void> {
   try {
     const level = getAuditLevel(ctx);
-    const report = await auditHealth(ctx.shitennoDir, ctx.shitennoDir, level);
+    const report = await auditHealth(ctx.projectRoot, ctx.shitennoDir, level);
 
     ctx.state.health = {
       score: report.healthScore,
