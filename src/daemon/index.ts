@@ -28,6 +28,7 @@ import { initDesktopNotifier } from "../desktop-notifier.js";
 import { initAutoBriefing } from "../auto-briefing.js";
 import { initProactiveDigest } from "../proactive-digest.js";
 import { classifyEvent } from "../semantic/signal-classifier.js";
+import { initializeKnowledgeGraph } from "../knowledge-graph.js";
 import { killActiveProcesses } from "../exec-async.js";
 import { getChangeJournal, resetChangeJournal } from "../semantic/change-journal.js";
 import { getPatternMatcher, resetPatternMatcher } from "../semantic/pattern-matcher.js";
@@ -205,11 +206,18 @@ function cleanupStaleSocket(ctx: DaemonContext): void {
   }
 }
 
+const MAX_MESSAGE_BYTES = 64 * 1024;
+
 function setupIpcServer(ctx: DaemonContext, startedAt: number): void {
   const server = createServer((socket: Socket) => {
     let buffer = "";
 
     socket.on("data", async (chunk: Buffer) => {
+      if (buffer.length + chunk.length > MAX_MESSAGE_BYTES) {
+        sendJson(socket, { type: "error", message: "Message too large" });
+        socket.destroy();
+        return;
+      }
       buffer += chunk.toString();
       const lines = buffer.split("\n");
       buffer = lines.pop() ?? "";
@@ -601,7 +609,7 @@ function subscribeSessionAndStateTracking(ctx: DaemonContext): void {
     recordEvent(ctx.state, "health.checked");
     const p = payload as { score?: number } | undefined;
     if (p?.score !== undefined) {
-      ctx.state.health = { score: p.score, checkedAt: new Date().toISOString() };
+      ctx.state.health = { score: p.score, previousScore: ctx.state.health?.score ?? null, checkedAt: new Date().toISOString() };
     }
   });
 }
@@ -813,6 +821,7 @@ async function runPeriodicAudit(ctx: DaemonContext): Promise<void> {
 
     ctx.state.health = {
       score: report.healthScore,
+      previousScore: ctx.state.health?.score ?? null,
       checkedAt: report.auditedAt,
     };
 
@@ -887,6 +896,18 @@ function setupShutdown(
 
   process.on("SIGTERM", () => shutdown("SIGTERM"));
   process.on("SIGINT", () => shutdown("SIGINT"));
+
+  process.on("uncaughtException", (err) => {
+    daemonLog(ctx.logPath, "FATAL", `Uncaught exception — daemon crashing: ${err.stack ?? err.message}`);
+    try { persistState(ctx.state, ctx.statePath); } catch { /* best-effort */ }
+    cleanup(ctx.pidPath, ctx.sockPath);
+    process.exit(1);
+  });
+
+  process.on("unhandledRejection", (reason) => {
+    const msg = reason instanceof Error ? (reason.stack ?? reason.message) : String(reason);
+    daemonLog(ctx.logPath, "ERROR", `Unhandled promise rejection: ${msg}`);
+  });
 }
 
 export async function runDaemon(shitennoDir: string, projectRoot?: string): Promise<void> {
@@ -922,13 +943,20 @@ export async function runDaemon(shitennoDir: string, projectRoot?: string): Prom
   setupIpcServer(ctx, startedAt);
 
   ctx.stopWatcher = startWatching(shitennoDir, {
-    extraPaths: [join(resolvedProjectRoot, "src", "commands")],
     watchSourceCode: process.env.SHITENNO_WATCH_SOURCE === "1",
     projectRoot: resolvedProjectRoot,
     watchGitEvents: process.env.SHITENNO_WATCH_GIT === "1",
   });
   const { stopProactive } = initEngines(ctx);
   ctx.stopProactive = stopProactive;
+
+  // Initialize knowledge graph persistence
+  try {
+    initializeKnowledgeGraph(ctx.shitennoDir);
+    daemonLog(ctx.logPath, "INFO", "Knowledge graph initialized — subscribed to adr/skill/capability events");
+  } catch (err) {
+    daemonLog(ctx.logPath, "ERROR", `Knowledge graph init failed: ${err}`);
+  }
 
   const verifyAllPendingPlans = createVerifyAllPendingPlans(shitennoDir, resolvedProjectRoot, paths.logPath);
   setImmediate(() => runStartupScan(ctx, verifyAllPendingPlans));

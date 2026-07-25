@@ -54,23 +54,33 @@ function checkCapabilityRules(capability: Capability, shitennoDir: string): bool
   return false;
 }
 
-function checkCapabilitySkills(_capability: Capability, shitennoDir: string): boolean {
+function checkCapabilitySkills(capability: Capability, shitennoDir: string): boolean {
   const skillsDir = join(shitennoDir, "docs", "skills");
   if (!existsSync(skillsDir)) return false;
+  const capabilityFiles = getCapabilityFilesForEngine(capability);
+  // Check if any skill file or skill-related path exists for this capability
+  const hasRelevantSkill = capabilityFiles.some((f) => f.startsWith("docs/skills/"));
+  if (!hasRelevantSkill) return false;
   return readdirSync(skillsDir).filter((f) => f.endsWith(".md")).length > 0;
 }
 
-function checkCapabilityTemplates(_capability: Capability, shitennoDir: string): boolean {
+function checkCapabilityTemplates(capability: Capability, shitennoDir: string): boolean {
   const templatesDir = join(shitennoDir, "templates");
   if (!existsSync(templatesDir)) return false;
+  const capabilityFiles = getCapabilityFilesForEngine(capability);
+  const hasRelevantTemplate = capabilityFiles.some((f) => f.startsWith("templates/"));
+  if (!hasRelevantTemplate) return false;
   return readdirSync(templatesDir).filter(
     (f) => f.endsWith(".md") || f.endsWith(".yaml")
   ).length > 0;
 }
 
-function checkCapabilityMetrics(_capability: Capability, shitennoDir: string): boolean {
+function checkCapabilityMetrics(capability: Capability, shitennoDir: string): boolean {
   const reportsDir = join(shitennoDir, "reports");
   if (!existsSync(reportsDir)) return false;
+  const capabilityFiles = getCapabilityFilesForEngine(capability);
+  const hasRelevantReport = capabilityFiles.some((f) => f.startsWith("reports/"));
+  if (!hasRelevantReport) return false;
   return readdirSync(reportsDir).filter((f) => f.endsWith(".json")).length > 0;
 }
 

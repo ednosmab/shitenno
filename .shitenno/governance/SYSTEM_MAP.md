@@ -125,6 +125,7 @@
 │   docs/history/2026-07-24-rule-plan_archived.md
 │   docs/history/2026-07-24-rule-session_close.md
 │   docs/history/2026-07-24-rule-session_end_plans.md
+│   docs/history/2026-07-25-rule-plan_archived.md
 │   docs/opencode-context.md
 │   docs/rules/
 │   docs/rules/agent-modes.md
@@ -536,6 +537,7 @@
 │   governance/executions/EXE-3F12ED96.json
 │   governance/executions/EXE-3F9113C7.json
 │   governance/executions/EXE-3FD2F0C4.json
+│   governance/executions/EXE-4050FF54.json
 │   governance/executions/EXE-4057266C.json
 │   governance/executions/EXE-40AC78DE.json
 │   governance/executions/EXE-40F7E9C2.json
@@ -625,6 +627,7 @@
 │   governance/executions/EXE-523032F9.json
 │   governance/executions/EXE-525788FD.json
 │   governance/executions/EXE-52796FB0.json
+│   governance/executions/EXE-529273D4.json
 │   governance/executions/EXE-52BEDA62.json
 │   governance/executions/EXE-52DB178F.json
 │   governance/executions/EXE-5300475C.json
@@ -712,6 +715,7 @@
 │   governance/executions/EXE-646764EF.json
 │   governance/executions/EXE-647997BE.json
 │   governance/executions/EXE-64F3B228.json
+│   governance/executions/EXE-65123D25.json
 │   governance/executions/EXE-652963BC.json
 │   governance/executions/EXE-6570EEAD.json
 │   governance/executions/EXE-65F02FCC.json
@@ -719,6 +723,7 @@
 │   governance/executions/EXE-66ADA1C8.json
 │   governance/executions/EXE-66BA883E.json
 │   governance/executions/EXE-6706E90F.json
+│   governance/executions/EXE-67346C97.json
 │   governance/executions/EXE-673D5641.json
 │   governance/executions/EXE-679EBC83.json
 │   governance/executions/EXE-67D08AFA.json
@@ -746,6 +751,7 @@
 │   governance/executions/EXE-6BAC3718.json
 │   governance/executions/EXE-6BAF63E7.json
 │   governance/executions/EXE-6BDD2F5F.json
+│   governance/executions/EXE-6BF66C91.json
 │   governance/executions/EXE-6C25A91A.json
 │   governance/executions/EXE-6CFE3848.json
 │   governance/executions/EXE-6D29EB8B.json
@@ -779,6 +785,7 @@
 │   governance/executions/EXE-70DAF0F1.json
 │   governance/executions/EXE-70F7AFA5.json
 │   governance/executions/EXE-710825EA.json
+│   governance/executions/EXE-7149713E.json
 │   governance/executions/EXE-71532FB4.json
 │   governance/executions/EXE-71DAA95D.json
 │   governance/executions/EXE-72210EE2.json
@@ -857,6 +864,7 @@
 │   governance/executions/EXE-82CB62E2.json
 │   governance/executions/EXE-82D12103.json
 │   governance/executions/EXE-82FE71F2.json
+│   governance/executions/EXE-833C9902.json
 │   governance/executions/EXE-8362CC8C.json
 │   governance/executions/EXE-83B00A61.json
 │   governance/executions/EXE-83F15691.json
@@ -940,6 +948,7 @@
 │   governance/executions/EXE-9307AC27.json
 │   governance/executions/EXE-931139B7.json
 │   governance/executions/EXE-932DCFF8.json
+│   governance/executions/EXE-9350C5FC.json
 │   governance/executions/EXE-9367CA31.json
 │   governance/executions/EXE-936FEE8F.json
 │   governance/executions/EXE-938D3551.json
@@ -1027,6 +1036,7 @@
 │   governance/executions/EXE-A116923D.json
 │   governance/executions/EXE-A11D72C3.json
 │   governance/executions/EXE-A1208EA5.json
+│   governance/executions/EXE-A1325DC5.json
 │   governance/executions/EXE-A1362AFA.json
 │   governance/executions/EXE-A16A5080.json
 │   governance/executions/EXE-A1D3A117.json
@@ -1252,6 +1262,7 @@
 │   governance/executions/EXE-D3FCD1C6.json
 │   governance/executions/EXE-D4634C9F.json
 │   governance/executions/EXE-D472DB15.json
+│   governance/executions/EXE-D4FDE9C4.json
 │   governance/executions/EXE-D533814B.json
 │   governance/executions/EXE-D5355014.json
 │   governance/executions/EXE-D549B1C6.json
@@ -1286,6 +1297,7 @@
 │   governance/executions/EXE-DA65E580.json
 │   governance/executions/EXE-DAE9E3CC.json
 │   governance/executions/EXE-DAEB7941.json
+│   governance/executions/EXE-DB1A492C.json
 │   governance/executions/EXE-DB9E880F.json
 │   governance/executions/EXE-DBAA3014.json
 │   governance/executions/EXE-DC1D4842.json
@@ -1380,6 +1392,7 @@
 │   governance/executions/EXE-F0C64D7E.json
 │   governance/executions/EXE-F0E1CCA6.json
 │   governance/executions/EXE-F13F7D41.json
+│   governance/executions/EXE-F14150F4.json
 │   governance/executions/EXE-F1F6D9D6.json
 │   governance/executions/EXE-F21D370F.json
 │   governance/executions/EXE-F2E68591.json
@@ -1472,7 +1485,6 @@
 │   governance/plans/PLAN-2026-07-22-reorganizar-suite-testes.md
 │   governance/plans/README.md
 │   governance/plans/TEMPLATE.md
-│   governance/plans/bloco-q-fix-backlog-writer.md
 │   governance/plans/done/
 │   governance/plans/done/2026-07-02-init-audit-dashboard.md
 │   governance/plans/done/2026-07-02-init-audit-dashboard.verification.json
@@ -1604,6 +1616,8 @@
 │   governance/plans/done/PLAN-2026-07-24-hardening-mecanismo-de-done-fase-2.verification.json
 │   governance/plans/done/PLAN-2026-07-24-quality-roadmap.md
 │   governance/plans/done/PLAN-2026-07-24-quality-roadmap.verification.json
+│   governance/plans/done/PLAN-2026-07-25-auto-fix-done-gate.md
+│   governance/plans/done/PLAN-2026-07-25-auto-fix-done-gate.verification.json
 │   governance/plans/done/PLAN-DYNAMIC-RULE-ADAPTATION.md
 │   governance/plans/done/PLAN-DYNAMIC-RULE-ADAPTATION.verification.json
 │   governance/plans/done/PLAN-HANDBOOK-SYNC.md
@@ -1629,6 +1643,8 @@
 │   governance/plans/done/auditoria-completa-plano.verification.json
 │   governance/plans/done/auditoria-correcao-completa.md
 │   governance/plans/done/auditoria-correcao-completa.verification.json
+│   governance/plans/done/bloco-q-fix-backlog-writer.md
+│   governance/plans/done/bloco-q-fix-backlog-writer.verification.json
 │   governance/plans/done/briefing-onboarding-shiten.md
 │   governance/plans/done/briefing-onboarding-shiten.verification.json
 │   governance/plans/done/changelog-final.md
@@ -1655,6 +1671,8 @@
 │   governance/plans/done/production-readiness.verification.json
 │   governance/plans/done/shiten-single-source-of-truth-plan.md
 │   governance/plans/done/shiten-single-source-of-truth-plan.verification.json
+│   governance/plans/done/shitenno-plano-consolidado.md
+│   governance/plans/done/shitenno-plano-consolidado.verification.json
 │   governance/plans/done/unified-execution.md
 │   governance/plans/done/unified-execution.verification.json
 │   governance/plans/pipeline/
@@ -1668,7 +1686,6 @@
 │   governance/plans/reference/PLAN-monettization-implementation.md
 │   governance/plans/reference/Plano-Estrategico-Proximo-Estagio-do-Shitenno.md
 │   governance/plans/reference/SHITENNO_EVOLUTION_PLAN.md
-│   governance/plans/shitenno-plano-consolidado.md
 │   governance/policies/
 │   governance/policies/BRANCH-POLICY.md
 │   governance/policies/COMMIT-POLICY.md

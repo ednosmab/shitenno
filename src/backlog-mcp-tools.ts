@@ -9,6 +9,7 @@
  * Also updates getBacklog to use the unified parser and include summary.
  */
 
+import { existsSync } from "node:fs";
 import {
   parseBacklogItems,
   addItem,
@@ -102,6 +103,7 @@ export function handleAddBacklogItem(
   }
 
   const paths = resolveBacklogPaths(shitennoDir);
+  const backlogExistedBefore = existsSync(paths.active);
   const result = addItem(paths.active, {
     id,
     title,
@@ -113,8 +115,11 @@ export function handleAddBacklogItem(
     source: (args.source as string) || "mcp",
   });
 
+  const text = !backlogExistedBefore
+    ? `⚠️ Backlog file did not exist and was recreated. ${result.message}`
+    : result.message;
   return {
-    content: [{ type: "text", text: result.message }],
+    content: [{ type: "text", text }],
     isError: !result.success,
   };
 }

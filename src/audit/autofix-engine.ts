@@ -46,12 +46,28 @@ function validatePreconditions(suggestion: Suggestion, projectRoot: string, minC
   return { valid: true };
 }
 
+function countOccurrences(haystack: string, needle: string): number {
+  if (needle.length === 0) return 0;
+  let count = 0;
+  let idx = haystack.indexOf(needle);
+  while (idx !== -1) {
+    count++;
+    idx = haystack.indexOf(needle, idx + needle.length);
+  }
+  return count;
+}
+
 function applyPatchAndVerify(filePath: string, suggestion: Suggestion, projectRoot: string, verifyCmd: string): ApplyResult {
   const backupPath = `${filePath}${BACKUP_SUFFIX}`;
   copyFileSync(filePath, backupPath);
   try {
     const content = readFileSync(filePath, "utf-8");
     if (!content.includes(suggestion.currentCode)) { unlinkSync(backupPath); return { suggestion, status: "skipped", reason: "currentCode not found — file changed since audit" }; }
+    const occurrences = countOccurrences(content, suggestion.currentCode);
+    if (occurrences > 1) {
+      unlinkSync(backupPath);
+      return { suggestion, status: "skipped", reason: `ambiguous match — currentCode appears ${occurrences} times, refusing to guess` };
+    }
     writeFileSync(filePath, content.replace(suggestion.currentCode, suggestion.suggestedCode), "utf-8");
     execSync(verifyCmd, { cwd: projectRoot, stdio: "pipe", timeout: VERIFY_TIMEOUT_MS });
     unlinkSync(backupPath);

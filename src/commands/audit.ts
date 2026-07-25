@@ -10,7 +10,7 @@ import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
 import { getEventBus } from "../event-bus.js";
 import { getHookBus } from "../plugin-system.js";
 import { printDaemonBanner } from "../daemon-context-banner.js";
-import { discoverArtifacts, discoverRelations, analyzeGraph } from "../knowledge-graph.js";
+import { discoverArtifacts, discoverRelations, analyzeGraph, saveArtifacts, saveRelations } from "../knowledge-graph.js";
 import { appendBacklogSection, issueToBacklogItem, type BacklogItem } from "../backlog-writer.js";
 import { resolveBacklogPaths } from "../backlog-core.js";
 import { loadGrowthProfile } from "../growth-profile.js";
@@ -705,6 +705,8 @@ export const auditCommand = new Command("audit")
       const reportFile = writeHealthReport(ctx.shitennoDir, report);
       const artifacts = discoverArtifacts(ctx.shitennoDir);
       const relations = discoverRelations(artifacts);
+      saveArtifacts(ctx.shitennoDir, artifacts);
+      saveRelations(ctx.shitennoDir, relations);
       const graphAnalysis = analyzeGraph(artifacts, relations);
       getEventBus().publish("knowledge.analyzed", { totalArtifacts: graphAnalysis.totalArtifacts, totalRelations: graphAnalysis.totalRelations, healthScore: graphAnalysis.healthScore });
       if (spinner) spinner.succeed(`Audit complete — code health: ${report.healthScore}/100`);

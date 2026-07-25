@@ -16,10 +16,11 @@ export class RunScriptExecutor implements ActionExecutor {
 
   async execute(params: Record<string, unknown>, context: { projectRoot: string }): Promise<Record<string, unknown>> {
     const script = String(params.script ?? "");
-    if (!script) return { executed: false, message: "No script specified" };
+    if (!script) return { success: false, executed: false, message: "No script specified" };
 
     if (!isScriptAllowed(script)) {
       return {
+        success: false,
         executed: false,
         message: `Script "${script}" not in allowlist`,
       };
@@ -27,7 +28,7 @@ export class RunScriptExecutor implements ActionExecutor {
 
     const command = getAllowedScriptCommand(script);
     if (!command) {
-      return { executed: false, message: `No command mapping for script: ${script}` };
+      return { success: false, executed: false, message: `No command mapping for script: ${script}` };
     }
 
     try {
@@ -37,9 +38,9 @@ export class RunScriptExecutor implements ActionExecutor {
         encoding: "utf-8",
         stdio: "pipe",
       });
-      return { executed: true, script, output: output.slice(0, 2000) };
+      return { success: true, executed: true, script, output: output.slice(0, 2000) };
     } catch (error) {
-      return { executed: false, message: `Script failed: ${error instanceof Error ? error.message : String(error)}` };
+      return { success: false, executed: false, message: `Script failed: ${error instanceof Error ? error.message : String(error)}` };
     }
   }
 }
@@ -49,10 +50,11 @@ export class RunLocalScriptExecutor implements ActionExecutor {
 
   async execute(params: Record<string, unknown>, context: { projectRoot: string }): Promise<Record<string, unknown>> {
     const script = String(params.script ?? "");
-    if (!script) return { executed: false, message: "No script specified" };
+    if (!script) return { success: false, executed: false, message: "No script specified" };
 
     if (!isScriptAllowed(script)) {
       return {
+        success: false,
         executed: false,
         message: `Script "${script}" not in allowlist`,
       };
@@ -60,7 +62,7 @@ export class RunLocalScriptExecutor implements ActionExecutor {
 
     const command = getAllowedScriptCommand(script);
     if (!command) {
-      return { executed: false, message: `No command mapping for script: ${script}` };
+      return { success: false, executed: false, message: `No command mapping for script: ${script}` };
     }
 
     try {
@@ -70,9 +72,9 @@ export class RunLocalScriptExecutor implements ActionExecutor {
         encoding: "utf-8",
         stdio: "pipe",
       });
-      return { executed: true, script, output: output.slice(0, 2000) };
+      return { success: true, executed: true, script, output: output.slice(0, 2000) };
     } catch (error) {
-      return { executed: false, message: `Script failed: ${error instanceof Error ? error.message : String(error)}` };
+      return { success: false, executed: false, message: `Script failed: ${error instanceof Error ? error.message : String(error)}` };
     }
   }
 }
@@ -82,10 +84,11 @@ export class RunShugoCommandExecutor implements ActionExecutor {
 
   async execute(params: Record<string, unknown>, context: { projectRoot: string }): Promise<Record<string, unknown>> {
     const command = String(params.command ?? "");
-    if (!command) return { executed: false, message: "No shugo command specified" };
+    if (!command) return { success: false, executed: false, message: "No shugo command specified" };
 
     if (!isShugoCommandAllowed(command)) {
       return {
+        success: false,
         executed: false,
         message: `Shugo command "${command}" not in allowlist`,
       };
@@ -93,12 +96,12 @@ export class RunShugoCommandExecutor implements ActionExecutor {
 
     const shugoCommand = getAllowedShugoCommand(command);
     if (!shugoCommand) {
-      return { executed: false, message: `No command mapping for: ${command}` };
+      return { success: false, executed: false, message: `No command mapping for: ${command}` };
     }
 
     const assessBin = join(context.projectRoot, "dist", "shugo.js");
     if (!existsSync(assessBin)) {
-      return { executed: true, message: "Shugo binary not found (dev environment)" };
+      return { success: true, executed: true, message: "Shugo binary not found (dev environment)" };
     }
 
     try {
@@ -108,9 +111,9 @@ export class RunShugoCommandExecutor implements ActionExecutor {
         encoding: "utf-8",
         stdio: "pipe",
       });
-      return { executed: true, command, output: output.slice(0, 2000) };
+      return { success: true, executed: true, command, output: output.slice(0, 2000) };
     } catch (error) {
-      return { executed: false, message: `Shugo command failed: ${error instanceof Error ? error.message : String(error)}` };
+      return { success: false, executed: false, message: `Shugo command failed: ${error instanceof Error ? error.message : String(error)}` };
     }
   }
 }

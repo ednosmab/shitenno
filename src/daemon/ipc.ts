@@ -111,10 +111,17 @@ function handleQueryEvents(opts: HandleMessageOptions): void {
 
 function handleQueryHealth(opts: HandleMessageOptions): void {
   const { state, startedAt, socket } = opts;
-  const prev = state.health;
-  let trend: "stable" | "improving" | "degrading" | "unknown" = "unknown";
-  if (prev) {
-    trend = prev.score >= 70 ? "stable" : prev.score >= 40 ? "degrading" : "unknown";
+  const health = state.health;
+  let trend: "improving" | "stable" | "degrading" | "critical" | "unknown" = "unknown";
+  if (health) {
+    if (health.score < 40) {
+      trend = "critical";
+    } else if (health.previousScore != null) {
+      const delta = health.score - health.previousScore;
+      trend = delta > 5 ? "improving" : delta < -5 ? "degrading" : "stable";
+    } else {
+      trend = "stable";
+    }
   }
   const uptimeSeconds = Math.round((Date.now() - startedAt) / 1000);
   sendJson(socket, {

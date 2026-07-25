@@ -127,7 +127,7 @@ function runPrecedenceGate(params: InvokeActionParams): InvokeResult | null {
 }
 
 function buildSuccessResult(actionType: ActionType, output: Record<string, unknown>, executionId: string): InvokeResult {
-  const actionSuccess = output.success !== false;
+  const actionSuccess = output.success === true;
   return {
     success: actionSuccess,
     message: actionSuccess ? `Executed ${actionType}` : (output.message as string ?? `Failed: ${actionType}`),

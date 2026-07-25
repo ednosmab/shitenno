@@ -251,7 +251,7 @@ async function displayDaemonHealth(shitennoDir: string): Promise<void> {
       lastCommand: string | null;
     }>(shitennoDir, { type: "query_health" });
     if (health) {
-      const icon = health.trend === "degrading" ? "🟡" : "🟢";
+      const icon = health.trend === "critical" ? "🔴" : health.trend === "degrading" ? "🟡" : "🟢";
       output(chalk.bold("  🔍 Daemon Health:"));
       output(`    ${icon} Score: ${health.score ?? "N/A"}/100  Trend: ${health.trend}`);
       output(chalk.gray(`    Uptime: ${Math.round((health.uptimeSeconds ?? 0) / 60)}min | PID: ${health.pid} | Sessions: ${health.activeSessions}`));

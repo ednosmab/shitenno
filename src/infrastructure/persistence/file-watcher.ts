@@ -10,7 +10,7 @@
 
 import { watch, type FSWatcher } from "chokidar";
 import { join, basename } from "node:path";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { getEventBus } from "../../event-bus.js";
 import {
   calculateSignificance,
@@ -100,11 +100,15 @@ export function startWatching(
     ...(options.extraPaths || []),
   ];
 
-  // C.1: Source code watching (opt-in)
+  // C.1: Source code watching (opt-in) — detect common source directories
   if (options.watchSourceCode && options.projectRoot) {
-    const srcDir = join(options.projectRoot, "src");
-    watchPaths.push(srcDir);
-    logger.info("file-watcher", `Source code watching enabled: ${srcDir}`);
+    const candidates = ["src", "lib", "app"].filter((d) => existsSync(join(options.projectRoot!, d)));
+    const resolvedDirs = candidates.length > 0 ? candidates : ["."];
+    for (const dir of resolvedDirs) {
+      const fullPath = join(options.projectRoot, dir);
+      watchPaths.push(fullPath);
+      logger.info("file-watcher", `Source code watching enabled: ${fullPath}`);
+    }
   }
 
   // C.2: Git event watching (opt-in)

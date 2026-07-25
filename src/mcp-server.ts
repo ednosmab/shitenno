@@ -10,17 +10,6 @@ import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-export {
-  handleGetBriefing,
-  handleGetRiskMap,
-  handleGetRules,
-  handleGetEngineeringState,
-  handleGetPlans,
-  handleSubmitFeedback,
-  handleGetADRs,
-  handleGetSkills,
-} from "./mcp-server-handlers.js";
-
 import {
   handleGetBriefing,
   handleGetRiskMap,
@@ -31,6 +20,18 @@ import {
   handleGetADRs,
   handleGetSkills,
 } from "./mcp-server-handlers.js";
+
+// Re-export handlers for test compatibility
+export {
+  handleGetBriefing,
+  handleGetRiskMap,
+  handleGetRules,
+  handleGetEngineeringState,
+  handleGetPlans,
+  handleSubmitFeedback,
+  handleGetADRs,
+  handleGetSkills,
+};
 import {
   handleGetBacklog,
   handleAddBacklogItem,

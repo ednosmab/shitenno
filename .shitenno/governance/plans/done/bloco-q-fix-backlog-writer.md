@@ -1,6 +1,6 @@
 # Bloco Q — `appendBacklogSection` sem tratamento de erro de filesystem
 
-**Status:** checked
+**Status:** Done
 
 ## Contexto
 

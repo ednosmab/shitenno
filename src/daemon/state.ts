@@ -19,6 +19,7 @@ export interface SessionInfo {
 
 export interface HealthInfo {
   score: number;
+  previousScore: number | null;
   checkedAt: string;
 }
 

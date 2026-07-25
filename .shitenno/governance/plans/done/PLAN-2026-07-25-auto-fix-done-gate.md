@@ -1,8 +1,8 @@
 # PLAN-2026-07-25-auto-fix-done-gate — Auto-fix controlado no gate de "done"
 
-**Status:** checked
+**Status:** Done
 **Date:** 2026-07-25
-**Updated_at:** 2026-07-25T03:55:00.000Z
+**Updated_at:** 2026-07-25T04:18:12.481Z
 **Priority:** P1
 **Owner:** AI Agent
 **Estimated Time:** 2h

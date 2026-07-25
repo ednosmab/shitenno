@@ -94,14 +94,17 @@ function handlePreAction(ctx: MiddlewareContext, resolvedSessionId: string, sess
   };
 }
 
-function getRootCommandName(cmd: Command): string {
+function isDescendantOfCommand(cmd: Command, name: string): boolean {
   let c: Command | null = cmd;
-  while (c?.parent) c = c.parent;
-  return c?.name() ?? "";
+  while (c) {
+    if (c.name() === name) return true;
+    c = c.parent;
+  }
+  return false;
 }
 
 function tryAutoStartDaemon(shitennoDir: string, command: Command) {
-  if (shouldSkipDaemon() || getRootCommandName(command) === "daemon") return;
+  if (shouldSkipDaemon() || isDescendantOfCommand(command, "daemon")) return;
   try {
     const breaker = new DaemonCircuitBreaker(shitennoDir);
     const approvedPath = getApprovedPath(shitennoDir);

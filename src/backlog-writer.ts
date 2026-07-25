@@ -352,6 +352,7 @@ export interface BacklogWriteResult {
   itemsAdded: number;
   itemsSkipped: number;
   sectionInserted: boolean;
+  fileWasRecreated: boolean;
   message: string;
 }
 function findInsertionPoint(content: string): number {
@@ -373,17 +374,19 @@ export function appendBacklogSection(
   const dir = dirname(backlogPath);
 
   let existingContent = "";
+  let fileExistedBefore = false;
   try {
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-    existingContent = existsSync(backlogPath) ? readFileSync(backlogPath, "utf-8") : "";
+    fileExistedBefore = existsSync(backlogPath);
+    existingContent = fileExistedBefore ? readFileSync(backlogPath, "utf-8") : "";
   } catch (err) {
     logger.warn("backlog-writer", `Could not access ${backlogPath}: ${(err as Error).message}`);
-    return { itemsAdded: 0, itemsSkipped: items.length, sectionInserted: false, message: "Backlog path not accessible" };
+    return { itemsAdded: 0, itemsSkipped: items.length, sectionInserted: false, fileWasRecreated: false, message: "Backlog path not accessible" };
   }
 
   const newItems = items.filter((item) => !isDuplicate(existingContent, item));
   if (newItems.length === 0) {
-    return { itemsAdded: 0, itemsSkipped: items.length, sectionInserted: false, message: "All items are duplicates" };
+    return { itemsAdded: 0, itemsSkipped: items.length, sectionInserted: false, fileWasRecreated: false, message: "All items are duplicates" };
   }
 
   const section = formatBacklogSection(newItems, date);
@@ -401,7 +404,7 @@ export function appendBacklogSection(
     writeFileSync(backlogPath, content, "utf-8");
   } catch (err) {
     logger.warn("backlog-writer", `Failed to write ${backlogPath}: ${(err as Error).message}`);
-    return { itemsAdded: 0, itemsSkipped: items.length, sectionInserted: false, message: "Failed to write backlog file" };
+    return { itemsAdded: 0, itemsSkipped: items.length, sectionInserted: false, fileWasRecreated: false, message: "Failed to write backlog file" };
   }
 
   logger.info("backlog-writer", `Appended ${newItems.length} items to ${backlogPath}`);
@@ -409,7 +412,10 @@ export function appendBacklogSection(
     itemsAdded: newItems.length,
     itemsSkipped: items.length - newItems.length,
     sectionInserted: true,
-    message: `Added ${newItems.length} items (${items.length - newItems.length} duplicates skipped)`,
+    fileWasRecreated: !fileExistedBefore,
+    message: fileExistedBefore
+      ? `Added ${newItems.length} items (${items.length - newItems.length} duplicates skipped)`
+      : `WARNING: backlog file did not exist and was recreated from scratch. Added ${newItems.length} item(s). Any prior history is lost if this wasn't expected.`,
   };
 }
 

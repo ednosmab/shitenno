@@ -12,6 +12,19 @@
 
 import chalk from "chalk";
 
+// ── Global JSON Mode Gate ─────────────────────────────────────────────────
+
+let globalJsonMode = false;
+
+/**
+ * Enable or disable global JSON mode. When enabled, all output() calls
+ * are suppressed to prevent human-readable text from polluting JSON streams.
+ * Must be set as early as possible (CLI bootstrap) before any hooks fire.
+ */
+export function setGlobalJsonMode(enabled: boolean): void {
+  globalJsonMode = enabled;
+}
+
 /**
  * Check if quiet mode is enabled (suppresses informational output).
  * In quiet mode, only error-level output is shown.
@@ -22,13 +35,13 @@ function isQuiet(): boolean {
 
 /**
  * Write a line to stdout (user-facing output).
- * Respects --quiet flag for non-essential messages.
+ * Respects --quiet flag and global JSON mode for non-essential messages.
  *
  * @param msg - The message to output.
  * @param opts - Options: { quiet: true } suppresses in quiet mode.
  */
 export function output(msg: string, opts?: { quiet?: boolean }): void {
-  if (opts?.quiet && isQuiet()) return;
+  if (globalJsonMode || (opts?.quiet && isQuiet())) return;
   process.stdout.write(msg + "\n");
 }
 

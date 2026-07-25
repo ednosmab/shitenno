@@ -31,6 +31,6 @@ export class ApplyAutofixExecutor implements ActionExecutor {
       throw new Error(`Autofix reverted: ${result.reason}`);
     }
 
-    return { status: result.status, suggestion: result.suggestion };
+    return { success: result.status === "applied", status: result.status, suggestion: result.suggestion };
   }
 }

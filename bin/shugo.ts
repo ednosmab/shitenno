@@ -16,6 +16,7 @@ import { getEventBus, enableEventPersistence } from "../src/event-bus.js";
 import { startSession, endSession } from "../src/session-tracker.js";
 import { setSessionContext, clearSessionContext } from "../src/session-context.js";
 import { installMiddleware } from "../src/cli-middleware.js";
+import { setGlobalJsonMode } from "../src/output.js";
 import { stopWatching } from "../src/infrastructure/persistence/file-watcher.js";
 import { COMMAND_CATEGORIES, findCommand } from "../src/help-data.js";
 import { SHITENNO_DIR_NAME } from "../src/constants.js";
@@ -275,6 +276,8 @@ program
     if (globalOpts.color === false) {
       chalk.level = 0;
     }
+    // Set global JSON mode early — suppresses output() for all modules
+    setGlobalJsonMode(process.argv.includes("--json"));
   });
 
 // ── Custom Help Formatting ──────────────────────────────────────────────────
