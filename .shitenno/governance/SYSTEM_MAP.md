@@ -1472,6 +1472,7 @@
 │   governance/plans/PLAN-2026-07-22-reorganizar-suite-testes.md
 │   governance/plans/README.md
 │   governance/plans/TEMPLATE.md
+│   governance/plans/bloco-q-fix-backlog-writer.md
 │   governance/plans/done/
 │   governance/plans/done/2026-07-02-init-audit-dashboard.md
 │   governance/plans/done/2026-07-02-init-audit-dashboard.verification.json
@@ -1667,6 +1668,7 @@
 │   governance/plans/reference/PLAN-monettization-implementation.md
 │   governance/plans/reference/Plano-Estrategico-Proximo-Estagio-do-Shitenno.md
 │   governance/plans/reference/SHITENNO_EVOLUTION_PLAN.md
+│   governance/plans/shitenno-plano-consolidado.md
 │   governance/policies/
 │   governance/policies/BRANCH-POLICY.md
 │   governance/policies/COMMIT-POLICY.md
@@ -1759,6 +1761,7 @@
 │   reports/doc-sync-2026-07-22.json
 │   reports/doc-sync-2026-07-23.json
 │   reports/doc-sync-2026-07-24.json
+│   reports/doc-sync-2026-07-25.json
 │   reports/evolution-2026-07-18.json
 │   reports/health-2026-07-16.json
 │   reports/health-2026-07-18.json
@@ -1778,6 +1781,7 @@
 │   reports/patterns-2026-07-22.json
 │   reports/patterns-2026-07-23.json
 │   reports/patterns-2026-07-24.json
+│   reports/patterns-2026-07-25.json
 │   scripts/
 │   scripts/add-frontmatter.ts
 │   scripts/backlog.ts
