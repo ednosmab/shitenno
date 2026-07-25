@@ -307,8 +307,43 @@ export const updateCommand = new Command("update")
 
     const currentManifest = readManifest(ctx.shitennoDir);
     if (!currentManifest) {
-      outputNoManifest(isJson);
-      return;
+      // Auto-create manifest from current state instead of failing
+      const spinner = ora("No manifest found — creating from current state...").start();
+      try {
+        const { createManifest } = await import("../manifest.js");
+        const { loadMaturityProfile } = await import("../maturity-profile.js");
+        const profile = loadMaturityProfile(ctx.shitennoDir);
+        const capabilities = profile?.installedCapabilities ?? ["core"];
+        const maturityScore = profile?.overallScore ?? 0;
+        // Read CLI version directly from package.json
+        let cliVersion = "unknown";
+        try {
+          const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8"));
+          cliVersion = pkg.version || "unknown";
+        } catch { /* ignore */ }
+        const newManifest = createManifest(cliVersion, ctx.shitennoDir, capabilities, maturityScore);
+        writeManifest(ctx.shitennoDir, newManifest);
+        spinner.succeed("Manifest created. Re-running update check...");
+        // Re-run with the new manifest
+        const data2 = processUpdate(ctx, newManifest);
+        if (!data2.hasChanges && !data2.versionMismatch) {
+          outputUpToDate(data2, isJson);
+        } else {
+          if (!isJson && data2.versionMismatch) {
+            outputInfo(`  ℹ CLI version changed: ${data2.currentManifest.cliVersion} → ${data2.currentCliVersion}`);
+            outputBlank();
+          }
+          if (!isJson) displayDiff(data2.diff, false);
+          if (options.apply || options.dryRun) {
+            if (options.dryRun) { outputDryRun(data2, isJson); } else { applyUpdatesAndReport(targetDir, data2, ctx, options); }
+          } else { outputChangesSummary(data2, isJson); }
+        }
+        return;
+      } catch (err) {
+        spinner.fail(`Failed to create manifest: ${err}`);
+        outputNoManifest(isJson);
+        return;
+      }
     }
 
     const data = processUpdate(ctx, currentManifest);

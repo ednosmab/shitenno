@@ -70,6 +70,18 @@ async function main() {
   const modeLabel = ctx.DRY_RUN ? "DRY RUN" : ctx.FIX ? "VALIDATE + FIX" : "VALIDATE ONLY";
   log(`\n🔄 SYNC DOCS — ${modeLabel}\n`);
 
+  // ── Semantic drift check — runs before SYSTEM_MAP so feedback records
+  // created here are captured by the directory tree ───────────────────────
+  try {
+    const { runSemanticDocSync } = await import("../../src/doc-semantic-sync.js");
+    const semanticResult = runSemanticDocSync({ projectRoot: resolve(SHUGO, "..", ".."), shitennoDir: SHUGO });
+    if (!ctx.QUIET && semanticResult.driftFound > 0) {
+      log(`\n🧠 Drift semântico: ${semanticResult.driftFound} doc(s) desalinhado(s). ${semanticResult.remindersWritten} reminder(s) novo(s) escrito(s) em context_buffer.yaml.`);
+    }
+  } catch {
+    if (ctx.VERBOSE) log("\n⚠️  Semantic drift check skipped (module not available)");
+  }
+
   checkDocumentedDirectories(ctx);
   checkUndocumentedDirectories(ctx);
   checkCLICommands(ctx);
@@ -91,17 +103,6 @@ async function main() {
   log(`\n📊 Summary: ${errors} errors, ${warnings} warnings (${fixable} fixable)`);
 
   generateReport();
-
-  // ── Semantic drift check ──────────────────────────────────────────────────
-  try {
-    const { runSemanticDocSync } = await import("../../src/doc-semantic-sync.js");
-    const semanticResult = runSemanticDocSync({ projectRoot: resolve(SHUGO, "..", ".."), shitennoDir: SHUGO });
-    if (!ctx.QUIET && semanticResult.driftFound > 0) {
-      log(`\n🧠 Drift semântico: ${semanticResult.driftFound} doc(s) desalinhado(s). ${semanticResult.remindersWritten} reminder(s) novo(s) escrito(s) em context_buffer.yaml.`);
-    }
-  } catch {
-    if (ctx.VERBOSE) log("\n⚠️  Semantic drift check skipped (module not available)");
-  }
 
   if (errors > 0 && !ctx.FIX) {
     log("\n❌ Documentation sync failed — run with --fix to auto-fix");

@@ -15,7 +15,7 @@ import { SHITENNO_DIR_NAME } from "../constants.js";
 import chalk from "chalk";
 import { output, outputBlank } from "../output.js";
 import { Command } from "commander";
-import { queryDaemon, isDaemonRunning } from "../daemon-client.js";
+
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -109,15 +109,6 @@ function buildContextOutput(
 
 export async function generateContext(shitennoDir: string): Promise<ContextOutput | null> {
   const projectRoot = process.cwd();
-
-  if (isDaemonRunning(shitennoDir)) {
-    const result = await queryDaemon<{ type: string; data: ContextOutput }>(shitennoDir, {
-      type: "query_briefing",
-    });
-    if (result?.data) {
-      return result.data as ContextOutput;
-    }
-  }
 
   let state;
   try {

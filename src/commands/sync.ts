@@ -192,7 +192,6 @@ export const syncCommand = new Command("sync")
   .option("--json", "Output results as JSON")
   .action(async (options) => {
     const targetDir = resolve(options.dir);
-    const shitennoPath = options.shitennoPath || process.env.SHITENNO_GO_PATH;
     const isJson = options.json === true;
 
     if (existsSync(resolve(targetDir, SHITENNO_DIR_NAME))) {
@@ -201,6 +200,12 @@ export const syncCommand = new Command("sync")
     }
 
     printBanner(isJson);
+
+    // Auto-detect shitenno path: explicit option > env var > target dir itself
+    let shitennoPath = options.shitennoPath || process.env.SHITENNO_GO_PATH;
+    if (!shitennoPath && existsSync(resolve(targetDir, SHITENNO_DIR_NAME))) {
+      shitennoPath = resolve(targetDir, SHITENNO_DIR_NAME);
+    }
 
     if (!shitennoPath) {
       outputMissingPath(isJson);
