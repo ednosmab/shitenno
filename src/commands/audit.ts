@@ -12,7 +12,7 @@ import chalk from "chalk";
 import ora from "ora";
 import { join } from "node:path";
 import { readdirSync, readFileSync } from "node:fs";
-import { auditHealth, writeHealthReport, issueFingerprint, type HealthAuditReport } from "../health-auditor.js";
+import { writeHealthReport, issueFingerprint, type HealthAuditReport } from "../health-auditor.js";
 import { outputJson, banner } from "../formatting.js";
 import { output, outputBlank } from "../output.js";
 import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
@@ -20,17 +20,11 @@ import { getEventBus } from "../event-bus.js";
 import { discoverArtifacts, discoverRelations, analyzeGraph, saveArtifacts, saveRelations } from "../knowledge-graph.js";
 import { muteLogs } from "../logger.js";
 import { loadSuppressions, addSuppression } from "../audit/suppression.js";
-import { loadGrowthProfile } from "../growth-profile.js";
+
 import { printDaemonBanner } from "../daemon-context-banner.js";
-import {
-  displayWhatWasMeasured, displayHumanAuditReport, displayDynamicRules,
-  displaySemanticAudit, displaySuppressedIssues, buildIssueCounts,
-} from "./audit/display.js";
-import {
-  runAuditExecution, handleJsonOutput, displayHumanPostAudit,
-  handleAutoBacklog,
-} from "./audit/handlers.js";
-import { formatGrowthProgress } from "../dual-path-presenter.js";
+import { displayWhatWasMeasured } from "./audit/display.js";
+import { runAuditExecution, handleJsonOutput, displayHumanPostAudit } from "./audit/handlers.js";
+
 
 // ── Subcommand: audit suppress ───────────────────────────────────────────────
 

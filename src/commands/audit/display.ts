@@ -5,7 +5,7 @@
  */
 
 import chalk from "chalk";
-import { healthBar, outputJson } from "../../formatting.js";
+import { healthBar } from "../../formatting.js";
 import { output, outputBlank } from "../../output.js";
 import { groupOptimizationsByAction, categorizeIssues, groupByType, formatTypeGroup, identifyQuickWins } from "./reporter.js";
 import { generateFixSuggestions, prioritizeSuggestions } from "../../audit/suggestion-engine.js";

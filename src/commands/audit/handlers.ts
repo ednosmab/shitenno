@@ -17,9 +17,7 @@ import { resolveBacklogPaths } from "../../backlog-core.js";
 import { getChangedFiles } from "../../audit/changed-files.js";
 import { loadGrowthProfile } from "../../growth-profile.js";
 import { checkBuild, checkTests, checkLint } from "../../plan-lifecycle.js";
-import { loadSuppressions } from "../../audit/suppression.js";
-import { issueFingerprint } from "../../health-auditor.js";
-import { displayIssueCounts, displayKnowledgeGraph } from "./display.js";
+
 import { buildIssueCounts } from "./display.js";
 import { collectSemanticData } from "./semantic-display.js";
 import { outputJson } from "../../formatting.js";

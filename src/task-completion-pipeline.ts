@@ -25,7 +25,7 @@ import { join } from "node:path";
 import { logger } from "./logger.js";
 import { matchesTaskId } from "./id-matcher.js";
 import { validateCompletionGate, type CompletionResult } from "./task-completion.js";
-import { archivePlan, type ValidationResult } from "./plan-lifecycle.js";
+import { archivePlan } from "./plan-lifecycle.js";
 import { completeTask } from "./backlog-state-machine.js";
 import { getEventBus } from "./event-bus.js";
 
@@ -162,12 +162,7 @@ interface ArchiveContext {
   errors: string[];
 }
 
-function buildValidationResult(gates: CompletionResult): ValidationResult {
-  return {
-    valid: gates.passed,
-    checks: gates.gates.map((g) => ({ name: g.name.toUpperCase(), passed: g.passed, message: g.message })),
-  };
-}
+
 
 function archiveActivePlan(
   ctx: ArchiveContext,
@@ -180,10 +175,8 @@ function archiveActivePlan(
     return { archived: false, planFound: false };
   }
 
-  const validationResult = buildValidationResult(ctx.gates);
-
   try {
-    const archived = archivePlan(ctx.shitennoDir, planId, validationResult);
+    const archived = archivePlan(ctx.shitennoDir, planId);
     if (archived) {
       logger.info("task-completion-pipeline", `Plan archived: ${planId}`);
       return { archived: true, planFound: true };
