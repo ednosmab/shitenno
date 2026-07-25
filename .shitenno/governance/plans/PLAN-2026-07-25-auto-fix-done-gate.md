@@ -1,6 +1,6 @@
 # PLAN-2026-07-25-auto-fix-done-gate — Auto-fix controlado no gate de "done"
 
-**Status:** Pending
+**Status:** checked
 **Date:** 2026-07-25
 **Updated_at:** 2026-07-25T03:55:00.000Z
 **Priority:** P1
