@@ -479,7 +479,23 @@ projecto/
     │   ├── health-check/plugin.js
     │   ├── health-check/plugin.ts
     │   └── health-monitor/plugin.js
-    └── scripts/                          ← Scripts de sessão
+    ├── daemon/                           ← Processo de fundo (capability: operations)
+    │   ├── daemon.pid                     ← PID do processo activo
+    │   ├── daemon.sock                     ← Socket IPC
+    │   ├── daemon.log                      ← Log rotativo
+    │   ├── daemon-state.json               ← Estado serializado
+    │   ├── daemon.approved                 ← Marca de auto-start aprovado
+    │   └── circuit-breaker.json            ← Estado do circuit breaker
+    ├── history/                           ← Estado de engenharia (capability: metrics)
+    │   └── snapshots/                      ← Snapshots de engineering state
+    ├── profile/                           ← Perfil do projecto (capability: core)
+    │   └── <project>.config.ts             ← Configuração do projecto
+    ├── session-feedback/                  ← Feedback de sessões (capability: governance)
+    │   └── records.jsonl                   ← Registos de resultado por sessão
+    ├── telemetry/                         ← Telemetria e eventos (capability: operations)
+    │   ├── events-YYYY-MM-DD.jsonl        ← Eventos diários
+    │   └── dead-letter/                    ← Eventos falhados
+    └── scripts/                           ← Scripts de sessão
         ├── validate-session.ts
         ├── close-session.ts
         ├── premortem-check.ts
@@ -513,6 +529,11 @@ projecto/
 | `plugins/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
 | `reports/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | `scripts/` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `daemon/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| `history/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| `profile/` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `session-feedback/` | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `telemetry/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ |
 
 ---
 
