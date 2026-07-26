@@ -20,6 +20,8 @@ import { loadManifest, partitionRules } from "./rule-manifest.js";
 import { loadSkillManifest, partitionSkills, type TaskMetadata } from "./skill-manifest.js";
 import { logger } from "./logger.js";
 import { recordSkillResolution } from "./context-buffer-writer.js";
+import { detectKnowledgeDebt } from "./knowledge-debt/engine.js";
+import { loadGrowthProfile } from "./growth-profile.js";
 
 import type { ToolResponse } from "./mcp-types.js";
 
@@ -480,4 +482,104 @@ export async function handleGetSkills(
   const summaries = listSkills(shitennoDir);
   const text = summaries.map((s) => `${s.name}: ${s.description}`).join("\n");
   return { content: [{ type: "text", text: text || "No skills found." }] };
+}
+
+// ── Knowledge Debt ────────────────────────────────────────────────────────
+
+export function handleGetKnowledgeDebt(
+  projectRoot: string,
+  shitennoDir: string,
+  args: Record<string, unknown>
+): ToolResponse {
+  const format = (args.format as string) ?? "json";
+
+  const report = detectKnowledgeDebt(projectRoot, shitennoDir);
+
+  if (format === "summary") {
+    const lines: string[] = [
+      report.summary,
+      "",
+      `Health Score: ${report.healthScore}/100`,
+      "",
+    ];
+
+    if (report.gaps.length > 0) {
+      lines.push("Gaps by severity:");
+      for (const [sev, count] of Object.entries(report.gapsBySeverity)) {
+        if (count > 0) lines.push(`  ${sev}: ${count}`);
+      }
+      lines.push("");
+
+      const critical = report.gaps.filter(g => g.severity === "critical");
+      if (critical.length > 0) {
+        lines.push("Critical gaps:");
+        for (const gap of critical) {
+          lines.push(`  - [${gap.type}] ${gap.description}`);
+        }
+      }
+    }
+
+    if (report.recommendations.length > 0) {
+      lines.push("Recommendations:");
+      for (const rec of report.recommendations.slice(0, 5)) {
+        lines.push(`  \u2192 ${rec}`);
+      }
+    }
+
+    return { content: [{ type: "text", text: lines.join("\n") }] };
+  }
+
+  return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };
+}
+
+// ── Challenges ────────────────────────────────────────────────────────────
+
+export function handleGetChallenges(
+  projectRoot: string,
+  shitennoDir: string,
+  args: Record<string, unknown>
+): ToolResponse {
+  const format = (args.format as string) ?? "json";
+
+  const profile = loadGrowthProfile(shitennoDir);
+  if (!profile) {
+    return { content: [{ type: "text", text: "No growth profile found. Run shugo assess first." }] };
+  }
+
+  const snapshot = collectContext(projectRoot, shitennoDir);
+  const recommendations = snapshot.briefing?.recommendations ?? [];
+
+  // Recommendations are strings — generate generic paradigm shifts
+  const challenges = recommendations.map((rec, idx) => ({
+    original: rec,
+    paradigmShift: {
+      currentParadigm: "Following the recommendation as stated",
+      newParadigm: "Understanding the underlying principle and applying it creatively",
+      shiftDescription: `From surface-level action to deep understanding: ${rec}`,
+      difficulty: "moderate" as const,
+    },
+    challengeLevel: profile.challengeLevel,
+    index: idx,
+  }));
+
+  if (format === "summary") {
+    const lines: string[] = [
+      `Challenge Level: ${profile.challengeLevel}`,
+      `Growth Capacity: ${profile.growthCapacity}`,
+      `Recommendations analysed: ${challenges.length}`,
+      "",
+    ];
+
+    lines.push(`${challenges.length} challenge(s) with paradigm shifts:`);
+    for (const ch of challenges) {
+      const shift = ch.paradigmShift;
+      lines.push(`  [${ch.index + 1}] ${ch.original}`);
+      lines.push(`      Shift: ${shift.currentParadigm} \u2192 ${shift.newParadigm}`);
+      lines.push(`      Difficulty: ${shift.difficulty}`);
+    }
+
+    return { content: [{ type: "text", text: lines.join("\n") }] };
+  }
+
+  return { content: [{ type: "text", text: JSON.stringify(challenges, null, 2) }] };
 }

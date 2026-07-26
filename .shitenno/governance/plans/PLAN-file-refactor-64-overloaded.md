@@ -1,8 +1,8 @@
 # PLAN-file-refactor-64-overloaded — Refactorização de 64 Ficheiros >300 Linhas
 
-**Status:** In Progress (Phase 1 done)
+**Status:** In Progress (Phase 4 done)
 **Date:** 2026-07-25
-**Updated_at:** 2026-07-26T03:00:00.000Z
+**Updated_at:** 2026-07-26T04:42:00.000Z
 **Priority:** P1
 **Owner:** AI Agent + Tech Lead
 **Estimated Time:** 61 sprints
@@ -128,47 +128,47 @@ Fragmentar, refatorar e corrigir lógica em todos os 64 ficheiros acima de 300 l
 ### Passo 2.1: Security Detectors Split
 **Ficheiro:** `src/audit/engineering-detectors-security.ts` (626 linhas)
 **Acção:** Dividir: `security/secrets.ts`, `security/injection.ts`, `security/crypto.ts`, `security/path-traversal.ts`, `security/cors.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 2.2: Docs Detectors Split
 **Ficheiro:** `src/audit/governance-detectors-docs.ts` (544 linhas)
 **Acção:** Dividir: `docs/structure.ts`, `docs/refs.ts`, `docs/config.ts`, `docs/maturity.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 2.3: Config Detectors Split
 **Ficheiro:** `src/audit/governance-detectors-config.ts` (509 linhas)
 **Acção:** Dividir: `config/adr.ts`, `config/naming.ts`, `config/consistency.ts`, `config/skills.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 2.4: Code Quality Detectors Split
 **Ficheiro:** `src/audit/code-quality-detectors.ts` (494 linhas)
 **Acção:** Dividir: `quality/jsdoc.ts`, `quality/correctness.ts`, `quality/complexity.ts`, `quality/duplication.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 2.5: Compliance Detectors Split
 **Ficheiro:** `src/audit/compliance-detectors.ts` (459 linhas)
 **Acção:** Dividir: `compliance/owasp.ts`, `compliance/soc2.ts`, `compliance/lgpd.ts`, `compliance/operational.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 2.6: Quality Detectors Split
 **Ficheiro:** `src/audit/engineering-detectors-quality.ts` (451 linhas)
 **Acção:** Dividir: `quality/tests.ts`, `quality/metrics.ts`, `quality/static.ts`, `quality/dead-code.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 2.7: Rules Detectors Split
 **Ficheiro:** `src/audit/governance-detectors-rules.ts` (431 linhas)
 **Acção:** Dividir: `rules/scripts.ts`, `rules/integrity.ts`, `rules/consistency.ts`, `rules/hygiene.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 2.8: Enforcement Detectors Split
 **Ficheiro:** `src/audit/governance-enforcement-detectors.ts` (394 linhas)
 **Acção:** Dividir: `enforcement/session.ts`, `enforcement/state-machine.ts`, `enforcement/plan.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 2.9: Supply Detectors Split
 **Ficheiro:** `src/audit/engineering-detectors-supply.ts` (366 linhas)
 **Acção:** Dividir: `supply/versions.ts`, `supply/dependencies.ts`, `supply/secrets.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ---
 
@@ -182,76 +182,76 @@ Fragmentar, refatorar e corrigir lógica em todos os 64 ficheiros acima de 300 l
 ### Passo 3.2: Goal Command Split
 **Ficheiro:** `src/commands/goal.ts` (391 linhas)
 **Acção:** Extrair `goal/display.ts` (~100).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 3.3: Daemon Command Split
 **Ficheiro:** `src/commands/daemon.ts` (381 linhas)
 **Acção:** Extrair `daemon/display.ts` (~100), `daemon/logs.ts` (~100).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 3.4: Sync Command Split
 **Ficheiro:** `src/commands/sync.ts` (377 linhas)
 **Acção:** Extrair `sync/merge.ts` (~150), `sync/display.ts` (~80).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 3.5: Update Command Split
 **Ficheiro:** `src/commands/update.ts` (374 linhas)
 **Acção:** Extrair `update/display.ts` (~120).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 3.6: Doctor Command Split
 **Ficheiro:** `src/commands/doctor.ts` (358 linhas)
 **Acção:** Extrair `doctor/analysis.ts` (~160), `doctor/display.ts` (~80).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 3.7: Assess Command Split
 **Ficheiro:** `src/commands/assess.ts` (354 linhas)
 **Acção:** Extrair `assess/display.ts` (~120), `assess/profile.ts` (~130).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 3.8: Reminders Command Split
 **Ficheiro:** `src/commands/reminders.ts` (341 linhas)
 **Acção:** Extrair `reminders/storage.ts` (~80).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 3.9: Feedback Command Split
 **Ficheiro:** `src/commands/feedback.ts` (331 linhas)
 **Acção:** Extrair `feedback/display.ts` (~60), `feedback/modes.ts` (~120).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 3.10: Evolve Command Split
 **Ficheiro:** `src/commands/evolve.ts` (322 linhas)
 **Acção:** Extrair `evolve/semantic-display.ts` (~80).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ---
 
 ### FASE 4 — Semantic & Domain (5 ficheiros)
 
-### Passo 4.1: Semantic Rules Split
+### Passo 4.1: Semantic Rules Split ✅
 **Ficheiro:** `src/semantic/rules.ts` (393 linhas)
 **Acção:** Extrair `CLASSIFICATION_RULES` array (~358 linhas) para `rules/classification-rules.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 4.2: Semantic Reasoner Split
+### Passo 4.2: Semantic Reasoner Split ✅
 **Ficheiro:** `src/semantic/reasoner.ts` (362 linhas)
 **Acção:** Extrair `insight-rules.ts` (6 regras), `evidence-collector.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 4.3: Area Scorer Split
+### Passo 4.3: Area Scorer Split ✅
 **Ficheiro:** `src/domain/scoring/area-scorer.ts` (458 linhas)
 **Acção:** Extrair `area-scanner.ts`, `git-churn.ts`, `behavioral-metrics.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 4.4: Taint Analyzer Split
+### Passo 4.4: Taint Analyzer Split ✅
 **Ficheiro:** `src/audit/taint/analyzer.ts` (483 linhas)
 **Acção:** Extrair `ast-visitor.ts` (~180), `issue-builder.ts` (~55).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 4.5: Architecture + Tech Debt Detectors
+### Passo 4.5: Architecture + Tech Debt Detectors ✅
 **Ficheiros:** `src/audit/architecture-detectors.ts` (312), `src/audit/tech-debt-detectors.ts` (310)
 **Acção:** Dividir cada em 2 sub-domínios.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ---
 

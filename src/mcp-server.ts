@@ -19,6 +19,8 @@ import {
   handleSubmitFeedback,
   handleGetADRs,
   handleGetSkills,
+  handleGetKnowledgeDebt,
+  handleGetChallenges,
 } from "./mcp-server-handlers.js";
 
 // Re-export handlers for test compatibility
@@ -31,6 +33,8 @@ export {
   handleSubmitFeedback,
   handleGetADRs,
   handleGetSkills,
+  handleGetKnowledgeDebt,
+  handleGetChallenges,
 };
 import {
   handleGetBacklog,
@@ -141,6 +145,26 @@ export const TOOLS = [
     },
   },
   ...BACKLOG_MCP_TOOLS,
+  {
+    name: "getKnowledgeDebt",
+    description: "Analyse knowledge debt in the project. Detects missing ADRs, runbooks, skills, docs, automation, contracts, workflows, and stale ADRs. Returns gaps, severity, health score, and recommendations.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
+      },
+    },
+  },
+  {
+    name: "getChallenges",
+    description: "Generate challenge alternatives for current recommendations. Shows paradigm shifts that push beyond comfortable thinking. Requires a growth profile (run shugo assess first).",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
+      },
+    },
+  },
 ];
 
 export async function dispatchTool(
@@ -175,6 +199,10 @@ export async function dispatchTool(
         return handleTransitionBacklogItem(projectRoot, shitennoDir, toolArgs);
       case "deleteBacklogItem":
         return handleDeleteBacklogItem(projectRoot, shitennoDir, toolArgs);
+      case "getKnowledgeDebt":
+        return handleGetKnowledgeDebt(projectRoot, shitennoDir, toolArgs);
+      case "getChallenges":
+        return handleGetChallenges(projectRoot, shitennoDir, toolArgs);
       default:
         return {
           content: [{ type: "text", text: `Unknown tool: ${name}. Available: ${TOOLS.map((t) => t.name).join(", ")}` }],

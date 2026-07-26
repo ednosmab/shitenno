@@ -150,6 +150,7 @@
 │   docs/skills/domain_driven_design_(ddd).md
 │   docs/skills/error_handling_observability.md
 │   docs/skills/handbook-fill.md
+│   docs/skills/mcp-interaction.md
 │   docs/skills/operacao_no_shitenno.md
 │   docs/skills/optimistic_ui.md
 │   docs/skills/pnpm_management.md
@@ -309,6 +310,7 @@
 │   governance/executions/EXE-03F2570D.json
 │   governance/executions/EXE-042A56A1.json
 │   governance/executions/EXE-045FD90F.json
+│   governance/executions/EXE-04A24194.json
 │   governance/executions/EXE-04BD77D9.json
 │   governance/executions/EXE-04D622AD.json
 │   governance/executions/EXE-0521E54E.json
@@ -336,6 +338,7 @@
 │   governance/executions/EXE-086A3D50.json
 │   governance/executions/EXE-086B18CB.json
 │   governance/executions/EXE-08A4B0D6.json
+│   governance/executions/EXE-08DC9B17.json
 │   governance/executions/EXE-090F8617.json
 │   governance/executions/EXE-092AB74B.json
 │   governance/executions/EXE-093D0745.json
@@ -348,6 +351,7 @@
 │   governance/executions/EXE-0A01A0FC.json
 │   governance/executions/EXE-0A116FBA.json
 │   governance/executions/EXE-0A2812DD.json
+│   governance/executions/EXE-0A36A4F8.json
 │   governance/executions/EXE-0A666525.json
 │   governance/executions/EXE-0AA013D0.json
 │   governance/executions/EXE-0AA21AB3.json
@@ -388,6 +392,7 @@
 │   governance/executions/EXE-108FB5E5.json
 │   governance/executions/EXE-109755D0.json
 │   governance/executions/EXE-10A22D8F.json
+│   governance/executions/EXE-10A7CBB2.json
 │   governance/executions/EXE-10EE008A.json
 │   governance/executions/EXE-10F8F30B.json
 │   governance/executions/EXE-1106BF72.json
@@ -406,9 +411,11 @@
 │   governance/executions/EXE-13712A05.json
 │   governance/executions/EXE-13C5C638.json
 │   governance/executions/EXE-1412F8C2.json
+│   governance/executions/EXE-14152043.json
 │   governance/executions/EXE-14A38585.json
 │   governance/executions/EXE-14A619F1.json
 │   governance/executions/EXE-14D28C10.json
+│   governance/executions/EXE-14D93378.json
 │   governance/executions/EXE-14DFEC14.json
 │   governance/executions/EXE-1514AF74.json
 │   governance/executions/EXE-153C7320.json
@@ -431,6 +438,7 @@
 │   governance/executions/EXE-16F20C15.json
 │   governance/executions/EXE-175B8A5B.json
 │   governance/executions/EXE-1779D1A3.json
+│   governance/executions/EXE-1799390A.json
 │   governance/executions/EXE-17B47A5E.json
 │   governance/executions/EXE-17C3F546.json
 │   governance/executions/EXE-17F67B1E.json
@@ -443,6 +451,7 @@
 │   governance/executions/EXE-1829317A.json
 │   governance/executions/EXE-18362497.json
 │   governance/executions/EXE-1884714E.json
+│   governance/executions/EXE-18AF8857.json
 │   governance/executions/EXE-18B8CF8F.json
 │   governance/executions/EXE-18C05774.json
 │   governance/executions/EXE-18C0F506.json
@@ -467,6 +476,7 @@
 │   governance/executions/EXE-1B8C3E98.json
 │   governance/executions/EXE-1BB05133.json
 │   governance/executions/EXE-1BCBBF62.json
+│   governance/executions/EXE-1BDFDF33.json
 │   governance/executions/EXE-1C14D26E.json
 │   governance/executions/EXE-1C97DC40.json
 │   governance/executions/EXE-1CA65088.json
@@ -480,6 +490,7 @@
 │   governance/executions/EXE-1E2DEA14.json
 │   governance/executions/EXE-1E752EF9.json
 │   governance/executions/EXE-1EDD72EA.json
+│   governance/executions/EXE-1EF1693D.json
 │   governance/executions/EXE-1F516BD5.json
 │   governance/executions/EXE-1F6FB613.json
 │   governance/executions/EXE-1F9C38FC.json
@@ -490,7 +501,9 @@
 │   governance/executions/EXE-200CC029.json
 │   governance/executions/EXE-2041C3F5.json
 │   governance/executions/EXE-204A6558.json
+│   governance/executions/EXE-2068B5E8.json
 │   governance/executions/EXE-2073556D.json
+│   governance/executions/EXE-209DF79D.json
 │   governance/executions/EXE-210A218C.json
 │   governance/executions/EXE-212EC6B0.json
 │   governance/executions/EXE-217F95F7.json
@@ -501,6 +514,7 @@
 │   governance/executions/EXE-22EC833D.json
 │   governance/executions/EXE-2302B9F6.json
 │   governance/executions/EXE-23150F1E.json
+│   governance/executions/EXE-232335EB.json
 │   governance/executions/EXE-2334AEE1.json
 │   governance/executions/EXE-233F6457.json
 │   governance/executions/EXE-2340C1AC.json
@@ -508,18 +522,22 @@
 │   governance/executions/EXE-238D8EC0.json
 │   governance/executions/EXE-23A6E231.json
 │   governance/executions/EXE-23BFB710.json
+│   governance/executions/EXE-23C51897.json
 │   governance/executions/EXE-23CC63F1.json
 │   governance/executions/EXE-23E879E6.json
+│   governance/executions/EXE-23ED62E2.json
 │   governance/executions/EXE-240EA1B2.json
 │   governance/executions/EXE-2422A9B0.json
 │   governance/executions/EXE-243035A1.json
 │   governance/executions/EXE-243A1FCC.json
 │   governance/executions/EXE-24953A74.json
 │   governance/executions/EXE-24967666.json
+│   governance/executions/EXE-2533C262.json
 │   governance/executions/EXE-2572DE17.json
 │   governance/executions/EXE-25929C95.json
 │   governance/executions/EXE-25CCB4B1.json
 │   governance/executions/EXE-25D67B5D.json
+│   governance/executions/EXE-25D76440.json
 │   governance/executions/EXE-26778ADB.json
 │   governance/executions/EXE-26C56988.json
 │   governance/executions/EXE-26F8BA27.json
@@ -535,17 +553,21 @@
 │   governance/executions/EXE-28A26E8B.json
 │   governance/executions/EXE-28BB2704.json
 │   governance/executions/EXE-28C13013.json
+│   governance/executions/EXE-28E1E4A1.json
 │   governance/executions/EXE-29695862.json
 │   governance/executions/EXE-29A3BE76.json
 │   governance/executions/EXE-2A2530D6.json
 │   governance/executions/EXE-2A268A88.json
 │   governance/executions/EXE-2A3B0CBE.json
 │   governance/executions/EXE-2A3D0207.json
+│   governance/executions/EXE-2A4D23CD.json
 │   governance/executions/EXE-2AC1FEDF.json
 │   governance/executions/EXE-2AE96209.json
 │   governance/executions/EXE-2B0E3CDF.json
 │   governance/executions/EXE-2B61EA2A.json
+│   governance/executions/EXE-2BA90798.json
 │   governance/executions/EXE-2BC9EB6B.json
+│   governance/executions/EXE-2BF765C3.json
 │   governance/executions/EXE-2C087071.json
 │   governance/executions/EXE-2C5D242B.json
 │   governance/executions/EXE-2CD60175.json
@@ -562,6 +584,7 @@
 │   governance/executions/EXE-2E16720D.json
 │   governance/executions/EXE-2E4FF24A.json
 │   governance/executions/EXE-2E51C7D9.json
+│   governance/executions/EXE-2E96ED13.json
 │   governance/executions/EXE-2EF98505.json
 │   governance/executions/EXE-2F22D39D.json
 │   governance/executions/EXE-2F2FB466.json
@@ -576,19 +599,23 @@
 │   governance/executions/EXE-300A5A18.json
 │   governance/executions/EXE-3086FED4.json
 │   governance/executions/EXE-30D01665.json
+│   governance/executions/EXE-30F1E057.json
 │   governance/executions/EXE-31117C04.json
 │   governance/executions/EXE-31152F08.json
 │   governance/executions/EXE-31525A3E.json
 │   governance/executions/EXE-31B59B50.json
 │   governance/executions/EXE-31F0FC9A.json
+│   governance/executions/EXE-31F322E5.json
 │   governance/executions/EXE-31F5514E.json
 │   governance/executions/EXE-31FE0AF6.json
 │   governance/executions/EXE-31FF8017.json
 │   governance/executions/EXE-3225EC59.json
+│   governance/executions/EXE-32BBB6E8.json
 │   governance/executions/EXE-32D6485B.json
 │   governance/executions/EXE-32D8ACB7.json
 │   governance/executions/EXE-32EE470C.json
 │   governance/executions/EXE-32FE070F.json
+│   governance/executions/EXE-32FEB31B.json
 │   governance/executions/EXE-334A3EBC.json
 │   governance/executions/EXE-33556FB5.json
 │   governance/executions/EXE-335C232C.json
@@ -614,6 +641,7 @@
 │   governance/executions/EXE-35605807.json
 │   governance/executions/EXE-356B2B44.json
 │   governance/executions/EXE-356EB37E.json
+│   governance/executions/EXE-35AFFEA1.json
 │   governance/executions/EXE-35E8BBEA.json
 │   governance/executions/EXE-360E44C7.json
 │   governance/executions/EXE-3640FEEE.json
@@ -640,6 +668,7 @@
 │   governance/executions/EXE-394FFC09.json
 │   governance/executions/EXE-39592888.json
 │   governance/executions/EXE-3977E00F.json
+│   governance/executions/EXE-39E384BE.json
 │   governance/executions/EXE-39FA1D5D.json
 │   governance/executions/EXE-3A52A6AB.json
 │   governance/executions/EXE-3A580674.json
@@ -657,6 +686,8 @@
 │   governance/executions/EXE-3BE039F3.json
 │   governance/executions/EXE-3C07A228.json
 │   governance/executions/EXE-3C145252.json
+│   governance/executions/EXE-3C695A90.json
+│   governance/executions/EXE-3C6E32AE.json
 │   governance/executions/EXE-3C75995F.json
 │   governance/executions/EXE-3C7678AB.json
 │   governance/executions/EXE-3C84C5A5.json
@@ -668,6 +699,7 @@
 │   governance/executions/EXE-3D05CE47.json
 │   governance/executions/EXE-3D4D26F3.json
 │   governance/executions/EXE-3D9FB6C6.json
+│   governance/executions/EXE-3DD70502.json
 │   governance/executions/EXE-3DDAAF0D.json
 │   governance/executions/EXE-3DE3B5CE.json
 │   governance/executions/EXE-3DE85F9E.json
@@ -691,6 +723,7 @@
 │   governance/executions/EXE-4057266C.json
 │   governance/executions/EXE-40787580.json
 │   governance/executions/EXE-40860A2A.json
+│   governance/executions/EXE-409731EA.json
 │   governance/executions/EXE-40AC78DE.json
 │   governance/executions/EXE-40F7E9C2.json
 │   governance/executions/EXE-40FA5662.json
@@ -706,6 +739,7 @@
 │   governance/executions/EXE-42D22A24.json
 │   governance/executions/EXE-42F65264.json
 │   governance/executions/EXE-42FCB1AA.json
+│   governance/executions/EXE-4302DA95.json
 │   governance/executions/EXE-4342B2DB.json
 │   governance/executions/EXE-43A35F57.json
 │   governance/executions/EXE-43AD7F1A.json
@@ -741,12 +775,16 @@
 │   governance/executions/EXE-4799DD79.json
 │   governance/executions/EXE-4804B4EA.json
 │   governance/executions/EXE-482195B5.json
+│   governance/executions/EXE-485C4375.json
 │   governance/executions/EXE-48600748.json
 │   governance/executions/EXE-48A66AC1.json
 │   governance/executions/EXE-48A73333.json
+│   governance/executions/EXE-48B84F27.json
 │   governance/executions/EXE-48D461CD.json
 │   governance/executions/EXE-48EE5998.json
 │   governance/executions/EXE-492643B8.json
+│   governance/executions/EXE-492ED724.json
+│   governance/executions/EXE-493773ED.json
 │   governance/executions/EXE-494A03B5.json
 │   governance/executions/EXE-4951435E.json
 │   governance/executions/EXE-4A0682B1.json
@@ -781,6 +819,7 @@
 │   governance/executions/EXE-4C5BDABE.json
 │   governance/executions/EXE-4C76F527.json
 │   governance/executions/EXE-4CE699F5.json
+│   governance/executions/EXE-4D352F02.json
 │   governance/executions/EXE-4DD89732.json
 │   governance/executions/EXE-4DF97463.json
 │   governance/executions/EXE-4E022D3C.json
@@ -798,6 +837,7 @@
 │   governance/executions/EXE-4F4DC2BD.json
 │   governance/executions/EXE-4F5F1683.json
 │   governance/executions/EXE-4F983835.json
+│   governance/executions/EXE-4FB64A18.json
 │   governance/executions/EXE-4FBB3D62.json
 │   governance/executions/EXE-4FC02B1B.json
 │   governance/executions/EXE-5013C36D.json
@@ -865,6 +905,7 @@
 │   governance/executions/EXE-57BBA6D5.json
 │   governance/executions/EXE-57E3ECA4.json
 │   governance/executions/EXE-57F3D85A.json
+│   governance/executions/EXE-585FD5C2.json
 │   governance/executions/EXE-586C0C6C.json
 │   governance/executions/EXE-58820A82.json
 │   governance/executions/EXE-58A02E47.json
@@ -875,6 +916,7 @@
 │   governance/executions/EXE-59156A5E.json
 │   governance/executions/EXE-5956009F.json
 │   governance/executions/EXE-596B8B7B.json
+│   governance/executions/EXE-5991C5DC.json
 │   governance/executions/EXE-59977C33.json
 │   governance/executions/EXE-59E843BC.json
 │   governance/executions/EXE-5A1B3915.json
@@ -882,6 +924,7 @@
 │   governance/executions/EXE-5A80F727.json
 │   governance/executions/EXE-5A95EAB1.json
 │   governance/executions/EXE-5AB488F8.json
+│   governance/executions/EXE-5B425866.json
 │   governance/executions/EXE-5B464D65.json
 │   governance/executions/EXE-5BACB109.json
 │   governance/executions/EXE-5BC284BC.json
@@ -907,15 +950,18 @@
 │   governance/executions/EXE-5E481AEF.json
 │   governance/executions/EXE-5E4CEAFE.json
 │   governance/executions/EXE-5E8D4328.json
+│   governance/executions/EXE-5ECAAEAD.json
 │   governance/executions/EXE-5EE212BD.json
 │   governance/executions/EXE-5F330F91.json
 │   governance/executions/EXE-5F40062E.json
 │   governance/executions/EXE-5F488AEF.json
 │   governance/executions/EXE-5FF2D45D.json
 │   governance/executions/EXE-600608EC.json
+│   governance/executions/EXE-60095E8C.json
 │   governance/executions/EXE-60105943.json
 │   governance/executions/EXE-602F615E.json
 │   governance/executions/EXE-605C6185.json
+│   governance/executions/EXE-6070183E.json
 │   governance/executions/EXE-60885105.json
 │   governance/executions/EXE-608EAFE7.json
 │   governance/executions/EXE-60AD0982.json
@@ -939,9 +985,11 @@
 │   governance/executions/EXE-64033533.json
 │   governance/executions/EXE-6426B638.json
 │   governance/executions/EXE-64408DB5.json
+│   governance/executions/EXE-644ED7D1.json
 │   governance/executions/EXE-646764EF.json
 │   governance/executions/EXE-647997BE.json
 │   governance/executions/EXE-648DDE81.json
+│   governance/executions/EXE-64971EF3.json
 │   governance/executions/EXE-64F3B228.json
 │   governance/executions/EXE-65123D25.json
 │   governance/executions/EXE-652963BC.json
@@ -949,6 +997,7 @@
 │   governance/executions/EXE-6570EEAD.json
 │   governance/executions/EXE-65F02FCC.json
 │   governance/executions/EXE-65F50460.json
+│   governance/executions/EXE-65FFEFB9.json
 │   governance/executions/EXE-66ADA1C8.json
 │   governance/executions/EXE-66BA883E.json
 │   governance/executions/EXE-66BC0DE1.json
@@ -957,6 +1006,7 @@
 │   governance/executions/EXE-67346C97.json
 │   governance/executions/EXE-673D5641.json
 │   governance/executions/EXE-679EBC83.json
+│   governance/executions/EXE-67A7C913.json
 │   governance/executions/EXE-67B567D8.json
 │   governance/executions/EXE-67D08AFA.json
 │   governance/executions/EXE-67E45E46.json
@@ -985,10 +1035,12 @@
 │   governance/executions/EXE-6A9BC845.json
 │   governance/executions/EXE-6A9FED2C.json
 │   governance/executions/EXE-6AAAE38C.json
+│   governance/executions/EXE-6B2621A6.json
 │   governance/executions/EXE-6B2A3B7C.json
 │   governance/executions/EXE-6B44275B.json
 │   governance/executions/EXE-6B6C812C.json
 │   governance/executions/EXE-6B8370B5.json
+│   governance/executions/EXE-6B9F71F0.json
 │   governance/executions/EXE-6BAC3718.json
 │   governance/executions/EXE-6BAF63E7.json
 │   governance/executions/EXE-6BDD2F5F.json
@@ -1015,6 +1067,7 @@
 │   governance/executions/EXE-6EB077E8.json
 │   governance/executions/EXE-6ED48186.json
 │   governance/executions/EXE-6ED6A731.json
+│   governance/executions/EXE-6EDB9D1B.json
 │   governance/executions/EXE-6EF92647.json
 │   governance/executions/EXE-6F3E8F1D.json
 │   governance/executions/EXE-6F4872D3.json
@@ -1030,6 +1083,7 @@
 │   governance/executions/EXE-70D3A28C.json
 │   governance/executions/EXE-70D514CA.json
 │   governance/executions/EXE-70DAF0F1.json
+│   governance/executions/EXE-70E72388.json
 │   governance/executions/EXE-70F7AFA5.json
 │   governance/executions/EXE-710825EA.json
 │   governance/executions/EXE-7149713E.json
@@ -1047,6 +1101,7 @@
 │   governance/executions/EXE-73C7BADD.json
 │   governance/executions/EXE-73E2281B.json
 │   governance/executions/EXE-73EBBF18.json
+│   governance/executions/EXE-73F0B761.json
 │   governance/executions/EXE-73F7DA2B.json
 │   governance/executions/EXE-74013C28.json
 │   governance/executions/EXE-740A9FAB.json
@@ -1063,6 +1118,7 @@
 │   governance/executions/EXE-75333A15.json
 │   governance/executions/EXE-755D2A65.json
 │   governance/executions/EXE-755F048C.json
+│   governance/executions/EXE-75E56B43.json
 │   governance/executions/EXE-760503B8.json
 │   governance/executions/EXE-76069B75.json
 │   governance/executions/EXE-760B7294.json
@@ -1071,6 +1127,7 @@
 │   governance/executions/EXE-769494BA.json
 │   governance/executions/EXE-76A70A89.json
 │   governance/executions/EXE-76ADB113.json
+│   governance/executions/EXE-76CF4E08.json
 │   governance/executions/EXE-773E8B6B.json
 │   governance/executions/EXE-77A23255.json
 │   governance/executions/EXE-7800F752.json
@@ -1097,6 +1154,7 @@
 │   governance/executions/EXE-7B2325C3.json
 │   governance/executions/EXE-7B81BE2C.json
 │   governance/executions/EXE-7B96A219.json
+│   governance/executions/EXE-7BD1C24D.json
 │   governance/executions/EXE-7C3024EC.json
 │   governance/executions/EXE-7C383F6A.json
 │   governance/executions/EXE-7C4B16D2.json
@@ -1104,6 +1162,7 @@
 │   governance/executions/EXE-7C65BDFB.json
 │   governance/executions/EXE-7C7A590E.json
 │   governance/executions/EXE-7CB41A6D.json
+│   governance/executions/EXE-7CC38704.json
 │   governance/executions/EXE-7CF49229.json
 │   governance/executions/EXE-7D4C26CD.json
 │   governance/executions/EXE-7D5710DF.json
@@ -1115,14 +1174,17 @@
 │   governance/executions/EXE-7E1A5753.json
 │   governance/executions/EXE-7E1B821D.json
 │   governance/executions/EXE-7E2897CC.json
+│   governance/executions/EXE-7E47CB87.json
 │   governance/executions/EXE-7E4A446A.json
 │   governance/executions/EXE-7EC92F7F.json
 │   governance/executions/EXE-7F76910C.json
 │   governance/executions/EXE-7F8C2662.json
 │   governance/executions/EXE-800B9309.json
+│   governance/executions/EXE-803369A1.json
 │   governance/executions/EXE-804B0B29.json
 │   governance/executions/EXE-80E9DBA3.json
 │   governance/executions/EXE-80ECB39D.json
+│   governance/executions/EXE-810281F0.json
 │   governance/executions/EXE-81088D62.json
 │   governance/executions/EXE-8153BCF7.json
 │   governance/executions/EXE-81605476.json
@@ -1136,6 +1198,7 @@
 │   governance/executions/EXE-823B08E3.json
 │   governance/executions/EXE-823E7D28.json
 │   governance/executions/EXE-82457E01.json
+│   governance/executions/EXE-8254AF13.json
 │   governance/executions/EXE-82712DD6.json
 │   governance/executions/EXE-82A0FC9D.json
 │   governance/executions/EXE-82CB62E2.json
@@ -1150,6 +1213,7 @@
 │   governance/executions/EXE-83F315C9.json
 │   governance/executions/EXE-8430BB6F.json
 │   governance/executions/EXE-84337E51.json
+│   governance/executions/EXE-8446F4EF.json
 │   governance/executions/EXE-8454040D.json
 │   governance/executions/EXE-84753334.json
 │   governance/executions/EXE-84852FBE.json
@@ -1223,6 +1287,7 @@
 │   governance/executions/EXE-8E2CAF2D.json
 │   governance/executions/EXE-8E5185C7.json
 │   governance/executions/EXE-8E75FC2F.json
+│   governance/executions/EXE-8EB83844.json
 │   governance/executions/EXE-8ECA4B3B.json
 │   governance/executions/EXE-8EE1E4A4.json
 │   governance/executions/EXE-8EF1D08E.json
@@ -1230,11 +1295,14 @@
 │   governance/executions/EXE-8F0E162F.json
 │   governance/executions/EXE-8F144A58.json
 │   governance/executions/EXE-8F4E0A5A.json
+│   governance/executions/EXE-8F4EA9CC.json
 │   governance/executions/EXE-8F5E8CB2.json
 │   governance/executions/EXE-8F6797C0.json
 │   governance/executions/EXE-8F986AB2.json
+│   governance/executions/EXE-9042C2D3.json
 │   governance/executions/EXE-90538E5B.json
 │   governance/executions/EXE-9057165A.json
+│   governance/executions/EXE-90618DF2.json
 │   governance/executions/EXE-90BB6054.json
 │   governance/executions/EXE-90C19687.json
 │   governance/executions/EXE-90F359BD.json
@@ -1242,8 +1310,10 @@
 │   governance/executions/EXE-9124EF62.json
 │   governance/executions/EXE-9152E43F.json
 │   governance/executions/EXE-916C94A0.json
+│   governance/executions/EXE-9185A77D.json
 │   governance/executions/EXE-9191DDAA.json
 │   governance/executions/EXE-91EA03EB.json
+│   governance/executions/EXE-91EDE698.json
 │   governance/executions/EXE-91F6FAE7.json
 │   governance/executions/EXE-9212F693.json
 │   governance/executions/EXE-92345C79.json
@@ -1271,6 +1341,7 @@
 │   governance/executions/EXE-9483ECC2.json
 │   governance/executions/EXE-94915A69.json
 │   governance/executions/EXE-94D54AA7.json
+│   governance/executions/EXE-950F2BBF.json
 │   governance/executions/EXE-95492BFA.json
 │   governance/executions/EXE-955B14BB.json
 │   governance/executions/EXE-9594ACB6.json
@@ -1278,6 +1349,7 @@
 │   governance/executions/EXE-95C72245.json
 │   governance/executions/EXE-95FB062F.json
 │   governance/executions/EXE-96115A33.json
+│   governance/executions/EXE-9622A2EA.json
 │   governance/executions/EXE-96249572.json
 │   governance/executions/EXE-963ACE1F.json
 │   governance/executions/EXE-969A7790.json
@@ -1291,6 +1363,7 @@
 │   governance/executions/EXE-978D5FBD.json
 │   governance/executions/EXE-9793700E.json
 │   governance/executions/EXE-979DC1FB.json
+│   governance/executions/EXE-97D18F29.json
 │   governance/executions/EXE-97FDA9C4.json
 │   governance/executions/EXE-9829EC2B.json
 │   governance/executions/EXE-983632B0.json
@@ -1307,6 +1380,7 @@
 │   governance/executions/EXE-9A0B7782.json
 │   governance/executions/EXE-9A2A35CE.json
 │   governance/executions/EXE-9A2E3ADE.json
+│   governance/executions/EXE-9A6A4E39.json
 │   governance/executions/EXE-9AA198B2.json
 │   governance/executions/EXE-9AE8C2BF.json
 │   governance/executions/EXE-9B093E57.json
@@ -1350,6 +1424,7 @@
 │   governance/executions/EXE-9F4FA85F.json
 │   governance/executions/EXE-9F52F529.json
 │   governance/executions/EXE-9F6F6FEC.json
+│   governance/executions/EXE-9F9F953C.json
 │   governance/executions/EXE-9FA82D7E.json
 │   governance/executions/EXE-9FAAE101.json
 │   governance/executions/EXE-9FB65589.json
@@ -1381,7 +1456,9 @@
 │   governance/executions/EXE-A205342F.json
 │   governance/executions/EXE-A214A17E.json
 │   governance/executions/EXE-A223DCC2.json
+│   governance/executions/EXE-A242C94A.json
 │   governance/executions/EXE-A28EF2EB.json
+│   governance/executions/EXE-A2CA5220.json
 │   governance/executions/EXE-A2D063BD.json
 │   governance/executions/EXE-A30B4540.json
 │   governance/executions/EXE-A30C0C54.json
@@ -1390,9 +1467,11 @@
 │   governance/executions/EXE-A44273EC.json
 │   governance/executions/EXE-A448DE6D.json
 │   governance/executions/EXE-A487F589.json
+│   governance/executions/EXE-A4BED1F6.json
 │   governance/executions/EXE-A4C41846.json
 │   governance/executions/EXE-A4F6D0D7.json
 │   governance/executions/EXE-A5216564.json
+│   governance/executions/EXE-A538DD0C.json
 │   governance/executions/EXE-A55DE415.json
 │   governance/executions/EXE-A61D9023.json
 │   governance/executions/EXE-A687019D.json
@@ -1408,6 +1487,7 @@
 │   governance/executions/EXE-A875B592.json
 │   governance/executions/EXE-A878668A.json
 │   governance/executions/EXE-A8A96299.json
+│   governance/executions/EXE-A904A255.json
 │   governance/executions/EXE-A907C697.json
 │   governance/executions/EXE-A90F4CD5.json
 │   governance/executions/EXE-A91D5C05.json
@@ -1419,9 +1499,12 @@
 │   governance/executions/EXE-A9C3ADD7.json
 │   governance/executions/EXE-A9F0B8FB.json
 │   governance/executions/EXE-A9FAFC6D.json
+│   governance/executions/EXE-AA1428B5.json
+│   governance/executions/EXE-AA523492.json
 │   governance/executions/EXE-AA8345F9.json
 │   governance/executions/EXE-AA8AFF40.json
 │   governance/executions/EXE-AA9380D1.json
+│   governance/executions/EXE-AAC87773.json
 │   governance/executions/EXE-AAC9DA64.json
 │   governance/executions/EXE-AAF64B3F.json
 │   governance/executions/EXE-AB3E7035.json
@@ -1436,6 +1519,7 @@
 │   governance/executions/EXE-ACB14DBD.json
 │   governance/executions/EXE-ACB7D7B4.json
 │   governance/executions/EXE-ACB9F88E.json
+│   governance/executions/EXE-ACC60E52.json
 │   governance/executions/EXE-ACCE9068.json
 │   governance/executions/EXE-AD2EEC82.json
 │   governance/executions/EXE-AD3B79B7.json
@@ -1460,6 +1544,7 @@
 │   governance/executions/EXE-AFEA3C4C.json
 │   governance/executions/EXE-AFEFD5F8.json
 │   governance/executions/EXE-B012EB15.json
+│   governance/executions/EXE-B014EFD9.json
 │   governance/executions/EXE-B0464011.json
 │   governance/executions/EXE-B096D2FC.json
 │   governance/executions/EXE-B09C8F84.json
@@ -1475,6 +1560,7 @@
 │   governance/executions/EXE-B20B8237.json
 │   governance/executions/EXE-B22AA2F6.json
 │   governance/executions/EXE-B2409821.json
+│   governance/executions/EXE-B27032F4.json
 │   governance/executions/EXE-B2AFE492.json
 │   governance/executions/EXE-B2D2485C.json
 │   governance/executions/EXE-B2F9BE97.json
@@ -1516,9 +1602,12 @@
 │   governance/executions/EXE-B847F6E2.json
 │   governance/executions/EXE-B8A1BBA7.json
 │   governance/executions/EXE-B8BDC78F.json
+│   governance/executions/EXE-B8DE1EB1.json
 │   governance/executions/EXE-B8E6DAAB.json
 │   governance/executions/EXE-B90353F5.json
+│   governance/executions/EXE-B9382A01.json
 │   governance/executions/EXE-B954B83A.json
+│   governance/executions/EXE-B9577574.json
 │   governance/executions/EXE-B9810E60.json
 │   governance/executions/EXE-B9E4B7B3.json
 │   governance/executions/EXE-B9F806AD.json
@@ -1544,6 +1633,7 @@
 │   governance/executions/EXE-BCC365F8.json
 │   governance/executions/EXE-BD50F081.json
 │   governance/executions/EXE-BD5CD73A.json
+│   governance/executions/EXE-BD6D1718.json
 │   governance/executions/EXE-BD88991A.json
 │   governance/executions/EXE-BD8EDBC1.json
 │   governance/executions/EXE-BDAB9F99.json
@@ -1574,6 +1664,7 @@
 │   governance/executions/EXE-C2A31469.json
 │   governance/executions/EXE-C2A62F81.json
 │   governance/executions/EXE-C2B48C0D.json
+│   governance/executions/EXE-C2D056D0.json
 │   governance/executions/EXE-C30531E3.json
 │   governance/executions/EXE-C3160B7B.json
 │   governance/executions/EXE-C3261767.json
@@ -1581,6 +1672,7 @@
 │   governance/executions/EXE-C36057E4.json
 │   governance/executions/EXE-C3929036.json
 │   governance/executions/EXE-C39D4275.json
+│   governance/executions/EXE-C39D7169.json
 │   governance/executions/EXE-C3B00E7E.json
 │   governance/executions/EXE-C3CDBADC.json
 │   governance/executions/EXE-C3E1C076.json
@@ -1631,6 +1723,8 @@
 │   governance/executions/EXE-C7EB892B.json
 │   governance/executions/EXE-C7FD6FF4.json
 │   governance/executions/EXE-C7FEC393.json
+│   governance/executions/EXE-C805E229.json
+│   governance/executions/EXE-C81D99A8.json
 │   governance/executions/EXE-C81FCA02.json
 │   governance/executions/EXE-C824D2B7.json
 │   governance/executions/EXE-C8277345.json
@@ -1652,9 +1746,11 @@
 │   governance/executions/EXE-CB7AB5DE.json
 │   governance/executions/EXE-CB8E0D18.json
 │   governance/executions/EXE-CBB4C05A.json
+│   governance/executions/EXE-CBB768DB.json
 │   governance/executions/EXE-CBD6A6BD.json
 │   governance/executions/EXE-CBD7CA65.json
 │   governance/executions/EXE-CBE85A46.json
+│   governance/executions/EXE-CC17D8FB.json
 │   governance/executions/EXE-CCBDF575.json
 │   governance/executions/EXE-CD06F70F.json
 │   governance/executions/EXE-CD09DD31.json
@@ -1671,6 +1767,8 @@
 │   governance/executions/EXE-CED7CC50.json
 │   governance/executions/EXE-CEDB2EB4.json
 │   governance/executions/EXE-CEE9ECE1.json
+│   governance/executions/EXE-CF21E4DE.json
+│   governance/executions/EXE-CFB05B03.json
 │   governance/executions/EXE-D011B934.json
 │   governance/executions/EXE-D0191110.json
 │   governance/executions/EXE-D045F72A.json
@@ -1699,6 +1797,7 @@
 │   governance/executions/EXE-D3E02737.json
 │   governance/executions/EXE-D3FCD1C6.json
 │   governance/executions/EXE-D3FEC3E9.json
+│   governance/executions/EXE-D447AFD0.json
 │   governance/executions/EXE-D4634C9F.json
 │   governance/executions/EXE-D470D371.json
 │   governance/executions/EXE-D472DB15.json
@@ -1714,6 +1813,7 @@
 │   governance/executions/EXE-D65BF3A3.json
 │   governance/executions/EXE-D68376AE.json
 │   governance/executions/EXE-D696FED5.json
+│   governance/executions/EXE-D6A3EE11.json
 │   governance/executions/EXE-D6A4466E.json
 │   governance/executions/EXE-D6ABEFB1.json
 │   governance/executions/EXE-D70B8953.json
@@ -1764,16 +1864,19 @@
 │   governance/executions/EXE-DC1E9E32.json
 │   governance/executions/EXE-DC32989F.json
 │   governance/executions/EXE-DC4ECB0A.json
+│   governance/executions/EXE-DC544B6E.json
 │   governance/executions/EXE-DC9DD8B0.json
 │   governance/executions/EXE-DCDAD887.json
 │   governance/executions/EXE-DD2F7A53.json
 │   governance/executions/EXE-DD2FACBF.json
 │   governance/executions/EXE-DD3641A9.json
+│   governance/executions/EXE-DD6F58D3.json
 │   governance/executions/EXE-DD8BC344.json
 │   governance/executions/EXE-DD8E4048.json
 │   governance/executions/EXE-DDC0A3AA.json
 │   governance/executions/EXE-DDC814B4.json
 │   governance/executions/EXE-DE40E373.json
+│   governance/executions/EXE-DE42C8EB.json
 │   governance/executions/EXE-DE95CC39.json
 │   governance/executions/EXE-DEA1A5CD.json
 │   governance/executions/EXE-DED7F723.json
@@ -1792,6 +1895,7 @@
 │   governance/executions/EXE-DFFDA3F1.json
 │   governance/executions/EXE-E02A91AC.json
 │   governance/executions/EXE-E088375B.json
+│   governance/executions/EXE-E08AE1FA.json
 │   governance/executions/EXE-E096CD80.json
 │   governance/executions/EXE-E0ABB749.json
 │   governance/executions/EXE-E0F1AD17.json
@@ -1804,8 +1908,10 @@
 │   governance/executions/EXE-E17D0E0E.json
 │   governance/executions/EXE-E185CB30.json
 │   governance/executions/EXE-E1A88AF6.json
+│   governance/executions/EXE-E1D474F4.json
 │   governance/executions/EXE-E231AB26.json
 │   governance/executions/EXE-E236EDAE.json
+│   governance/executions/EXE-E2BFEA61.json
 │   governance/executions/EXE-E2E9C6D6.json
 │   governance/executions/EXE-E2F74D62.json
 │   governance/executions/EXE-E3388644.json
@@ -1861,6 +1967,7 @@
 │   governance/executions/EXE-EB7E3C9C.json
 │   governance/executions/EXE-EB8C0103.json
 │   governance/executions/EXE-EBB78281.json
+│   governance/executions/EXE-EBC07C0E.json
 │   governance/executions/EXE-EC52BB2A.json
 │   governance/executions/EXE-EC6DD3B4.json
 │   governance/executions/EXE-EC7DAD97.json
@@ -1869,6 +1976,7 @@
 │   governance/executions/EXE-ECF55E30.json
 │   governance/executions/EXE-ED201EB1.json
 │   governance/executions/EXE-ED40BE64.json
+│   governance/executions/EXE-ED42F39C.json
 │   governance/executions/EXE-ED5E8C96.json
 │   governance/executions/EXE-EDC5B6FB.json
 │   governance/executions/EXE-EDECF016.json
@@ -1878,11 +1986,15 @@
 │   governance/executions/EXE-EE7B86FB.json
 │   governance/executions/EXE-EE8A343D.json
 │   governance/executions/EXE-EE90B693.json
+│   governance/executions/EXE-EEB8415C.json
 │   governance/executions/EXE-EEE205D1.json
 │   governance/executions/EXE-EF12890C.json
+│   governance/executions/EXE-EF4CCFA9.json
 │   governance/executions/EXE-EF6B598B.json
 │   governance/executions/EXE-EF71BE6C.json
 │   governance/executions/EXE-EF8930F0.json
+│   governance/executions/EXE-EFADDE42.json
+│   governance/executions/EXE-F01EB8D3.json
 │   governance/executions/EXE-F04DC4EB.json
 │   governance/executions/EXE-F04E6D2C.json
 │   governance/executions/EXE-F085785C.json
@@ -1936,6 +2048,7 @@
 │   governance/executions/EXE-F8103B52.json
 │   governance/executions/EXE-F814AF2C.json
 │   governance/executions/EXE-F81EBC70.json
+│   governance/executions/EXE-F842AE51.json
 │   governance/executions/EXE-F845F854.json
 │   governance/executions/EXE-F8481C9F.json
 │   governance/executions/EXE-F85F7B51.json
@@ -1963,16 +2076,20 @@
 │   governance/executions/EXE-FA523DA9.json
 │   governance/executions/EXE-FA580131.json
 │   governance/executions/EXE-FA7C3133.json
+│   governance/executions/EXE-FA860617.json
 │   governance/executions/EXE-FAD2654E.json
 │   governance/executions/EXE-FAD43D41.json
 │   governance/executions/EXE-FAF9832D.json
 │   governance/executions/EXE-FB03E536.json
+│   governance/executions/EXE-FB0EFBD3.json
 │   governance/executions/EXE-FB32075A.json
 │   governance/executions/EXE-FB41EC0D.json
 │   governance/executions/EXE-FB507074.json
 │   governance/executions/EXE-FB60C108.json
 │   governance/executions/EXE-FB76562A.json
 │   governance/executions/EXE-FB91584A.json
+│   governance/executions/EXE-FBB0C7B3.json
+│   governance/executions/EXE-FC09A073.json
 │   governance/executions/EXE-FC13C5DE.json
 │   governance/executions/EXE-FC1F31B7.json
 │   governance/executions/EXE-FC236025.json
@@ -1984,6 +2101,7 @@
 │   governance/executions/EXE-FCBBFDD9.json
 │   governance/executions/EXE-FCD8D96B.json
 │   governance/executions/EXE-FD143A2B.json
+│   governance/executions/EXE-FD35EE7E.json
 │   governance/executions/EXE-FD366E60.json
 │   governance/executions/EXE-FD45BABF.json
 │   governance/executions/EXE-FD4E2C0D.json
@@ -1991,6 +2109,7 @@
 │   governance/executions/EXE-FD9D2EB3.json
 │   governance/executions/EXE-FD9F37A5.json
 │   governance/executions/EXE-FDB163EA.json
+│   governance/executions/EXE-FDD091F7.json
 │   governance/executions/EXE-FDDB1FA9.json
 │   governance/executions/EXE-FE0CFF37.json
 │   governance/executions/EXE-FE408C38.json
@@ -2300,6 +2419,7 @@
 │   reports/complexity-shitenno-2026-07-26-session1.json
 │   reports/complexity-shitenno-2026-07-26-session2.json
 │   reports/complexity-shitenno-2026-07-26-session3.json
+│   reports/complexity-shitenno-2026-07-26-session4.json
 │   reports/complexity-shitenno-cli-2026-07-12-session1.json
 │   reports/complexity-shitenno-cli-2026-07-13-session1.json
 │   reports/complexity-shitenno-cli-2026-07-14-session1.json

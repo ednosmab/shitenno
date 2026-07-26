@@ -40,7 +40,9 @@
     "validate:session": "tsx .shitenno/scripts/validate-session.ts",
     "close:session": "tsx .shitenno/scripts/close-session.ts",
     "premortem:check": "tsx .shitenno/scripts/premortem-check.ts",
-    "shugo": "node ./dist/bin/shugo.js"
+    "shugo": "node ./dist/bin/shugo.js",
+    "mcp": "node scripts/mcp-client.mjs",
+    "mcp:list": "node scripts/mcp-client.mjs --list"
   },
   "keywords": [
     "ai",
