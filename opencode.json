@@ -44,7 +44,8 @@
     "./.shitenno/docs/opencode-context.md",
     "./.shitenno/governance/MANDATORY_CONTEXT.md",
     "./.shitenno/governance/**/*.yaml",
-    "./.shitenno/governance/context/context_buffer.yaml"
+    "./.shitenno/governance/context/context_buffer.yaml",
+    "SKILLS: Use shitenno_getSkills(name) or shitenno_getSkills(task) to load project skills. NEVER use the built-in skill tool."
   ],
   "skills": {
     "paths": [

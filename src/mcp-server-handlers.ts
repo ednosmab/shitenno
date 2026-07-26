@@ -9,7 +9,7 @@ import {
 import { loadRules } from "./rule-engine.js";
 import { generateDynamicRules } from "./dynamic-rules.js";
 import { getEngineeringState } from "./engineering-state/index.js";
-import { readCache } from "./briefing-cache.js";
+import { readCache, computeInputHash, setCachedBriefing } from "./briefing-cache.js";
 import { recordOutcome, createFileStorage } from "./session-feedback.js";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -108,6 +108,16 @@ export async function handleGetBriefing(
   if (format === "summary") {
     return { content: [{ type: "text", text: briefingToSummary(briefing) }] };
   }
+
+  // Write briefing cache so submitFeedback can link feedback to this briefing
+  const inputHash = computeInputHash({
+    fingerprintHash: briefing.generatedAt,
+    riskMapHash: briefing.risks.overall,
+    contextRuleCount: briefing.tokenEconomy.contextRuleCount,
+    dynamicRuleCount: briefing.tokenEconomy.dynamicRuleCount,
+    maturityScore: briefing.project.maturityScore,
+  });
+  setCachedBriefing(shitennoDir, briefing, inputHash);
 
   const json = briefingToJson(briefing);
   return { content: [{ type: "text", text: formatBriefingJson(briefing, json, mandatorySkills, depth) }] };

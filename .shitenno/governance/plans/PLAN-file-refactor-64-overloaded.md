@@ -1,8 +1,8 @@
 # PLAN-file-refactor-64-overloaded — Refactorização de 64 Ficheiros >300 Linhas
 
-**Status:** Pending
+**Status:** In Progress (Phase 1 done)
 **Date:** 2026-07-25
-**Updated_at:** 2026-07-25T12:00:00.000Z
+**Updated_at:** 2026-07-26T03:00:00.000Z
 **Priority:** P1
 **Owner:** AI Agent + Tech Lead
 **Estimated Time:** 61 sprints
@@ -34,80 +34,90 @@ Fragmentar, refatorar e corrigir lógica em todos os 64 ficheiros acima de 300 l
 
 > Extrair tipos, constants e registry central. Base para todas as fases seguintes.
 
-### Passo 1.1: Audit Types Split
-**Ficheiro:** `src/audit/types.ts` (334 linhas)
+### Passo 1.1: Audit Types Split ✅
+**Ficheiro:** `src/audit/types.ts` (334→barrel)
 **Acção:** Dividir por domínio em `types/common.ts`, `types/governance.ts`, `types/engineering.ts`, `types/security.ts`. Manter barrel `types.ts` com re-exports.
-**Verificação:** `pnpm run typecheck` sem erros novos
+**Verificação:** `pnpm run typecheck` ✅
 
-### Passo 1.2: Audit Constants Split
-**Ficheiro:** `src/audit/constants.ts` (456 linhas)
-**Acção:** Extrair `DETECTORS_BY_LEVEL` (~358 linhas) para `constants/detector-levels.ts`. Manter thresholds e patterns em `constants.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.2: Audit Constants Split ✅
+**Ficheiro:** `src/audit/constants.ts` (456→barrel)
+**Acção:** Extrair `DETECTORS_BY_LEVEL` para `constants/detector-levels.ts`. Manter thresholds e patterns em `constants.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.3: Detector Map Split
-**Ficheiro:** `src/audit/detector-map.ts` (497 linhas)
-**Acção:** Extrair 6 builder functions para ficheiros separados: `detector-map/governance.ts`, `engineering.ts`, `git.ts`, `arch.ts`, `ops.ts`, `supply-chain.ts`. Manter `buildDetectorMap` como orquestrador.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.3: Detector Map Split ✅
+**Ficheiro:** `src/audit/detector-map.ts` (497→barrel)
+**Acção:** Extrair 6 builder functions para `detector-map/governance.ts`, `engineering.ts`, `git.ts`, `arch.ts`, `ops.ts`, `supply-chain.ts`. Manter `buildDetectorMap` como orquestrador.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.4: Commands Briefing Split
-**Ficheiro:** `src/commands/briefing.ts` (532 linhas)
-**Acção:** Extrair `briefing/display.ts` (~150 linhas, 12 display*), `briefing/challenges.ts` (~80), `briefing/collectors.ts` (~80). Manter orquestração e command registration.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.4: Commands Briefing Split ✅
+**Ficheiro:** `src/commands/briefing.ts` (532→barrel)
+**Acção:** Extrair `briefing/display.ts`, `briefing/challenges.ts`, `briefing/collectors.ts`. Manter orquestração e command registration.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.5: Commands Init Split
-**Ficheiro:** `src/commands/init.ts` (514 linhas)
-**Acção:** Extrair `init/display.ts` (~100), `init/mcp.ts` (~60), `init/orchestration.ts` (~150), `init/prompts.ts` (~80).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.5: Commands Init Split ✅
+**Ficheiro:** `src/commands/init.ts` (514→barrel)
+**Acção:** Extrair `init/display.ts`, `init/mcp.ts`, `init/orchestration.ts`, `init/prompts.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.6: Commands Validate Split
-**Ficheiro:** `src/commands/validate.ts` (509 linhas)
-**Acção:** Extrair `validate/checks.ts` (~200, 6 check functions), `validate/display.ts` (~50), `validate/fixers.ts` (~100).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.6: Commands Validate Split ✅
+**Ficheiro:** `src/commands/validate.ts` (509→barrel)
+**Acção:** Extrair `validate/checks.ts`, `validate/display.ts`, `validate/fixers.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.7: Markdown Plan Engine Split
-**Ficheiro:** `src/markdown-plan-engine.ts` (619 linhas)
-**Acção:** Extrair `plan-parser.ts` (frontmatter parsing), `plan-status.ts` (status inference). Manter `MarkdownPlanEngine` como orquestrador.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.7: Markdown Plan Engine Split ✅
+**Ficheiro:** `src/markdown-plan-engine.ts` (619→barrel)
+**Acção:** Extrair `markdown-plan-engine/file-operations.ts`, `markdown-plan-engine/status-inference.ts`. Manter `MarkdownPlanEngine` como orquestrador.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.8: Briefing Core Split
-**Ficheiro:** `src/briefing.ts` (598 linhas)
-**Acção:** Extrair `briefing-formatter.ts` (toJson, toMarkdown, toSummary), `briefing-diff.ts` (diff logic).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.8: Briefing Core Split ✅
+**Ficheiro:** `src/briefing.ts` (598→305)
+**Acção:** Extrair `briefing-formatter.ts` (218L), `briefing-diff.ts` (91L).
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.9: Context Collector Split
-**Ficheiro:** `src/context-collector.ts` (527 linhas)
-**Acção:** Extrair `context-cache.ts` (cache management), `context-snapshot.ts` (snapshot construction).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.9: Context Collector Split ✅
+**Ficheiro:** `src/context-collector.ts` (527→barrel)
+**Acção:** Extrair `context-collector/types.ts`, `context-collector/quick-board.ts`, `context-collector/enrichments.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.10: Context Buffer Writer Split
-**Ficheiro:** `src/context-buffer-writer.ts` (498 linhas)
-**Acção:** Extrair `buffer-session.ts`, `buffer-reminders.ts`, `buffer-impediments.ts` (domain updates). Manter core YAML manipulation.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.10: Context Buffer Writer Split ✅
+**Ficheiro:** `src/context-buffer-writer.ts` (498→barrel)
+**Acção:** Extrair `context-buffer-writer/buffer-io.ts`, `context-buffer-writer/updates.ts`, `context-buffer-writer/reminders.ts`, `context-buffer-writer/impediments.ts`, `context-buffer-writer/skill-resolution.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.11: Prioritization Recommend Split
-**Ficheiro:** `src/prioritization/recommend.ts` (504 linhas)
-**Acção:** Extrair `recommendation/generators/` (7 geradores), `recommendation/engine.ts` (orquestração), `recommendation/report.ts` (persistência).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.11: Prioritization Recommend Split ✅
+**Ficheiro:** `src/prioritization/recommend.ts` (504→barrel)
+**Acção:** Extrair `recommend/types.ts`, `recommend/generators.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.12: Prioritization Evaluators Split
-**Ficheiro:** `src/prioritization/evaluators.ts` (452 linhas)
-**Acção:** Extrair `evaluators/goal.ts`, `risk.ts`, `impact.ts`, `confidence.ts`, `debt.ts`, `repository.ts`, `engine.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.12: Prioritization Evaluators Split ✅
+**Ficheiro:** `src/prioritization/evaluators.ts` (452→barrel)
+**Acção:** Extrair `evaluators/types.ts`, `evaluators/evaluators.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.13: File Watcher Split
-**Ficheiro:** `src/infrastructure/persistence/file-watcher.ts` (513 linhas)
-**Acção:** Extrair `watcher-lifecycle.ts`, `watcher/event-handlers.ts`, `watcher/git-watcher.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.13: File Watcher Split ✅
+**Ficheiro:** `src/infrastructure/persistence/file-watcher.ts` (513→barrel)
+**Acção:** Extrair `file-watcher/types.ts`, `file-watcher/handlers.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.14: Rule Engine Policy Split
-**Ficheiro:** `src/rule-engine/policy.ts` (431 linhas)
-**Acção:** Extrair `condition-evaluator.ts` (~100), `repository.ts` (~80), `engine.ts` (~250).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.14: Rule Engine Policy Split ✅
+**Ficheiro:** `src/rule-engine/policy.ts` (431→barrel)
+**Acção:** Extrair `policy/types.ts`, `policy/conditions.ts`, `policy/repository.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 1.15-1.17: Outros Foundation
-**Ficheiros:** `src/event-payloads.ts` (450), `src/action-engine.ts` (446), `src/backlog-writer.ts` (471)
-**Acção:** Extrair sub-módulos por domínio funcional.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 1.15: Backlog Writer Split ✅
+**Ficheiro:** `src/backlog-writer.ts` (471→barrel)
+**Acção:** Extrair `backlog-writer/core.ts`, `backlog-writer/legacy.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
+
+### Passo 1.16: Event Payloads Split ✅
+**Ficheiro:** `src/event-payloads.ts` (450→barrel 92L)
+**Acção:** Extrair `event-payloads/types.ts` (397L). Manter `createEventPayload` helper.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
+
+### Passo 1.17: Action Engine Split ✅
+**Ficheiro:** `src/action-engine.ts` (446→barrel 12L)
+**Acção:** Extrair `action-engine/types.ts` (92L), `action-engine/executors.ts` (121L), `action-engine/engine.ts` (215L).
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ---
 

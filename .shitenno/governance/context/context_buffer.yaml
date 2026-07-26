@@ -1,21 +1,43 @@
+skills_resolved:
+  - skillId: "tdd-agent"
+    taskMeta: "task=implementation"
+    reason: "mandatory"
+    resolvedAt: "2026-07-26T03:02:22.348Z"
+  - skillId: "clean_code_standards"
+    taskMeta: "task=implementation"
+    reason: "mandatory"
+    resolvedAt: "2026-07-26T03:02:22.348Z"
+  - skillId: "senior-engineer"
+    taskMeta: "task=implementation"
+    reason: "mandatory"
+    resolvedAt: "2026-07-26T03:02:22.348Z"
+  - skillId: "tdd_workflow"
+    taskMeta: "task=implementation"
+    reason: "mandatory"
+    resolvedAt: "2026-07-26T03:02:22.347Z"
+
 reminders:
   - message: "Revisar handbook — AI preencheu dados semânticos. Editar partes filosóficas."
     priority: "medium"
     category: "docs"
     createdAt: "2026-07-24T14:26:13.522Z"
+  - message: "Path .shitenno: MCP local-filesystem filtra dot-prefs. Usar MCP shitenno para governance/plans."
+    priority: "high"
+    category: "mcp"
+    createdAt: "2026-07-25T22:50:00.000Z"
 []
 session:
   id: session-2026-07-16-audit
   status: active
 
 current_task:
-  id: governance-plans-execution
-  description: "Execute 3 governance plans: Resilience, Log Rotation, Full Integration"
+  id: plan-file-refactor-phase1
+  description: "PLAN-file-refactor-64-overloaded — Phase 1 (17 foundation files)"
   status: "completed"
-  started_at: "2026-07-17T00:00:00.000Z"
-  completed_at: "2026-07-17T05:55:00.000Z"
+  started_at: "2026-07-25T12:00:00.000Z"
+  completed_at: "2026-07-26T03:00:00.000Z"
 
-next_p0: "Define next P0 item from backlog (quality-roadmap completed)"
+next_p0: "PLAN-file-refactor Phase 2 — Audit Detectors (9 files >300L)"
 
 documents_loaded:
   - docs/BACKLOG.md
@@ -47,6 +69,7 @@ completed_tasks:
   - PLAN-LOG-ROTATION (byte counter, rotation config, rotateLogIfNeeded)
   - PLAN-DAEMON-FULL-INTEGRATION (Fases 6-9: watch removal, daemon logs, command.completed loop, daemon-aware banner)
   - PLAN-QUALITY-ROADMAP (Phases 1-3: atomic writes, daemon hardening, code hygiene)
+  - PLAN-FILE-REFACTOR Phase 1 (17 foundation files: audit types/constants/detector-map, commands briefing/init/validate, markdown-plan-engine, briefing, context-collector, context-buffer-writer, backlog-writer, prioritization recommend/evaluators, rule-engine policy, file-watcher, event-payloads, action-engine)
 
 impediments:
   - description: "Retroactive sync failed for TEST-FILE-WATCHER-001: 2 errors"
