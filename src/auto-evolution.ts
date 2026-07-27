@@ -195,9 +195,10 @@ function countByPriority(recommendations: EvolutionRecommendation[]): Record<Rec
 }
 
 function buildSummary(
-  recommendations: EvolutionRecommendation[], byPriority: Record<RecommendationPriority, number>,
-  suppressedCount: number, state: EngineeringState, debtReport: KnowledgeDebtReport | null, growthProfile: GrowthProfile
+  input: { recommendations: EvolutionRecommendation[]; byPriority: Record<RecommendationPriority, number>;
+    suppressedCount: number; state: EngineeringState; debtReport: KnowledgeDebtReport | null; growthProfile: GrowthProfile }
 ): string {
+  const { recommendations, byPriority, suppressedCount, state, debtReport, growthProfile } = input;
   const parts: string[] = [`${recommendations.length} recommendation(s).`];
   if (byPriority.urgent) parts.push(`${byPriority.urgent} urgent.`);
   if (byPriority.high) parts.push(`${byPriority.high} high.`);
@@ -235,7 +236,7 @@ export function analyzeEvolution(projectRoot: string, shitennoDir: string): Evol
     analyzedAt: new Date().toISOString(),
     currentState: { maturityScore: state.maturity?.overallScore || 0, installedCapabilities: state.capabilities, knowledgeDebtScore: debtReport?.healthScore || 100 },
     totalRecommendations: recommendations.length, byType, byPriority, recommendations, dualPaths, growthProfile, topNextSteps,
-    summary: buildSummary(recommendations, byPriority, suppressedCount, state, debtReport, growthProfile),
+    summary: buildSummary({ recommendations, byPriority, suppressedCount, state, debtReport, growthProfile }),
   };
 }
 

@@ -65,22 +65,26 @@ export function updateLegacyStatus(content: string, newStatus: MarkdownPlanStatu
 
 // ── Event Publishing ───────────────────────────────────────────────────────
 
-export function publishStatusEvents(
-  id: string,
-  planStatus: MarkdownPlanStatus,
-  planRelativePath: string,
-  planTitle: string,
-  newStatus: MarkdownPlanStatus,
-  plansDir: string,
-  doneDir: string
-): void {
-  if (planStatus !== newStatus) {
+export interface StatusEventPayload {
+  id: string;
+  oldStatus: MarkdownPlanStatus;
+  newStatus: MarkdownPlanStatus;
+  relativePath: string;
+  title: string;
+  plansDir: string;
+  doneDir: string;
+}
+
+export function publishStatusEvents(payload: StatusEventPayload): void {
+  const { id, oldStatus, newStatus, relativePath, title, plansDir, doneDir } = payload;
+
+  if (oldStatus !== newStatus) {
     const bus = getEventBus();
     bus.publish("plan.status_changed", {
       planId: id,
-      oldStatus: planStatus,
+      oldStatus,
       newStatus,
-      path: planRelativePath,
+      path: relativePath,
     });
   }
 
@@ -89,7 +93,7 @@ export function publishStatusEvents(
     const bus = getEventBus();
     bus.publish("plan.archived", {
       planId: id,
-      title: planTitle,
+      title,
       path: `shitenno/governance/plans/done/${id}.md`,
       finalStatus: "done",
     });

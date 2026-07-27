@@ -97,13 +97,18 @@ export function generatePerformanceReport(
   });
 }
 
-export function writePerformanceReport(projectRoot: string, report: PerformanceReport): void {
+export function writePerformanceReport(projectRoot: string, report: PerformanceReport): string | null {
   const shitennoDir = join(projectRoot, ".shitenno");
   if (!existsSync(shitennoDir)) {
     mkdirSync(shitennoDir, { recursive: true });
   }
-  const reportPath = join(shitennoDir, "performance-report.json");
-  writeFileSync(reportPath, JSON.stringify(report, null, 2));
+  try {
+    const reportPath = join(shitennoDir, "performance-report.json");
+    writeFileSync(reportPath, JSON.stringify(report, null, 2));
+    return "performance-report.json";
+  } catch {
+    return null;
+  }
 }
 
 export function getRecommendations(report: PerformanceReport): PerformanceRecommendation[] {

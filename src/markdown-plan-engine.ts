@@ -167,15 +167,15 @@ export class MarkdownPlanEngine {
     }
 
     writeFileSync(plan.filePath, content, "utf-8");
-    publishStatusEvents(
+    publishStatusEvents({
       id,
-      plan.status,
-      plan.relativePath,
-      plan.title,
+      oldStatus: plan.status,
       newStatus,
-      this.plansDir,
-      this.doneDir
-    );
+      relativePath: plan.relativePath,
+      title: plan.title,
+      plansDir: this.plansDir,
+      doneDir: this.doneDir,
+    });
     return this.getById(id)!;
   }
 

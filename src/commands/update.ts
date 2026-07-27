@@ -186,6 +186,33 @@ function processUpdate(ctx: { shitennoDir: string }, currentManifest: Manifest):
   return { currentManifest, currentCliVersion, diff, hasChanges, versionMismatch };
 }
 
+async function tryAutoCreateManifest(
+  ctx: { shitennoDir: string; projectRoot: string },
+  isJson: boolean
+): Promise<UpdateData | null> {
+  const spinner = ora("No manifest found — creating from current state...").start();
+  try {
+    const { createManifest } = await import("../manifest.js");
+    const { loadMaturityProfile } = await import("../maturity-profile.js");
+    const profile = loadMaturityProfile(ctx.shitennoDir);
+    const capabilities = profile?.installedCapabilities ?? ["core"];
+    const maturityScore = profile?.overallScore ?? 0;
+    let cliVersion = "unknown";
+    try {
+      const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8"));
+      cliVersion = pkg.version || "unknown";
+    } catch { /* ignore */ }
+    const newManifest = createManifest(cliVersion, ctx.shitennoDir, capabilities, maturityScore);
+    writeManifest(ctx.shitennoDir, newManifest);
+    spinner.succeed("Manifest created. Re-running update check...");
+    return processUpdate(ctx, newManifest);
+  } catch (err) {
+    spinner.fail(`Failed to create manifest: ${err}`);
+    outputNoManifest(isJson);
+    return null;
+  }
+}
+
 function outputNoManifest(isJson: boolean): void {
   if (isJson) {
     outputJson({ error: "no_manifest", message: "No manifest found. Run 'shugo init' or 'shugo upgrade' first." });
@@ -306,67 +333,29 @@ export const updateCommand = new Command("update")
     if (!checkLifecycleGate("update", ctx.projectRoot, ctx.shitennoDir, isJson)) return;
 
     const currentManifest = readManifest(ctx.shitennoDir);
-    if (!currentManifest) {
-      // Auto-create manifest from current state instead of failing
-      const spinner = ora("No manifest found — creating from current state...").start();
-      try {
-        const { createManifest } = await import("../manifest.js");
-        const { loadMaturityProfile } = await import("../maturity-profile.js");
-        const profile = loadMaturityProfile(ctx.shitennoDir);
-        const capabilities = profile?.installedCapabilities ?? ["core"];
-        const maturityScore = profile?.overallScore ?? 0;
-        // Read CLI version directly from package.json
-        let cliVersion = "unknown";
-        try {
-          const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8"));
-          cliVersion = pkg.version || "unknown";
-        } catch { /* ignore */ }
-        const newManifest = createManifest(cliVersion, ctx.shitennoDir, capabilities, maturityScore);
-        writeManifest(ctx.shitennoDir, newManifest);
-        spinner.succeed("Manifest created. Re-running update check...");
-        // Re-run with the new manifest
-        const data2 = processUpdate(ctx, newManifest);
-        if (!data2.hasChanges && !data2.versionMismatch) {
-          outputUpToDate(data2, isJson);
-        } else {
-          if (!isJson && data2.versionMismatch) {
-            outputInfo(`  ℹ CLI version changed: ${data2.currentManifest.cliVersion} → ${data2.currentCliVersion}`);
-            outputBlank();
-          }
-          if (!isJson) displayDiff(data2.diff, false);
-          if (options.apply || options.dryRun) {
-            if (options.dryRun) { outputDryRun(data2, isJson); } else { applyUpdatesAndReport(targetDir, data2, ctx, options); }
-          } else { outputChangesSummary(data2, isJson); }
-        }
-        return;
-      } catch (err) {
-        spinner.fail(`Failed to create manifest: ${err}`);
-        outputNoManifest(isJson);
-        return;
-      }
-    }
+    let data: UpdateData;
 
-    const data = processUpdate(ctx, currentManifest);
+    if (!currentManifest) {
+      const result = await tryAutoCreateManifest(ctx, isJson);
+      if (!result) return;
+      data = result;
+    } else {
+      data = processUpdate(ctx, currentManifest);
+    }
 
     if (!data.hasChanges && !data.versionMismatch) {
       outputUpToDate(data, isJson);
       return;
     }
 
-    if (!isJson) {
-      if (data.versionMismatch) {
-        outputInfo(`  ℹ CLI version changed: ${data.currentManifest.cliVersion} → ${data.currentCliVersion}`);
-        outputBlank();
-      }
-      displayDiff(data.diff, false);
+    if (!isJson && data.versionMismatch) {
+      outputInfo(`  ℹ CLI version changed: ${data.currentManifest.cliVersion} → ${data.currentCliVersion}`);
+      outputBlank();
     }
+    if (!isJson) displayDiff(data.diff, false);
 
     if (options.apply || options.dryRun) {
-      if (options.dryRun) {
-        outputDryRun(data, isJson);
-        return;
-      }
-
+      if (options.dryRun) { outputDryRun(data, isJson); return; }
       applyUpdatesAndReport(targetDir, data, ctx, options);
     } else {
       outputChangesSummary(data, isJson);

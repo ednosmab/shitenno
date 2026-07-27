@@ -137,7 +137,13 @@ export class TaintAnalyzer {
     for (const sourceFile of sourceFiles) {
       if (sourceFile.isDeclarationFile) continue;
       if (sourceFile.fileName.includes("node_modules")) continue;
-      visit(sourceFile, sourceFile, this.graph, this.variableTaint, this.checker, () => this.nextNodeId());
+      visit(sourceFile, {
+        graph: this.graph,
+        variableTaint: this.variableTaint,
+        checker: this.checker,
+        sourceFile,
+        nextNodeId: () => this.nextNodeId(),
+      });
     }
   }
 

@@ -588,6 +588,86 @@ export function handleGetChallenges(
 
 // ── Audit Report ──────────────────────────────────────────────────────────
 
+type AuditReport = {
+  healthScore: number;
+  dimensionScores?: Record<string, number>;
+  issues: Array<{ type: string; severity: number; description: string; location: string }>;
+  suppressedIssues?: unknown[];
+  optimizations?: unknown[];
+  summary?: string;
+  auditedAt?: string;
+  level?: string;
+  filesScanned?: number;
+  detectorsRun?: string[];
+};
+
+function formatAuditReportSummary(report: AuditReport, latest: string): string {
+  const lines: string[] = [
+    `Health Score: ${report.healthScore}/100`,
+    `Report: ${latest}`,
+    `Audited: ${report.auditedAt ?? "unknown"}`,
+    `Level: ${report.level ?? "unknown"}`,
+    `Files scanned: ${report.filesScanned ?? "unknown"}`,
+    "",
+  ];
+
+  if (report.dimensionScores) {
+    lines.push("Dimension Scores:");
+    for (const [dim, score] of Object.entries(report.dimensionScores)) {
+      lines.push(`  ${dim}: ${score}`);
+    }
+    lines.push("");
+  }
+
+  const critical = report.issues.filter(i => i.severity === 3);
+  const warnings = report.issues.filter(i => i.severity === 2);
+  const info = report.issues.filter(i => i.severity === 1);
+
+  lines.push(`Issues: ${critical.length} critical, ${warnings.length} warnings, ${info.length} info`);
+  if (report.suppressedIssues && report.suppressedIssues.length > 0) {
+    lines.push(`Suppressed: ${report.suppressedIssues.length}`);
+  }
+  if (report.optimizations && report.optimizations.length > 0) {
+    lines.push(`Optimizations proposed: ${report.optimizations.length}`);
+  }
+
+  if (critical.length > 0) {
+    lines.push("");
+    lines.push("Critical Issues:");
+    for (const issue of critical.slice(0, 5)) {
+      lines.push(`  - [${issue.type}] ${issue.description}`);
+      lines.push(`    Location: ${issue.location}`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+function resolveLatestReport(
+  reportsDir: string,
+  dateFilter: string | undefined
+): { latest: string; error?: ToolResponse } | { latest: string; error?: never } {
+  const allFiles = readdirSync(reportsDir)
+    .filter(f => f.startsWith("health-") && f.endsWith(".json"))
+    .sort()
+    .reverse();
+
+  if (allFiles.length === 0) {
+    return { latest: "", error: { content: [{ type: "text", text: "No audit reports found. Run 'shugo audit' first." }] } };
+  }
+
+  if (dateFilter) {
+    const target = `health-${dateFilter}.json`;
+    if (!allFiles.includes(target)) {
+      const available = allFiles.map(f => f.replace("health-", "").replace(".json", "")).join(", ");
+      return { latest: "", error: { content: [{ type: "text", text: `No audit report found for date '${dateFilter}'. Available dates: ${available || "none"}` }] } };
+    }
+    return { latest: target };
+  }
+
+  return { latest: allFiles[0]! };
+}
+
 export function handleGetAuditReport(
   _projectRoot: string,
   shitennoDir: string,
@@ -601,39 +681,11 @@ export function handleGetAuditReport(
     return { content: [{ type: "text", text: "No audit reports found. Run 'shugo audit' first." }] };
   }
 
-  const allFiles = readdirSync(reportsDir)
-    .filter(f => f.startsWith("health-") && f.endsWith(".json"))
-    .sort()
-    .reverse();
+  const { latest, error } = resolveLatestReport(reportsDir, dateFilter);
+  if (error) return error;
 
-  if (allFiles.length === 0) {
-    return { content: [{ type: "text", text: "No audit reports found. Run 'shugo audit' first." }] };
-  }
-
-  let latest: string;
-  if (dateFilter) {
-    const target = `health-${dateFilter}.json`;
-    if (!allFiles.includes(target)) {
-      const available = allFiles.map(f => f.replace("health-", "").replace(".json", "")).join(", ");
-      return { content: [{ type: "text", text: `No audit report found for date '${dateFilter}'. Available dates: ${available || "none"}` }] };
-    }
-    latest = target;
-  } else {
-    latest = allFiles[0]!;
-  }
   const reportPath = join(reportsDir, latest);
-  let report: {
-    healthScore: number;
-    dimensionScores?: Record<string, number>;
-    issues: Array<{ type: string; severity: number; description: string; location: string }>;
-    suppressedIssues?: unknown[];
-    optimizations?: unknown[];
-    summary?: string;
-    auditedAt?: string;
-    level?: string;
-    filesScanned?: number;
-    detectorsRun?: string[];
-  };
+  let report: AuditReport;
   try {
     report = JSON.parse(readFileSync(reportPath, "utf-8"));
   } catch (parseError) {
@@ -642,45 +694,7 @@ export function handleGetAuditReport(
   }
 
   if (format === "summary") {
-    const lines: string[] = [
-      `Health Score: ${report.healthScore}/100`,
-      `Report: ${latest}`,
-      `Audited: ${report.auditedAt ?? "unknown"}`,
-      `Level: ${report.level ?? "unknown"}`,
-      `Files scanned: ${report.filesScanned ?? "unknown"}`,
-      "",
-    ];
-
-    if (report.dimensionScores) {
-      lines.push("Dimension Scores:");
-      for (const [dim, score] of Object.entries(report.dimensionScores)) {
-        lines.push(`  ${dim}: ${score}`);
-      }
-      lines.push("");
-    }
-
-    const critical = report.issues.filter(i => i.severity === 3);
-    const warnings = report.issues.filter(i => i.severity === 2);
-    const info = report.issues.filter(i => i.severity === 1);
-
-    lines.push(`Issues: ${critical.length} critical, ${warnings.length} warnings, ${info.length} info`);
-    if (report.suppressedIssues && report.suppressedIssues.length > 0) {
-      lines.push(`Suppressed: ${report.suppressedIssues.length}`);
-    }
-    if (report.optimizations && report.optimizations.length > 0) {
-      lines.push(`Optimizations proposed: ${report.optimizations.length}`);
-    }
-
-    if (critical.length > 0) {
-      lines.push("");
-      lines.push("Critical Issues:");
-      for (const issue of critical.slice(0, 5)) {
-        lines.push(`  - [${issue.type}] ${issue.description}`);
-        lines.push(`    Location: ${issue.location}`);
-      }
-    }
-
-    return { content: [{ type: "text", text: lines.join("\n") }] };
+    return { content: [{ type: "text", text: formatAuditReportSummary(report, latest) }] };
   }
 
   return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };

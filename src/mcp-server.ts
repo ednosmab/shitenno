@@ -205,6 +205,32 @@ export const TOOLS = [
   },
 ];
 
+type ToolHandler = (
+  projectRoot: string,
+  shitennoDir: string,
+  toolArgs: Record<string, unknown>
+) => ToolResponse | Promise<ToolResponse>;
+
+const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  getBriefing: handleGetBriefing,
+  getRiskMap: handleGetRiskMap,
+  getRules: handleGetRules,
+  getEngineeringState: handleGetEngineeringState,
+  getBacklog: handleGetBacklog,
+  getPlans: handleGetPlans,
+  submitFeedback: handleSubmitFeedback,
+  getADRs: handleGetADRs,
+  getSkills: handleGetSkills,
+  addBacklogItem: handleAddBacklogItem,
+  transitionBacklogItem: handleTransitionBacklogItem,
+  deleteBacklogItem: handleDeleteBacklogItem,
+  getKnowledgeDebt: handleGetKnowledgeDebt,
+  getChallenges: handleGetChallenges,
+  getAuditReport: handleGetAuditReport,
+  getEvolution: handleGetEvolution,
+  getMandatoryContext: handleGetMandatoryContext,
+};
+
 export async function dispatchTool(
   name: string,
   projectRoot: string,
@@ -212,47 +238,14 @@ export async function dispatchTool(
   toolArgs: Record<string, unknown>
 ): Promise<ToolResponse> {
   try {
-    switch (name) {
-      case "getBriefing":
-        return await handleGetBriefing(projectRoot, shitennoDir, toolArgs);
-      case "getRiskMap":
-        return await handleGetRiskMap(projectRoot, shitennoDir, toolArgs);
-      case "getRules":
-        return await handleGetRules(projectRoot, shitennoDir, toolArgs);
-      case "getEngineeringState":
-        return await handleGetEngineeringState(projectRoot, shitennoDir, toolArgs);
-      case "getBacklog":
-        return handleGetBacklog(projectRoot, shitennoDir, toolArgs);
-      case "getPlans":
-        return handleGetPlans(projectRoot, shitennoDir, toolArgs);
-      case "submitFeedback":
-        return handleSubmitFeedback(projectRoot, shitennoDir, toolArgs);
-      case "getADRs":
-        return await handleGetADRs(projectRoot, shitennoDir, toolArgs);
-      case "getSkills":
-        return await handleGetSkills(projectRoot, shitennoDir, toolArgs);
-      case "addBacklogItem":
-        return handleAddBacklogItem(projectRoot, shitennoDir, toolArgs);
-      case "transitionBacklogItem":
-        return handleTransitionBacklogItem(projectRoot, shitennoDir, toolArgs);
-      case "deleteBacklogItem":
-        return handleDeleteBacklogItem(projectRoot, shitennoDir, toolArgs);
-      case "getKnowledgeDebt":
-        return handleGetKnowledgeDebt(projectRoot, shitennoDir, toolArgs);
-      case "getChallenges":
-        return handleGetChallenges(projectRoot, shitennoDir, toolArgs);
-      case "getAuditReport":
-        return handleGetAuditReport(projectRoot, shitennoDir, toolArgs);
-      case "getEvolution":
-        return handleGetEvolution(projectRoot, shitennoDir, toolArgs);
-      case "getMandatoryContext":
-        return handleGetMandatoryContext(projectRoot, shitennoDir, toolArgs);
-      default:
-        return {
-          content: [{ type: "text", text: `Unknown tool: ${name}. Available: ${TOOLS.map((t) => t.name).join(", ")}` }],
-          isError: true,
-        };
+    const handler = TOOL_HANDLERS[name];
+    if (!handler) {
+      return {
+        content: [{ type: "text", text: `Unknown tool: ${name}. Available: ${TOOLS.map((t) => t.name).join(", ")}` }],
+        isError: true,
+      };
     }
+    return await handler(projectRoot, shitennoDir, toolArgs);
   } catch (error) {
     return {
       content: [{ type: "text", text: error instanceof Error ? error.message : String(error) }],

@@ -22,7 +22,10 @@ export interface VariableInfo {
 export interface AstVisitorContext {
   graph: DataFlowGraph;
   variableTaint: Map<string, VariableInfo>;
-  nodeCounter: number;
+  nodeCounter?: number;
+  checker: ts.TypeChecker;
+  sourceFile: ts.SourceFile;
+  nextNodeId: () => string;
 }
 
 /** Extract the full name of a property access expression (e.g., "req.body.user") */
@@ -103,13 +106,16 @@ export function getSymbolName(
     ?? resolveSymbolFromNode(node, checker, getPropertyAccessNameBound);
 }
 
-export function createTaintNodeAt(
-  variableName: string,
-  kind: "source" | "sink" | "assignment",
-  text: string,
-  tsNode: ts.Node,
-  nextNodeId: () => string
-): TaintNode {
+export interface TaintNodeParams {
+  variableName: string;
+  kind: "source" | "sink" | "assignment";
+  text: string;
+  tsNode: ts.Node;
+  nextNodeId: () => string;
+}
+
+export function createTaintNodeAt(params: TaintNodeParams): TaintNode {
+  const { variableName, kind, text, tsNode, nextNodeId } = params;
   const sourceFile = tsNode.getSourceFile();
   const nodeId = nextNodeId();
   const { line, character } = ts.getLineAndCharacterOfPosition(sourceFile, tsNode.getStart());
@@ -135,9 +141,7 @@ export function findExistingSourceNode(
 
 export function visitSource(
   node: ts.Node,
-  graph: DataFlowGraph,
-  variableTaint: Map<string, VariableInfo>,
-  nextNodeId: () => string
+  ctx: Pick<AstVisitorContext, "graph" | "variableTaint" | "nextNodeId">
 ): void {
   let sourceNode: ts.PropertyAccessExpression | undefined;
 
@@ -153,10 +157,10 @@ export function visitSource(
   const sourceDef = isTaintSource(fullName);
   if (!sourceDef) return;
 
-  const taintNode = createTaintNodeAt(fullName, "source", fullName, node, nextNodeId);
-  graph.addNode(taintNode);
+  const taintNode = createTaintNodeAt({ variableName: fullName, kind: "source", text: fullName, tsNode: node, nextNodeId: ctx.nextNodeId });
+  ctx.graph.addNode(taintNode);
 
-  variableTaint.set(fullName, {
+  ctx.variableTaint.set(fullName, {
     name: fullName,
     tainted: true,
     source: sourceDef,
@@ -180,23 +184,20 @@ export function findTaintedArgument(
 
 export function visitSink(
   node: ts.CallExpression,
-  graph: DataFlowGraph,
-  variableTaint: Map<string, VariableInfo>,
-  nextNodeId: () => string,
-  checker: ts.TypeChecker
+  ctx: Pick<AstVisitorContext, "graph" | "variableTaint" | "checker" | "nextNodeId">
 ): void {
   const funcName = getCallName(node);
   const sinkDef = findTaintSink(funcName);
   if (!sinkDef) return;
 
-  const sourceVar = findTaintedArgument(node, variableTaint, checker);
-  const taintNode = createTaintNodeAt(funcName, "sink", funcName, node, nextNodeId);
-  graph.addNode(taintNode);
+  const sourceVar = findTaintedArgument(node, ctx.variableTaint, ctx.checker);
+  const taintNode = createTaintNodeAt({ variableName: funcName, kind: "sink", text: funcName, tsNode: node, nextNodeId: ctx.nextNodeId });
+  ctx.graph.addNode(taintNode);
 
   if (!sourceVar) return;
-  const sourceNode = findExistingSourceNode(sourceVar, graph);
+  const sourceNode = findExistingSourceNode(sourceVar, ctx.graph);
   if (sourceNode) {
-    graph.addEdge({ from: sourceNode.id, to: taintNode.id, kind: "parameter" });
+    ctx.graph.addEdge({ from: sourceNode.id, to: taintNode.id, kind: "parameter" });
   }
 }
 
@@ -253,108 +254,95 @@ export function handleCommanderAction(
 
 export function visitAssignment(
   node: ts.BinaryExpression,
-  sourceFile: ts.SourceFile,
-  graph: DataFlowGraph,
-  variableTaint: Map<string, VariableInfo>,
-  checker: ts.TypeChecker,
-  nextNodeId: () => string
+  ctx: Pick<AstVisitorContext, "graph" | "variableTaint" | "checker" | "sourceFile" | "nextNodeId">
 ): void {
-  const leftName = getSymbolName(node.left, checker, variableTaint);
-  const rightName = getSymbolName(node.right, checker, variableTaint);
+  const leftName = getSymbolName(node.left, ctx.checker, ctx.variableTaint);
+  const rightName = getSymbolName(node.right, ctx.checker, ctx.variableTaint);
   if (!leftName || !rightName) return;
-  const rightInfo = variableTaint.get(rightName);
+  const rightInfo = ctx.variableTaint.get(rightName);
   if (!rightInfo?.tainted) return;
 
-  const leftSymbol = checker.getSymbolAtLocation(node.left);
+  const leftSymbol = ctx.checker.getSymbolAtLocation(node.left);
   const actualLeftName = leftSymbol?.getName() ?? leftName;
 
-  variableTaint.set(actualLeftName, {
+  ctx.variableTaint.set(actualLeftName, {
     name: actualLeftName,
     tainted: true,
     source: rightInfo.source,
     declarations: [],
   });
 
-  const leftNodeId = nextNodeId();
-  const { line, character } = ts.getLineAndCharacterOfPosition(sourceFile, node.getStart());
-  const taintNode: TaintNode = {
-    id: leftNodeId,
+  const nodeId = ctx.nextNodeId();
+  const { line, character } = ts.getLineAndCharacterOfPosition(ctx.sourceFile, node.left.getStart());
+  ctx.graph.addNode({
+    id: nodeId,
     kind: "assignment",
     variableName: actualLeftName,
-    sourceFile: sourceFile.fileName,
+    sourceFile: ctx.sourceFile.fileName,
     line: line + 1,
     column: character + 1,
-    text: `${actualLeftName} = ${rightName}`,
-  };
-  graph.addNode(taintNode);
+    text: node.getText(),
+  });
 
-  const rightNode = findExistingSourceNode(rightName, graph);
+  const rightNode = findExistingSourceNode(rightName, ctx.graph);
   if (rightNode) {
-    graph.addEdge({ from: rightNode.id, to: leftNodeId, kind: "assignment" });
+    ctx.graph.addEdge({ from: rightNode.id, to: nodeId, kind: "assignment" });
   }
 }
 
 export function visitVarDeclaration(
   node: ts.VariableDeclaration,
-  sourceFile: ts.SourceFile,
-  graph: DataFlowGraph,
-  variableTaint: Map<string, VariableInfo>,
-  checker: ts.TypeChecker,
-  nextNodeId: () => string
+  ctx: Pick<AstVisitorContext, "graph" | "variableTaint" | "checker" | "sourceFile" | "nextNodeId">
 ): void {
   if (!node.initializer) return;
-  const varName = getSymbolName(node.name, checker, variableTaint);
-  const initName = getSymbolName(node.initializer, checker, variableTaint);
+  const varName = getSymbolName(node.name, ctx.checker, ctx.variableTaint);
+  const initName = getSymbolName(node.initializer, ctx.checker, ctx.variableTaint);
   if (!varName || !initName) return;
-  const initInfo = variableTaint.get(initName);
+  const initInfo = ctx.variableTaint.get(initName);
   if (!initInfo?.tainted) return;
 
-  variableTaint.set(varName, {
+  ctx.variableTaint.set(varName, {
     name: varName,
     tainted: true,
     source: initInfo.source,
     declarations: [node],
   });
 
-  const nodeId = nextNodeId();
-  const { line, character } = ts.getLineAndCharacterOfPosition(sourceFile, node.getStart());
+  const nodeId = ctx.nextNodeId();
+  const { line, character } = ts.getLineAndCharacterOfPosition(ctx.sourceFile, node.getStart());
   const taintNode: TaintNode = {
     id: nodeId,
     kind: "assignment",
     variableName: varName,
-    sourceFile: sourceFile.fileName,
+    sourceFile: ctx.sourceFile.fileName,
     line: line + 1,
     column: character + 1,
     text: `const ${varName} = ${initName}`,
   };
-  graph.addNode(taintNode);
+  ctx.graph.addNode(taintNode);
 
-  const initNode = findExistingSourceNode(initName, graph);
+  const initNode = findExistingSourceNode(initName, ctx.graph);
   if (initNode) {
-    graph.addEdge({ from: initNode.id, to: nodeId, kind: "assignment" });
+    ctx.graph.addEdge({ from: initNode.id, to: nodeId, kind: "assignment" });
   }
 }
 
 /** Visit a node and perform taint analysis */
 export function visit(
   node: ts.Node,
-  sourceFile: ts.SourceFile,
-  graph: DataFlowGraph,
-  variableTaint: Map<string, VariableInfo>,
-  checker: ts.TypeChecker,
-  nextNodeId: () => string
+  ctx: AstVisitorContext
 ): void {
-  ts.forEachChild(node, (child) => visit(child, sourceFile, graph, variableTaint, checker, nextNodeId));
-  visitSource(node, graph, variableTaint, nextNodeId);
+  ts.forEachChild(node, (child) => visit(child, ctx));
+  visitSource(node, ctx);
   if (ts.isCallExpression(node)) {
-    visitSink(node, graph, variableTaint, nextNodeId, checker);
-    propagateTaintAtCall(node, variableTaint, checker);
-    handleCommanderAction(node, variableTaint);
+    visitSink(node, ctx);
+    propagateTaintAtCall(node, ctx.variableTaint, ctx.checker);
+    handleCommanderAction(node, ctx.variableTaint);
   }
   if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
-    visitAssignment(node, sourceFile, graph, variableTaint, checker, nextNodeId);
+    visitAssignment(node, ctx);
   }
   if (ts.isVariableDeclaration(node) && node.initializer) {
-    visitVarDeclaration(node, sourceFile, graph, variableTaint, checker, nextNodeId);
+    visitVarDeclaration(node, ctx);
   }
 }
