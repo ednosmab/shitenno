@@ -3,7 +3,7 @@
  *
  * Consolidates all engineering information into a single canonical state.
  * Thin orchestrator — discovery in engineering-state-discovery.ts,
- * persistence in engineering-state-io.ts.
+ * persistence in engineering-state-io.ts, entropy in entropy.ts.
  */
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
@@ -22,7 +22,6 @@ import {
   loadArtifacts,
   loadRelations,
   analyzeGraph,
-  type Relation,
 } from "./knowledge-graph.js";
 
 // ── Types (re-exported from domain entities) ────────────────────────────────
@@ -39,6 +38,7 @@ export {
   loadEngineeringState,
   engineeringStateToText,
 } from "./engineering-state/io.js";
+export { calculateEntropy } from "./engineering-state/entropy.js";
 
 // ── Import from split modules ───────────────────────────────────────────────
 
@@ -47,84 +47,7 @@ import {
   saveEngineeringState,
   loadEngineeringState,
 } from "./engineering-state/io.js";
-
-// ── Entropy Calculation ────────────────────────────────────────────────────
-
-const STALE_THRESHOLDS_DAYS: Record<AssetType, number> = {
-  plan: 15,
-  checklist: 15,
-  prompt: 15,
-  decision: 15,
-  doc: 30,
-  contract: 30,
-  runbook: 30,
-  context: 30,
-  sdr: 30,
-  script: 30,
-  feedback: 30,
-  rule: 45,
-  workflow: 45,
-  skill: 45,
-  policy: 180,
-  adr: 180,
-  template: 180,
-  report: Infinity,
-};
-
-const ORPHAN_EXEMPT_TYPES = new Set<AssetType>(["report", "doc", "adr", "policy"]);
-
-function orphanWeightFor(lifecycle: ShitennoLifecycleState): number {
-  if (lifecycle === "uninitialized" || lifecycle === "discovered") return 20;
-  if (lifecycle === "governed" || lifecycle === "evolved") return 45;
-  return 40;
-}
-
-export function calculateEntropy(
-  assets: EngineeringAsset[],
-  relations: Relation[],
-  lifecycle: ShitennoLifecycleState
-): { orphanedAssets: number; staleAssets: number; missingDependencies: number; score: number } {
-  const now = Date.now();
-
-  const connectedIds = new Set<string>();
-  for (const r of relations) {
-    connectedIds.add(r.source);
-    connectedIds.add(r.target);
-  }
-
-  const orphanedAssets = assets.filter(
-    (a) => !connectedIds.has(a.id) && !ORPHAN_EXEMPT_TYPES.has(a.type)
-  ).length;
-
-  const staleAssets = assets.filter((a) => {
-    const thresholdDays = STALE_THRESHOLDS_DAYS[a.type] ?? 30;
-    if (!isFinite(thresholdDays)) return false;
-    const thresholdMs = thresholdDays * 24 * 60 * 60 * 1000;
-    return now - new Date(a.updatedAt).getTime() > thresholdMs && a.status === "active";
-  }).length;
-
-  const assetIds = new Set(assets.map((a) => a.id));
-  const missingDependencies = assets.filter((a) =>
-    a.dependencies.some((dep) => !assetIds.has(dep))
-  ).length;
-
-  const totalAssets = assets.length || 1;
-  const orphanWeight = orphanWeightFor(lifecycle);
-  const staleWeight = 100 - orphanWeight - 30;
-
-  const orphanRatio = orphanedAssets / totalAssets;
-  const staleRatio = staleAssets / totalAssets;
-  const depRatio = missingDependencies / totalAssets;
-
-  const score = Math.round(orphanRatio * orphanWeight + staleRatio * staleWeight + depRatio * 30);
-
-  return {
-    orphanedAssets,
-    staleAssets,
-    missingDependencies,
-    score: Math.min(100, score),
-  };
-}
+import { calculateEntropy } from "./engineering-state/entropy.js";
 
 // ── Main Consolidation ─────────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 # Pre-Session Briefing
-*Generated: 2026-07-25T05:50:49.880Z*
+*Generated: 2026-07-27T01:42:36.556Z*
 
 ---
 
@@ -40,7 +40,7 @@
 - This is a monorepo. When modifying shared packages, ensure backward compatibility.
 
 ## Dynamic Rules (From History)
-- [high] This project has 145 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
+- [high] This project has 148 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
 - [medium] This project has 7 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
 
 

@@ -260,72 +260,72 @@ Fragmentar, refatorar e corrigir lógica em todos os 64 ficheiros acima de 300 l
 ### Passo 5.1: Performance Reporter Split
 **Ficheiro:** `src/performance-reporter.ts` (563 linhas)
 **Acção:** Dividir: `reporter/telemetry-readers.ts`, `reporter/assembly.ts`, `reporter/insights.ts`, `reporter/summary.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.2: MCP Handlers Split
 **Ficheiro:** `src/mcp-server-handlers.ts` (473 linhas)
 **Acção:** Dividir: `mcp-handlers/briefing.ts`, `mcp-handlers/knowledge.ts`, `mcp-handlers/plans.ts`, `mcp-handlers/feedback.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.3: Backlog Writer Split
 **Ficheiro:** `src/backlog-writer.ts` (471 linhas)
 **Acção:** Extrair `backlog-format.ts` (~180 linhas de formatação).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.4: Event Payloads Split
 **Ficheiro:** `src/event-payloads.ts` (450 linhas)
 **Acção:** Dividir por domínio: `payloads/session.ts`, `payloads/plan.ts`, `payloads/feedback.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.5: Action Engine Split
 **Ficheiro:** `src/action-engine.ts` (446 linhas)
 **Acção:** Extrair `executors/log.ts`, `executors/notify.ts`, `repository.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.6: Feedback Loops Split
 **Ficheiro:** `src/feedback-loops.ts` (426 linhas)
 **Acção:** Extrair `feedback-dimensions.ts` (~100), `feedback-patterns.ts` (~80).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.7: Scaffolder Split
 **Ficheiro:** `src/scaffolder.ts` (425 linhas)
 **Acção:** Extrair `scaffold/templates.ts`, `scaffold/skills.ts`, `scaffold/gitignore.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.8: Auto Evolution Split
 **Ficheiro:** `src/auto-evolution.ts` (420 linhas)
 **Acção:** Extrair `evolution/capability.ts`, `evolution/knowledge.ts`, `evolution/governance.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.9: State Manager Split
 **Ficheiro:** `src/state-manager.ts` (411 linhas)
 **Acção:** Dividir: `knowledge-reader.ts`, `project-state-reader.ts`, `session-memory-reader.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.10: Advanced Infrastructure Split
 **Ficheiro:** `src/advanced-infrastructure.ts` (392 linhas)
 **Acção:** Dividir: `infrastructure/dead-letter.ts`, `infrastructure/event-replayer.ts`, `infrastructure/versioning.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.11: Engineering State Evolved Split
 **Ficheiro:** `src/engineering-state/evolved.ts` (391 linhas)
 **Acção:** Dividir: `evolved/lifecycle.ts`, `evolved/event-sourced.ts`, `evolved/consolidator.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.12: Doc Engine Split
 **Ficheiro:** `src/doc-engine.ts` (348 linhas)
 **Acção:** Extrair geradores por tipo de doc em sub-módulos.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.13: Engineering State Review
 **Ficheiro:** `src/engineering-state.ts` (344 linhas)
 **Acção:** Verificar se discovery/io existentes cobrem — caso contrário, extrair remaining helpers.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ### Passo 5.14: Feedback Generator Split
 **Ficheiro:** `src/engine/feedback/generator.ts` (353 linhas)
 **Acção:** Extrair `feedback/items.ts`, `feedback/guidance.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ---
 
