@@ -42,10 +42,6 @@
     "premortem:check": "tsx .shitenno/scripts/premortem-check.ts",
     "shugo": "node ./dist/bin/shugo.js",
     "mcp": "node scripts/mcp-client.mjs",
-    "mcp:list": "node scripts/mcp-client.mjs --list",
-    "mcp": "node scripts/mcp-client.mjs",
-    "mcp:list": "node scripts/mcp-client.mjs --list",
-    "mcp": "node scripts/mcp-client.mjs",
     "mcp:list": "node scripts/mcp-client.mjs --list"
   },
   "keywords": [
