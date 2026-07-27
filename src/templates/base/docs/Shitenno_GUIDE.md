@@ -479,6 +479,22 @@ projecto/
     │   ├── health-check/plugin.js
     │   ├── health-check/plugin.ts
     │   └── health-monitor/plugin.js
+    ├── daemon/                           ← Processo de fundo (capability: operations)
+    │   ├── daemon.pid
+    │   ├── daemon.sock
+    │   ├── daemon.log
+    │   ├── daemon-state.json
+    │   ├── daemon.approved
+    │   └── circuit-breaker.json
+    ├── history/                          ← Estado de engenharia (capability: metrics)
+    │   └── snapshots/
+    ├── profile/                          ← Perfil do projecto (capability: core)
+    │   └── <project>.config.ts
+    ├── session-feedback/                 ← Feedback de sessões (capability: governance)
+    │   └── records.jsonl
+    ├── telemetry/                        ← Telemetria e eventos (capability: operations)
+    │   ├── events-YYYY-MM-DD.jsonl
+    │   └── dead-letter/
     └── scripts/                          ← Scripts de sessão
         ├── validate-session.ts
         ├── close-session.ts
@@ -513,6 +529,11 @@ projecto/
 | `plugins/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
 | `reports/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | `scripts/` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `daemon/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| `history/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| `profile/` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `session-feedback/` | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `telemetry/` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ |
 
 ---
 
