@@ -21,6 +21,9 @@ import {
   handleGetSkills,
   handleGetKnowledgeDebt,
   handleGetChallenges,
+  handleGetAuditReport,
+  handleGetEvolution,
+  handleGetMandatoryContext,
 } from "./mcp-server-handlers.js";
 
 // Re-export handlers for test compatibility
@@ -35,6 +38,9 @@ export {
   handleGetSkills,
   handleGetKnowledgeDebt,
   handleGetChallenges,
+  handleGetAuditReport,
+  handleGetEvolution,
+  handleGetMandatoryContext,
 };
 import {
   handleGetBacklog,
@@ -165,6 +171,38 @@ export const TOOLS = [
       },
     },
   },
+  {
+    name: "getAuditReport",
+    description: "Read the latest health audit report. Shows health score, dimension scores, issues by severity, and optimizations. Run 'shugo audit' first to generate a report.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
+        date: { type: "string" as const, description: "Optional date filter (YYYY-MM-DD). If omitted, returns the latest report." },
+      },
+    },
+  },
+  {
+    name: "getEvolution",
+    description: "Read maturity evolution history. Shows score trends, dimension changes, and capability additions over time. Run 'shugo assess' multiple times to build history.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
+      },
+    },
+  },
+  {
+    name: "getMandatoryContext",
+    description: "Return the full mandatory context for the current session: MANDATORY_CONTEXT.md, context_buffer.yaml, mandatory rules, and unconditional mandatory skills.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["markdown", "json"], description: "Output format." },
+        task: { type: "string" as const, description: "Optional task scope (e.g. implementation, refactor) to resolve task-scoped mandatory skills." },
+      },
+    },
+  },
 ];
 
 export async function dispatchTool(
@@ -203,6 +241,12 @@ export async function dispatchTool(
         return handleGetKnowledgeDebt(projectRoot, shitennoDir, toolArgs);
       case "getChallenges":
         return handleGetChallenges(projectRoot, shitennoDir, toolArgs);
+      case "getAuditReport":
+        return handleGetAuditReport(projectRoot, shitennoDir, toolArgs);
+      case "getEvolution":
+        return handleGetEvolution(projectRoot, shitennoDir, toolArgs);
+      case "getMandatoryContext":
+        return handleGetMandatoryContext(projectRoot, shitennoDir, toolArgs);
       default:
         return {
           content: [{ type: "text", text: `Unknown tool: ${name}. Available: ${TOOLS.map((t) => t.name).join(", ")}` }],

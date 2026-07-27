@@ -1,5 +1,11 @@
 # Skill: MCP Server Interaction
 
+## ⚡ Mandatory Rule
+
+- **Sempre** usar o MCP (`node scripts/mcp-client.mjs <tool> <args>`) para obter dados do projecto (briefing, regras, estado, backlog, etc.)
+- **Nunca** ler ficheiros raw quando o MCP está disponível — o servidor aplica governance e transformações
+- Se o build não existir, o client faz build automático
+
 ## Purpose
 Interact with the Shitenno MCP server via JSON-RPC over stdio to retrieve project intelligence data.
 
@@ -41,6 +47,9 @@ node scripts/mcp-client.mjs <toolName> '<jsonArgs>'
 | `addBacklogItem` | Add item | `{"title":"...","priority":"P1"}` |
 | `transitionBacklogItem` | Transition state | `{"id":"...","toState":"done"}` |
 | `deleteBacklogItem` | Delete item | `{"id":"..."}` |
+| `getAuditReport` | Latest health audit report | `{"format":"summary"}` |
+| `getEvolution` | Maturity evolution history | `{"format":"summary"}` |
+| `getMandatoryContext` | Full mandatory context for session | `{"format":"markdown","task":"implementation"}` |
 
 ### Examples
 
@@ -62,6 +71,12 @@ node scripts/mcp-client.mjs getEngineeringState '{}'
 
 # View a specific plan
 node scripts/mcp-client.mjs getPlans '{"planName":"PLAN-file-refactor-64-overloaded.md"}'
+
+# Check latest audit report
+node scripts/mcp-client.mjs getAuditReport '{"format":"summary"}'
+
+# View maturity evolution over time
+node scripts/mcp-client.mjs getEvolution '{"format":"summary"}'
 ```
 
 ## Integration with Freebuff

@@ -22,6 +22,8 @@ import { logger } from "./logger.js";
 import { recordSkillResolution } from "./context-buffer-writer.js";
 import { detectKnowledgeDebt } from "./knowledge-debt/engine.js";
 import { loadGrowthProfile } from "./growth-profile.js";
+import { readMaturityHistory } from "./maturity-profile/telemetry.js";
+import { readBuffer } from "./context-buffer-writer/buffer-io.js";
 
 import type { ToolResponse } from "./mcp-types.js";
 
@@ -582,4 +584,215 @@ export function handleGetChallenges(
   }
 
   return { content: [{ type: "text", text: JSON.stringify(challenges, null, 2) }] };
+}
+
+// ── Audit Report ──────────────────────────────────────────────────────────
+
+export function handleGetAuditReport(
+  _projectRoot: string,
+  shitennoDir: string,
+  args: Record<string, unknown>
+): ToolResponse {
+  const format = (args.format as string) ?? "json";
+  const dateFilter = args.date as string | undefined;
+  const reportsDir = join(shitennoDir, "reports");
+
+  if (!existsSync(reportsDir)) {
+    return { content: [{ type: "text", text: "No audit reports found. Run 'shugo audit' first." }] };
+  }
+
+  const allFiles = readdirSync(reportsDir)
+    .filter(f => f.startsWith("health-") && f.endsWith(".json"))
+    .sort()
+    .reverse();
+
+  if (allFiles.length === 0) {
+    return { content: [{ type: "text", text: "No audit reports found. Run 'shugo audit' first." }] };
+  }
+
+  let latest: string;
+  if (dateFilter) {
+    const target = `health-${dateFilter}.json`;
+    if (!allFiles.includes(target)) {
+      const available = allFiles.map(f => f.replace("health-", "").replace(".json", "")).join(", ");
+      return { content: [{ type: "text", text: `No audit report found for date '${dateFilter}'. Available dates: ${available || "none"}` }] };
+    }
+    latest = target;
+  } else {
+    latest = allFiles[0]!;
+  }
+  const reportPath = join(reportsDir, latest);
+  let report: {
+    healthScore: number;
+    dimensionScores?: Record<string, number>;
+    issues: Array<{ type: string; severity: number; description: string; location: string }>;
+    suppressedIssues?: unknown[];
+    optimizations?: unknown[];
+    summary?: string;
+    auditedAt?: string;
+    level?: string;
+    filesScanned?: number;
+    detectorsRun?: string[];
+  };
+  try {
+    report = JSON.parse(readFileSync(reportPath, "utf-8"));
+  } catch (parseError) {
+    const msg = parseError instanceof Error ? parseError.message : String(parseError);
+    return { content: [{ type: "text", text: `Failed to parse audit report '${latest}': ${msg}. The file may be corrupted. Run 'shugo audit' to regenerate.` }] };
+  }
+
+  if (format === "summary") {
+    const lines: string[] = [
+      `Health Score: ${report.healthScore}/100`,
+      `Report: ${latest}`,
+      `Audited: ${report.auditedAt ?? "unknown"}`,
+      `Level: ${report.level ?? "unknown"}`,
+      `Files scanned: ${report.filesScanned ?? "unknown"}`,
+      "",
+    ];
+
+    if (report.dimensionScores) {
+      lines.push("Dimension Scores:");
+      for (const [dim, score] of Object.entries(report.dimensionScores)) {
+        lines.push(`  ${dim}: ${score}`);
+      }
+      lines.push("");
+    }
+
+    const critical = report.issues.filter(i => i.severity === 3);
+    const warnings = report.issues.filter(i => i.severity === 2);
+    const info = report.issues.filter(i => i.severity === 1);
+
+    lines.push(`Issues: ${critical.length} critical, ${warnings.length} warnings, ${info.length} info`);
+    if (report.suppressedIssues && report.suppressedIssues.length > 0) {
+      lines.push(`Suppressed: ${report.suppressedIssues.length}`);
+    }
+    if (report.optimizations && report.optimizations.length > 0) {
+      lines.push(`Optimizations proposed: ${report.optimizations.length}`);
+    }
+
+    if (critical.length > 0) {
+      lines.push("");
+      lines.push("Critical Issues:");
+      for (const issue of critical.slice(0, 5)) {
+        lines.push(`  - [${issue.type}] ${issue.description}`);
+        lines.push(`    Location: ${issue.location}`);
+      }
+    }
+
+    return { content: [{ type: "text", text: lines.join("\n") }] };
+  }
+
+  return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };
+}
+
+// ── Evolution ─────────────────────────────────────────────────────────────
+
+export function handleGetEvolution(
+  _projectRoot: string,
+  shitennoDir: string,
+  args: Record<string, unknown>
+): ToolResponse {
+  const format = (args.format as string) ?? "json";
+  const history = readMaturityHistory(shitennoDir);
+
+  if (history.length === 0) {
+    return { content: [{ type: "text", text: "No maturity history found. Run 'shugo assess' first." }] };
+  }
+
+  if (format === "summary") {
+    const first = history[0]!;
+    const last = history[history.length - 1]!;
+    const delta = last.overallScore - first.overallScore;
+
+    const lines: string[] = [
+      `Snapshots: ${history.length}`,
+      `First: ${first.timestamp} (score: ${first.overallScore})`,
+      `Latest: ${last.timestamp} (score: ${last.overallScore})`,
+      `Delta: ${delta >= 0 ? "+" : ""}${delta}`,
+      "",
+    ];
+
+    // Dimension trends
+    const dimKeys = Object.keys(first.dimensions) as Array<keyof typeof first.dimensions>;
+    lines.push("Dimension Trends:");
+    for (const dim of dimKeys) {
+      const firstVal = first.dimensions[dim];
+      const lastVal = last.dimensions[dim];
+      const d = lastVal - firstVal;
+      lines.push(`  ${dim}: ${firstVal} \u2192 ${lastVal} (${d >= 0 ? "+" : ""}${d})`);
+    }
+    lines.push("");
+
+    // Capability evolution
+    const firstCaps = new Set(first.installedCapabilities);
+    const lastCaps = new Set(last.installedCapabilities);
+    const added = [...lastCaps].filter(c => !firstCaps.has(c));
+    const removed = [...firstCaps].filter(c => !lastCaps.has(c));
+    if (added.length > 0) lines.push(`Capabilities added: ${added.join(", ")}`);
+    if (removed.length > 0) lines.push(`Capabilities removed: ${removed.join(", ")}`);
+
+    return { content: [{ type: "text", text: lines.join("\n") }] };
+  }
+
+  return { content: [{ type: "text", text: JSON.stringify(history, null, 2) }] };
+}
+
+// ── Mandatory Context ─────────────────────────────────────────────────────
+
+export function handleGetMandatoryContext(
+  _projectRoot: string,
+  shitennoDir: string,
+  args: Record<string, unknown>
+): ToolResponse {
+  const format = (args.format as string) ?? "markdown";
+  const sections: string[] = [];
+
+  // 1. MANDATORY_CONTEXT.md
+  const mandatoryPath = join(shitennoDir, "governance", "MANDATORY_CONTEXT.md");
+  if (existsSync(mandatoryPath)) {
+    sections.push(readFileSync(mandatoryPath, "utf-8"));
+  } else {
+    sections.push("<!-- MANDATORY_CONTEXT.md not found -->");
+  }
+
+  // 2. Context buffer (session state, reminders, current task)
+  const bufferContent = readBuffer(shitennoDir);
+  if (bufferContent) {
+    sections.push("---\n\n# Context Buffer (Session State)\n\n```yaml\n" + bufferContent.trim() + "\n```");
+  }
+
+  // 3. Mandatory rules from manifest
+  const ruleManifestPath = join(shitennoDir, "governance", "rule-manifest.yaml");
+  if (existsSync(ruleManifestPath)) {
+    try {
+      const manifest = loadManifest(ruleManifestPath);
+      const { mandatory } = partitionRules(manifest, {});
+      if (mandatory.length > 0) {
+        const ruleLines = mandatory.map(r => `- ${r.id} (priority: ${r.priority})`);
+        sections.push("---\n\n# Mandatory Rules (from manifest)\n\n" + ruleLines.join("\n"));
+      }
+    } catch { /* ignore parse errors */ }
+  }
+
+  // 4. Mandatory skills (task-scoped if task param provided)
+  const taskArg = args.task as string | undefined;
+  const skillManifestPath = join(shitennoDir, "governance", "skill-manifest.yaml");
+  if (existsSync(skillManifestPath)) {
+    try {
+      const manifest = loadSkillManifest(skillManifestPath);
+      const taskMeta: TaskMetadata = taskArg ? { task: taskArg } : {};
+      const { mandatory } = partitionSkills(manifest, taskMeta);
+      if (mandatory.length > 0) {
+        const skillLines = mandatory.map(s => `- ${s.id} (priority: ${s.priority})`);
+        sections.push("---\n\n# Mandatory Skills (from manifest)\n\n" + skillLines.join("\n"));
+      }
+    } catch { /* ignore parse errors */ }
+  }
+
+  if (format === "json") {
+    return { content: [{ type: "text", text: JSON.stringify({ sections: sections.length, content: sections.join("\n\n") }, null, 2) }] };
+  }
+
+  return { content: [{ type: "text", text: sections.join("\n\n") }] };
 }

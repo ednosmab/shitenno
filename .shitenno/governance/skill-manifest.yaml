@@ -122,3 +122,11 @@ skills:
     priority: 4
     when:
       task: docs
+
+  # ── MCP Integration ────────────────────────────────────────────────────────
+  - id: mcp-interaction
+    path: docs/skills/mcp-interaction.md
+    mandatory: true
+    priority: 0
+    when:
+      task: [implementation, refactor, governance, audit, docs]

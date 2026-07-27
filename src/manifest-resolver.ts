@@ -10,7 +10,7 @@ export interface ManifestEntry {
   path: string;
   mandatory?: boolean;
   priority: number;
-  when?: Record<string, string>;
+  when?: Record<string, string | string[]>;
 }
 
 export interface TaskMetadata {
@@ -22,13 +22,17 @@ export interface TaskMetadata {
 }
 
 function matchesWhen(
-  when: Record<string, string> | undefined,
+  when: Record<string, string | string[]> | undefined,
   taskMeta: TaskMetadata
 ): boolean {
   if (!when) return true; // no condition = always matches once selected
-  return Object.entries(when).every(
-    ([key, value]) => taskMeta[key] === value
-  );
+  return Object.entries(when).every(([key, value]) => {
+    const actual = taskMeta[key];
+    if (Array.isArray(value)) {
+      return actual !== undefined && value.includes(actual);
+    }
+    return actual === value;
+  });
 }
 
 /**

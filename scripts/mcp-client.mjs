@@ -8,7 +8,8 @@
  *   node scripts/mcp-client.mjs getRules '{"type":"context","format":"json"}'
  *   node scripts/mcp-client.mjs --list
  */
-import { spawn } from 'node:child_process';
+import { spawn, execSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -35,8 +36,21 @@ if (!listMode && !toolName) {
   process.exit(1);
 }
 
+// Check if build exists, build if needed
+const buildPath = join(projectRoot, 'dist/bin/shugo.js');
+if (!existsSync(buildPath)) {
+  console.error('Build not found. Running pnpm build...');
+  try {
+    execSync('pnpm run build', { cwd: projectRoot, stdio: 'inherit' });
+    console.error('Build completed successfully.');
+  } catch (err) {
+    console.error('Build failed:', err.message);
+    process.exit(1);
+  }
+}
+
 // Start the MCP server
-const server = spawn('node', [join(projectRoot, 'dist/bin/shugo.js'), 'mcp', '--dir', projectRoot], {
+const server = spawn('node', [buildPath, 'mcp', '--dir', projectRoot], {
   stdio: ['pipe', 'pipe', 'pipe'],
   cwd: projectRoot,
 });

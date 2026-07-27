@@ -49,8 +49,7 @@
 ## 🔄 FLUXO DE SESSÃO
 
 1. **Início:** Ler este ficheiro + `AGENTS.md` + `context_buffer.yaml`
-2. **Durante:** Seguir TDD, respeitar proibições, registar decisões
-3. **Fim:** `shugo feedback --outcome success|failure|partial`
+2. **Durante:** Seguir TDD, respeitar proibições, registar decisões3. **Fim:** `shugo feedback --outcome success|failure|partial`
 
 ---
 
