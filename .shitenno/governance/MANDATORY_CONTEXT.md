@@ -1,61 +1,51 @@
 # MANDATORY_CONTEXT — Regras Obrigatórias de Toda Sessão
 
-> **Este ficheiro é carregado automaticamente em TODA sessão via opencode.json.**
-> Não edite manualmente. Execute `shugo status` para atualizar.
+> Carregado automaticamente via opencode.json. Não edite manualmente.
 
 ---
 
-## ⛔ PROIBIÇÕES ABSOLUTAS
+## ⛔ PROIBIÇÕES
 
 | # | Regra | Violação |
 |---|---|---|
-| **G-01** | Nenhum `git commit` ou `git push` sem autorização explícita do utilizador | Revert imediato + documentar |
-| **G-02** | Escrita restrita ao directório do projecto (workspace root) | Revert + audit de segurança |
-| **F-01** | Nenhuma lógica de domínio em componentes UI — apenas renderizar dados | Refactor obrigatório |
-| **F-03** | Nenhum import cruzado entre apps — apps devem ser independentes | Correcção imediata |
-| **F-06** | Nenhum ficheiro >300 linhas em `src/` (excl. `__tests__/` e `src/templates/`) | Refactor obrigatório |
-| **S-01** | Nenhum HTML dinâmico sem sanitização | Bloqueio de deploy |
-| **ENV-01** | Nenhuma flag de teste em configs de deploy/produção | Correcção imediata |
+| G-01 | Sem `git commit`/`git push` sem autorização explícita | Revert + documentar |
+| G-02 | Escrita restrita ao workspace root | Revert + audit |
+| F-01 | Sem lógica de domínio em UI — apenas renderizar | Refactor |
+| F-03 | Sem import cruzado entre apps | Correcção imediata |
+| F-06 | Sem ficheiro >300L em `src/` (excl. `__tests__/`, `templates/`) | Refactor |
+| S-01 | Sem HTML dinâmico sem sanitização | Bloquear deploy |
+| ENV-01 | Sem flags de teste em configs de produção | Correcção imediata |
 
----
+## 📐 PADRÕES
 
-## 📐 PADRÕES DE CÓDIGO
+> Detalhes: `docs/engineering-standards.md`
 
-- **Legibilidade > Concisão** — código declarativo, simples, autoexplicativo
-- **SOLID** — Single Responsibility, Open/Closed, Liskov, Interface Segregation, Dependency Inversion
-- **TDD estrito** — Red → Green → Refactor. Teste antes da implementação.
-- **Limites:** função ≤50 linhas, profundidade ≤4, parâmetros ≤4, complexidade ≤15
-
----
+- **Legibilidade > Concisão** — código declarativo, autoexplicativo
+- **SOLID** — §2 em `engineering-standards.md`
+- **TDD** — §3 em `engineering-standards.md` (Red → Green → Refactor)
+- **Limites** — §4 em `engineering-standards.md`
 
 ## 🔒 SEGURANÇA
 
-1. Sanitizar todo input dinâmico
-2. Nunca `dangerouslySetInnerHTML` sem sanitização
-3. Validar todos os dados na entrada (Zod, Yup, etc.)
-4. RLS em todas as tabelas (se aplicável)
-5. Sanitizar output (prevenir XSS)
+> Detalhes: `docs/engineering-standards.md` §5
 
----
+Sanitizar input → validar entrada (Zod/Yup) → RLS → sanitizar output
 
 ## 📝 DOCUMENTAÇÃO
 
-- **JSDoc** obrigatório em todas as funções exportadas
+- **JSDoc** obrigatório em funções exportadas
 - **ADRs** para decisões arquitecturais (`docs/adrs/`)
-- **Commit messages** em inglês, Conventional Commits (`feat:`, `fix:`, `chore:`)
+- **Commits** em inglês, Conventional Commits
 
----
+## 🔄 FLUXO
 
-## 🔄 FLUXO DE SESSÃO
+1. **Início:** Ler este + `AGENTS.md` + `context_buffer.yaml`
+2. **Durante:** Seguir TDD, respeitar proibições
+3. **Fim:** `shugo feedback --outcome success|failure|partial`
 
-1. **Início:** Ler este ficheiro + `AGENTS.md` + `context_buffer.yaml`
-2. **Durante:** Seguir TDD, respeitar proibições, registar decisões3. **Fim:** `shugo feedback --outcome success|failure|partial`
+## 🚨 REFERÊNCIAS
 
----
-
-## 🚨 REFERÊNCIAS COMPLETAS
-
-- Proibições detalhadas: `docs/FORBIDDEN_OPERATIONS.md`
-- Diretrizes de engenharia: `docs/DESDO.md`
-- Skills: `docs/skills/`
-- ADRs: `docs/adrs/`
+- `docs/FORBIDDEN_OPERATIONS.md` — Proibições detalhadas
+- `docs/DESDO.md` — Diretrizes de engenharia
+- `docs/engineering-standards.md` — Padrões de código
+- `docs/skills/` — Skills operacionais

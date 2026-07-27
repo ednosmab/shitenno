@@ -56,7 +56,7 @@ export async function auditHealth(
 
   const detectorMap = buildDetectorMap({ projectRoot, shitennoDir, sourceFiles, rules, history });
 
-  const isAuditingShitennoItself = projectRoot.includes("shitenno-go");
+  const isAuditingShitennoItself = existsSync(join(projectRoot, ".shitenno-self"));
   const { issues, detectorErrors } = await executeDetectors(detectorMap, activeDetectors, changedFiles, isAuditingShitennoItself);
 
   const deduped = deduplicateIssues(issues);

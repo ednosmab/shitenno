@@ -1,3 +1,4 @@
+contextVersion: 1
 skills_resolved:
   - skillId: "mcp-interaction"
     taskMeta: "task=governance"
@@ -37,7 +38,7 @@ reminders:
     priority: "high"
     category: "mcp"
     createdAt: "2026-07-25T22:50:00.000Z"
-[]
+
 session:
   id: session-2026-07-16-audit
   status: active
@@ -55,8 +56,6 @@ documents_loaded:
   - docs/BACKLOG.md
   - governance/WORKFLOW.md
   - governance/context/context_buffer.yaml
-
-impediments: []
 
 technical_debt:
   - id: NEW-001

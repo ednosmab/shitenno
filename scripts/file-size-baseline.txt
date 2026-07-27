@@ -1,0 +1,4 @@
+src/briefing.ts
+src/doc-sync-significance.ts
+src/event-payloads/types.ts
+src/help-data.ts

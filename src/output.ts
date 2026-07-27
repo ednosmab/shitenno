@@ -26,6 +26,14 @@ export function setGlobalJsonMode(enabled: boolean): void {
 }
 
 /**
+ * Check if global JSON mode is enabled. When true, all non-essential output
+ * should be suppressed to keep JSON streams clean.
+ */
+export function isGlobalJsonMode(): boolean {
+  return globalJsonMode;
+}
+
+/**
  * Check if quiet mode is enabled (suppresses informational output).
  * In quiet mode, only error-level output is shown.
  */

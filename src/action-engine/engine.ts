@@ -1,10 +1,14 @@
 /**
- * engine.ts — ActionEngine with idempotency, policy gates, and resource arbitration.
+ * engine.ts — ActionEngine with unified orchestration.
+ *
+ * Uses runPolicyGate from decision-core (shared policy logic) and
+ * claimResource/releaseResource for resource arbitration (previously
+ * duplicated only in ActionEngine, now unified with invokeAction path).
  */
 
 import { randomUUID, createHash } from "node:crypto";
-import { getResourceId } from "../decision-core/precedence.js";
 import { runPolicyGate } from "../decision-core/invoke.js";
+import { getResourceId } from "../decision-core/precedence.js";
 import { claimResource, releaseResource } from "../resource-claims.js";
 import type { RuleAction, RuleContext } from "../domain/rules/rule.js";
 import { RunScriptExecutor, CreateReminderExecutor } from "../decision-core/executors/index.js";
@@ -24,34 +28,22 @@ export function computeExecutionHash(type: string, params: Record<string, unknow
   return createHash("sha256").update(payload).digest("hex").slice(0, 16);
 }
 
+function resourceIdToClaimType(resourceId: string): "plan" | "task" {
+  return resourceId.startsWith("plan:") ? "plan" : "task";
+}
+
 export class ActionEngine {
   private executors = new Map<string, ActionExecutor>();
-  private shitennoDir: string;
 
-  constructor(private repo: ExecutionRepository, shitennoDir?: string) {
-    this.shitennoDir = shitennoDir ?? "";
-    // Register built-in executors (real implementations from decision-core)
+  constructor(private repo: ExecutionRepository, private shitennoDir: string) {
     this.registerExecutor(new LogEventExecutor());
     this.registerExecutor(new NotifyExecutor());
     this.registerExecutor(new CreateReminderExecutor());
     this.registerExecutor(new RunScriptExecutor());
   }
 
-  /** Register an action executor. */
   registerExecutor(executor: ActionExecutor): void {
     this.executors.set(executor.name, executor);
-  }
-
-  private findIdempotentMatch(request: ActionRequest, executionHash: string): ExecutionRecord | undefined {
-    const existing = this.repo.findByActionId(request.id);
-    if (existing && existing.status === "completed") {
-      return existing;
-    }
-    const hashMatch = this.repo.findByHash(executionHash);
-    if (hashMatch && hashMatch.status === "completed") {
-      return hashMatch;
-    }
-    return undefined;
   }
 
   private createFailedRecord(request: ActionRequest, executionHash: string, error: string): ExecutionRecord {
@@ -68,15 +60,20 @@ export class ActionEngine {
     };
   }
 
-  private evaluatePolicyGate(request: ActionRequest, executionHash: string): ExecutionRecord | undefined {
+  private checkIdempotency(request: ActionRequest, executionHash: string): ExecutionRecord | undefined {
+    const existingByAction = this.repo.findByActionId(request.id);
+    if (existingByAction?.status === "completed") return existingByAction;
+    const existingByHash = this.repo.findByHash(executionHash);
+    if (existingByHash?.status === "completed") return existingByHash;
+    return undefined;
+  }
+
+  private checkPolicy(request: ActionRequest, executionHash: string): ExecutionRecord | undefined {
     if (!this.shitennoDir) return undefined;
     const action: RuleAction = { type: request.type as RuleAction["type"], params: request.params as RuleAction["params"] };
     const context: RuleContext = {
-      trigger: "manual",
-      eventData: {},
-      projectRoot: "",
-      shitennoDir: this.shitennoDir,
-      timestamp: new Date().toISOString(),
+      trigger: "manual", eventData: {}, projectRoot: "",
+      shitennoDir: this.shitennoDir, timestamp: new Date().toISOString(),
     };
     const policyBlock = runPolicyGate(action, context);
     if (policyBlock) {
@@ -87,74 +84,46 @@ export class ActionEngine {
     return undefined;
   }
 
-  private async runWithResources(executor: ActionExecutor, request: ActionRequest, record: ExecutionRecord): Promise<void> {
+  private async runExecutor(request: ActionRequest, executor: ActionExecutor, executionHash: string): Promise<ExecutionRecord> {
     const resourceId = getResourceId(request.type as RuleAction["type"], request.params);
-    const claimType: "plan" | "task" | undefined = resourceId?.startsWith("plan:")
-      ? "plan"
-      : resourceId?.startsWith("task:")
-      ? "task"
-      : undefined;
-    const claimSessionId = resourceId && claimType ? claimResource(resourceId, claimType) : undefined;
-
+    const claimSessionId = resourceId ? claimResource(resourceId, resourceIdToClaimType(resourceId)) : undefined;
+    const record: ExecutionRecord = {
+      executionId: `EXE-${randomUUID().slice(0, 8).toUpperCase()}`,
+      request, executionHash, status: "running", startedAt: new Date().toISOString(),
+    };
+    this.repo.save(record);
     try {
       const startTime = Date.now();
-      const output = await executor.execute(request.params, {
-        projectRoot: "",
-        shitennoDir: this.shitennoDir,
-      });
-      const duration = Date.now() - startTime;
-
-      record.status = "completed";
-      record.result = "success";
-      record.output = output;
-      record.completedAt = new Date().toISOString();
-      record.duration = duration;
+      const output = await executor.execute(request.params, { projectRoot: "", shitennoDir: this.shitennoDir });
+      record.status = "completed"; record.result = "success"; record.output = output;
+      record.completedAt = new Date().toISOString(); record.duration = Date.now() - startTime;
     } catch (error) {
-      record.status = "failed";
-      record.result = "failure";
+      record.status = "failed"; record.result = "failure";
       record.error = error instanceof Error ? error.message : String(error);
       record.completedAt = new Date().toISOString();
       record.duration = Date.now() - new Date(record.startedAt).getTime();
     } finally {
-      if (resourceId && claimSessionId) {
-        releaseResource(resourceId, claimSessionId);
-      }
+      if (resourceId && claimSessionId) releaseResource(resourceId, claimSessionId);
     }
+    this.repo.save(record);
+    return record;
   }
 
-  /** Execute an action with idempotency guarantees. */
   async execute(request: ActionRequest): Promise<ExecutionRecord> {
     const executionHash = computeExecutionHash(request.type, request.params);
-
-    const idempotentMatch = this.findIdempotentMatch(request, executionHash);
-    if (idempotentMatch) return idempotentMatch;
-
-    const policyBlock = this.evaluatePolicyGate(request, executionHash);
-    if (policyBlock) return policyBlock;
-
+    const idempotent = this.checkIdempotency(request, executionHash);
+    if (idempotent) return idempotent;
+    const policyBlocked = this.checkPolicy(request, executionHash);
+    if (policyBlocked) return policyBlocked;
     const executor = this.executors.get(request.type);
     if (!executor) {
       const record = this.createFailedRecord(request, executionHash, `No executor registered for type: ${request.type}`);
       this.repo.save(record);
       return record;
     }
-
-    const record: ExecutionRecord = {
-      executionId: `EXE-${randomUUID().slice(0, 8).toUpperCase()}`,
-      request,
-      executionHash,
-      status: "running",
-      startedAt: new Date().toISOString(),
-    };
-    this.repo.save(record);
-
-    await this.runWithResources(executor, request, record);
-
-    this.repo.save(record);
-    return record;
+    return this.runExecutor(request, executor, executionHash);
   }
 
-  /** Rollback a completed action. */
   async rollback(executionId: string): Promise<ExecutionRecord | undefined> {
     const record = this.repo.findById(executionId);
     if (!record) return undefined;
@@ -190,27 +159,22 @@ export class ActionEngine {
     return record;
   }
 
-  /** Get an execution record by ID. */
   get(executionId: string): ExecutionRecord | undefined {
     return this.repo.findById(executionId);
   }
 
-  /** Get execution by action ID (idempotency lookup). */
   getByActionId(actionId: string): ExecutionRecord | undefined {
     return this.repo.findByActionId(actionId);
   }
 
-  /** List executions. */
   list(filter?: ActionFilter): ExecutionRecord[] {
     return this.repo.findAll(filter);
   }
 
-  /** Count executions. */
   count(filter?: ActionFilter): number {
     return this.repo.count(filter);
   }
 
-  /** Get execution statistics. */
   stats(): {
     total: number;
     byStatus: Record<ActionStatus, number>;

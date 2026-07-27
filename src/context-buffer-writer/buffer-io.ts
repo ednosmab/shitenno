@@ -22,7 +22,17 @@ export function writeBuffer(shitennoDir: string, content: string): void {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
+  content = ensureContextVersion(content);
   writeFileSync(path, content, "utf-8");
+}
+
+function ensureContextVersion(content: string): string {
+  const match = content.match(/^contextVersion:\s*(\d+)/m);
+  if (match) {
+    const next = Number(match[1]) + 1;
+    return content.replace(/^contextVersion:\s*\d+/m, `contextVersion: ${next}`);
+  }
+  return content;
 }
 
 /**

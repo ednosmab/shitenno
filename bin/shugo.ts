@@ -16,7 +16,7 @@ import { getEventBus, enableEventPersistence } from "../src/event-bus.js";
 import { startSession, endSession } from "../src/session-tracker.js";
 import { setSessionContext, clearSessionContext } from "../src/session-context.js";
 import { installMiddleware } from "../src/cli-middleware.js";
-import { setGlobalJsonMode } from "../src/output.js";
+import { setGlobalJsonMode, isGlobalJsonMode, output as outputCli } from "../src/output.js";
 import { stopWatching } from "../src/infrastructure/persistence/file-watcher.js";
 import { COMMAND_CATEGORIES, findCommand } from "../src/help-data.js";
 import { SHITENNO_DIR_NAME } from "../src/constants.js";
@@ -226,6 +226,7 @@ function resolveNextP0(shitennoDir: string, fallback: string): string {
 }
 
 async function showBriefingSummary(projectRoot: string, shitennoDir: string): Promise<void> {
+  if (isGlobalJsonMode()) return;
   try {
     await autoRegenerateBriefing(projectRoot, shitennoDir);
 
@@ -248,11 +249,11 @@ async function showBriefingSummary(projectRoot: string, shitennoDir: string): Pr
       // Ignore read errors
     }
 
-    console.log("");
-    console.log(chalk.gray("  📋 Quick Board:"));
-    console.log(chalk.gray(`     Tarefa: ${currentTask} | P0: ${nextP0}`));
-    console.log(chalk.gray(`     Dívidas P1: ${p1Debts} | Estado: ${sessionStatus}`));
-    console.log("");
+    outputCli("");
+    outputCli(chalk.gray("  📋 Quick Board:"));
+    outputCli(chalk.gray(`     Tarefa: ${currentTask} | P0: ${nextP0}`));
+    outputCli(chalk.gray(`     Dívidas P1: ${p1Debts} | Estado: ${sessionStatus}`));
+    outputCli("");
   } catch {
     // Quick Board not available — skip silently
   }
@@ -326,40 +327,40 @@ const helpCmd = new Command("help")
 
     const cmd = findCommand(cmdName);
     if (!cmd) {
-      console.log(chalk.red(`  Unknown command: ${cmdName}`));
-      console.log(chalk.gray("  Run 'shugo --help' to see all available commands."));
+      outputCli(chalk.red(`  Unknown command: ${cmdName}`));
+      outputCli(chalk.gray("  Run 'shugo --help' to see all available commands."));
       process.exitCode = 1;
       return;
     }
 
-    console.log("");
-    console.log(`${chalk.bold.cyan(`shugo ${cmd.name}`)} — ${cmd.description}`);
-    console.log("");
-    console.log(`${chalk.bold("Usage:")}`);
-    console.log(`  ${cmd.usage}`);
-    console.log("");
+    outputCli("");
+    outputCli(`${chalk.bold.cyan(`shugo ${cmd.name}`)} — ${cmd.description}`);
+    outputCli("");
+    outputCli(`${chalk.bold("Usage:")}`);
+    outputCli(`  ${cmd.usage}`);
+    outputCli("");
 
     if (cmd.examples.length > 0) {
-      console.log(`${chalk.bold("Examples:")}`);
+      outputCli(`${chalk.bold("Examples:")}`);
       for (const ex of cmd.examples) {
-        console.log(`  ${chalk.gray(ex)}`);
+        outputCli(`  ${chalk.gray(ex)}`);
       }
-      console.log("");
+      outputCli("");
     }
 
     if (cmd.tips && cmd.tips.length > 0) {
-      console.log(`${chalk.bold("Tips:")}`);
+      outputCli(`${chalk.bold("Tips:")}`);
       for (const tip of cmd.tips) {
-        console.log(`  ${chalk.yellow("→")} ${tip}`);
+        outputCli(`  ${chalk.yellow("→")} ${tip}`);
       }
-      console.log("");
+      outputCli("");
     }
 
     // Show Commander.js help for options
     const registeredCmd = program.commands.find((c) => c.name() === cmdName);
     if (registeredCmd) {
-      console.log(`${chalk.bold("Options:")}`);
-      console.log(registeredCmd.helpInformation());
+      outputCli(`${chalk.bold("Options:")}`);
+      outputCli(registeredCmd.helpInformation());
     }
   });
 

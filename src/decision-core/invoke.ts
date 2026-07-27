@@ -18,7 +18,8 @@ import type { ActionType, RuleAction, RuleContext } from "../domain/rules/rule.j
 import { PolicyEngine, FilePolicyRepository } from "../rule-engine/index.js";
 import { computeExecutionHash, type ExecutionRecord } from "../action-engine.js";
 import { checkPolicyGate } from "./policy-gate.js";
-import { checkPrecedence, type InvokeMode } from "./precedence.js";
+import { checkPrecedence, getResourceId, type InvokeMode } from "./precedence.js";
+import { claimResource, releaseResource } from "../resource-claims.js";
 import type { ActionExecutor } from "./executors/types.js";
 import {
   RunScriptExecutor,
@@ -38,6 +39,15 @@ export interface InvokeActionParams {
   ruleAutonomousFlag?: boolean;
   sessionId?: string;
   resourceClaimed?: (id: string) => boolean;
+  /** Optional repository for idempotency checks. When provided, invokeAction
+   *  will check for existing completed executions before running. */
+  executionRepo?: {
+    findByHash(hash: string): ExecutionRecord | undefined;
+    findByActionId(actionId: string): ExecutionRecord | undefined;
+  };
+  /** Optional external executor. When provided, bypasses the built-in registry.
+   *  Used by ActionEngine to delegate execution while keeping its own executors. */
+  externalExecutor?: ActionExecutor;
 }
 
 export interface InvokeResult {
@@ -46,6 +56,8 @@ export interface InvokeResult {
   deferred?: boolean;
   message: string;
   executionId?: string;
+  /** Output data from the executor (when execution succeeds). */
+  output?: Record<string, unknown>;
 }
 
 // ── Executor Registry ──────────────────────────────────────────────────────
@@ -132,6 +144,7 @@ function buildSuccessResult(actionType: ActionType, output: Record<string, unkno
     success: actionSuccess,
     message: actionSuccess ? `Executed ${actionType}` : (output.message as string ?? `Failed: ${actionType}`),
     executionId,
+    output,
   };
 }
 
@@ -147,6 +160,10 @@ function writeExecRecord(execPath: string, record: ExecutionRecord): void {
   writeFileSync(execPath, JSON.stringify(record, null, 2), "utf-8");
 }
 
+function resourceIdToClaimType(resourceId: string): "plan" | "task" {
+  return resourceId.startsWith("plan:") ? "plan" : "task";
+}
+
 async function executeWithAudit(
   params: InvokeActionParams,
   executor: ActionExecutor,
@@ -154,6 +171,9 @@ async function executeWithAudit(
   const { action, context } = params;
   const executionId = `EXE-${randomUUID().slice(0, 8).toUpperCase()}`;
   const executionHash = computeExecutionHash(action.type, action.params as Record<string, unknown>);
+
+  const resourceId = getResourceId(action.type, action.params as Record<string, unknown>);
+  const claimSessionId = resourceId ? claimResource(resourceId, resourceIdToClaimType(resourceId)) : undefined;
 
   const record: ExecutionRecord = {
     executionId,
@@ -194,6 +214,10 @@ async function executeWithAudit(
     writeExecRecord(execPath, record);
 
     return buildFailureResult(error, executionId);
+  } finally {
+    if (resourceId && claimSessionId) {
+      releaseResource(resourceId, claimSessionId);
+    }
   }
 }
 
@@ -210,12 +234,25 @@ async function executeWithAudit(
 export async function invokeAction(params: InvokeActionParams): Promise<InvokeResult> {
   const { action, context } = params;
 
+  // Idempotency check — skip if same action already completed
+  if (params.executionRepo) {
+    const executionHash = computeExecutionHash(action.type, action.params as Record<string, unknown>);
+    const existing = params.executionRepo.findByHash(executionHash);
+    if (existing?.status === "completed") {
+      return { success: true, message: `Already executed (idempotent): ${action.type}`, executionId: existing.executionId };
+    }
+    const actionMatch = params.executionRepo.findByActionId(params.sessionId ?? "");
+    if (actionMatch?.status === "completed") {
+      return { success: true, message: `Already executed (idempotent): ${action.type}`, executionId: actionMatch.executionId };
+    }
+  }
+
   const policyBlock = runPolicyGate(action, context);
   if (policyBlock) return policyBlock;
 
   const precedenceBlock = runPrecedenceGate(params);
   if (precedenceBlock) return precedenceBlock;
 
-  const executor = getExecutor(action.type);
+  const executor = params.externalExecutor ?? getExecutor(action.type);
   return executeWithAudit(params, executor);
 }

@@ -57,6 +57,11 @@ vi.mock("chalk", () => ({
   },
 }));
 
+vi.mock("node:fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  return { ...actual, existsSync: vi.fn().mockReturnValue(true) };
+});
+
 vi.mock("node:child_process", () => ({
   execSync: vi.fn().mockReturnValue(""),
 }));

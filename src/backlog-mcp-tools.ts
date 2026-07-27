@@ -22,6 +22,7 @@ import {
   formatSummaryLine,
   type BacklogPriority,
   type BacklogSeverity,
+  type BacklogItem,
 } from "./backlog-core.js";
 
 import type { ToolResponse } from "./mcp-types.js";
@@ -60,6 +61,11 @@ export function handleGetBacklog(
     items = items.filter((item) => item.priority === p);
   }
 
+  // Adaptive recommend mode: suggest next items based on context
+  if (args.recommend === true) {
+    items = recommendNextItems(items, shitennoDir);
+  }
+
   // Include summary stats
   const summary = getBacklogSummary(items);
 
@@ -80,6 +86,19 @@ export function handleGetBacklog(
       text: JSON.stringify({ summary, items }, null, 2),
     }],
   };
+}
+
+function recommendNextItems(items: BacklogItem[], _shitennoDir: string): BacklogItem[] {
+  const active = items.filter((i) => i.state === "em implementação" || i.state === "em investigação");
+  if (active.length > 0) return active;
+
+  const p0 = items.filter((i) => i.priority === "P0");
+  if (p0.length > 0) return p0;
+
+  const p1Planeado = items.filter((i) => i.priority === "P1" && i.state === "planeado");
+  if (p1Planeado.length > 0) return p1Planeado;
+
+  return items.filter((i) => i.state === "planeado").slice(0, 5);
 }
 
 // ── addBacklogItem ─────────────────────────────────────────────────────────

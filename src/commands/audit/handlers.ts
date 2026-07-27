@@ -11,7 +11,7 @@ import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { auditHealth, type HealthAuditReport, type AuditLevel } from "../../health-auditor.js";
 import { getCached, computeKeyChecksums } from "../../cache.js";
-import { output, outputBlank } from "../../output.js";
+import { output, outputBlank, outputError } from "../../output.js";
 import { appendBacklogSection, issueToBacklogItem, type BacklogItem } from "../../backlog-writer.js";
 import { resolveBacklogPaths } from "../../backlog-core.js";
 import { getChangedFiles } from "../../audit/changed-files.js";
@@ -116,7 +116,7 @@ export function handleChangedFiles(options: { changed?: string | boolean }, ctx:
 export function handleFullSweep(options: { fullSweep?: boolean }, ctx: AuditActionCtx, isJson: boolean): void {
   if (!options.fullSweep) return;
   if (process.env.SHITENNO_CHILD === "1") {
-    console.error("Erro: --full-sweep não pode ser usado por processo automatizado (daemon/CI). Rode manualmente.");
+    outputError("Erro: --full-sweep não pode ser usado por processo automatizado (daemon/CI). Rode manualmente.");
     process.exitCode = 1;
     throw new Error("exit");
   }

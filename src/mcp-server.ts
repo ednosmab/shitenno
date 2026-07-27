@@ -94,13 +94,14 @@ export const TOOLS = [
   },
   {
     name: "getBacklog",
-    description: "Get the current active tasks and backlog items. Supports filtering by state and priority. Returns summary stats.",
+    description: "Get the current active tasks and backlog items. Supports filtering by state and priority. Use recommend=true to get context-aware next-item suggestions.",
     inputSchema: {
       type: "object" as const,
       properties: {
         state: { type: "string" as const, description: "Optional filter by state." },
         priority: { type: "string" as const, description: "Optional filter by priority (P0, P1, P2, P3)." },
         includeDone: { type: "boolean" as const, description: "Include done items." },
+        recommend: { type: "boolean" as const, description: "Return context-aware recommended next items." },
         format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
       },
     },
@@ -231,6 +232,8 @@ const TOOL_HANDLERS: Record<string, ToolHandler> = {
   getMandatoryContext: handleGetMandatoryContext,
 };
 
+import { recordToolCall } from "./usage-tracker.js";
+
 export async function dispatchTool(
   name: string,
   projectRoot: string,
@@ -238,6 +241,7 @@ export async function dispatchTool(
   toolArgs: Record<string, unknown>
 ): Promise<ToolResponse> {
   try {
+    recordToolCall(shitennoDir, name);
     const handler = TOOL_HANDLERS[name];
     if (!handler) {
       return {
