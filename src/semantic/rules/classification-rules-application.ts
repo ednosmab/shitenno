@@ -1,0 +1,128 @@
+import type { ClassificationRule } from "../taxonomy.js";
+
+export const APPLICATION_RULES: ClassificationRule[] = [
+  // ── API ──────────────────────────────────────────────────────────────────
+  {
+    signal: "file.created",
+    match: /(?:src\/routes\/|src\/controllers\/|src\/endpoints\/|src\/api\/)/i,
+    domain: "api",
+    subdomain: "api-endpoint",
+    priority: 90,
+    confidenceBoost: 0.8,
+    description: "API endpoint or route file created",
+  },
+  {
+    signal: "file.created",
+    match: /(?:src\/contracts\/|.*\.schema\.ts|.*\.types\.ts|openapi|swagger)/i,
+    domain: "api",
+    subdomain: "api-contract",
+    priority: 85,
+    confidenceBoost: 0.75,
+    description: "API contract or schema file created",
+  },
+  {
+    signal: "file.modified",
+    match: /(?:src\/routes\/|src\/controllers\/|src\/endpoints\/)/i,
+    domain: "api",
+    subdomain: "api-endpoint",
+    priority: 80,
+    confidenceBoost: 0.7,
+    description: "API endpoint file modified",
+  },
+
+  // ── Frontend ────────────────────────────────────────────────────────────
+  {
+    signal: "dependency.added",
+    match: /\b(react|vue|angular|svelte|next|nuxt|remix|solid-js)\b/i,
+    domain: "frontend",
+    subdomain: "ui-component",
+    priority: 100,
+    confidenceBoost: 0.85,
+    description: "Frontend framework dependency added",
+  },
+  {
+    signal: "file.created",
+    match: /(?:src\/components\/|src\/pages\/|src\/views\/|src\/screens\/)/i,
+    domain: "frontend",
+    subdomain: "ui-component",
+    priority: 85,
+    confidenceBoost: 0.75,
+    description: "UI component file created",
+  },
+  {
+    signal: "file.created",
+    match: /(?:src\/styles\/|src\/css\/|\.module\.css|\.module\.scss)/i,
+    domain: "frontend",
+    subdomain: "style-system",
+    priority: 80,
+    confidenceBoost: 0.7,
+    description: "Style file created",
+  },
+
+  // ── Testing ─────────────────────────────────────────────────────────────
+  {
+    signal: "dependency.added",
+    match: /\b(jest|vitest|mocha|chai|cypress|playwright|testing-library)\b/i,
+    domain: "testing",
+    subdomain: "test-framework",
+    priority: 100,
+    confidenceBoost: 0.9,
+    description: "Testing framework dependency added",
+  },
+  {
+    signal: "file.created",
+    match: /(?:\.test\.(?:ts|tsx|js|jsx)|\.spec\.(?:ts|tsx|js|jsx)|__tests__\/)/i,
+    domain: "testing",
+    subdomain: "test-file",
+    priority: 90,
+    confidenceBoost: 0.85,
+    description: "Test file created",
+  },
+  {
+    signal: "test.passed",
+    match: /.*/i,
+    domain: "testing",
+    subdomain: "test-file",
+    priority: 50,
+    confidenceBoost: 0.5,
+    description: "Test passed",
+  },
+  {
+    signal: "test.failed",
+    match: /.*/i,
+    domain: "testing",
+    subdomain: "test-file",
+    priority: 50,
+    confidenceBoost: 0.5,
+    description: "Test failed",
+  },
+
+  // ── Documentation ───────────────────────────────────────────────────────
+  {
+    signal: "file.created",
+    match: /(?:\.md$|readme|changelog|CONTRIBUTING)/i,
+    domain: "documentation",
+    subdomain: "doc-file",
+    priority: 80,
+    confidenceBoost: 0.7,
+    description: "Documentation file created",
+  },
+  {
+    signal: "adr.created",
+    match: /.*/i,
+    domain: "documentation",
+    subdomain: "adr",
+    priority: 100,
+    confidenceBoost: 0.95,
+    description: "Architecture Decision Record created",
+  },
+  {
+    signal: "file.created",
+    match: /(?:docs\/|doc\/)/i,
+    domain: "documentation",
+    subdomain: "doc-file",
+    priority: 75,
+    confidenceBoost: 0.65,
+    description: "Documentation directory file created",
+  },
+];

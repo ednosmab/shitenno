@@ -4,6 +4,24 @@ import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { SHITENNO_DIR_NAME } from "../../constants.js";
 import type { Reminder, ReminderPriority, ReminderCategory } from "../../briefing.js";
 
+export const VALID_PRIORITIES: ReminderPriority[] = ["high", "medium", "low"];
+export const VALID_CATEGORIES: ReminderCategory[] = ["bug", "feature", "debt", "security", "docs", "infra"];
+
+export const PRIORITY_ICONS: Record<ReminderPriority, string> = {
+  high: "🔴",
+  medium: "🟡",
+  low: "🟢",
+};
+
+export const CATEGORY_ICONS: Record<ReminderCategory, string> = {
+  bug: "🐛",
+  feature: "✨",
+  debt: "🔧",
+  security: "🔒",
+  docs: "📝",
+  infra: "⚙️",
+};
+
 export function getBufferPath(projectRoot: string): string {
   return join(projectRoot, SHITENNO_DIR_NAME, "governance", "context", "context_buffer.yaml");
 }

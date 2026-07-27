@@ -1,14 +1,19 @@
 import chalk from "chalk";
+import fse from "fs-extra";
+import { existsSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { type ManifestDiff } from "../../manifest.js";
+import { SHITENNO_DIR_NAME } from "../../constants.js";
 import { outputJson } from "../../formatting.js";
 import { output, outputBlank, outputSection, outputSuccess, outputError, outputWarning } from "../../output.js";
-import type { ManifestDiff } from "../../manifest.js";
 
-interface UpdateData {
-  currentManifest: { cliVersion: string; installedAt: string };
-  currentCliVersion: string;
-  diff: ManifestDiff;
-  hasChanges: boolean;
-  versionMismatch: boolean;
+const { copySync, ensureDirSync, removeSync } = fse;
+
+export function getTemplatesDir(): string {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  return join(__dirname, "..", "..", "templates", "base");
 }
 
 export function displayDiff(diff: ManifestDiff, isJson: boolean): void {
@@ -56,6 +61,54 @@ export function displayDiff(diff: ManifestDiff, isJson: boolean): void {
   outputBlank();
 }
 
+export function applyUpdates(
+  targetDir: string,
+  diff: ManifestDiff,
+  options: { backup?: boolean }
+): void {
+  const templatesDir = getTemplatesDir();
+  const shitennoDir = join(targetDir, SHITENNO_DIR_NAME);
+
+  if (options.backup) {
+    const backupDir = join(shitennoDir, "backups", new Date().toISOString().replace(/[:.]/g, "-"));
+    ensureDirSync(backupDir);
+
+    for (const file of [...diff.changed, ...diff.removed]) {
+      const srcPath = join(shitennoDir, file);
+      if (existsSync(srcPath)) {
+        const destPath = join(backupDir, file);
+        ensureDirSync(join(destPath, ".."));
+        copySync(srcPath, destPath);
+      }
+    }
+
+    output(chalk.gray(`  Backup created at: ${backupDir.replace(targetDir + "/", "")}`));
+  }
+
+  let filesUpdated = 0;
+
+  for (const file of [...diff.added, ...diff.changed]) {
+    const srcPath = join(templatesDir, file);
+    const destPath = join(shitennoDir, file);
+
+    if (existsSync(srcPath)) {
+      ensureDirSync(join(destPath, ".."));
+      copySync(srcPath, destPath);
+      filesUpdated++;
+    }
+  }
+
+  for (const file of diff.removed) {
+    const filePath = join(shitennoDir, file);
+    if (existsSync(filePath)) {
+      removeSync(filePath);
+      filesUpdated++;
+    }
+  }
+
+  outputSuccess(`  ✔ Updated ${filesUpdated} file(s)`);
+}
+
 export function outputNoManifest(isJson: boolean): void {
   if (isJson) {
     outputJson({ error: "no_manifest", message: "No manifest found. Run 'shugo init' or 'shugo upgrade' first." });
@@ -66,7 +119,7 @@ export function outputNoManifest(isJson: boolean): void {
   }
 }
 
-export function outputUpToDate(data: UpdateData, isJson: boolean): void {
+export function outputUpToDate(data: { currentCliVersion: string; currentManifest: { cliVersion: string; installedAt: string } }, isJson: boolean): void {
   if (isJson) {
     outputJson({
       status: "up_to_date",
@@ -82,7 +135,7 @@ export function outputUpToDate(data: UpdateData, isJson: boolean): void {
   }
 }
 
-export function outputDryRun(data: UpdateData, isJson: boolean): void {
+export function outputDryRun(data: { diff: ManifestDiff }, isJson: boolean): void {
   if (isJson) {
     outputJson({ dryRun: true, diff: data.diff });
   } else {
@@ -91,7 +144,7 @@ export function outputDryRun(data: UpdateData, isJson: boolean): void {
   }
 }
 
-export function outputChangesSummary(data: UpdateData, isJson: boolean): void {
+export function outputChangesSummary(data: { diff: ManifestDiff }, isJson: boolean): void {
   if (isJson) {
     outputJson({
       status: "changes_detected",
@@ -101,6 +154,20 @@ export function outputChangesSummary(data: UpdateData, isJson: boolean): void {
   } else {
     output(chalk.gray("  Run 'shugo update --apply' to apply these changes."));
     output(chalk.gray("  Run 'shugo update --dry-run' to preview without applying."));
+    outputBlank();
+  }
+}
+
+export function outputUpdateResult(data: { currentCliVersion: string; diff: ManifestDiff }, isJson: boolean, updatedManifest: { installedAt: string }): void {
+  if (isJson) {
+    outputJson({
+      status: "updated",
+      cliVersion: data.currentCliVersion,
+      filesChanged: data.diff.changed.length + data.diff.added.length + data.diff.removed.length,
+    });
+  } else {
+    output(chalk.gray(`  CLI version: ${data.currentCliVersion}`));
+    output(chalk.gray(`  Last updated: ${updatedManifest.installedAt}`));
     outputBlank();
   }
 }

@@ -1,8 +1,8 @@
 # PLAN-file-refactor-64-overloaded — Refactorização de 64 Ficheiros >300 Linhas
 
-**Status:** In Progress (Phase 4 done)
+**Status:** In Progress (Phase 6 done)
 **Date:** 2026-07-25
-**Updated_at:** 2026-07-26T04:42:00.000Z
+**Updated_at:** 2026-07-27T04:12:00.000Z
 **Priority:** P1
 **Owner:** AI Agent + Tech Lead
 **Estimated Time:** 61 sprints
@@ -331,45 +331,45 @@ Fragmentar, refatorar e corrigir lógica em todos os 64 ficheiros acima de 300 l
 
 ### FASE 6 — Ficheiros Pequenos (12 ficheiros)
 
-### Passo 6.1: Plan Backlog Sync Split
-**Ficheiro:** `src/plan-backlog-sync.ts` (340 linhas)
-**Acção:** Extrair `sync/parsing.ts`, `sync/events.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 6.1: Plan Backlog Sync Split ✅
+**Ficheiro:** `src/plan-backlog-sync.ts` (340→191)
+**Acção:** Extrair `plan-backlog-sync/checklist.ts`, `plan-backlog-sync/retroactive.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 6.2: Pattern Detector Split
-**Ficheiro:** `src/pattern-detector.ts` (338 linhas)
-**Acção:** Extrair `pattern/history.ts`, `pattern/report.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 6.2: Pattern Detector Split ✅
+**Ficheiro:** `src/pattern-detector.ts` (338→82)
+**Acção:** Extrair `pattern-detector/history.ts`, `pattern-detector/detectors.ts`, `pattern-detector/rules.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 6.3: Pipeline Split
-**Ficheiro:** `src/pipeline.ts` (330 linhas)
-**Acção:** Extrair `pipeline-stages.ts` (~100).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 6.3: Pipeline Split ✅
+**Ficheiro:** `src/pipeline.ts` (330→216)
+**Acção:** Extrair `pipeline/stages.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 6.4: Challenge Responder Split
-**Ficheiro:** `src/challenge-responder.ts` (325 linhas)
-**Acção:** Extrair `challenge/storage.ts`, `challenge/normalization.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 6.4: Challenge Responder Split ✅
+**Ficheiro:** `src/challenge-responder.ts` (325→172)
+**Acção:** Extrair `challenge-responder/storage.ts`, `challenge-responder/actions.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 6.5: Daemon Client Split
-**Ficheiro:** `src/daemon-client.ts` (312 linhas)
-**Acção:** Extrair `client/paths.ts`, `client/status.ts`, `client/query.ts`.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 6.5: Daemon Client Split ✅
+**Ficheiro:** `src/daemon-client.ts` (312→37)
+**Acção:** Extrair `daemon-client/paths.ts`, `daemon-client/process.ts`, `daemon-client/ipc.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 6.6: Inference Engine Merge
-**Ficheiro:** `src/inference-engine.ts` (317 linhas)
-**Acção:** Considerar merge em `markdown-plan-engine.ts` (depende só dele).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 6.6: Inference Engine Split ✅
+**Ficheiro:** `src/inference-engine.ts` (317→124)
+**Acção:** Extrair `inference-engine/analysis.ts`, `inference-engine/recommendations.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 6.7: Handbook Nav Split
-**Ficheiro:** `src/handbook/hooks/use-handbook-nav.ts` (320 linhas)
-**Acção:** Extrair `TOPIC_REGISTRY` para data file separado.
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 6.7: Handbook Nav Split ✅
+**Ficheiro:** `src/handbook/hooks/use-handbook-nav.ts` (320→280)
+**Acção:** Extrair `TOPIC_REGISTRY` para `handbook/data/topic-registry.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
-### Passo 6.8: Audit Display Split
-**Ficheiro:** `src/commands/audit/display.ts` (315 linhas)
-**Acção:** Extrair `audit/display-summary.ts` (~100).
-**Verificação:** `pnpm run lint && pnpm run typecheck`
+### Passo 6.8: Audit Display Split ✅
+**Ficheiro:** `src/commands/audit/display.ts` (315→191)
+**Acção:** Extrair `commands/audit/display-summary.ts`.
+**Verificação:** `pnpm run lint && pnpm run typecheck` ✅
 
 ---
 

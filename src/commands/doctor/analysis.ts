@@ -1,7 +1,7 @@
-import { logger } from "../../logger.js";
 import { type EngineeringState, consolidateEngineeringState } from "../../engineering-state.js";
 import { detectKnowledgeDebt, type KnowledgeDebtReport } from "../../knowledge-debt.js";
 import { calculateHealthPenalty } from "../../formatting.js";
+import { logger } from "../../logger.js";
 
 export interface DoctorFinding {
   category: "risk" | "improvement" | "info" | "teaching";
@@ -32,7 +32,6 @@ export function analyzeRisks(state: EngineeringState, debtReport: KnowledgeDebtR
 export function analyzeImprovements(state: EngineeringState): DoctorFinding[] {
   const findings: DoctorFinding[] = [];
 
-  // No CI/CD
   if (!state.project.hasCI) {
     findings.push({
       category: "improvement",
@@ -48,7 +47,6 @@ export function analyzeImprovements(state: EngineeringState): DoctorFinding[] {
     });
   }
 
-  // Low capability count
   if (state.capabilities.length < 4) {
     findings.push({
       category: "improvement",
@@ -63,7 +61,6 @@ export function analyzeImprovements(state: EngineeringState): DoctorFinding[] {
     });
   }
 
-  // No knowledge graph
   if (!state.knowledgeGraph || state.knowledgeGraph.totalArtifacts === 0) {
     findings.push({
       category: "improvement",
@@ -88,7 +85,6 @@ export function analyzeTeaching(state: EngineeringState): { findings: DoctorFind
   const adrs = state.assets.filter((a) => a.type === "adr");
   const skills = state.assets.filter((a) => a.type === "skill");
 
-  // Teaching: ADR importance
   if (adrs.length === 0 && skills.length > 0) {
     findings.push({
       category: "teaching",
@@ -105,7 +101,6 @@ export function analyzeTeaching(state: EngineeringState): { findings: DoctorFind
     moments.push("ADRs are immutable records of decisions — they document the 'why'. Skills are living documents — they evolve as patterns mature.");
   }
 
-  // Teaching: Capability system
   if (state.capabilities.length > 0 && state.maturity?.recommendedCapabilities && state.maturity.recommendedCapabilities.length > 0) {
     moments.push(
       `Your project has ${state.capabilities.length} capabilities installed. ` +
@@ -114,7 +109,6 @@ export function analyzeTeaching(state: EngineeringState): { findings: DoctorFind
     );
   }
 
-  // Teaching: Knowledge lifecycle
   if (adrs.length > 0 && skills.length === 0) {
     moments.push(
       "You have ADRs but no Skills. Consider extracting reusable patterns from your ADRs into Skills. " +
@@ -185,7 +179,6 @@ export function runDoctorAnalysis(
 ): DoctorReport {
   const state = consolidateEngineeringState(projectRoot, shitennoDir);
 
-  // Knowledge debt
   let debtReport: KnowledgeDebtReport | null = null;
   try {
     debtReport = detectKnowledgeDebt(projectRoot, shitennoDir);
@@ -193,14 +186,12 @@ export function runDoctorAnalysis(
     logger.debug("doctor", "Knowledge debt detection unavailable");
   }
 
-  // Run analyses
   const riskFindings = analyzeRisks(state, debtReport);
   const improvementFindings = analyzeImprovements(state);
   const { findings: teachingFindings, moments: teachingMoments } = analyzeTeaching(state);
 
   const allFindings = [...riskFindings, ...improvementFindings, ...teachingFindings];
 
-  // Calculate health
   let healthScore = 100;
   for (const f of allFindings) {
     if (f.category === "risk") {

@@ -1,10 +1,9 @@
 import chalk from "chalk";
 import { detectComplexity } from "../../complexity-detector.js";
 import { getActiveRules } from "../../rule-loader.js";
+import { readMaturityHistory, type MaturityProfile } from "../../maturity-profile.js";
 import { outputJson, healthBar } from "../../formatting.js";
 import { output, outputBlank } from "../../output.js";
-import { readMaturityHistory } from "../../maturity-profile.js";
-import type { MaturityProfile } from "../../maturity-profile.js";
 
 export function displayDimensionBar(label: string, value: number, prev?: number): void {
   const barWidth = 20;
@@ -33,11 +32,9 @@ export function displayEvolution(history: Array<{ timestamp: string; overallScor
   output(chalk.bold("  Evolution:"));
   outputBlank();
 
-  const maxScore = Math.max(...history.map((h) => h.overallScore));
-
-  // Simple ASCII sparkline
   const scores = history.map((h) => h.overallScore);
   const minScore = Math.min(...scores);
+  const maxScore = Math.max(...scores);
   const range = maxScore - minScore || 1;
 
   const chars = " ▁▂▃▄▅▆▇█";
@@ -47,6 +44,63 @@ export function displayEvolution(history: Array<{ timestamp: string; overallScor
   }).join("");
 
   output(`    ${chalk.cyan(sparkline)} ${chalk.gray(`(${history.length} assessments)`)}`);
+  outputBlank();
+}
+
+export function displayComplexity(projectRoot: string, shitennoDir: string, isJson: boolean): void {
+  const result = detectComplexity(projectRoot);
+  const active = getActiveRules(projectRoot, shitennoDir);
+
+  if (isJson) {
+    outputJson({
+      complexity: result.level,
+      score: result.score,
+      factors: result.factors,
+      capabilities: result.recommendedCapabilities,
+      rules: {
+        loaded: active.loadedCount,
+        total: active.totalCount,
+      },
+    });
+    return;
+  }
+
+  outputBlank();
+  output(chalk.bold.cyan("  ╔══════════════════════════════════════════╗"));
+  output(chalk.bold.cyan("  ║  shugo assess complexity                 ║"));
+  output(chalk.bold.cyan("  ╚══════════════════════════════════════════╝"));
+  outputBlank();
+
+  const levelColor = result.level === "simple" ? chalk.green : result.level === "medium" ? chalk.yellow : chalk.red;
+  output(chalk.bold("  Project Complexity Analysis"));
+  output("  " + "─".repeat(40));
+  output(`  Level:     ${levelColor.bold(result.level)}`);
+  output(`  Score:     ${result.score}`);
+  outputBlank();
+
+  output(chalk.bold("  Factors:"));
+  for (const f of result.factors) {
+    const icon = f.score >= 3 ? "🔴" : f.score >= 2 ? "🟡" : "🟢";
+    output(`    ${icon} ${f.description}`);
+  }
+  outputBlank();
+
+  output(chalk.bold("  Recommended Capabilities:"));
+  for (const cap of result.recommendedCapabilities) {
+    output(chalk.green(`    ✅ ${cap}`));
+  }
+  outputBlank();
+
+  output(chalk.bold("  Rules loaded:"));
+  output(`    Complexity: ${result.level}`);
+  output(`    Active: ${active.loadedCount}/${active.totalCount} rules`);
+  if (result.level === "simple") {
+    output(chalk.gray("    ℹ️  Simple project — only core rules active"));
+  } else if (result.level === "medium") {
+    output(chalk.gray("    ℹ️  Medium project — core + knowledge + governance + quality rules active"));
+  } else {
+    output(chalk.gray("    ℹ️  Complex project — all rules active"));
+  }
   outputBlank();
 }
 
@@ -113,61 +167,4 @@ export function displayAssessmentResults(shitennoDir: string, previousProfile: M
   const history = readMaturityHistory(shitennoDir);
   displayEvolution(history);
   displayAssessmentSummary(newProfile);
-}
-
-export function displayComplexity(projectRoot: string, shitennoDir: string, isJson: boolean): void {
-  const result = detectComplexity(projectRoot);
-  const active = getActiveRules(projectRoot, shitennoDir);
-
-  if (isJson) {
-    outputJson({
-      complexity: result.level,
-      score: result.score,
-      factors: result.factors,
-      capabilities: result.recommendedCapabilities,
-      rules: {
-        loaded: active.loadedCount,
-        total: active.totalCount,
-      },
-    });
-    return;
-  }
-
-  outputBlank();
-  output(chalk.bold.cyan("  ╔══════════════════════════════════════════╗"));
-  output(chalk.bold.cyan("  ║  shugo assess complexity                 ║"));
-  output(chalk.bold.cyan("  ╚══════════════════════════════════════════╝"));
-  outputBlank();
-
-  const levelColor = result.level === "simple" ? chalk.green : result.level === "medium" ? chalk.yellow : chalk.red;
-  output(chalk.bold("  Project Complexity Analysis"));
-  output("  " + "─".repeat(40));
-  output(`  Level:     ${levelColor.bold(result.level)}`);
-  output(`  Score:     ${result.score}`);
-  outputBlank();
-
-  output(chalk.bold("  Factors:"));
-  for (const f of result.factors) {
-    const icon = f.score >= 3 ? "🔴" : f.score >= 2 ? "🟡" : "🟢";
-    output(`    ${icon} ${f.description}`);
-  }
-  outputBlank();
-
-  output(chalk.bold("  Recommended Capabilities:"));
-  for (const cap of result.recommendedCapabilities) {
-    output(chalk.green(`    ✅ ${cap}`));
-  }
-  outputBlank();
-
-  output(chalk.bold("  Rules loaded:"));
-  output(`    Complexity: ${result.level}`);
-  output(`    Active: ${active.loadedCount}/${active.totalCount} rules`);
-  if (result.level === "simple") {
-    output(chalk.gray("    ℹ️  Simple project — only core rules active"));
-  } else if (result.level === "medium") {
-    output(chalk.gray("    ℹ️  Medium project — core + knowledge + governance + quality rules active"));
-  } else {
-    output(chalk.gray("    ℹ️  Complex project — all rules active"));
-  }
-  outputBlank();
 }

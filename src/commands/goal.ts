@@ -2,17 +2,6 @@
  * goal.ts — Goal Management CLI Command
  *
  * The `shugo goal` command. CRUD operations for governance goals.
- *
- * Usage:
- *   shugo goal create "Achieve 80% test coverage" --priority high --target quality
- *   shugo goal list
- *   shugo goal list --status active
- *   shugo goal show GOAL-abc123
- *   shugo goal update GOAL-abc123 --progress 50
- *   shugo goal complete GOAL-abc123
- *   shugo goal abandon GOAL-abc123
- *   shugo goal stats
- *   shugo goal delete GOAL-abc123
  */
 
 import { Command } from "commander";
@@ -23,7 +12,8 @@ import { GoalEngine, type Goal, type GoalStatus, type GoalPriority, FileGoalRepo
 import { printDaemonBanner } from "../daemon-context-banner.js";
 import { outputJson } from "../formatting.js";
 import { SHITENNO_DIR_NAME } from "../constants.js";
-import { output, outputBlank, outputSection, outputSuccess, outputError, outputWarning } from "../output.js";
+import { output, outputBlank, outputSuccess, outputError, outputWarning } from "../output.js";
+import { formatGoal, displayGoalList, displayGoalDetail, displayGoalStats } from "./goal/display.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -39,34 +29,6 @@ function join(...paths: string[]): string {
   });
 }
 
-const STATUS_COLORS: Record<GoalStatus, (s: string) => string> = {
-  draft: (s) => chalk.gray(s),
-  active: (s) => chalk.cyan(s),
-  completed: (s) => chalk.green(s),
-  abandoned: (s) => chalk.red(s),
-};
-
-const PRIORITY_COLORS: Record<GoalPriority, (s: string) => string> = {
-  low: (s) => chalk.gray(s),
-  medium: (s) => chalk.yellow(s),
-  high: (s) => chalk.hex("#FF8800")(s),
-  critical: (s) => chalk.red.bold(s),
-};
-
-function formatGoal(goal: { id: string; title: string; status: GoalStatus; priority: GoalPriority; progress: number; targets: string[]; description?: string }): string {
-  const status = STATUS_COLORS[goal.status](goal.status.padEnd(10));
-  const priority = PRIORITY_COLORS[goal.priority](goal.priority.padEnd(8));
-  const bar = progressBar(goal.progress);
-  const targets = goal.targets.length > 0 ? chalk.dim(` [${goal.targets.join(", ")}]`) : "";
-  return `  ${chalk.bold(goal.id)}  ${status}  ${priority}  ${bar}  ${goal.title}${targets}`;
-}
-
-function progressBar(pct: number): string {
-  const filled = Math.round(pct / 10);
-  const empty = 10 - filled;
-  return chalk.cyan("█".repeat(filled)) + chalk.dim("░".repeat(empty)) + ` ${pct}%`;
-}
-
 function resolveGoalContext(opts: Record<string, unknown>, isJson: boolean) {
   const ctx = guardNotInitialized(opts, isJson);
   if (!ctx) return null;
@@ -80,58 +42,6 @@ function handleGoalError(isJson: boolean, jsonMsg: string, humanMsg: string): vo
   } else {
     outputError(humanMsg);
   }
-}
-
-function displayGoalList(goals: Goal[]): void {
-  outputBlank();
-  if (goals.length === 0) {
-    output(chalk.dim("  No goals found. Create one with: shugo goal create \"<title>\""));
-  } else {
-    outputSection(`Goals (${goals.length})`);
-    output(chalk.dim("  " + "─".repeat(70)));
-    for (const goal of goals) {
-      output(formatGoal(goal));
-    }
-  }
-  outputBlank();
-}
-
-function displayGoalDetail(goal: Goal): void {
-  outputBlank();
-  output(chalk.bold(`  ${goal.id}`));
-  output(`  ${goal.title}`);
-  if (goal.description) output(`  ${chalk.dim(goal.description)}`);
-  outputBlank();
-  output(`  Status:     ${STATUS_COLORS[goal.status](goal.status)}`);
-  output(`  Priority:   ${PRIORITY_COLORS[goal.priority](goal.priority)}`);
-  output(`  Progress:   ${progressBar(goal.progress)}`);
-  if (goal.targets.length > 0) output(`  Targets:    ${goal.targets.join(", ")}`);
-  if (goal.criteria.length > 0) output(`  Criteria:   ${goal.criteria.join(", ")}`);
-  if (goal.tags.length > 0) output(`  Tags:       ${goal.tags.join(", ")}`);
-  if (goal.parentId) output(`  Parent:     ${goal.parentId}`);
-  output(`  Created:    ${goal.createdAt}`);
-  output(`  Updated:    ${goal.updatedAt}`);
-  if (goal.completedAt) output(`  Completed:  ${goal.completedAt}`);
-  outputBlank();
-}
-
-function displayGoalStats(stats: { total: number; byStatus: Record<GoalStatus, number>; byPriority: Record<GoalPriority, number>; avgProgress: number }): void {
-  outputBlank();
-  outputSection("Goal Statistics");
-  output(chalk.dim("  " + "─".repeat(40)));
-  output(`  Total:     ${stats.total}`);
-  output(`  Avg Progress: ${stats.avgProgress}%`);
-  outputBlank();
-  outputSection("By Status:");
-  for (const [status, count] of Object.entries(stats.byStatus)) {
-    if (count > 0) output(`    ${STATUS_COLORS[status as GoalStatus](status)}: ${count}`);
-  }
-  outputBlank();
-  outputSection("By Priority:");
-  for (const [priority, count] of Object.entries(stats.byPriority)) {
-    if (count > 0) output(`    ${PRIORITY_COLORS[priority as GoalPriority](priority)}: ${count}`);
-  }
-  outputBlank();
 }
 
 function handleGoalUpdate(id: string, opts: Record<string, unknown>, engine: GoalEngine, projectRoot: string): { goal?: Goal; error?: string } {
@@ -152,7 +62,6 @@ function handleGoalUpdate(id: string, opts: Record<string, unknown>, engine: Goa
     const repo = new FileGoalRepository(join(projectRoot, SHITENNO_DIR_NAME));
     repo.save(goal!);
   }
-
   return { goal };
 }
 

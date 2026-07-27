@@ -2,27 +2,21 @@
  * evolve.ts — Evolution Recommendations Command
  *
  * Shows evolution recommendations and allows accept/feedback.
- * Integrates with auto-evolution, feedback-loops, and event bus.
- * Displays dual paths (comfortable + challenging) for each recommendation.
- *
- * PRINCIPLE: The system shows two paths and trusts the user's intention to choose.
  */
 
 import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
 import { output, outputBlank } from "../output.js";
-import { logger } from "../logger.js";
 import { analyzeEvolution, writeEvolutionReport } from "../auto-evolution.js";
-import { recordFeedback, detectFeedbackPatterns, getAllFeedbackSummaries, recordDimensionFeedback, type PerformanceMetric } from "../feedback-loops.js";
+import { detectFeedbackPatterns, getAllFeedbackSummaries } from "../feedback/core.js";
+import { recordFeedback, recordDimensionFeedback, type PerformanceMetric } from "../feedback-loops.js";
 import { getEventBus } from "../event-bus.js";
 import { outputJson } from "../formatting.js";
 import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { formatDualPath, formatDualPathJson, formatGrowthProgress } from "../dual-path-presenter.js";
 import { recordPathChoice } from "../growth-profile.js";
 import { printDaemonBanner } from "../daemon-context-banner.js";
-// Semantic layer imports
-import { runSemanticAnalysis, createSemanticDualPath, formatSemanticDualPath, formatSemanticDualPathJson } from "../semantic/index.js";
+import { outputReportHuman, outputReportJson } from "./evolve/semantic-display.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -110,143 +104,6 @@ function handleFeedback(ctx: { shitennoDir: string }, options: { accept?: string
   }
 }
 
-function buildSemanticReport(ctx: { projectRoot: string; shitennoDir: string }): Record<string, unknown> {
-  try {
-    const { profile, patterns, insights, correlations } = runSemanticAnalysis(ctx.shitennoDir, ctx.projectRoot);
-    return {
-      patterns: patterns.map((p) => ({ id: p.id, type: p.type, domain: p.domain, confidence: p.confidence, description: p.description })),
-      insights: insights.map((i) => ({ id: i.id, type: i.type, priority: i.priority, description: i.description, domains: i.domains })),
-      correlations: correlations.map((c) => ({ id: c.id, type: c.type, strength: c.strength, description: c.description, confidence: c.confidence })),
-      dualPaths: patterns.slice(0, 3).map((p) => formatSemanticDualPathJson(createSemanticDualPath(p, profile))),
-      growthProfile: { growthCapacity: profile.growthCapacity, challengeLevel: profile.challengeLevel, domainChallengeLevels: profile.domainChallengeLevels },
-    };
-  } catch (err) {
-    logger.warn("evolve", `Semantic analysis failed for JSON: ${err}`);
-    return {};
-  }
-}
-
-function outputReportJson(
-  ctx: { projectRoot: string; shitennoDir: string },
-  report: ReturnType<typeof analyzeEvolution>,
-  totalFeedback: number,
-  patterns: ReturnType<typeof detectFeedbackPatterns>,
-): void {
-  outputJson({
-    projectRoot: ctx.projectRoot,
-    analyzedAt: report.analyzedAt,
-    currentState: report.currentState,
-    totalRecommendations: report.totalRecommendations,
-    byType: report.byType,
-    byPriority: report.byPriority,
-    recommendations: report.recommendations,
-    dualPaths: report.dualPaths.map((dp) => formatDualPathJson(dp.comfortable, dp.challenging, report.growthProfile)),
-    growthProfile: { growthCapacity: report.growthProfile.growthCapacity, challengeLevel: report.growthProfile.challengeLevel, pattern: report.growthProfile.patterns[0]?.type || "balanced" },
-    topNextSteps: report.topNextSteps,
-    summary: report.summary,
-    feedback: { totalInteractions: totalFeedback, patterns },
-    semantic: buildSemanticReport(ctx),
-  });
-}
-
-function displaySemanticPatterns(profile: ReturnType<typeof runSemanticAnalysis>["profile"], patterns: ReturnType<typeof runSemanticAnalysis>["patterns"]): void {
-  output(chalk.bold.cyan(`    📊 Semantic Patterns (${patterns.length})`));
-  outputBlank();
-  for (const pattern of patterns.slice(0, 3)) {
-    output(chalk.gray(`    • ${pattern.description}`));
-    output(chalk.gray(`      Domain: ${pattern.domain} | Confidence: ${Math.round(pattern.confidence * 100)}%`));
-    output(formatSemanticDualPath(createSemanticDualPath(pattern, profile)));
-  }
-}
-
-function displaySemanticInsightsEvolve(insights: ReturnType<typeof runSemanticAnalysis>["insights"]): void {
-  output(chalk.bold.magenta(`    🧠 Semantic Insights (${insights.length})`));
-  outputBlank();
-  for (const insight of insights.slice(0, 3)) {
-    const icon = insight.priority === "urgent" ? "🚨" : insight.priority === "high" ? "⚠️" : "💡";
-    output(`    ${icon} ${chalk.bold(insight.description)}`);
-    output(chalk.gray(`      Priority: ${insight.priority} | Domains: ${insight.domains.join(", ")}`));
-    for (const action of insight.suggestedActions.slice(0, 2)) output(chalk.gray(`        → ${action}`));
-    outputBlank();
-  }
-}
-
-function displaySemanticCorrelationsEvolve(correlations: ReturnType<typeof runSemanticAnalysis>["correlations"]): void {
-  output(chalk.bold.yellow(`    🔗 Cross-System Correlations (${correlations.length})`));
-  outputBlank();
-  for (const corr of correlations.slice(0, 3)) {
-    const icon = corr.strength === "strong" ? "🔴" : corr.strength === "moderate" ? "🟡" : "🟢";
-    output(`    ${icon} ${chalk.bold(corr.description)}`);
-    output(chalk.gray(`      Type: ${corr.type} | Confidence: ${Math.round(corr.confidence * 100)}%`));
-    outputBlank();
-  }
-}
-
-function displaySemanticEvolution(projectRoot: string, shitennoDir: string): void {
-  try {
-    const { profile, patterns, insights, correlations } = runSemanticAnalysis(shitennoDir, projectRoot);
-    if (patterns.length === 0 && insights.length === 0 && correlations.length === 0) return;
-    output(chalk.bold.magenta("  ╔══════════════════════════════════════════════════╗"));
-    output(chalk.bold.magenta("  ║         SEMANTIC EVOLUTION — Deep Analysis       ║"));
-    output(chalk.bold.magenta("  ╚══════════════════════════════════════════════════╝"));
-    outputBlank();
-    if (patterns.length > 0) displaySemanticPatterns(profile, patterns);
-    if (insights.length > 0) displaySemanticInsightsEvolve(insights);
-    if (correlations.length > 0) displaySemanticCorrelationsEvolve(correlations);
-  } catch (err) {
-    logger.warn("evolve", `Semantic analysis failed: ${err}`);
-  }
-}
-
-interface EvolveReportOutput {
-  report: ReturnType<typeof analyzeEvolution>;
-  totalFeedback: number;
-  patterns: ReturnType<typeof detectFeedbackPatterns>;
-  projectRoot?: string;
-  shitennoDir?: string;
-}
-
-function outputReportHuman({ report, totalFeedback, patterns, projectRoot, shitennoDir }: EvolveReportOutput): void {
-  output(chalk.bold("  Current State:"));
-  output(`    Maturity: ${report.currentState.maturityScore}/100`);
-  output(`    Knowledge Debt: ${report.currentState.knowledgeDebtScore}/100`);
-  output(`    Capabilities: ${report.currentState.installedCapabilities.length} installed`);
-  outputBlank();
-
-  output(formatGrowthProgress(report.growthProfile));
-  outputBlank();
-
-  if (totalFeedback > 0) {
-    output(chalk.bold("  Feedback History:"));
-    output(`    Total interactions: ${totalFeedback}`);
-    for (const p of patterns) output(chalk.gray(`    ⚠ ${p.description}`));
-    outputBlank();
-  }
-
-  output(chalk.bold.cyan("  ╔══════════════════════════════════════════════════╗"));
-  output(chalk.bold.cyan("  ║           DUAL PATH — Choose Your Way           ║"));
-  output(chalk.bold.cyan("  ╚══════════════════════════════════════════════════╝"));
-  outputBlank();
-
-  for (const dualPath of report.dualPaths) {
-    output(formatDualPath(dualPath.comfortable, dualPath.challenging, report.growthProfile));
-  }
-
-  if (report.topNextSteps.length > 0) {
-    output(chalk.bold("  Top Next Steps:"));
-    for (const step of report.topNextSteps) output(`    → ${step}`);
-    outputBlank();
-  }
-
-  if (projectRoot && shitennoDir) displaySemanticEvolution(projectRoot, shitennoDir);
-
-  output(chalk.gray("  Usage:"));
-  output(chalk.gray("    shugo evolve --accept EVO-001 --comfortable   # Choose comfortable path"));
-  output(chalk.gray("    shugo evolve --accept CHL-001 --challenging   # Choose challenging path"));
-  output(chalk.gray("    shugo evolve --reject EVO-001 --reason \"Not now\""));
-  outputBlank();
-}
-
 function printBanner(): void {
   outputBlank();
   output(chalk.bold.cyan("  ╔══════════════════════════════════════╗"));
@@ -315,6 +172,7 @@ export const evolveCommand = new Command("evolve")
       if (isJson) {
         outputJson({ error: "evolution_failed", message: String(error) });
       } else {
+        const { logger } = await import("../logger.js") as { logger: { error: (name: string, msg: string) => void } };
         logger.error("evolve", `Evolution analysis failed: ${error}`);
       }
       outputBlank();

@@ -10,6 +10,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { HandbookLevel, HandbookTopic, ViewMode } from "../types.js";
+import { TOPIC_REGISTRY } from "../data/topic-registry.js";
 
 function findHandbookRoot(startDir: string): string {
   let dir = startDir;
@@ -19,39 +20,11 @@ function findHandbookRoot(startDir: string): string {
     if (parent === dir) break;
     dir = parent;
   }
-  // Fallback: assume running from project root
   return join(process.cwd(), "docs", "handbook");
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const HANDBOOK_ROOT = findHandbookRoot(__dirname);
-
-// ── Topic Registry ─────────────────────────────────────────────────────────
-
-const TOPIC_REGISTRY: HandbookTopic[] = [
-  // Level 1 — Fundamentals
-  { id: "what-is-shugo", level: 1, levelName: "Fundamentos", title: "O que é Shugo", description: "Definição, problema que resolve, para quem serve", file: "01-fundamentals/what-is-shugo.md" },
-  { id: "installation", level: 1, levelName: "Fundamentos", title: "Instalação", description: "Pré-requisitos, métodos de instalação, verificação", file: "01-fundamentals/installation.md" },
-  { id: "quick-start", level: 1, levelName: "Fundamentos", title: "Primeiros Passos", description: "Init, status, detect, briefing, feedback", file: "01-fundamentals/quick-start.md" },
-  { id: "concepts", level: 1, levelName: "Fundamentos", title: "Conceitos", description: "Maturity, capabilities, governance, knowledge debt", file: "01-fundamentals/concepts.md" },
-
-  // Level 2 — Commands
-  { id: "setup", level: 2, levelName: "Comandos", title: "Setup & Config", description: "init, mcp, upgrade, clean", file: "02-commands/setup.md" },
-  { id: "analysis", level: 2, levelName: "Comandos", title: "Status & Análise", description: "status, audit, doctor, assess, detect", file: "02-commands/analysis.md" },
-  { id: "pipeline", level: 2, levelName: "Comandos", title: "Pipeline & Execução", description: "run, evolve, act, plan", file: "02-commands/pipeline.md" },
-  { id: "governance", level: 2, levelName: "Comandos", title: "Governança", description: "goal, decide, policy", file: "02-commands/governance.md" },
-  { id: "reports", level: 2, levelName: "Comandos", title: "Relatórios", description: "console, report, digest, bench", file: "02-commands/reports.md" },
-  { id: "ai-integration", level: 2, levelName: "Comandos", title: "Integração AI", description: "briefing, feedback, profile, dashboard, reminders", file: "02-commands/ai-integration.md" },
-  { id: "system", level: 2, levelName: "Comandos", title: "Sistema", description: "validate, shell-init", file: "02-commands/system.md" },
-  { id: "documentation", level: 2, levelName: "Comandos", title: "Documentação", description: "docs-audit", file: "02-commands/documentation.md" },
-
-  // Level 3 — Architecture
-  { id: "event-system", level: 3, levelName: "Arquitetura", title: "Sistema de Eventos", description: "Event bus, tipos de eventos, subscribe/publish", file: "03-architecture/event-system.md" },
-  { id: "rule-engine", level: 3, levelName: "Arquitetura", title: "Rule Engine", description: "Regras reativas, triggers, como criar regras", file: "03-architecture/rule-engine.md" },
-  { id: "mcp-server", level: 3, levelName: "Arquitetura", title: "MCP Server", description: "Protocolo MCP, configuração, uso com AI agents", file: "03-architecture/mcp-server.md" },
-  { id: "custom-rules", level: 3, levelName: "Arquitetura", title: "Regras Customizadas", description: "Como criar regras próprias", file: "03-architecture/custom-rules.md" },
-  { id: "contributing", level: 3, levelName: "Arquitetura", title: "Contribuindo", description: "Guia para contribuidores", file: "03-architecture/contributing.md" },
-];
 
 // ── Build Levels ───────────────────────────────────────────────────────────
 
@@ -74,7 +47,7 @@ function buildLevels(): HandbookLevel[] {
     .sort(([a], [b]) => a - b)
     .map(([number, topics]) => ({
       number,
-      name: levelNames[number]?.name || `Nível ${number}`,
+      name: levelNames[number]?.name || `Nivel ${number}`,
       description: levelNames[number]?.description || "",
       topics,
     }));
@@ -158,15 +131,9 @@ function expandLevelUpdate(prev: HandbookNavState, levelNumber: number): Handboo
   const newExpanded = prev.expandedLevel === levelNumber ? null : levelNumber;
   const newNavItems = buildNavItems(prev.levels, newExpanded, 0);
   return {
-    ...prev,
-    expandedLevel: newExpanded,
-    selectedIndex: 0,
-    sidebarScrollOffset: 0,
-    navItems: newNavItems,
-    totalItems: newNavItems.length,
-    viewMode: "tree",
-    selectedTopic: null,
-    content: null,
+    ...prev, expandedLevel: newExpanded, selectedIndex: 0, sidebarScrollOffset: 0,
+    navItems: newNavItems, totalItems: newNavItems.length, viewMode: "tree",
+    selectedTopic: null, content: null,
   };
 }
 
@@ -307,14 +274,7 @@ export function useHandbookNav() {
 
   return {
     ...state,
-    expandLevel,
-    moveUp,
-    moveDown,
-    selectCurrent,
-    selectAt,
-    goBack,
-    jumpToLevel,
-    selectTopicById,
-    setSidebarScroll,
+    expandLevel, moveUp, moveDown, selectCurrent, selectAt,
+    goBack, jumpToLevel, selectTopicById, setSidebarScroll,
   };
 }

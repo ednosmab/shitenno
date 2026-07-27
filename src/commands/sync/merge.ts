@@ -1,7 +1,41 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import fse from "fs-extra";
+
+const { readdirSync } = fse;
+
+export function getFilesToSync(shitennoDir: string, _targetDir: string): string[] {
+  const files: string[] = [];
+
+  const coreFiles = [
+    "docs/AGENTS.md",
+    "docs/opencode-context.md",
+    "docs/Shitenno_GUIDE.md",
+    "opencode.json",
+    "scripts/validate-session.ts",
+    "scripts/close-session.ts",
+  ];
+
+  for (const file of coreFiles) {
+    if (existsSync(join(shitennoDir, file))) {
+      files.push(file);
+    }
+  }
+
+  const skillsDir = join(shitennoDir, "docs/skills");
+  if (existsSync(skillsDir)) {
+    const skillFiles = readdirSync(skillsDir).filter((f: string) =>
+      f.endsWith(".md")
+    );
+    for (const skill of skillFiles) {
+      files.push(`docs/skills/${skill}`);
+    }
+  }
+
+  return files;
+}
 
 export function shouldPreserveCustomizations(filePath: string): boolean {
-  // Files that should preserve project-specific customizations
   const preserveList = [
     "docs/AGENTS.md",
     "docs/opencode-context.md",
@@ -18,17 +52,14 @@ export function mergeWithCustomizations(
   const shitennoContent = readFileSync(shitennoFile, "utf-8");
   const targetContent = readFileSync(targetFile, "utf-8");
 
-  // JSON files: merge preserving project-specific values
   if (shitennoFile.endsWith(".json")) {
     return mergeJsonFiles(shitennoContent, targetContent);
   }
 
-  // Markdown files: preserve custom sections, update/add shugo sections
   if (shitennoFile.endsWith(".md")) {
     return mergeMarkdownFiles(shitennoContent, targetContent);
   }
 
-  // For other files, use shugo content
   return shitennoContent;
 }
 
@@ -60,25 +91,17 @@ export function mergeJsonFiles(shitennoContent: string, targetContent: string): 
 }
 
 export function mergeMarkdownFiles(shitennoContent: string, targetContent: string): string {
-  // Extract sections from both files
   const shitennoSections = extractSections(shitennoContent);
   const targetSections = extractSections(targetContent);
 
-  // Start with shugo content as base
   let result = shitennoContent;
 
-  // For each section in target, check if it's a custom section
   for (const [sectionTitle, sectionContent] of Object.entries(targetSections)) {
-    // If section doesn't exist in shugo, it's custom - preserve it
     if (!shitennoSections[sectionTitle]) {
-      // Add custom section at the end
       result += `\n\n${sectionContent}`;
     }
-    // If section exists but content differs, check if it's personalized
     else if (shitennoSections[sectionTitle] !== sectionContent) {
-      // Check if target section contains personalized content (not placeholders)
       if (!sectionContent.includes("[PERSONALIZAR:") && !sectionContent.includes("[Adicionar")) {
-        // Preserve user's personalized content
         result = result.replace(shitennoSections[sectionTitle], sectionContent);
       }
     }
@@ -94,14 +117,11 @@ export function extractSections(content: string): Record<string, string> {
   let currentContent: string[] = [];
 
   for (const line of lines) {
-    // Check if line is a heading (## or ###)
     const headingMatch = line.match(/^(#{1,3})\s+(.+)/);
     if (headingMatch) {
-      // Save previous section if exists
       if (currentSection) {
         sections[currentSection] = currentContent.join("\n");
       }
-      // Start new section
       currentSection = headingMatch[2]?.trim() ?? "";
       currentContent = [line];
     } else if (currentSection) {
@@ -109,7 +129,6 @@ export function extractSections(content: string): Record<string, string> {
     }
   }
 
-  // Save last section
   if (currentSection) {
     sections[currentSection] = currentContent.join("\n");
   }

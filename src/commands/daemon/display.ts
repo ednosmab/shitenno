@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { readFileSync, statSync, createReadStream } from "node:fs";
 import { output, outputBlank } from "../../output.js";
 import type { DaemonStatusResponse } from "../../daemon-client.js";
 
@@ -84,4 +85,50 @@ export function displayRunningDaemonStatus(status: DaemonStatusResponse): void {
   output(`  Events:     ${status.eventsRecorded} recorded`);
   outputBlank();
   displayDaemonSections(status);
+}
+
+export async function attachToDaemonLog(logPath: string, numLines: number): Promise<void> {
+  output(chalk.gray(`  Attached to daemon log (${logPath}) — Ctrl+C to detach (daemon keeps running)`));
+  outputBlank();
+
+  try {
+    const content = readFileSync(logPath, "utf-8");
+    const lines = content.split("\n").filter(Boolean);
+    const tail = lines.slice(-numLines);
+    for (const line of tail) {
+      output(colorizeLogLine(line));
+    }
+  } catch {
+    // File may have been rotated — continue to follow
+  }
+
+  let lastSize = statSync(logPath).size;
+  const stream = () => {
+    try {
+      const { size } = statSync(logPath);
+      if (size > lastSize) {
+        const rs = createReadStream(logPath, { start: lastSize, end: size });
+        rs.on("data", (chunk) => {
+          const text = chunk.toString();
+          for (const line of text.split("\n").filter(Boolean)) {
+            output(colorizeLogLine(line));
+          }
+        });
+        lastSize = size;
+      } else if (size < lastSize) {
+        lastSize = 0;
+      }
+    } catch {
+      // Log file may have been removed — keep polling
+    }
+  };
+
+  const { watchFile, unwatchFile } = await import("node:fs");
+  watchFile(logPath, { interval: 300 }, stream);
+
+  process.on("SIGINT", () => {
+    unwatchFile(logPath, stream);
+    output(chalk.gray("\n  Detached (daemon continues running in background)."));
+    process.exit(0);
+  });
 }

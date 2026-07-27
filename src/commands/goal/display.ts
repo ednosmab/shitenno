@@ -1,6 +1,6 @@
 import chalk from "chalk";
+import { type Goal, type GoalStatus, type GoalPriority } from "../../prioritization/goals.js";
 import { output, outputBlank, outputSection } from "../../output.js";
-import type { Goal, GoalStatus, GoalPriority } from "../../prioritization/goals.js";
 
 export const STATUS_COLORS: Record<GoalStatus, (s: string) => string> = {
   draft: (s) => chalk.gray(s),
@@ -16,18 +16,18 @@ export const PRIORITY_COLORS: Record<GoalPriority, (s: string) => string> = {
   critical: (s) => chalk.red.bold(s),
 };
 
-export function progressBar(pct: number): string {
-  const filled = Math.round(pct / 10);
-  const empty = 10 - filled;
-  return chalk.cyan("█".repeat(filled)) + chalk.dim("░".repeat(empty)) + ` ${pct}%`;
-}
-
-export function formatGoal(goal: { id: string; title: string; status: GoalStatus; priority: GoalPriority; progress: number; targets: string[] }): string {
+export function formatGoal(goal: { id: string; title: string; status: GoalStatus; priority: GoalPriority; progress: number; targets: string[]; description?: string }): string {
   const status = STATUS_COLORS[goal.status](goal.status.padEnd(10));
   const priority = PRIORITY_COLORS[goal.priority](goal.priority.padEnd(8));
   const bar = progressBar(goal.progress);
   const targets = goal.targets.length > 0 ? chalk.dim(` [${goal.targets.join(", ")}]`) : "";
   return `  ${chalk.bold(goal.id)}  ${status}  ${priority}  ${bar}  ${goal.title}${targets}`;
+}
+
+export function progressBar(pct: number): string {
+  const filled = Math.round(pct / 10);
+  const empty = 10 - filled;
+  return chalk.cyan("█".repeat(filled)) + chalk.dim("░".repeat(empty)) + ` ${pct}%`;
 }
 
 export function displayGoalList(goals: Goal[]): void {

@@ -1,22 +1,18 @@
 /**
  * commands/audit/display.ts — Audit report display functions
- *
- * Extracted from commands/audit.ts to keep modules focused.
  */
 
 import chalk from "chalk";
-import { healthBar } from "../../formatting.js";
 import { output, outputBlank } from "../../output.js";
 import { groupOptimizationsByAction, categorizeIssues, groupByType, formatTypeGroup, identifyQuickWins } from "./reporter.js";
 import { generateFixSuggestions, prioritizeSuggestions } from "../../audit/suggestion-engine.js";
 import { runPolicyGate } from "../../decision-core/invoke.js";
 import { applyAllFixes, type AutofixReport } from "../../audit/autofix-engine.js";
-import { dimensionIcon, dimensionLabel, type AuditDimension } from "../../audit/dimensions.js";
 export { displaySemanticAudit, collectSemanticData } from "./semantic-display.js";
-import { issueFingerprint, type HealthAuditReport } from "../../health-auditor.js";
+export { displayKnowledgeGraph, displayWhatWasMeasured, displaySuppressedIssues, displayHumanAuditReport } from "./display-summary.js";
+export type { HumanReportInput } from "./display-summary.js";
+import type { HealthAuditReport } from "../../health-auditor.js";
 import type { AuditActionCtx } from "./types.js";
-
-// ── Types ───────────────────────────────────────────────────────────────────
 
 export interface IssueCategoryInput {
   title: string;
@@ -25,19 +21,6 @@ export interface IssueCategoryInput {
   color: typeof chalk;
   limit?: number;
 }
-
-export interface HumanReportInput {
-  report: HealthAuditReport;
-  graphAnalysis: {
-    totalArtifacts: number; totalRelations: number; healthScore: number;
-    orphanArtifacts: Array<{ name: string; type: string }>;
-    hubArtifacts: Array<{ artifact: { name: string }; connectionCount: number }>;
-    suggestions: string[];
-  };
-  ctx: AuditActionCtx; isJson: boolean; cacheHit: boolean; reportFile: string | null;
-}
-
-// ── Issue Display ───────────────────────────────────────────────────────────
 
 export function displayIssueCategory(input: IssueCategoryInput): void {
   const { title, issues, icon, color, limit = 5 } = input;
@@ -85,8 +68,6 @@ export async function displayDynamicRules(projectRoot: string, shitennoDir: stri
   } catch { /* Skip dynamic rules on error */ }
 }
 
-// ── Issue Counts ────────────────────────────────────────────────────────────
-
 export function buildIssueCounts(issues: HealthAuditReport["issues"]) {
   const count = (type: string) => issues.filter((i) => i.type === type).length;
   return {
@@ -133,38 +114,7 @@ export function displayIssueCounts(issues: HealthAuditReport["issues"]): void {
   show("Deprecated pkgs", "deprecated_package", chalk.yellow);
 }
 
-// ── Knowledge Graph Display ─────────────────────────────────────────────────
-
-export function displayKnowledgeGraph(graphAnalysis: {
-  totalArtifacts: number; totalRelations: number; healthScore: number;
-  orphanArtifacts: Array<{ name: string; type: string }>;
-  hubArtifacts: Array<{ artifact: { name: string }; connectionCount: number }>;
-  suggestions: string[];
-}): void {
-  output(chalk.bold("  📊 Knowledge Graph:"));
-  outputBlank();
-  const graphColor = graphAnalysis.healthScore >= 70 ? chalk.green : graphAnalysis.healthScore >= 40 ? chalk.yellow : chalk.red;
-  output(`    Health:  ${graphColor(graphAnalysis.healthScore + "/100")}  ${healthBar(graphAnalysis.healthScore, 100)}`);
-  output(`    Artifacts: ${graphAnalysis.totalArtifacts} | Relations: ${graphAnalysis.totalRelations}`);
-  outputBlank();
-  if (graphAnalysis.orphanArtifacts.length > 0) {
-    output(chalk.yellow(`    ⚠ ${graphAnalysis.orphanArtifacts.length} orphaned artifact(s):`));
-    for (const orphan of graphAnalysis.orphanArtifacts.slice(0, 5)) output(chalk.gray(`      - ${orphan.name} (${orphan.type})`));
-    outputBlank();
-  }
-  if (graphAnalysis.hubArtifacts.length > 0) {
-    output(chalk.cyan("    🔗 Top Hubs:"));
-    for (const hub of graphAnalysis.hubArtifacts.slice(0, 5)) output(chalk.gray(`      - ${hub.artifact.name}: ${hub.connectionCount} connection(s)`));
-    outputBlank();
-  }
-  if (graphAnalysis.suggestions.length > 0) {
-    output(chalk.blue("    💡 Suggestions:"));
-    for (const suggestion of graphAnalysis.suggestions) output(chalk.gray(`      - ${suggestion}`));
-    outputBlank();
-  }
-}
-
-// ── Categorized Issues Display ──────────────────────────────────────────────
+export { groupByType, formatTypeGroup, identifyQuickWins } from "./reporter.js";
 
 export function displayCategorizedIssues(report: HealthAuditReport, ctx: AuditActionCtx, isJson: boolean): void {
   const categorized = categorizeIssues(report.issues);
@@ -193,8 +143,6 @@ export function displayCategorizedIssues(report: HealthAuditReport, ctx: AuditAc
   displayFixSuggestions(report, ctx, isJson);
   displayOptimizations(report.optimizations);
 }
-
-// ── Fix Suggestions Display ─────────────────────────────────────────────────
 
 export function displayFixSuggestions(report: HealthAuditReport, ctx: AuditActionCtx, isJson: boolean): void {
   if (report.issues.length === 0) return;
@@ -241,75 +189,3 @@ export function displayAutofixApplication(prioritized: ReturnType<typeof priorit
     outputBlank();
   }
 }
-
-// ── Semantic Audit Display ──────────────────────────────────────────────────
-
-
-
-// ── What Was Measured ───────────────────────────────────────────────────────
-
-export function displayWhatWasMeasured(report: HealthAuditReport): void {
-  outputBlank();
-  output(chalk.bold("  📏 What Was Measured:"));
-  outputBlank();
-  output(chalk.gray(`    Duration:         ${report.durationMs}ms`));
-  output(chalk.gray(`    Files scanned:    ${report.filesScanned}`));
-  output(chalk.gray(`    Detectors run:    ${report.detectorsRun.length}`));
-  output(chalk.gray(`    Rules evaluated:  ${report.totalRules}`));
-  output(chalk.gray(`    History sessions: ${report.historyEntries}`));
-  outputBlank();
-  output(chalk.bold("  📊 Health Card:"));
-  outputBlank();
-  const dimensions: AuditDimension[] = ["security", "reliability", "complexity", "hygiene", "coverage", "governance"];
-  for (const dim of dimensions) {
-    const score = report.dimensionScores[dim] ?? 100;
-    const color = score >= 80 ? chalk.green : score >= 60 ? chalk.yellow : chalk.red;
-    output(`    ${dimensionIcon(dim)} ${dimensionLabel(dim).padEnd(15)} ${color(`${score}/100`)}`);
-  }
-  outputBlank();
-  outputBlank();
-}
-
-// ── Human Audit Report ──────────────────────────────────────────────────────
-
-export function displayHumanAuditReport(input: HumanReportInput): void {
-  const { report, graphAnalysis, ctx, isJson, cacheHit, reportFile } = input;
-  if (cacheHit) output(chalk.gray("  📦 Used cached results"));
-  outputBlank();
-  output(chalk.bold("  🏥 Health Audit Results:"));
-  outputBlank();
-  output(chalk.gray(`    Rules:           ${report.totalRules}`));
-  output(chalk.gray(`    History entries:  ${report.historyEntries}`));
-  output(chalk.gray(`    Issues found:    ${report.issues.length}`));
-  output(chalk.gray(`    Optimizations:   ${report.optimizations.length}`));
-  displayIssueCounts(report.issues);
-  outputBlank();
-  output(chalk.bold("    Code Health:"));
-  output(`      ${report.healthScore}/100  ${healthBar(report.healthScore, 100)}`);
-  outputBlank();
-  displayKnowledgeGraph(graphAnalysis);
-  if (report.issues.length === 0) {
-    output(chalk.green("  ✔ No issues found. Governance is healthy!"));
-    outputBlank();
-  } else {
-    displayCategorizedIssues(report, ctx, isJson);
-  }
-  if (reportFile) { output(chalk.gray(`  📄 Report saved: shitenno/reports/${reportFile}`)); outputBlank(); }
-}
-
-// ── Suppressed Issues Display ───────────────────────────────────────────────
-
-export function displaySuppressedIssues(suppressedIssues: HealthAuditReport["suppressedIssues"]): void {
-  output(chalk.bold("  🚫 Suppressed Issues:"));
-  outputBlank();
-  for (const issue of suppressedIssues) {
-    const fp = issueFingerprint(issue);
-    output(chalk.gray(`    [${fp}] ${issue.description}`));
-    output(chalk.gray(`      Reason: ${issue.suppressionReason}`));
-  }
-  outputBlank();
-}
-
-// ── Semantic Data Collection ────────────────────────────────────────────────
-
-

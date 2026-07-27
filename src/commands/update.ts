@@ -6,15 +6,10 @@
  */
 
 import { Command } from "commander";
-import { existsSync, readFileSync } from "node:fs";
-import { join, resolve, dirname } from "node:path";
+import { readFileSync } from "node:fs";
+import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-import chalk from "chalk";
 import ora from "ora";
-import fse from "fs-extra";
 import {
   readManifest,
   writeManifest,
@@ -27,13 +22,15 @@ import {
 import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
 import { outputJson } from "../formatting.js";
 import { getEventBus } from "../event-bus.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
-import { output, outputBlank, outputSection, outputSuccess, outputError, outputWarning, outputInfo } from "../output.js";
+import { output, outputBlank, outputSection, outputInfo } from "../output.js";
 import { logger } from "../logger.js";
+import {
+  displayDiff, applyUpdates, outputNoManifest, outputUpToDate,
+  outputDryRun, outputChangesSummary, outputUpdateResult,
+} from "./update/display.js";
 
-const { copySync, ensureDirSync, removeSync } = fse;
-
-// ── Types ────────────────────────────────────────────────────────────────────
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 interface UpdateOptions {
   dir?: string;
@@ -50,113 +47,6 @@ interface UpdateData {
   diff: ManifestDiff;
   hasChanges: boolean;
   versionMismatch: boolean;
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getTemplatesDir(): string {
-  // Templates are in src/templates/base/ relative to the CLI package
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  return join(__dirname, "..", "templates", "base");
-}
-
-function displayDiff(diff: ManifestDiff, isJson: boolean): void {
-  if (isJson) {
-    outputJson(diff as unknown as Record<string, unknown>);
-    return;
-  }
-
-  outputSection("Changes detected:");
-
-  if (diff.added.length > 0) {
-    outputSuccess(`    + ${diff.added.length} file(s) added`);
-    for (const f of diff.added.slice(0, 10)) {
-      output(chalk.green(`      + ${f}`));
-    }
-    if (diff.added.length > 10) {
-      output(chalk.gray(`      ... and ${diff.added.length - 10} more`));
-    }
-  }
-
-  if (diff.removed.length > 0) {
-    outputError(`    - ${diff.removed.length} file(s) removed`);
-    for (const f of diff.removed.slice(0, 10)) {
-      output(chalk.red(`      - ${f}`));
-    }
-    if (diff.removed.length > 10) {
-      output(chalk.gray(`      ... and ${diff.removed.length - 10} more`));
-    }
-  }
-
-  if (diff.changed.length > 0) {
-    outputWarning(`    ~ ${diff.changed.length} file(s) changed`);
-    for (const f of diff.changed.slice(0, 10)) {
-      output(chalk.yellow(`      ~ ${f}`));
-    }
-    if (diff.changed.length > 10) {
-      output(chalk.gray(`      ... and ${diff.changed.length - 10} more`));
-    }
-  }
-
-  if (diff.added.length === 0 && diff.removed.length === 0 && diff.changed.length === 0) {
-    outputSuccess("    No changes detected. Everything is up to date.");
-  }
-
-  outputBlank();
-}
-
-function applyUpdates(
-  targetDir: string,
-  diff: ManifestDiff,
-
-  options: UpdateOptions
-): void {
-  const templatesDir = getTemplatesDir();
-  const shitennoDir = join(targetDir, SHITENNO_DIR_NAME);
-
-  // Create backup if requested
-  if (options.backup) {
-    const backupDir = join(shitennoDir, "backups", new Date().toISOString().replace(/[:.]/g, "-"));
-    ensureDirSync(backupDir);
-
-    for (const file of [...diff.changed, ...diff.removed]) {
-      const srcPath = join(shitennoDir, file);
-      if (existsSync(srcPath)) {
-        const destPath = join(backupDir, file);
-        ensureDirSync(join(destPath, ".."));
-        copySync(srcPath, destPath);
-      }
-    }
-
-    output(chalk.gray(`  Backup created at: ${backupDir.replace(targetDir + "/", "")}`));
-  }
-
-  // Apply changes
-  let filesUpdated = 0;
-
-  // Copy new/changed files
-  for (const file of [...diff.added, ...diff.changed]) {
-    const srcPath = join(templatesDir, file);
-    const destPath = join(shitennoDir, file);
-
-    if (existsSync(srcPath)) {
-      ensureDirSync(join(destPath, ".."));
-      copySync(srcPath, destPath);
-      filesUpdated++;
-    }
-  }
-
-  // Remove deleted files
-  for (const file of diff.removed) {
-    const filePath = join(shitennoDir, file);
-    if (existsSync(filePath)) {
-      removeSync(filePath);
-      filesUpdated++;
-    }
-  }
-
-  outputSuccess(`  ✔ Updated ${filesUpdated} file(s)`);
 }
 
 function processUpdate(ctx: { shitennoDir: string }, currentManifest: Manifest): UpdateData {
@@ -213,55 +103,6 @@ async function tryAutoCreateManifest(
   }
 }
 
-function outputNoManifest(isJson: boolean): void {
-  if (isJson) {
-    outputJson({ error: "no_manifest", message: "No manifest found. Run 'shugo init' or 'shugo upgrade' first." });
-  } else {
-    outputWarning("  ⚠ No manifest found.");
-    output(chalk.gray("  Run 'shugo init' or 'shugo upgrade' to create a manifest."));
-    outputBlank();
-  }
-}
-
-function outputUpToDate(data: UpdateData, isJson: boolean): void {
-  if (isJson) {
-    outputJson({
-      status: "up_to_date",
-      cliVersion: data.currentCliVersion,
-      installedVersion: data.currentManifest.cliVersion,
-      installedAt: data.currentManifest.installedAt,
-    });
-  } else {
-    outputSuccess("  ✔ Everything is up to date!");
-    output(chalk.gray(`  CLI version: ${data.currentCliVersion}`));
-    output(chalk.gray(`  Last updated: ${data.currentManifest.installedAt}`));
-    outputBlank();
-  }
-}
-
-function outputDryRun(data: UpdateData, isJson: boolean): void {
-  if (isJson) {
-    outputJson({ dryRun: true, diff: data.diff });
-  } else {
-    output(chalk.gray("  Dry run — no changes applied."));
-    outputBlank();
-  }
-}
-
-function outputChangesSummary(data: UpdateData, isJson: boolean): void {
-  if (isJson) {
-    outputJson({
-      status: "changes_detected",
-      diff: data.diff,
-      hint: "Run 'shugo update --apply' to apply changes",
-    });
-  } else {
-    output(chalk.gray("  Run 'shugo update --apply' to apply these changes."));
-    output(chalk.gray("  Run 'shugo update --dry-run' to preview without applying."));
-    outputBlank();
-  }
-}
-
 function applyUpdatesAndReport(
   targetDir: string,
   data: UpdateData,
@@ -271,7 +112,7 @@ function applyUpdatesAndReport(
   const isJson = options.json === true;
   const applySpinner = ora("Applying updates...").start();
   try {
-    applyUpdates(targetDir, data.diff, options);
+    applyUpdates(targetDir, data.diff, { backup: options.backup });
 
     const updatedManifest = updateManifest(
       data.currentManifest,
@@ -285,18 +126,7 @@ function applyUpdatesAndReport(
     });
 
     applySpinner.succeed("Updates applied successfully!");
-
-    if (isJson) {
-      outputJson({
-        status: "updated",
-        cliVersion: data.currentCliVersion,
-        filesChanged: data.diff.changed.length + data.diff.added.length + data.diff.removed.length,
-      });
-    } else {
-      output(chalk.gray(`  CLI version: ${data.currentCliVersion}`));
-      output(chalk.gray(`  Last updated: ${updatedManifest.installedAt}`));
-      outputBlank();
-    }
+    outputUpdateResult(data, isJson, updatedManifest);
   } catch (error) {
     applySpinner.fail("Failed to apply updates");
     if (isJson) {
@@ -319,7 +149,7 @@ export const updateCommand = new Command("update")
   .option("--json", "Output results as JSON")
   .action(async (options: UpdateOptions) => {
     const isJson = options.json === true;
-    const targetDir = resolve(options.dir || ".");
+    const targetDir = join(options.dir || ".");
 
     if (!isJson) {
       output("");
