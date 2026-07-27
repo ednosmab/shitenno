@@ -63,15 +63,15 @@ export function generatePerformanceReport(
   const growthProfile = loadGrowthProfile(shitennoDir);
 
   const debtTrend = {
-    current: readTelemetryValue(shitennoDir, "knowledge-debt", (d) => d.overallScore ?? 0),
-    previous: readTelemetryValue(shitennoDir, "knowledge-debt", (d) => d.overallScore ?? 0, { rank: 1 }),
+    current: readTelemetryValue(shitennoDir, "knowledge-debt", (d) => d.healthScore, { fallback: 100 }),
+    previous: readTelemetryValue(shitennoDir, "knowledge-debt", (d) => d.healthScore, { rank: 1, fallback: 100 }),
     delta: 0,
   };
   debtTrend.delta = debtTrend.current - debtTrend.previous;
 
   const maturityTrend = {
-    current: readTelemetryValue(shitennoDir, "maturity", (d) => d.healthScore ?? 0),
-    previous: readTelemetryValue(shitennoDir, "maturity", (d) => d.healthScore ?? 0, { rank: 1 }),
+    current: readTelemetryValue(shitennoDir, "maturity", (d) => d.overallScore),
+    previous: readTelemetryValue(shitennoDir, "maturity", (d) => d.overallScore, { rank: 1 }),
     delta: 0,
   };
   maturityTrend.delta = maturityTrend.current - maturityTrend.previous;
@@ -99,13 +99,16 @@ export function generatePerformanceReport(
 
 export function writePerformanceReport(projectRoot: string, report: PerformanceReport): string | null {
   const shitennoDir = join(projectRoot, ".shitenno");
-  if (!existsSync(shitennoDir)) {
-    mkdirSync(shitennoDir, { recursive: true });
-  }
   try {
-    const reportPath = join(shitennoDir, "performance-report.json");
+    if (!existsSync(shitennoDir)) {
+      mkdirSync(shitennoDir, { recursive: true });
+    }
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const filename = `performance-${dateStr}.json`;
+    const reportPath = join(shitennoDir, filename);
     writeFileSync(reportPath, JSON.stringify(report, null, 2));
-    return "performance-report.json";
+    return filename;
   } catch {
     return null;
   }

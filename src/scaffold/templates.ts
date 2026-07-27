@@ -2,7 +2,8 @@
  * scaffold/templates.ts — Template Filling and File Customization
  */
 
-import { copySync, readFileSync, writeFileSync, existsSync, ensureDirSync, removeSync } from "fs-extra";
+import fse from "fs-extra";
+const { copySync, readFileSync, writeFileSync, existsSync, ensureDirSync, removeSync } = fse;
 import { join, dirname } from "node:path";
 import type { UserAnswers } from "../prompts.js";
 import type { Capability } from "../maturity-profile.js";

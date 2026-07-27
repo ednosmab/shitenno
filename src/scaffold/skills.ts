@@ -2,7 +2,8 @@
  * scaffold/skills.ts — Skills Selection and Copying
  */
 
-import { copySync, existsSync } from "fs-extra";
+import fse from "fs-extra";
+const { copySync, existsSync } = fse;
 import { join } from "node:path";
 import type { Capability } from "../maturity-profile.js";
 import { SHITENNO_DIR_NAME } from "../constants.js";

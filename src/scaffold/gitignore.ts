@@ -2,7 +2,8 @@
  * scaffold/gitignore.ts — Gitignore Management for Scaffolding
  */
 
-import { readFileSync, writeFileSync, existsSync } from "fs-extra";
+import fse from "fs-extra";
+const { readFileSync, writeFileSync, existsSync } = fse;
 import { join } from "node:path";
 import { SHITENNO_DIR_NAME } from "../constants.js";
 

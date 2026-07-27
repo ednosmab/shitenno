@@ -18,6 +18,11 @@ vi.mock("../mcp-server-handlers.js", () => ({
   handleSubmitFeedback: vi.fn(),
   handleGetADRs: vi.fn(),
   handleGetSkills: vi.fn(),
+  handleGetKnowledgeDebt: vi.fn(),
+  handleGetChallenges: vi.fn(),
+  handleGetAuditReport: vi.fn(),
+  handleGetEvolution: vi.fn(),
+  handleGetMandatoryContext: vi.fn(),
 }));
 
 vi.mock("../backlog-mcp-tools.js", () => ({
@@ -75,6 +80,11 @@ import {
   handleSubmitFeedback,
   handleGetADRs,
   handleGetSkills,
+  handleGetKnowledgeDebt,
+  handleGetChallenges,
+  handleGetAuditReport,
+  handleGetEvolution,
+  handleGetMandatoryContext,
 } from "../mcp-server-handlers.js";
 import {
   handleGetBacklog,
@@ -91,6 +101,11 @@ const mockHandleGetPlans = vi.mocked(handleGetPlans);
 const mockHandleSubmitFeedback = vi.mocked(handleSubmitFeedback);
 const mockHandleGetADRs = vi.mocked(handleGetADRs);
 const mockHandleGetSkills = vi.mocked(handleGetSkills);
+const mockHandleGetKnowledgeDebt = vi.mocked(handleGetKnowledgeDebt);
+const mockHandleGetChallenges = vi.mocked(handleGetChallenges);
+const mockHandleGetAuditReport = vi.mocked(handleGetAuditReport);
+const mockHandleGetEvolution = vi.mocked(handleGetEvolution);
+const mockHandleGetMandatoryContext = vi.mocked(handleGetMandatoryContext);
 const mockHandleGetBacklog = vi.mocked(handleGetBacklog);
 const mockHandleAddBacklogItem = vi.mocked(handleAddBacklogItem);
 const mockHandleTransitionBacklogItem = vi.mocked(handleTransitionBacklogItem);
@@ -116,6 +131,11 @@ beforeEach(() => {
   mockHandleSubmitFeedback.mockReturnValue(MOCK_RESPONSE);
   mockHandleGetADRs.mockResolvedValue(MOCK_RESPONSE);
   mockHandleGetSkills.mockResolvedValue(MOCK_RESPONSE);
+  mockHandleGetKnowledgeDebt.mockResolvedValue(MOCK_RESPONSE);
+  mockHandleGetChallenges.mockResolvedValue(MOCK_RESPONSE);
+  mockHandleGetAuditReport.mockResolvedValue(MOCK_RESPONSE);
+  mockHandleGetEvolution.mockResolvedValue(MOCK_RESPONSE);
+  mockHandleGetMandatoryContext.mockResolvedValue(MOCK_RESPONSE);
   mockHandleGetBacklog.mockReturnValue(MOCK_RESPONSE);
   mockHandleAddBacklogItem.mockReturnValue(MOCK_RESPONSE);
   mockHandleTransitionBacklogItem.mockReturnValue(MOCK_RESPONSE);
