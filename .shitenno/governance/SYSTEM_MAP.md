@@ -652,6 +652,7 @@
 │   governance/executions/EXE-2FB874EA.json
 │   governance/executions/EXE-2FE12D48.json
 │   governance/executions/EXE-2FED0100.json
+│   governance/executions/EXE-2FFD3343.json
 │   governance/executions/EXE-300A5A18.json
 │   governance/executions/EXE-301B3FEB.json
 │   governance/executions/EXE-3086FED4.json
@@ -1476,6 +1477,7 @@
 │   governance/executions/EXE-923F7535.json
 │   governance/executions/EXE-925147C5.json
 │   governance/executions/EXE-928D62F3.json
+│   governance/executions/EXE-92991592.json
 │   governance/executions/EXE-92A8CBAA.json
 │   governance/executions/EXE-92B332D7.json
 │   governance/executions/EXE-92C3A545.json
@@ -1702,6 +1704,7 @@
 │   governance/executions/EXE-AAD8F2E5.json
 │   governance/executions/EXE-AAF64B3F.json
 │   governance/executions/EXE-AB3E7035.json
+│   governance/executions/EXE-AB461647.json
 │   governance/executions/EXE-AB7D0240.json
 │   governance/executions/EXE-AB9B36C1.json
 │   governance/executions/EXE-ABC5F42D.json
@@ -1781,6 +1784,7 @@
 │   governance/executions/EXE-B5AA3076.json
 │   governance/executions/EXE-B5C5F935.json
 │   governance/executions/EXE-B5C9A9C2.json
+│   governance/executions/EXE-B5D8B87D.json
 │   governance/executions/EXE-B63577AA.json
 │   governance/executions/EXE-B63BF773.json
 │   governance/executions/EXE-B63D2CAF.json
@@ -1940,6 +1944,7 @@
 │   governance/executions/EXE-C756C627.json
 │   governance/executions/EXE-C7609E99.json
 │   governance/executions/EXE-C76EFBD4.json
+│   governance/executions/EXE-C796B3A5.json
 │   governance/executions/EXE-C79DD3D5.json
 │   governance/executions/EXE-C79FA697.json
 │   governance/executions/EXE-C7AAC30C.json
@@ -2046,6 +2051,7 @@
 │   governance/executions/EXE-D533814B.json
 │   governance/executions/EXE-D5355014.json
 │   governance/executions/EXE-D549B1C6.json
+│   governance/executions/EXE-D570AC18.json
 │   governance/executions/EXE-D5B3C65A.json
 │   governance/executions/EXE-D6422146.json
 │   governance/executions/EXE-D653B18C.json
@@ -2056,6 +2062,7 @@
 │   governance/executions/EXE-D6A3EE11.json
 │   governance/executions/EXE-D6A4466E.json
 │   governance/executions/EXE-D6ABEFB1.json
+│   governance/executions/EXE-D70821C0.json
 │   governance/executions/EXE-D70B8953.json
 │   governance/executions/EXE-D72AC3CF.json
 │   governance/executions/EXE-D72DB8EF.json
@@ -2302,6 +2309,7 @@
 │   governance/executions/EXE-F57466CF.json
 │   governance/executions/EXE-F57B4AE7.json
 │   governance/executions/EXE-F58752EB.json
+│   governance/executions/EXE-F58D08D7.json
 │   governance/executions/EXE-F5A24BFA.json
 │   governance/executions/EXE-F5AEBE7C.json
 │   governance/executions/EXE-F5BB0A37.json
@@ -2714,6 +2722,7 @@
 │   reports/complexity-shitenno-2026-07-26-session3.json
 │   reports/complexity-shitenno-2026-07-26-session4.json
 │   reports/complexity-shitenno-2026-07-27-session1.json
+│   reports/complexity-shitenno-2026-07-28-session1.json
 │   reports/complexity-shitenno-cli-2026-07-12-session1.json
 │   reports/complexity-shitenno-cli-2026-07-13-session1.json
 │   reports/complexity-shitenno-cli-2026-07-14-session1.json
@@ -2770,6 +2779,7 @@
 │   reports/patterns-2026-07-25.json
 │   reports/patterns-2026-07-26.json
 │   reports/patterns-2026-07-27.json
+│   reports/patterns-2026-07-28.json
 │   scripts/
 │   scripts/add-frontmatter.ts
 │   scripts/backlog.ts

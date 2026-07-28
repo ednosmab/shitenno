@@ -1,0 +1,22 @@
+{
+  "executionId": "EXE-22B47991",
+  "request": {
+    "id": "act-001",
+    "type": "log_event",
+    "params": {
+      "event": "test",
+      "message": "Hello"
+    }
+  },
+  "executionHash": "185b88ab313c59ff",
+  "status": "completed",
+  "startedAt": "2026-07-28T04:44:32.169Z",
+  "result": "success",
+  "output": {
+    "logged": true,
+    "event": "test",
+    "message": "Hello"
+  },
+  "completedAt": "2026-07-28T04:44:32.170Z",
+  "duration": 1
+}

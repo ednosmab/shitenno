@@ -1,5 +1,5 @@
 # Pre-Session Briefing
-*Generated: 2026-07-27T01:42:36.556Z*
+*Generated: 2026-07-28T05:26:46.266Z*
 
 ---
 
@@ -10,13 +10,18 @@
 
 | Campo | Estado |
 |---|---|
-| **Tarefa em curso** | Nenhuma |
-| **Próximo P0** | Definir novo P0 no BACKLOG.md |
+| **Tarefa em curso** | LIVING-007 LIVING-007 Sistema de Pipelines de Validação (In Progress) |
+| **Próximo P0** | Define next P0 item from backlog (23 files still >300L in src/, plan phase 6 complete) |
 | **Dívidas P1** | Nenhuma |
-| **Impedimentos** | Nenhum |
-| **Estado última sessão** | Desconhecido |
+| **Impedimentos** | Retroactive sync failed for TEST-FILE-WATCHER-001: 2 errors |
+| **Estado última sessão** | Em curso |
 
 ---
+
+## Active Reminders
+
+- 🔴 **HIGH** — Path .shitenno: MCP local-filesystem filtra dot-prefs. Usar MCP shitenno para governance/plans. [mcp]
+- 🟡 **MEDIUM** — Revisar handbook — AI preencheu dados semânticos. Editar partes filosóficas. [docs]
 
 ## Project Identity
 - **Domain:** monorepo
@@ -40,7 +45,7 @@
 - This is a monorepo. When modifying shared packages, ensure backward compatibility.
 
 ## Dynamic Rules (From History)
-- [high] This project has 148 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
+- [high] This project has 151 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
 - [medium] This project has 7 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
 
 

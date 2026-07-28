@@ -1,0 +1,18 @@
+{
+  "executionId": "EXE-FCE789A9",
+  "request": {
+    "id": "act-fail-rb",
+    "type": "unknown_type",
+    "params": {}
+  },
+  "executionHash": "e7008ffdcb03c380",
+  "status": "completed",
+  "startedAt": "2026-07-28T04:44:32.202Z",
+  "result": "success",
+  "output": {
+    "success": false,
+    "message": "Unknown action type: unknown_type"
+  },
+  "completedAt": "2026-07-28T04:44:32.202Z",
+  "duration": 0
+}
