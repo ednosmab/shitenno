@@ -90,12 +90,15 @@ export async function displayDaemonHealth(shitennoDir: string): Promise<void> {
       type: string; challenges: Array<{ type: string; severity: string; message: string }>;
     }>(shitennoDir, { type: "query_challenges" });
     if (challenges?.challenges?.length) {
-      output(chalk.bold("  🎯 Pending Challenges:"));
-      for (const c of challenges.challenges.slice(0, 5)) {
-        const sev = c.severity === "high" ? "🔴" : c.severity === "medium" ? "🟡" : "🔵";
-        output(`    ${sev} ${c.message}`);
+      const visible = challenges.challenges.filter((c) => c.message);
+      if (visible.length > 0) {
+        output(chalk.bold("  🎯 Pending Challenges:"));
+        for (const c of visible.slice(0, 5)) {
+          const sev = c.severity === "high" ? "🔴" : c.severity === "medium" ? "🟡" : "🔵";
+          output(`    ${sev} ${c.message}`);
+        }
+        outputBlank();
       }
-      outputBlank();
     }
   } catch { /* daemon may not be running */ }
 }
@@ -113,7 +116,7 @@ export async function displayCapabilityEngine(projectRoot: string, shitennoDir: 
     output(chalk.bold("  ⚙ Capability Engine:"));
     output(chalk.gray(`    Overall: ${engineResult.overallScore}% | Installed: ${engineResult.byMaturity.installed.length + engineResult.byMaturity.configured.length + engineResult.byMaturity.active.length + engineResult.byMaturity.optimized.length} | Dormant: ${engineResult.byMaturity.dormant.length}`));
     const activeCaps = [...engineResult.byMaturity.active, ...engineResult.byMaturity.optimized];
-    if (activeCaps.length > 0) output(chalk.green(`    Active: ${activeCaps.join(", ")}`));
+    if (activeCaps.length > 0) output(chalk.green(`    Active: ${activeCaps.map((c) => c.name).join(", ")}`));
     outputBlank();
   } catch (error) {
     logger.debug("status", "Suppressed error", { error });

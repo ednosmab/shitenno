@@ -182,7 +182,8 @@ function buildConsolidatedState(ctx: {
 
 export function consolidateEngineeringState(
   projectRoot: string,
-  shitennoDir: string
+  shitennoDir: string,
+  existingMaturityProfile?: ReturnType<typeof loadMaturityProfile>
 ): EngineeringState {
   if (isConsolidating) return buildReentrantState(projectRoot, shitennoDir);
 
@@ -191,7 +192,7 @@ export function consolidateEngineeringState(
   try {
     const projectAnalysis = analyseProject(projectRoot);
     const lifecycle = detectLifecycleState(projectRoot, shitennoDir);
-    const maturityProfile = loadMaturityProfile(shitennoDir);
+    const maturityProfile = existingMaturityProfile ?? loadMaturityProfile(shitennoDir);
     const assets = discoverAssets(shitennoDir);
 
     const artifacts = loadArtifacts(shitennoDir);

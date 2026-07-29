@@ -91,25 +91,13 @@ function hasTestFile(filePath: string): boolean {
   return testPatterns.some((p) => existsSync(p));
 }
 
-function getFileLineCount(filePath: string): number {
-  try {
-    const content = readFileSync(filePath, "utf-8");
-    return content.split("\n").length;
-  } catch (err) {
-    logger.debug("risk-map", `Cannot read file for line count: ${err}`);
-    return 0;
-  }
+function getFileLineCount(content: string): number {
+  return content.split("\n").length;
 }
 
-function getImportCount(filePath: string): number {
-  try {
-    const content = readFileSync(filePath, "utf-8");
-    const importMatches = content.match(/^import\s+.*from\s+["'].*["']/gm) || [];
-    return importMatches.length;
-  } catch (err) {
-    logger.debug("risk-map", `Cannot read file for import count: ${err}`);
-    return 0;
-  }
+function getImportCount(content: string): number {
+  const importMatches = content.match(/^import\s+.*from\s+["'].*["']/gm) || [];
+  return importMatches.length;
 }
 
 function getChurnData(projectRoot: string): Map<string, number> {
@@ -131,14 +119,9 @@ function getChurnData(projectRoot: string): Map<string, number> {
   return churn;
 }
 
-function detectSensitiveKeywords(filePath: string): boolean {
-  try {
-    const content = readFileSync(filePath, "utf-8").toLowerCase();
-    return SENSITIVE_KEYWORDS.some((kw) => content.includes(kw));
-  } catch (err) {
-    logger.debug("risk-map", `Cannot read file for sensitive keywords: ${err}`);
-    return false;
-  }
+function detectSensitiveKeywords(content: string): boolean {
+  const lower = content.toLowerCase();
+  return SENSITIVE_KEYWORDS.some((kw) => lower.includes(kw));
 }
 
 function evaluateFileRisk(
@@ -161,19 +144,26 @@ function evaluateFileRisk(
     score += 10;
   }
 
-  const lineCount = getFileLineCount(file);
+  let content: string;
+  try {
+    content = readFileSync(file, "utf-8");
+  } catch {
+    return { factors, score };
+  }
+
+  const lineCount = getFileLineCount(content);
   if (lineCount > 300) {
     factors.push({ type: "large-file", description: `${relPath} has ${lineCount} lines`, weight: 0.2 });
     score += 8;
   }
 
-  const importCount = getImportCount(file);
+  const importCount = getImportCount(content);
   if (importCount > 15) {
     factors.push({ type: "many-imports", description: `${relPath} has ${importCount} imports`, weight: 0.15 });
     score += 5;
   }
 
-  if (detectSensitiveKeywords(file)) {
+  if (detectSensitiveKeywords(content)) {
     factors.push({ type: "sensitive-keyword", description: `${relPath} contains sensitive keywords`, weight: 0.1 });
     score += 3;
   }
@@ -219,6 +209,7 @@ function analyzeArea(
 
 export function generateRiskMap(projectRoot: string, _shitennoDir: string): RiskMap {
   const areas: RiskArea[] = [];
+  const churnData = getChurnData(projectRoot);
 
   // Detect areas to analyze
   const possibleAreas = ["src", "lib", "packages", "apps", "pages", "components", "services", "utils"];
@@ -229,7 +220,7 @@ export function generateRiskMap(projectRoot: string, _shitennoDir: string): Risk
     if (existsSync(fullPath)) {
       const stat = statSync(fullPath);
       if (stat.isDirectory()) {
-        areas.push(analyzeArea(projectRoot, areaPath, getChurnData(projectRoot)));
+        areas.push(analyzeArea(projectRoot, areaPath, churnData));
       }
     }
   }
@@ -238,9 +229,9 @@ export function generateRiskMap(projectRoot: string, _shitennoDir: string): Risk
   if (areas.length === 0) {
     const srcPath = join(projectRoot, "src");
     if (existsSync(srcPath)) {
-      areas.push(analyzeArea(projectRoot, "src", getChurnData(projectRoot)));
+      areas.push(analyzeArea(projectRoot, "src", churnData));
     } else {
-      areas.push(analyzeArea(projectRoot, ".", getChurnData(projectRoot)));
+      areas.push(analyzeArea(projectRoot, ".", churnData));
     }
   }
 

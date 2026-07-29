@@ -8,6 +8,11 @@ rules:
     mandatory: true
     priority: 0
 
+  - id: desdo
+    path: docs/DESDO.md
+    mandatory: true
+    priority: 0
+
   - id: architecture
     path: docs/architecture.md
     mandatory: true

@@ -88,7 +88,7 @@ async function handleListReminders(opts: Record<string, unknown>): Promise<void>
     for (let i = 0; i < sortedReminders.length; i++) {
       const r = sortedReminders[i]!;
       const icon = PRIORITY_ICONS[r.priority];
-      const categoryIcon = CATEGORY_ICONS[r.category];
+      const categoryIcon = CATEGORY_ICONS[r.category] ?? "🏷️";
       output(`  ${chalk.cyan(`${i + 1}.`)} ${icon} ${r.message} ${chalk.dim(`${categoryIcon} ${r.category}`)}`);
     }
   }
@@ -136,7 +136,7 @@ async function handleAddReminder(message: string, opts: Record<string, unknown>)
     outputJson({ added: newReminder, count: reminders.length });
   } else {
     const icon = PRIORITY_ICONS[priority];
-    const categoryIcon = CATEGORY_ICONS[category];
+    const categoryIcon = CATEGORY_ICONS[category] ?? "🏷️";
     output(chalk.green(`  ✓ Reminder added: ${icon} ${message} ${chalk.dim(`${categoryIcon} ${category}`)}`));
     output(chalk.dim(`  Total reminders: ${reminders.length}`));
   }

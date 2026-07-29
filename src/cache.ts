@@ -1,13 +1,13 @@
 /**
  * cache.ts — Disk cache for shugo scoring results
  *
- * Strategy: SHA256 checksum per key file.
+ * Strategy: SHA256 checksum per key file with mtime-based fast-path.
  * Cache stored at project root as .shitenno-cache.json.
  * Invalidated when any tracked file changes.
  */
 
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync, renameSync, chmodSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync, renameSync, chmodSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { SHITENNO_DIR_NAME } from "./constants.js";
@@ -37,13 +37,38 @@ export interface ShitennoCache {
   health?: CacheEntry<unknown>;
 }
 
+// ── Mtime Cache ────────────────────────────────────────────────────────────
+
+interface MtimeEntry {
+  mtimeMs: number;
+  size: number;
+  hash: string;
+}
+
+const mtimeCache = new Map<string, MtimeEntry>();
+
+/** Clear the in-memory mtime cache (for testing). */
+export function clearMtimeCache(): void {
+  mtimeCache.clear();
+}
+
 // ── Checksum Helpers ────────────────────────────────────────────────────────
 
-/** Compute SHA256 of a file's content. */
+/** Compute SHA256 of a file's content, using mtime+size as fast-path. */
 function fileChecksum(filePath: string): string | null {
   try {
+    const s = statSync(filePath);
+
+    const cacheKey = filePath;
+    const cached = mtimeCache.get(cacheKey);
+    if (cached && cached.mtimeMs === s.mtimeMs && cached.size === s.size) {
+      return cached.hash;
+    }
+
     const content = readFileSync(filePath);
-    return createHash("sha256").update(content).digest("hex");
+    const hash = createHash("sha256").update(content).digest("hex");
+    mtimeCache.set(cacheKey, { mtimeMs: s.mtimeMs, size: s.size, hash });
+    return hash;
   } catch {
     return null;
   }

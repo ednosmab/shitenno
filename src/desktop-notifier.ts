@@ -13,7 +13,7 @@
  */
 
 import { getEventBus } from "./event-bus.js";
-import { sendDesktopNotification } from "./notify.js";
+import { sendDesktopNotification, logNotificationOnly } from "./notify.js";
 import { logger } from "./logger.js";
 
 // ── Configuration ────────────────────────────────────────────────────────
@@ -26,6 +26,12 @@ const MIN_SESSION_DURATION_MS = 60_000; // Ignore sessions shorter than 60s
 let lastGlobalNotification = 0;
 let initialized = false;
 let sharedShitennoDir = "";
+
+export function _resetForTesting(): void {
+  initialized = false;
+  sharedShitennoDir = "";
+  lastGlobalNotification = 0;
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -40,10 +46,10 @@ function throttledNotify(
   message: string,
   priority: "high" | "medium" | "low" = "medium",
 ): void {
-  // Low priority never notifies via desktop
+  // Low priority never notifies via desktop — log only
   if (priority === "low") {
     if (sharedShitennoDir) {
-      sendDesktopNotification(sharedShitennoDir, title, message, "low");
+      logNotificationOnly(sharedShitennoDir, title, message, "low");
     }
     return;
   }
@@ -52,6 +58,9 @@ function throttledNotify(
   if (priority !== "high" && !canNotify()) {
     const remaining = Math.round(((lastGlobalNotification + GLOBAL_COOLDOWN_MS) - Date.now()) / 1000);
     logger.debug("desktop-notifier", `Throttled: ${key} (${remaining}s remaining)`);
+    if (sharedShitennoDir) {
+      logNotificationOnly(sharedShitennoDir, title, message, priority);
+    }
     return;
   }
 

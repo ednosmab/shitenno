@@ -69,25 +69,25 @@ function ensureFingerprint(
   deps: ContextDeps,
 ) {
   let fingerprint = deps.loadFingerprint(shitennoDir);
+  const maturityProfile = deps.loadMaturityProfile(shitennoDir);
   if (!fingerprint || deps.isFingerprintStale(shitennoDir)) {
     const analysis = deps.analyseProject(projectRoot);
-    const maturityProfile = deps.loadMaturityProfile(shitennoDir);
     fingerprint = deps.generateProjectFingerprint(projectRoot, analysis, maturityProfile?.overallScore);
     deps.saveFingerprint(shitennoDir, fingerprint);
   }
-  return fingerprint;
+  return { fingerprint, maturityProfile };
 }
 
 function buildSnapshot(
-  projectRoot: string,
-  shitennoDir: string,
-  fingerprint: ReturnType<typeof ensureFingerprint>,
+  paths: { projectRoot: string; shitennoDir: string },
+  fingerprint: ReturnType<typeof ensureFingerprint>["fingerprint"],
+  maturityProfile: ReturnType<typeof ensureFingerprint>["maturityProfile"],
   deps: ContextDeps,
 ): ContextSnapshot {
+  const { projectRoot, shitennoDir } = paths;
   const riskMap = deps.generateRiskMap(projectRoot, shitennoDir);
   const contextRules = deps.generateContextRules(fingerprint, riskMap);
   const dynamicRules = deps.generateDynamicRules(projectRoot, shitennoDir);
-  const maturityProfile = deps.loadMaturityProfile(shitennoDir);
   const quickBoard = loadQuickBoard(shitennoDir);
 
   const briefing = deps.generateBriefing({
@@ -150,8 +150,8 @@ export function collectContext(
   const cached = tryReadCache<ContextSnapshot>(projectRoot, shitennoDir, computeChecksums, cacheGet);
   if (cached) return cached;
 
-  const fingerprint = ensureFingerprint(projectRoot, shitennoDir, deps);
-  const snapshot = buildSnapshot(projectRoot, shitennoDir, fingerprint, deps);
+  const { fingerprint, maturityProfile } = ensureFingerprint(projectRoot, shitennoDir, deps);
+  const snapshot = buildSnapshot({ projectRoot, shitennoDir }, fingerprint, maturityProfile, deps);
 
   try {
     const checksums = computeChecksums(projectRoot, shitennoDir);

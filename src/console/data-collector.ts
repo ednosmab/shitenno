@@ -121,8 +121,8 @@ export interface DecisionData {
 export function collectConsoleData(projectRoot: string, shitennoDir: string): ConsoleData {
   const timestamp = new Date().toISOString();
   const lifecycle = detectLifecycleState(projectRoot, shitennoDir);
-  const engineering = consolidateEngineeringState(projectRoot, shitennoDir);
   const maturity = loadMaturityProfile(shitennoDir);
+  const engineering = consolidateEngineeringState(projectRoot, shitennoDir, maturity);
 
   const artifacts = loadArtifacts(shitennoDir);
   const relations = loadRelations(shitennoDir);

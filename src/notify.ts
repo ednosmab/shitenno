@@ -131,7 +131,35 @@ function sendWindows(title: string, message: string): boolean {
   }
 }
 
+// ── Deduplication ─────────────────────────────────────────────────────────
+
+const DEDUP_COOLDOWN_MS = 5_000; // 5 seconds between identical notifications
+const notificationCache = new Map<string, number>();
+
+function getNotificationHash(title: string, message: string): string {
+  return `${title}::${message}`;
+}
+
+function isDuplicate(title: string, message: string): boolean {
+  const hash = getNotificationHash(title, message);
+  const lastSent = notificationCache.get(hash);
+  if (lastSent && Date.now() - lastSent < DEDUP_COOLDOWN_MS) {
+    return true;
+  }
+  notificationCache.set(hash, Date.now());
+  return false;
+}
+
 // ── Main Entry ────────────────────────────────────────────────────────────
+
+export function logNotificationOnly(
+  shitennoDir: string,
+  title: string,
+  message: string,
+  priority: ReminderPriority,
+): void {
+  logNotification({ shitennoDir, title, message, severity: priority, delivered: false, channel: "log" });
+}
 
 /**
  * Send a desktop notification with cross-platform support.
@@ -169,6 +197,18 @@ export function sendDesktopNotification(
   message: string,
   priority: ReminderPriority = "medium",
 ): boolean {
+  // Skip empty messages
+  if (!message || message.trim() === "") {
+    logger.debug("notify", `Skipped notification with empty message: ${title}`);
+    return false;
+  }
+
+  // Deduplication check
+  if (isDuplicate(title, message)) {
+    logger.debug("notify", `Skipped duplicate notification: ${title}`);
+    return false;
+  }
+
   const urgency = priority === "high" ? "critical" : priority === "low" ? "low" : "normal";
   const { delivered, channel } = deliverByPlatform(detectPlatform(), title, message, urgency);
   logNotification({ shitennoDir, title, message, severity: priority, delivered, channel });

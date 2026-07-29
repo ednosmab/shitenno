@@ -10,6 +10,8 @@ import { loadSkillManifest, partitionSkills, type TaskMetadata } from "../skill-
 import { queryDaemon, isDaemonRunning } from "../daemon-client.js";
 import { readMaturityHistory } from "../maturity-profile/telemetry.js";
 import { readBuffer } from "../context-buffer-writer/buffer-io.js";
+import { logger } from "../logger.js";
+import { withCache } from "../mcp-cache.js";
 import type { ToolResponse } from "../mcp-types.js";
 
 
@@ -19,43 +21,49 @@ export async function handleGetRiskMap(
   args: Record<string, unknown>
 ): Promise<ToolResponse> {
   const format = (args.format as string) ?? "json";
+  const cacheKey = `riskmap:${projectRoot}:${format}`;
 
-  let riskMap: RiskMap;
-  if (isDaemonRunning(shitennoDir)) {
-    const result = await queryDaemon<{ type: string; data: RiskMap }>(shitennoDir, {
-      type: "query_riskmap",
-    });
-    riskMap = result?.data ?? generateRiskMap(projectRoot, shitennoDir);
-  } else {
-    riskMap = generateRiskMap(projectRoot, shitennoDir);
-  }
-
-  if (format === "summary") {
-    const lines: string[] = [
-      `Overall Risk: ${riskMap.overallRisk} (${riskMap.overallScore}/100)`,
-      `Areas analysed: ${riskMap.areas.length}`,
-      "",
-    ];
-
-    const critical = riskMap.areas.filter(
-      (a) => a.riskLevel === "critical" || a.riskLevel === "high"
-    );
-    if (critical.length > 0) {
-      lines.push("High/Critical areas:");
-      for (const area of critical) {
-        lines.push(`  - ${area.path}: ${area.riskLevel} (${area.score}/100, ${area.fileCount} files)`);
-        for (const factor of area.factors.slice(0, 3)) {
-          lines.push(`    • ${factor.description}`);
-        }
+  return withCache(
+    async () => {
+      let riskMap: RiskMap;
+      if (isDaemonRunning(shitennoDir)) {
+        const result = await queryDaemon<{ type: string; data: RiskMap }>(shitennoDir, {
+          type: "query_riskmap",
+        });
+        riskMap = result?.data ?? generateRiskMap(projectRoot, shitennoDir);
+      } else {
+        riskMap = generateRiskMap(projectRoot, shitennoDir);
       }
-    } else {
-      lines.push("All areas within acceptable risk levels.");
-    }
 
-    return { content: [{ type: "text", text: lines.join("\n") }] };
-  }
+      if (format === "summary") {
+        const lines: string[] = [
+          `Overall Risk: ${riskMap.overallRisk} (${riskMap.overallScore}/100)`,
+          `Areas analysed: ${riskMap.areas.length}`,
+          "",
+        ];
 
-  return { content: [{ type: "text", text: JSON.stringify(riskMap, null, 2) }] };
+        const critical = riskMap.areas.filter(
+          (a) => a.riskLevel === "critical" || a.riskLevel === "high"
+        );
+        if (critical.length > 0) {
+          lines.push("High/Critical areas:");
+          for (const area of critical) {
+            lines.push(`  - ${area.path}: ${area.riskLevel} (${area.score}/100, ${area.fileCount} files)`);
+            for (const factor of area.factors.slice(0, 3)) {
+              lines.push(`    • ${factor.description}`);
+            }
+          }
+        } else {
+          lines.push("All areas within acceptable risk levels.");
+        }
+
+        return { content: [{ type: "text", text: lines.join("\n") }] };
+      }
+
+      return { content: [{ type: "text", text: JSON.stringify(riskMap, null, 2) }] };
+    },
+    { key: cacheKey, ttlMs: 120_000 },
+  );
 }
 
 export async function handleGetEngineeringState(
@@ -63,12 +71,19 @@ export async function handleGetEngineeringState(
   shitennoDir: string,
   _args: Record<string, unknown>
 ): Promise<ToolResponse> {
-  try {
-    const state = getEngineeringState(projectRoot, shitennoDir);
-    return { content: [{ type: "text", text: JSON.stringify(state, null, 2) }] };
-  } catch (error) {
-    throw new Error(`Failed to get engineering state: ${error}`);
-  }
+  const cacheKey = `engineering:${projectRoot}`;
+
+  return withCache(
+    async () => {
+      try {
+        const state = getEngineeringState(projectRoot, shitennoDir);
+        return { content: [{ type: "text", text: JSON.stringify(state, null, 2) }] };
+      } catch (error) {
+        return { content: [{ type: "text", text: `Failed to get engineering state: ${error}` }], isError: true };
+      }
+    },
+    { key: cacheKey, ttlMs: 60_000 },
+  );
 }
 
 export function handleGetPlans(
@@ -85,7 +100,7 @@ export function handleGetPlans(
     const safeName = sanitizePlanName(args.planName);
     const planPath = join(plansDir, safeName);
     if (!existsSync(planPath)) {
-      throw new Error(`Plan not found: ${safeName}`);
+      return { content: [{ type: "text", text: `Plan not found: ${safeName}` }], isError: true };
     }
     const content = readFileSync(planPath, "utf-8");
     return { content: [{ type: "text", text: content }] };
@@ -104,12 +119,12 @@ export function handleSubmitFeedback(
   const notes = args.notes as string;
 
   if (!outcome || !notes) {
-    throw new Error("Missing required arguments: outcome, notes");
+    return { content: [{ type: "text", text: "Missing required arguments: outcome, notes" }], isError: true };
   }
 
   const cache = readCache(shitennoDir);
   if (!cache || !cache.entry) {
-    throw new Error("No briefing cache found. A briefing must be generated first.");
+    return { content: [{ type: "text", text: "No briefing cache found. A briefing must be generated first." }], isError: true };
   }
 
   const storage = createFileStorage(shitennoDir);
@@ -200,7 +215,9 @@ export function handleGetMandatoryContext(
         const ruleLines = mandatory.map(r => `- ${r.id} (priority: ${r.priority})`);
         sections.push("---\n\n# Mandatory Rules (from manifest)\n\n" + ruleLines.join("\n"));
       }
-    } catch { /* ignore parse errors */ }
+    } catch (err) {
+      logger.debug("mcp-handlers/context", `Failed to parse rule manifest: ${err}`);
+    }
   }
 
   const taskArg = args.task as string | undefined;
@@ -214,7 +231,9 @@ export function handleGetMandatoryContext(
         const skillLines = mandatory.map(s => `- ${s.id} (priority: ${s.priority})`);
         sections.push("---\n\n# Mandatory Skills (from manifest)\n\n" + skillLines.join("\n"));
       }
-    } catch { /* ignore parse errors */ }
+    } catch (err) {
+      logger.debug("mcp-handlers/context", `Failed to parse skill manifest: ${err}`);
+    }
   }
 
   if (format === "json") {

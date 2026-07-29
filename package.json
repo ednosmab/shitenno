@@ -36,6 +36,7 @@
     "sync:docs:dry": "tsx .shitenno/scripts/sync-docs.ts --dry-run",
     "validate:docs": "tsx .shitenno/scripts/sync-docs.ts",
     "validate:architecture": "tsx scripts/validate-architecture.ts",
+    "validate": "npm run validate:architecture && npm run typecheck",
     "backlog": "tsx .shitenno/scripts/backlog.ts",
     "validate:session": "tsx .shitenno/scripts/validate-session.ts",
     "close:session": "tsx .shitenno/scripts/close-session.ts",
@@ -66,6 +67,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "packageManager": "pnpm@9.15.4",
   "dependencies": {
     "@ink-tools/ink-mouse": "^2.1.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -91,7 +93,6 @@
     "@typescript-eslint/eslint-plugin": "^8.62.0",
     "@typescript-eslint/parser": "^8.62.0",
     "@vitest/coverage-v8": "^4.1.9",
-    "eslint": "^10.6.0",
     "husky": "^9.1.7",
     "ink-testing-library": "^4.0.0",
     "tsup": "^8.3.0",

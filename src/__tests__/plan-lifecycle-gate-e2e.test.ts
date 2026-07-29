@@ -70,7 +70,7 @@ describe("Bloco F — gate de done, caso positivo, negativo e invalidação por 
     writeFileSync(
       join(dir, "package.json"),
       JSON.stringify(
-        { scripts: { build: "echo ok", test: "echo ok", lint: "echo ok" } },
+        { scripts: { build: "echo ok", test: "echo ok", lint: "echo ok", validate: "echo ok" } },
         null,
         2
       )
