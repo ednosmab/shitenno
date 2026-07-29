@@ -136,3 +136,16 @@ export function loadState(statePath: string): DaemonState | null {
     return null;
   }
 }
+
+// ── Notification Stats ──────────────────────────────────────────────────────
+
+export function recordNotificationStat(state: DaemonState, sent: boolean): void {
+  if (!state.notificationStats) {
+    state.notificationStats = { sent: 0, throttled: 0, last24hWindow: new Date().toISOString() };
+  }
+  if (sent) {
+    state.notificationStats.sent++;
+  } else {
+    state.notificationStats.throttled++;
+  }
+}

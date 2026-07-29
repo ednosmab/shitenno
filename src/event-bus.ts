@@ -81,7 +81,9 @@ export type ShitennoEventType =
   | "git.commit_detected"
   | "git.ref_updated"
   | "semantic.pattern_detected"
-  | "semantic.insight_detected";
+  | "semantic.insight_detected"
+  | "notification.sent"
+  | "notification.throttled";
 
 export type EventHandler<T = unknown> = (payload: T) => void | Promise<void>;
 

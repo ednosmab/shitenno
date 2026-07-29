@@ -10,7 +10,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { CompletionCheck, VerificationRecord } from "../plan-lifecycle.js";
 import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
-import { checkBuild, checkTests, checkLint, checkGateIntegrity, checkDocumentation } from "./checks.js";
+import { checkBuild, checkTests, checkLint, checkGateIntegrity, checkDocumentation, checkPlanFormat } from "./checks.js";
 
 export function computeDiffHash(projectRoot: string): string {
   try {
@@ -26,13 +26,19 @@ export function runAutoVerification(
   projectRoot: string,
   planId: string,
 ): VerificationRecord {
-  const checks: CompletionCheck[] = [
+  const engine = new MarkdownPlanEngine(shitennoDir);
+  const plan = engine.getById(planId);
+
+  const checks: CompletionCheck[] = plan
+    ? [checkPlanFormat(plan.filePath)]
+    : [];
+  checks.push(
     checkBuild(projectRoot),
     checkTests(projectRoot),
     checkLint(projectRoot),
     checkGateIntegrity(projectRoot),
     checkDocumentation(projectRoot),
-  ];
+  );
   const passed = checks.every((c) => c.passed);
   const record: VerificationRecord = {
     planId,
@@ -43,7 +49,6 @@ export function runAutoVerification(
   };
 
   // Update plan status — engine.updateStatus("done") already calls moveToDone()
-  const engine = new MarkdownPlanEngine(shitennoDir);
   if (passed) {
     engine.updateStatus(planId, "done");
     // Write verification.json sidecar in done/

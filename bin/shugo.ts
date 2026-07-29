@@ -120,7 +120,6 @@ async function ensureHeavyBootstrap(): Promise<void> {
   const { initializeRules, initializeRuleEngine } = await import("../src/rule-engine.js");
   const { initializeKnowledgeGraph } = await import("../src/knowledge-graph.js");
   const { initializeCapabilityEngine } = await import("../src/capability-engine.js");
-  const { initializeTaskPipeline } = await import("../src/task-pipeline.js");
   const { initializeEngineeringState, consolidateEngineeringState } = await import("../src/engineering-state.js");
   const { initializeProactiveEngine } = await import("../src/prioritization/triggers.js");
   const { initializeFromAnswers } = await import("../src/model-config.js");
@@ -134,7 +133,6 @@ async function ensureHeavyBootstrap(): Promise<void> {
   initializeRuleEngine(projectRoot, shitennoDir);
   initializeKnowledgeGraph(shitennoDir);
   initializeCapabilityEngine(projectRoot, shitennoDir);
-  initializeTaskPipeline({ projectRoot, shitennoDir });
   initializeEngineeringState(projectRoot, shitennoDir);
   initializeProactiveEngine(projectRoot, shitennoDir);
   initializeFromAnswers(shitennoDir);

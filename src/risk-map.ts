@@ -58,6 +58,9 @@ export interface RiskMap {
 
 const SENSITIVE_KEYWORDS = ["auth", "payment", "security", "session", "token", "password", "secret"];
 
+let churnCache: { data: Map<string, number>; computedAt: number } | null = null;
+const CHURN_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 function getSourceFiles(dir: string, extensions = [".ts", ".tsx", ".js", ".jsx"]): string[] {
   const files: string[] = [];
   if (!existsSync(dir)) return files;
@@ -101,6 +104,8 @@ function getImportCount(content: string): number {
 }
 
 function getChurnData(projectRoot: string): Map<string, number> {
+  if (churnCache && Date.now() - churnCache.computedAt < CHURN_TTL_MS) return churnCache.data;
+
   const churn = new Map<string, number>();
   try {
     const output = execSync(
@@ -116,6 +121,8 @@ function getChurnData(projectRoot: string): Map<string, number> {
   } catch (err) {
     logger.debug("risk-map", `Git not available or no history: ${err}`);
   }
+
+  churnCache = { data: churn, computedAt: Date.now() };
   return churn;
 }
 

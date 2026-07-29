@@ -6,7 +6,7 @@
  * persistence in engineering-state-io.ts, entropy in entropy.ts.
  */
 
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { analyseProject } from "./analyser.js";
 import { detectKnowledgeDebt, type KnowledgeDebtReport } from "./knowledge-debt.js";
@@ -52,6 +52,16 @@ import { calculateEntropy } from "./engineering-state/entropy.js";
 // ── Main Consolidation ─────────────────────────────────────────────────────
 
 let isConsolidating = false;
+
+function tryAcquireLock(shitennoDir: string): { acquired: boolean; release: () => void } {
+  const lockPath = join(shitennoDir, "engineering-state.lock");
+  try {
+    writeFileSync(lockPath, String(process.pid), { flag: "wx" });
+    return { acquired: true, release: () => { try { unlinkSync(lockPath); } catch { /* best-effort */ } } };
+  } catch {
+    return { acquired: false, release: () => {} };
+  }
+}
 
 function buildReentrantState(projectRoot: string, shitennoDir: string): EngineeringState {
   const cached = loadEngineeringState(shitennoDir);
@@ -187,6 +197,9 @@ export function consolidateEngineeringState(
 ): EngineeringState {
   if (isConsolidating) return buildReentrantState(projectRoot, shitennoDir);
 
+  const { acquired, release } = tryAcquireLock(shitennoDir);
+  if (!acquired) return buildReentrantState(projectRoot, shitennoDir);
+
   isConsolidating = true;
 
   try {
@@ -233,6 +246,7 @@ export function consolidateEngineeringState(
     return state;
   } finally {
     isConsolidating = false;
+    release();
   }
 }
 

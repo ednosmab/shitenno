@@ -9,6 +9,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { CompletionCheck } from "../plan-lifecycle.js";
 import { logger } from "../logger.js";
+import { validatePlanFormat } from "../plan-format-validator.js";
 
 export interface PackageJson {
   scripts?: Record<string, string>;
@@ -42,10 +43,10 @@ export function isDocSyncFailure(detail: string): boolean {
 
 export function checkBuild(projectRoot: string): CompletionCheck {
   try {
-    execSync("npx tsc --noEmit", { cwd: projectRoot, encoding: "utf-8", timeout: 60_000, stdio: ["pipe", "pipe", "pipe"] });
+    execSync("npx tsc --noEmit", { cwd: projectRoot, encoding: "utf-8", timeout: 180_000, stdio: ["pipe", "pipe", "pipe"] });
     return { name: "BUILD", passed: true, message: "TypeScript compilation succeeded" };
   } catch (err) {
-    return { name: "BUILD", passed: false, message: `TypeScript compilation failed: ${extractExecError(err).slice(0, 300)}` };
+    return { name: "BUILD", passed: false, message: describeExecError(err, "TypeScript compilation") };
   }
 }
 
@@ -56,10 +57,10 @@ export function checkTests(projectRoot: string): CompletionCheck {
   if (!scriptName) return { name: "TESTS", passed: false, message: "No 'test' or 'test:unit' script in package.json" };
   const { run } = resolveRunner(projectRoot);
   try {
-    execSync(`${run(scriptName)}`, { cwd: projectRoot, encoding: "utf-8", timeout: 120_000, stdio: ["pipe", "pipe", "pipe"] });
+    execSync(`${run(scriptName)}`, { cwd: projectRoot, encoding: "utf-8", timeout: 300_000, stdio: ["pipe", "pipe", "pipe"] });
     return { name: "TESTS", passed: true, message: `${scriptName} passed` };
   } catch (err) {
-    return { name: "TESTS", passed: false, message: `${scriptName} failed: ${extractExecError(err).slice(0, 300)}` };
+    return { name: "TESTS", passed: false, message: describeExecError(err, scriptName) };
   }
 }
 
@@ -106,3 +107,44 @@ export function checkDocumentation(projectRoot: string): CompletionCheck {
     }
   }
 }
+
+// ── Timeout-aware error description ─────────────────────────────────────────
+
+function describeExecError(err: unknown, label: string): string {
+  const isTimeout =
+    err !== null &&
+    typeof err === "object" &&
+    "signal" in err &&
+    (err as { signal?: string }).signal === "SIGTERM";
+  if (isTimeout) {
+    return `${label} timed out — increase the timeout constant in plan/checks.ts or split the suite`;
+  }
+  return `${label} failed: ${extractExecError(err).slice(0, 300)}`;
+}
+
+// ── Plan format check ───────────────────────────────────────────────────────
+
+export function checkPlanFormat(filePath: string): CompletionCheck {
+  try {
+    const content = readFileSync(filePath, "utf-8");
+    const result = validatePlanFormat(filePath, content);
+    if (result.errors.length > 0) {
+      return {
+        name: "FORMAT",
+        passed: false,
+        message: `Plan format errors: ${result.errors.map((e) => e.message).join("; ")}`,
+      };
+    }
+    return {
+      name: "FORMAT",
+      passed: true,
+      message: result.warnings.length > 0 ? `Passed with ${result.warnings.length} warning(s)` : "Format valid",
+    };
+  } catch (error) {
+    return { name: "FORMAT", passed: false, message: `Could not validate format: ${String(error)}` };
+  }
+}
+
+// ── Canonical check names (single source of truth) ──────────────────────────
+
+export const LIFECYCLE_CHECK_NAMES = ["FORMAT", "BUILD", "TESTS", "LINT", "GATE_SELF_TEST", "DOCS"] as const;

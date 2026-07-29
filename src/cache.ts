@@ -54,6 +54,8 @@ export function clearMtimeCache(): void {
 
 // ── Checksum Helpers ────────────────────────────────────────────────────────
 
+const dirStructureCache = new Map<string, { mtimeMs: number; checksum: string }>();
+
 /** Compute SHA256 of a file's content, using mtime+size as fast-path. */
 function fileChecksum(filePath: string): string | null {
   try {
@@ -77,6 +79,10 @@ function fileChecksum(filePath: string): string | null {
 /** Compute a directory's aggregate checksum (all files recursively, capped at depth 3). */
 function dirChecksum(dirPath: string, maxDepth = 3): string {
   if (!existsSync(dirPath)) return "missing";
+
+  const dirStat = statSync(dirPath);
+  const cached = dirStructureCache.get(dirPath);
+  if (cached && cached.mtimeMs === dirStat.mtimeMs) return cached.checksum;
 
   const hashes: string[] = [];
 
@@ -102,7 +108,9 @@ function dirChecksum(dirPath: string, maxDepth = 3): string {
 
   walk(dirPath, 0);
   hashes.sort(); // deterministic order
-  return createHash("sha256").update(hashes.join("\n")).digest("hex");
+  const checksum = createHash("sha256").update(hashes.join("\n")).digest("hex");
+  dirStructureCache.set(dirPath, { mtimeMs: dirStat.mtimeMs, checksum });
+  return checksum;
 }
 
 // ── Checksum Collection ─────────────────────────────────────────────────────

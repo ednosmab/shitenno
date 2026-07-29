@@ -12,9 +12,11 @@ exports[`cobertura das duas portas de entrada para done > snapshot dos conjuntos
 
 exports[`cobertura das duas portas de entrada para done > snapshot dos conjuntos de gate — mudança exige atualizar o comentário cruzado 2`] = `
 [
+  "FORMAT",
   "BUILD",
   "TESTS",
   "LINT",
   "GATE_SELF_TEST",
+  "DOCS",
 ]
 `;

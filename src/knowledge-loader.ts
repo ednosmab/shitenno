@@ -9,7 +9,7 @@
  * knowledge (ADRs, skills) at runtime via MCP, not just metadata.
  */
 
-import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, openSync, readSync, closeSync } from "node:fs";
 import { join } from "node:path";
 import { sanitizePlanName } from "./path-safety.js";
 
@@ -42,6 +42,17 @@ export interface SkillFull extends SkillMeta {
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
+function readHeadOfFile(path: string, maxBytes: number): string {
+  const fd = openSync(path, "r");
+  try {
+    const buf = Buffer.alloc(maxBytes);
+    const bytesRead = readSync(fd, buf, 0, maxBytes, 0);
+    return buf.toString("utf-8", 0, bytesRead);
+  } finally {
+    closeSync(fd);
+  }
+}
+
 /**
  * Parse YAML frontmatter from a markdown file.
  * Returns meta object and body (content after frontmatter).
@@ -70,10 +81,10 @@ export function listAdrs(shitennoDir: string): AdrSummary[] {
   return readdirSync(adrDir)
     .filter((f) => f.endsWith(".md") && !f.startsWith("ADR-TEMPLATE"))
     .map((filename) => {
-      const raw = readFileSync(join(adrDir, filename), "utf-8");
+      const head = readHeadOfFile(join(adrDir, filename), 2048);
       const idMatch = filename.match(/^(ADR-\d+)/);
-      const titleMatch = raw.match(/^#\s*(.+)$/m);
-      const statusMatch = raw.match(/\*\*Status:\*\*\s*(\w+)/);
+      const titleMatch = head.match(/^#\s*(.+)$/m);
+      const statusMatch = head.match(/\*\*Status:\*\*\s*(\w+)/);
       return {
         id: idMatch?.[1] ?? filename,
         title: titleMatch?.[1]?.replace(/^ADR-\d+:\s*/, "") ?? filename,
@@ -118,8 +129,8 @@ export function listSkills(shitennoDir: string): SkillMeta[] {
   return readdirSync(skillsDir)
     .filter((f) => f.endsWith(".md"))
     .map((filename) => {
-      const raw = readFileSync(join(skillsDir, filename), "utf-8");
-      const { meta } = parseFrontmatter(raw);
+      const head = readHeadOfFile(join(skillsDir, filename), 2048);
+      const { meta } = parseFrontmatter(head);
       return {
         name: meta.name ?? filename.replace(".md", ""),
         description: meta.description ?? "",

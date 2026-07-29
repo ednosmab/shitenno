@@ -51,6 +51,7 @@ function throttledNotify(
     if (sharedShitennoDir) {
       logNotificationOnly(sharedShitennoDir, title, message, "low");
     }
+    getEventBus().publish("notification.throttled", { key, title, priority, reason: "low_priority" });
     return;
   }
 
@@ -61,6 +62,7 @@ function throttledNotify(
     if (sharedShitennoDir) {
       logNotificationOnly(sharedShitennoDir, title, message, priority);
     }
+    getEventBus().publish("notification.throttled", { key, title, priority, reason: "cooldown" });
     return;
   }
 
@@ -68,6 +70,7 @@ function throttledNotify(
   if (sharedShitennoDir) {
     sendDesktopNotification(sharedShitennoDir, title, message, priority);
   }
+  getEventBus().publish("notification.sent", { key, title, priority });
 }
 
 // ── Event Handlers ───────────────────────────────────────────────────────

@@ -97,6 +97,8 @@ export const EVENT_VERSIONS: Record<ShitennoEventType, EventVersion> = {
   "git.ref_updated": 1,
   "semantic.pattern_detected": 1,
   "semantic.insight_detected": 1,
+  "notification.sent": 1,
+  "notification.throttled": 1,
 };
 
 // ── Migration ──────────────────────────────────────────────────────────────

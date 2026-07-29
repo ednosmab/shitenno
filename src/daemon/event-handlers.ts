@@ -9,7 +9,7 @@ import type { ResourceClaimedPayload, ResourceReleasedPayload } from "../event-p
 import { LRUCache } from "../daemon-resources.js";
 import { checkAndArchiveDonePlans } from "../plan-lifecycle.js";
 import { moveCompletedBacklogToDone } from "./startup-scan.js";
-import { recordEvent, MAX_SESSIONS } from "./state.js";
+import { recordEvent, recordNotificationStat, MAX_SESSIONS } from "./state.js";
 import { daemonLog } from "./log-rotation.js";
 import type { DaemonContext } from "./pid-manager.js";
 import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
@@ -277,6 +277,12 @@ export function subscribeAllEvents(
     }
     ctx.state.audit.lastAuditTime = new Date().toISOString();
     ctx.state.audit.auditCount++;
+  });
+  bus.subscribe("notification.sent", () => {
+    recordNotificationStat(ctx.state, true);
+  });
+  bus.subscribe("notification.throttled", () => {
+    recordNotificationStat(ctx.state, false);
   });
 
   return [];

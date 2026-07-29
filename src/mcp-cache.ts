@@ -7,7 +7,7 @@
 
 import { createHash } from "node:crypto";
 import { logger } from "./logger.js";
-import { recordHit, recordMiss, recordEviction } from "./cache-metrics.js";
+import { recordHit, recordMiss, recordEviction, getCacheStats as getMetrics } from "./cache-metrics.js";
 
 // ── Cache Configuration ───────────────────────────────────────────────────
 
@@ -135,11 +135,11 @@ export function getCacheStats(): {
   totalHits: number;
   totalMisses: number;
 } {
-  // This would need to be tracked in production
+  const m = getMetrics("mcp-cache");
   return {
     size: cacheStore.size,
-    hitRate: 0,
-    totalHits: 0,
-    totalMisses: 0,
+    hitRate: m.hitRate,
+    totalHits: m.hits,
+    totalMisses: m.misses,
   };
 }

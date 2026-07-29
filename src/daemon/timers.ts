@@ -40,6 +40,12 @@ export async function runPeriodicAudit(ctx: DaemonContext): Promise<void> {
     };
 
     recordEvent(ctx.state, "health.checked");
+    getEventBus().publish("audit.standard", {
+      healthScore: report.healthScore,
+      issueCount: report.issues.length,
+      level,
+      timestamp: new Date().toISOString(),
+    });
     daemonLog(ctx.logPath, "INFO", `Periodic audit (${level}): score=${report.healthScore}/100, ${report.issues.length} issue(s)`);
   } catch (err) {
     daemonLog(ctx.logPath, "ERROR", `Periodic audit failed: ${err}`);

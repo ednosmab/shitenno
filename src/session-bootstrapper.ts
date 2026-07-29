@@ -5,7 +5,7 @@
  * Other files are loaded on-demand via MCP or explicit requests.
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { logger } from "./logger.js";
 
@@ -72,6 +72,29 @@ function loadFileWithCache(shitennoDir: string, relativePath: string): string | 
 
 // ── Public API ────────────────────────────────────────────────────────────
 
+function loadGlobFiles(
+  shitennoDir: string,
+  relativePath: string,
+  key: string,
+  result: Record<string, string>,
+): void {
+  const lastSlash = relativePath.lastIndexOf("/");
+  const dirPart = relativePath.substring(0, lastSlash);
+  const filePattern = relativePath.substring(lastSlash + 1);
+  const ext = filePattern.startsWith("*.") ? filePattern.slice(1) : null;
+  const dirPath = join(shitennoDir, dirPart);
+
+  if (!ext || !existsSync(dirPath)) return;
+
+  const files = readdirSync(dirPath).filter((f) => f.endsWith(ext));
+  for (const file of files) {
+    const content = loadFileWithCache(shitennoDir, join(dirPart, file));
+    if (content) {
+      result[`${key}:${file}`] = content;
+    }
+  }
+}
+
 export interface SessionContext {
   essential: Record<string, string>;
   tokensUsed: number;
@@ -116,9 +139,9 @@ export function loadOptionalContext(
     const relativePath = OPTIONAL_FILES[key];
     if (!relativePath) continue;
     
-    // Handle glob patterns (simplified - in reality would need glob matching)
+    // Handle glob patterns (dir/*.ext — single level, no recursive glob)
     if (relativePath.includes("*")) {
-      // For now, skip glob patterns - would need proper implementation
+      loadGlobFiles(shitennoDir, relativePath, key, result);
       continue;
     }
     
