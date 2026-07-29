@@ -72,7 +72,9 @@ export function walkDir(dir: string, prefix = ""): string[] {
   const entries: string[] = [];
   if (!existsSync(dir)) return entries;
 
-  for (const item of readdirSync(dir, { withFileTypes: true })) {
+  const items = readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
+
+  for (const item of items) {
     if (item.name.startsWith(".") || item.name === "node_modules" || item.name === "checkpoints") continue;
     const relPath = prefix ? `${prefix}/${item.name}` : item.name;
     if (item.isDirectory()) {
