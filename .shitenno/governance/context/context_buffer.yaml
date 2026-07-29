@@ -1,5 +1,9 @@
-contextVersion: 1
+contextVersion: 2
 skills_resolved:
+  - skillId: "mcp-interaction"
+    taskMeta: "task=implementation,language=typescript"
+    reason: "mandatory"
+    resolvedAt: "2026-07-29T06:37:04.874Z"
   - skillId: "tdd-agent"
     taskMeta: "task=implementation,language=typescript"
     reason: "mandatory"
