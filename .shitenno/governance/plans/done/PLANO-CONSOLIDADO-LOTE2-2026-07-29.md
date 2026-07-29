@@ -1,6 +1,6 @@
 # Plano Consolidado — Lote 2 (pendências + achados novos)
 
-**Status:** Refused
+**Status:** Done
 
 **Base:** commit `f88036de506a574f5df3696fc83ece234c14828c` (validado contra o HEAD real de `feat/refactor` no GitHub). Este plano cobre só o que **ainda não foi corrigido** depois do lote 1 (já verificado: P0.2, P0.5, N.3, N.5, E.1, E.5, bugs de `.join()`/ícone, cache do `analyser.ts`, P0 de sessão — todos confirmados por execução real de `tsc`/`eslint`/`vitest`, não repita esse trabalho).
 
