@@ -11,23 +11,18 @@ import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
 import { Pipeline, createPipelineContext, type PipelineContext, type PipelineStage } from "../pipeline.js";
-import type { ComplexityReport } from "../scorer.js";
-import { analyseProject } from "../analyser.js";
-import { calculateComplexityScore, writeComplexityReport } from "../scorer.js";
-import { detectPatterns, writePatternReport } from "../pattern-detector.js";
-import { auditHealth, writeHealthReport } from "../health-auditor.js";
-import { analyzeEvolution, writeEvolutionReport } from "../auto-evolution.js";
 import { output, outputBlank, outputError } from "../output.js";
 import { muteLogs } from "../logger.js";
 import { outputJson } from "../formatting.js";
 import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
 
-// ── Stages ───────────────────────────────────────────────────────────────────
+// ── Stages (lazy-loaded) ────────────────────────────────────────────────────
 
 const analyzeStage: PipelineStage = {
   name: "analyze",
   description: "Analyse project structure",
   execute: async (ctx: PipelineContext) => {
+    const { analyseProject } = await import("../analyser.js");
     const analysis = analyseProject(ctx.projectRoot);
     ctx.analysis = analysis;
     return ctx;
@@ -39,10 +34,12 @@ const scoreStage: PipelineStage = {
   description: "Calculate complexity score",
   execute: async (ctx: PipelineContext) => {
     if (!ctx.analysis) return ctx;
-    const analysis = ctx.analysis as ReturnType<typeof analyseProject>;
+    const { calculateComplexityScore, writeComplexityReport } = await import("../scorer.js");
+    type AnalyseProjectResult = Awaited<ReturnType<typeof import("../analyser.js").analyseProject>>;
+    const analysis = ctx.analysis as AnalyseProjectResult;
     const complexity = await calculateComplexityScore(ctx.projectRoot, ctx.shitennoDir, analysis);
     writeComplexityReport(ctx.projectRoot, ctx.shitennoDir, complexity);
-    ctx.complexityReport = complexity as ComplexityReport;
+    ctx.complexityReport = complexity as import("../scorer.js").ComplexityReport;
     return ctx;
   },
 };
@@ -51,6 +48,7 @@ const detectStage: PipelineStage = {
   name: "detect",
   description: "Detect patterns in history",
   execute: async (ctx: PipelineContext) => {
+    const { detectPatterns, writePatternReport } = await import("../pattern-detector.js");
     const report = detectPatterns(ctx.projectRoot, ctx.shitennoDir);
     writePatternReport(ctx.shitennoDir, report);
     ctx.patternReport = report;
@@ -62,6 +60,7 @@ const auditStage: PipelineStage = {
   name: "audit",
   description: "Audit governance health",
   execute: async (ctx: PipelineContext) => {
+    const { auditHealth, writeHealthReport } = await import("../health-auditor.js");
     const report = await auditHealth(ctx.projectRoot, ctx.shitennoDir);
     writeHealthReport(ctx.shitennoDir, report);
     ctx.healthReport = report;
@@ -77,6 +76,7 @@ const evolveStage: PipelineStage = {
       output(chalk.yellow("  ⚠ Skipping evolve stage (requires 'governed' state)"));
       return { ...ctx, __lastStageSkipped: true };
     }
+    const { analyzeEvolution, writeEvolutionReport } = await import("../auto-evolution.js");
     const report = analyzeEvolution(ctx.projectRoot, ctx.shitennoDir);
     writeEvolutionReport(ctx.shitennoDir, report);
     ctx.evolutionReport = report;

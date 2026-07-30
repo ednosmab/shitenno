@@ -87,7 +87,6 @@ export const EVENT_VERSIONS: Record<ShitennoEventType, EventVersion> = {
   "action.pre_sensitive": 1,
   "resource.claimed": 1,
   "resource.released": 1,
-  "pipeline.partial_failure": 1,
   "audit.standard": 1,
   "source.changed": 1,
   "source.file_added": 1,
@@ -100,6 +99,7 @@ export const EVENT_VERSIONS: Record<ShitennoEventType, EventVersion> = {
   "semantic.insight_detected": 1,
   "notification.sent": 1,
   "notification.throttled": 1,
+  "user.notification": 1,
 };
 
 // ── Migration ──────────────────────────────────────────────────────────────

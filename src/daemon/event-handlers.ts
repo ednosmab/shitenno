@@ -215,6 +215,8 @@ export function subscribeTier2Events(ctx: DaemonContext, runPeriodicAuditFn: () 
       const backlog = moveCompletedBacklogToDone(ctx.shitennoDir, ctx.shitennoDir);
       if (backlog.moved > 0) {
         daemonLog(ctx.logPath, "INFO", `backlog.updated: moved ${backlog.moved} completed item(s)`);
+        // Notify user about completed backlog items
+        bus.publish("backlog.updated", { itemId: "batch", movedCount: backlog.moved });
       }
     } catch (err) {
       daemonLog(ctx.logPath, "ERROR", `backlog.updated handler failed: ${err}`);

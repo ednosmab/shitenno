@@ -10,16 +10,11 @@
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { consolidateEngineeringState, type EngineeringState } from "../engineering-state.js";
-import { loadMaturityProfile, type MaturityProfile } from "../maturity-profile.js";
-import { loadArtifacts, loadRelations, analyzeGraph, type GraphAnalysis } from "../knowledge-graph.js";
-import { detectKnowledgeDebt, type KnowledgeDebtReport } from "../knowledge-debt.js";
 import { detectLifecycleState, type ShitennoLifecycleState } from "../shitenno-state-machine.js";
 import { getSessionMetrics, type SessionMetrics } from "../session-tracker.js";
 import { getEventBus, type EventEnvelope } from "../event-bus.js";
-import { detectCapabilitySignalsFromFilesystem, type Capability } from "../maturity-profile.js";
-import { evaluateCapabilities, type CapabilityEntity } from "../capability-engine.js";
-import { loadGrowthProfile, type GrowthProfile } from "../growth-profile.js";
+import type { GrowthProfile } from "../growth-profile.js";
+import type { EngineeringState } from "../engineering-state.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -32,20 +27,20 @@ export interface ConsoleData {
   lifecycle: ShitennoLifecycleState;
 
   // Engineering State
-  engineering: EngineeringState;
+  engineering: import("../engineering-state.js").EngineeringState;
 
   // Maturity
-  maturity: MaturityProfile | null;
+  maturity: import("../maturity-profile.js").MaturityProfile | null;
 
   // Knowledge Graph
-  graph: GraphAnalysis;
+  graph: import("../knowledge-graph.js").GraphAnalysis;
 
   // Knowledge Debt
-  debt: KnowledgeDebtReport | null;
+  debt: import("../knowledge-debt.js").KnowledgeDebtReport | null;
 
   // Capabilities
-  capabilities: Capability[];
-  capabilityEntities: CapabilityEntity[];
+  capabilities: import("../maturity-profile.js").Capability[];
+  capabilityEntities: import("../capability-engine.js").CapabilityEntity[];
 
   // Goals (raw JSON files)
   goals: GoalData[];
@@ -118,9 +113,18 @@ export interface DecisionData {
 
 // ── Data Collection ────────────────────────────────────────────────────────
 
-export function collectConsoleData(projectRoot: string, shitennoDir: string): ConsoleData {
+export async function collectConsoleData(projectRoot: string, shitennoDir: string): Promise<ConsoleData> {
   const timestamp = new Date().toISOString();
   const lifecycle = detectLifecycleState(projectRoot, shitennoDir);
+
+  // Lazy-load heavy modules
+  const { loadMaturityProfile, detectCapabilitySignalsFromFilesystem } = await import("../maturity-profile.js");
+  const { consolidateEngineeringState } = await import("../engineering-state.js");
+  const { loadArtifacts, loadRelations, analyzeGraph } = await import("../knowledge-graph.js");
+  const { detectKnowledgeDebt } = await import("../knowledge-debt.js");
+  const { evaluateCapabilities } = await import("../capability-engine.js");
+  const { loadGrowthProfile } = await import("../growth-profile.js");
+
   const maturity = loadMaturityProfile(shitennoDir);
   const engineering = consolidateEngineeringState(projectRoot, shitennoDir, maturity);
 
@@ -177,11 +181,11 @@ const cache = new Map<string, CacheEntry>();
  * Get cached data or collect fresh data.
  * TTL defaults to 5 seconds to avoid excessive file I/O during rapid tab switches.
  */
-export function getOrCollectConsoleData(
+export async function getOrCollectConsoleData(
   projectRoot: string,
   shitennoDir: string,
   ttlMs: number = 5000,
-): ConsoleData {
+): Promise<ConsoleData> {
   const key = `${projectRoot}:${shitennoDir}`;
   const now = Date.now();
   const entry = cache.get(key);
@@ -190,7 +194,7 @@ export function getOrCollectConsoleData(
     return entry.data;
   }
 
-  const data = collectConsoleData(projectRoot, shitennoDir);
+  const data = await collectConsoleData(projectRoot, shitennoDir);
   cache.set(key, { data, timestamp: now });
   return data;
 }

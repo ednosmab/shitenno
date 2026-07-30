@@ -42,7 +42,7 @@ export function dashboardCommand(): Command {
 
       // JSON mode — output data and exit
       if (isJson) {
-        const data = collectConsoleData(ctx.projectRoot, ctx.shitennoDir);
+        const data = await collectConsoleData(ctx.projectRoot, ctx.shitennoDir);
         outputJson(data as unknown as Record<string, unknown>);
         return;
       }
@@ -70,7 +70,7 @@ export function dashboardCommand(): Command {
         console.log("");
 
         // Fallback: static output
-        const data = collectConsoleData(ctx.projectRoot, ctx.shitennoDir);
+        const data = await collectConsoleData(ctx.projectRoot, ctx.shitennoDir);
         displayStaticDashboard(data);
       }
     });
@@ -80,7 +80,7 @@ export function dashboardCommand(): Command {
 
 // ── Static Fallback ────────────────────────────────────────────────────────
 
-function displayStaticDashboard(data: ReturnType<typeof collectConsoleData>): void {
+function displayStaticDashboard(data: import("../console/data-collector.js").ConsoleData): void {
   const { health, maturity, lifecycle, capabilities, stats, graph } = data;
 
   console.log(chalk.bold.cyan("  ┌─ Health Score ─────────────────────────────────┐"));

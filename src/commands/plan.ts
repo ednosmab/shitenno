@@ -12,7 +12,6 @@ import { parseAllDocuments } from "yaml";
 import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
 import { validatePlanFormat, extractChecklistItems, extractStepHeadings } from "../plan-format-validator.js";
 import { getEventBus } from "../event-bus.js";
-import { sendDesktopNotification } from "../notify.js";
 import { resolveBacklogPaths } from "../backlog-core.js";
 
 // ── Sub-command imports ────────────────────────────────────────────────────
@@ -80,7 +79,7 @@ function ensureLegacyFields(content: string): { content: string; updated: boolea
 
   if (!content.match(/\*\*Status:\*\*/)) {
     const titleLine = lines.findIndex((l) => l.startsWith("# "));
-    if (titleLine !== -1) { lines.splice(titleLine + 2, 0, "", "**Status:** Pending"); updated = true; }
+    if (titleLine !== -1) { lines.splice(titleLine + 1, 0, "", "**Status:** Pending"); updated = true; }
   }
   if (!content.match(/\*\*Date:\*\*/)) {
     const statusLine = lines.findIndex((l) => l.match(/\*\*Status:\*\*/));
@@ -114,7 +113,7 @@ function ensureFormatHeader(plan: { filePath: string }): PrepareResult {
   } catch (error) { return { step: "format_header", status: "error", detail: String(error) }; }
 }
 
-function validateFormat(shitennoDir: string, planId: string, plan: { filePath: string }): PrepareResult[] {
+function validateFormat(_shitennoDir: string, planId: string, plan: { filePath: string }): PrepareResult[] {
   const results: PrepareResult[] = [];
   try {
     const content = readFileSync(plan.filePath, "utf-8");
@@ -123,7 +122,9 @@ function validateFormat(shitennoDir: string, planId: string, plan: { filePath: s
     for (const warn of validation.warnings) results.push({ step: "format_validation", status: "warn", detail: warn.message });
     if (validation.errors.length > 0 || validation.warnings.length > 0) {
       getEventBus().publish("plan.format_warning", { planId, path: plan.filePath, errors: validation.errors, warnings: validation.warnings });
-      if (validation.errors.length > 0) sendDesktopNotification(shitennoDir, "Shugo Plan", `Formato inválido: ${validation.errors.map((e) => e.message).join("; ")}`);
+      if (validation.errors.length > 0) {
+        getEventBus().publish("user.notification", { title: "⚠️ Formato Inválido", message: validation.errors.map((e) => e.message).join("; "), priority: "medium" });
+      }
     }
   } catch (error) { results.push({ step: "format_validation", status: "error", detail: String(error) }); }
   return results;
@@ -227,10 +228,8 @@ export async function runPrepare(
   results.push(ensureChecklist(plan));
   results.push(syncToBacklog(planId, plan, shitennoDir));
 
-  try {
-    sendDesktopNotification(shitennoDir, "Shugo Plan", `Plan prepared: ${plan.title}`);
-    results.push({ step: "notify", status: "done", detail: "Desktop notification sent" });
-  } catch { results.push({ step: "notify", status: "skip", detail: "Notification failed" }); }
+  getEventBus().publish("user.notification", { title: "📋 Plano Preparado", message: plan.title, priority: "low" });
+  results.push({ step: "notify", status: "done", detail: "Notification dispatched via event bus" });
 
   return results;
 }

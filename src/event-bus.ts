@@ -72,7 +72,6 @@ export type ShitennoEventType =
   | "briefing.generated"
   | "proactive.digest_ready"
   | "action.pre_sensitive"
-  | "pipeline.partial_failure"
   | "audit.standard"
   | "source.changed"
   | "source.file_added"
@@ -84,7 +83,8 @@ export type ShitennoEventType =
   | "semantic.pattern_detected"
   | "semantic.insight_detected"
   | "notification.sent"
-  | "notification.throttled";
+  | "notification.throttled"
+  | "user.notification";
 
 export type EventHandler<T = unknown> = (payload: T) => void | Promise<void>;
 

@@ -30,6 +30,7 @@ import {
 } from "../backlog-core.js";
 import { guardNotInitialized } from "../shared.js";
 import { output, outputBlank } from "../output.js";
+import { getEventBus } from "../event-bus.js";
 
 // ── Shared Helpers ─────────────────────────────────────────────────────────
 
@@ -107,6 +108,10 @@ function cmdDone(shitennoDir: string, id: string) {
         output(chalk.green(`   📦 ${moveResult.message}`));
       }
     }
+    // Publish events so daemon + desktop-notifier can react
+    const bus = getEventBus();
+    bus.publish("task.completed", { taskId: id, fromState: "em implementação", toState: "concluído" });
+    bus.publish("backlog.updated", { itemId: id, movedCount: 1 });
   } else {
     output(chalk.red(`❌ ${result.message}`));
   }

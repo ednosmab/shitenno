@@ -61,6 +61,7 @@ if (isInitialized) {
   setSessionContext(session.id, session.startedAt);
 
   // Desktop notifications for lifecycle events (session end, task completed, etc.)
+  // Initialized here for CLI mode; daemon initializes its own instance in engine-init.ts.
   initDesktopNotifier(shitennoDir);
 }
 
@@ -257,27 +258,39 @@ async function showBriefingSummary(projectRoot: string, shitennoDir: string): Pr
   }
 }
 
-// ── CLI Program ─────────────────────────────────────────────────────────────
+// ── CLI Program Factory ─────────────────────────────────────────────────────
 
-const program = new Command();
+/**
+ * Create a fresh CLI program instance.
+ * Use this when importing shugo as a library to avoid state persistence issues.
+ */
+export function createProgram(): Command {
+  const cmd = new Command();
 
-program
-  .name("shugo")
-  .description("AI governance ecosystem that grows with your project")
-  .version(version)
-  .option("--quiet", "Suppress informational output (errors only)")
-  .option("--no-color", "Disable colored output")
-  .hook("preAction", () => {
-    const globalOpts = program.opts();
-    if (globalOpts.quiet) {
-      process.env.SHITENNO_QUIET = "1";
-    }
-    if (globalOpts.color === false) {
-      chalk.level = 0;
-    }
-    // Set global JSON mode early — suppresses output() for all modules
-    setGlobalJsonMode(process.argv.includes("--json"));
-  });
+  cmd
+    .name("shugo")
+    .description("AI governance ecosystem that grows with your project")
+    .version(version)
+    .option("--quiet", "Suppress informational output (errors only)")
+    .option("--no-color", "Disable colored output")
+    .hook("preAction", () => {
+      const globalOpts = cmd.opts();
+      if (globalOpts.quiet) {
+        process.env.SHITENNO_QUIET = "1";
+      }
+      if (globalOpts.color === false) {
+        chalk.level = 0;
+      }
+      // Set global JSON mode early — suppresses output() for all modules
+      setGlobalJsonMode(process.argv.includes("--json"));
+    });
+
+  return cmd;
+}
+
+// ── CLI Program (singleton for direct execution) ────────────────────────────
+
+const program = createProgram();
 
 // ── Custom Help Formatting ──────────────────────────────────────────────────
 
@@ -368,6 +381,7 @@ program.addCommand((await import("../src/commands/init.js")).initCommand);
 program.addCommand((await import("../src/commands/status.js")).statusCommand);
 program.addCommand((await import("../src/commands/upgrade.js")).upgradeCommand);
 program.addCommand((await import("../src/commands/validate.js")).validateCommand);
+program.addCommand((await import("../src/commands/pipeline.js")).pipelineCommand);
 program.addCommand((await import("../src/commands/detect.js")).detectCommand);
 program.addCommand((await import("../src/commands/audit.js")).auditCommand);
 program.addCommand((await import("../src/commands/clean.js")).cleanCommand);
@@ -434,24 +448,36 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
   }
 });
 
-await program.parseAsync();
+// ── Execute CLI (only when run directly, not when imported) ─────────────────
 
-// ── Post-Execution: Session End ─────────────────────────────────────────────
+const isMainModule = process.argv[1] &&
+  (process.argv[1].endsWith("/shugo") ||
+   process.argv[1].endsWith("\\shugo") ||
+   process.argv[1].endsWith("/shugo.ts") ||
+   process.argv[1].endsWith("\\shugo.ts") ||
+   process.argv[1].endsWith("/shugo.js") ||
+   process.argv[1].endsWith("\\shugo.js"));
 
-if (isInitialized && currentSessionId) {
-  const bus = getEventBus();
-  const endedAt = new Date();
-  const duration = currentSessionStartedAt
-    ? endedAt.getTime() - new Date(currentSessionStartedAt).getTime()
-    : 0;
-  bus.publish("session.end", {
-    sessionId: currentSessionId,
-    duration,
-    outcome: "success",
-  });
-  endSession(shitennoDir, currentSessionId);
-  clearSessionContext();
-  if (!process.env.SHITENNO_CHILD) {
-    stopWatching();
+if (isMainModule) {
+  await program.parseAsync();
+
+  // ── Post-Execution: Session End ─────────────────────────────────────────────
+
+  if (isInitialized && currentSessionId) {
+    const bus = getEventBus();
+    const endedAt = new Date();
+    const duration = currentSessionStartedAt
+      ? endedAt.getTime() - new Date(currentSessionStartedAt).getTime()
+      : 0;
+    bus.publish("session.end", {
+      sessionId: currentSessionId,
+      duration,
+      outcome: "success",
+    });
+    endSession(shitennoDir, currentSessionId);
+    clearSessionContext();
+    if (!process.env.SHITENNO_CHILD) {
+      stopWatching();
+    }
   }
 }

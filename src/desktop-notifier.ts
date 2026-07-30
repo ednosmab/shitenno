@@ -158,6 +158,39 @@ function handlePlanInconsistency(payload: Record<string, unknown>): void {
   );
 }
 
+function handleHealthChecked(payload: Record<string, unknown>): void {
+  const score = Number(payload.score ?? -1);
+  if (score < 0) return;
+
+  // Only notify when health is critical (<40) or improved significantly (>=80)
+  if (score < 40) {
+    throttledNotify(
+      `health:critical:${Date.now()}`,
+      "🔴 Saúde Crítica",
+      `Score de saúde: ${score}/100 — ação imediata necessária`,
+      "high",
+    );
+  } else if (score >= 80) {
+    throttledNotify(
+      `health:good:${Date.now()}`,
+      "🟢 Saúde Estável",
+      `Score de saúde recuperou para ${score}/100`,
+      "low",
+    );
+  }
+}
+
+function handleBacklogCompleted(payload: Record<string, unknown>): void {
+  const itemId = String(payload.itemId ?? payload.taskId ?? "desconhecido");
+  const count = Number(payload.movedCount ?? payload.count ?? 1);
+  throttledNotify(
+    `backlog-done:${Date.now()}`,
+    "✅ Tarefa do Backlog Concluída",
+    `${count} item(ns) movido(s) para done — ${itemId}`,
+    "medium",
+  );
+}
+
 function handleBriefingGenerated(): void {
   throttledNotify(
     `briefing:${Date.now()}`,
@@ -169,8 +202,10 @@ function handleBriefingGenerated(): void {
 
 function handlePlanArchived(payload: Record<string, unknown>): void {
   const planId = String(payload.planId ?? payload.planName ?? "unknown");
-  const newStatus = String(payload.newStatus ?? "");
-  if (newStatus !== "done") return;
+  // payload uses `finalStatus` (not `newStatus`) when published from
+  // markdown-plan-engine/file-operations.ts. Accept both for backward compat.
+  const finalStatus = String(payload.finalStatus ?? payload.newStatus ?? "");
+  if (finalStatus !== "done") return;
 
   throttledNotify(
     `plan-archived:${planId}:${Date.now()}`,
@@ -178,6 +213,13 @@ function handlePlanArchived(payload: Record<string, unknown>): void {
     `${planId} foi arquivado como done`,
     "medium",
   );
+}
+
+function handleUserNotification(payload: Record<string, unknown>): void {
+  const title = String(payload.title ?? "Shugo");
+  const message = String(payload.message ?? "");
+  const priority = String(payload.priority ?? "medium") as "high" | "medium" | "low";
+  throttledNotify(`user-notif:${Date.now()}`, title, message, priority);
 }
 
 // ── Initialization ───────────────────────────────────────────────────────
@@ -200,5 +242,12 @@ export function initDesktopNotifier(shitennoDir: string): void {
   bus.subscribe("briefing.generated", handleBriefingGenerated);
   bus.subscribe("plan.archived", handlePlanArchived);
 
-  logger.info("desktop-notifier", "Initialized — subscribed to task.completed, session.end, challenge.generated, drift, plan.inconsistency, briefing.generated, plan.archived");
+  // Health & backlog
+  bus.subscribe("health.checked", handleHealthChecked);
+  bus.subscribe("backlog.updated", handleBacklogCompleted as (payload: Record<string, unknown>) => void);
+
+  // Direct user notifications (bypass challenge rate-limiting)
+  bus.subscribe("user.notification", handleUserNotification);
+
+  logger.info("desktop-notifier", "Initialized — subscribed to task.completed, session.end, challenge.generated, drift, plan.inconsistency, briefing.generated, plan.archived, health.checked, backlog.updated, user.notification");
 }
