@@ -52,6 +52,11 @@ export function updateLegacyStatus(content: string, newStatus: MarkdownPlanStatu
     if (titleIndex !== -1) {
       lines.splice(titleIndex + 2, 0, "", `**Status:** ${statusDisplayText(newStatus)}`);
       content = lines.join("\n");
+    } else {
+      const firstNonEmpty = lines.findIndex((l) => l.trim().length > 0);
+      const insertAt = firstNonEmpty === -1 ? 0 : firstNonEmpty + 1;
+      lines.splice(insertAt, 0, "", `**Status:** ${statusDisplayText(newStatus)}`);
+      content = lines.join("\n");
     }
   }
 

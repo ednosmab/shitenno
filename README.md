@@ -12,7 +12,7 @@ It exists to solve a specific problem: work sessions (human or AI) that start fr
 
 | Component | What it is |
 |---|---|
-| **Shugo** | The binary/CLI — single entry point (`shugo init`, `audit`, `briefing`, `plan`, `daemon`, `mcp`, among ~35 commands) |
+| **Shugo** | The binary/CLI — single entry point (`shugo init`, `audit`, `briefing`, `plan`, `daemon`, `mcp`, among ~39 commands) |
 | **`.shitenno/`** | Artifact generated per project when running `shugo init` — where state, cache, history, and that repository's daemon live |
 | **Daemon** | Background process, one per project, started by the CLI (automatically or via `shugo daemon start`). Once started it runs isolated — watches files, listens to the event bus, triggers checks — but the CLI never depends on it: there's always a disk-based fallback path |
 
@@ -96,7 +96,7 @@ That's it. Your project now has governed context for you and your AI agents.
 
 ---
 
-## All Commands (38)
+## All Commands (39)
 
 ### Core Commands
 
@@ -118,6 +118,7 @@ That's it. Your project now has governed context for you and your AI agents.
 | `shugo assess` | Re-evaluate maturity profile | After major changes |
 | `shugo doctor` | System diagnostics | When something feels off |
 | `shugo scheduled-check` | Check uncommitted drift | Detect stale uncommitted changes |
+| `shugo large-commit-check` | Check recent commit size | Trigger audit for large commits (internal) |
 
 ### Governance Commands
 
@@ -213,7 +214,7 @@ shitenno-cli/
 │   │   ├── init.ts
 │   │   ├── status.ts
 │   │   ├── audit.ts
-│   │   ├── ... (32 commands)
+ │   │   ├── ... (33 commands)
 │   │   └── mcp.ts
 │   ├── audit/                # Audit detectors
 │   │   ├── engineering-detectors.ts
@@ -232,7 +233,7 @@ shitenno-cli/
 
 | Metric | Count |
 |--------|-------|
-| CLI Commands | 38 |
+| CLI Commands | 39 |
 | Source Files | 269 |
 | Test Files | 163 |
 | Audit Detectors | 100+ |

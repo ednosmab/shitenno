@@ -337,7 +337,7 @@ describe("detectPathTraversal", () => {
     const issues = detectPathTraversal(tempDir, files);
     expect(issues.length).toBe(1);
     expect(issues[0]!.type).toBe("path_traversal");
-    expect(issues[0]!.severity).toBe(3);
+    expect(issues[0]!.severity).toBe(1);
   });
 
   it("detects writeFile with template literal", () => {

@@ -9,6 +9,7 @@ import { SHITENNO_DIR_NAME } from "../constants.js";
 import { escapeRegex } from "../validation.js";
 import { transitionTask, type BacklogState } from "../backlog-state-machine.js";
 import { replaceSectionField, updateNextP0 } from "../context-buffer-writer.js";
+import { getEventBus } from "../event-bus.js";
 import type { RuleAction, RuleContext } from "../domain/rules/rule.js";
 import { resolveField } from "./conditions.js";
 
@@ -122,6 +123,8 @@ function executeUpdateBacklog(action: RuleAction, context: RuleContext): { succe
   }
 }
 
+const TERMINAL_STATES: Set<string> = new Set(["concluído", "encerrado"]);
+
 function executeUpdateBacklogStatus(action: RuleAction, context: RuleContext): { success: boolean; message: string } {
   const taskId = String(action.params.taskId || "");
   const fromState = String(action.params.fromState || "");
@@ -129,6 +132,14 @@ function executeUpdateBacklogStatus(action: RuleAction, context: RuleContext): {
   if (!taskId || !fromState || !toState) return { success: false, message: "Missing required params: taskId, fromState, toState" };
   try {
     const result = transitionTask(context.shitennoDir, taskId, fromState as BacklogState, toState as BacklogState);
+    if (result.success && TERMINAL_STATES.has(toState)) {
+      getEventBus().publish("task.completed", {
+        taskId,
+        fromState,
+        toState,
+        timestamp: new Date().toISOString(),
+      });
+    }
     return { success: result.success, message: result.message };
   } catch (error) {
     return { success: false, message: `Failed to transition backlog: ${error instanceof Error ? error.message : String(error)}` };

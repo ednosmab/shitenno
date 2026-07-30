@@ -6,6 +6,7 @@
 
 import type { HealthIssue, SourceFileInfo } from "../types.js";
 import { isDetectorDefinitionFile } from "./helpers.js";
+import { stripComments } from "../shared.js";
 
 /**
  * Detect potential SQL injection vulnerabilities in source code.
@@ -20,7 +21,9 @@ export function detectSQLInjection(_projectRoot: string, files: SourceFileInfo[]
   ];
 
   for (const file of files) {
-    const lines = file.content.split("\n");
+    if (isDetectorDefinitionFile(file.relPath)) continue;
+    const codeOnly = stripComments(file.content);
+    const lines = codeOnly.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       if (sqlPatterns.some((p) => p.test(line))) {
@@ -51,7 +54,8 @@ export function detectXSS(_projectRoot: string, files: SourceFileInfo[]): Health
   for (const file of files) {
     if (file.relPath.includes("__tests__")) continue;
     if (isDetectorDefinitionFile(file.relPath)) continue;
-    const lines = file.content.split("\n");
+    const codeOnly = stripComments(file.content);
+    const lines = codeOnly.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       if (xssPatterns.some((p) => p.test(line))) {
@@ -83,7 +87,8 @@ export function detectUnsafeEval(_projectRoot: string, files: SourceFileInfo[]):
   for (const file of files) {
     if (file.relPath.includes("__tests__")) continue;
     if (isDetectorDefinitionFile(file.relPath)) continue;
-    const lines = file.content.split("\n");
+    const codeOnly = stripComments(file.content);
+    const lines = codeOnly.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       if (evalPatterns.some((p) => p.test(line))) {
@@ -121,7 +126,9 @@ export function detectUnsafeDeserialization(_projectRoot: string, files: SourceF
   ];
 
   for (const file of files) {
-    const lines = file.content.split("\n");
+    if (isDetectorDefinitionFile(file.relPath)) continue;
+    const codeOnly = stripComments(file.content);
+    const lines = codeOnly.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       if (realDeserializationSinks.some((p) => p.test(line))) {

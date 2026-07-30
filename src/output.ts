@@ -116,7 +116,7 @@ export function outputWarning(msg: string, opts?: { quiet?: boolean }): void {
  * @param msg - The error message.
  */
 export function outputError(msg: string): void {
-  output(`${chalk.red("✗")} ${msg}`);
+  process.stderr.write(`${chalk.red("✗")} ${msg}\n`);
 }
 
 /**

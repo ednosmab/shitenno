@@ -11,27 +11,19 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { join } from "node:path";
-import { startMcpServer } from "../mcp-server.js";
+import { startMcpServer, TOOLS } from "../mcp-server.js";
 import { consolidateEngineeringState } from "../engineering-state.js";
 import { SHITENNO_DIR_NAME } from "../constants.js";
-import { outputBlank, outputError } from "../output.js";
+import { outputError } from "../output.js";
 
 async function startServerAction(projectRoot: string, shitennoDir: string): Promise<void> {
-  outputError(chalk.gray("  shitenno-mcp: Starting MCP server over stdio..."));
-  outputError(
-    chalk.gray(
-      "  Tools: getBriefing, getRiskMap, getRules, getEngineeringState, getBacklog, getPlans, submitFeedback, getADRs, getSkills"
-    )
-  );
-  outputBlank();
+  const toolNames = TOOLS.map((t) => t.name).join(", ");
+  console.error(chalk.dim(`  shitenno-mcp: Starting MCP server over stdio...`));
+  console.error(chalk.dim(`  Tools: ${toolNames}`));
   try {
     await startMcpServer(projectRoot, shitennoDir);
   } catch (error) {
-    outputError(
-      chalk.red(
-        `  MCP server error: ${error instanceof Error ? error.message : String(error)}`
-      )
-    );
+    console.error(chalk.red(`  MCP server error: ${error instanceof Error ? error.message : String(error)}`));
     process.exitCode = 1;
   }
 }

@@ -79,6 +79,7 @@ export type ShitennoEventType =
   | "source.file_deleted"
   | "git.branch_changed"
   | "git.commit_detected"
+  | "git.large_commit_detected"
   | "git.ref_updated"
   | "semantic.pattern_detected"
   | "semantic.insight_detected"

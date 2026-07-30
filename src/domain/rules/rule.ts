@@ -20,6 +20,7 @@ export type TriggerType =
   | "pattern_detected"
   | "pipeline_complete"
   | "task_completed"
+  | "command_completed"
   | "plan_archived"
   | "plan_created"
   | "plan_file_changed"

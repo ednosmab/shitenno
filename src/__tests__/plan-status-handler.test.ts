@@ -36,6 +36,11 @@ describe("handlePlanStatus (in-process, no subprocess)", () => {
 
   it("accepts all valid statuses", () => {
     for (const status of VALID_PLAN_STATUSES) {
+      // Create fresh plan for each status since "done" moves the file
+      writeFileSync(
+        join(dir, ".shitenno/governance/plans/PLAN-A.md"),
+        `# Plan A\n\n**Status:** In Progress\n`
+      );
       const result = handlePlanStatus(join(dir, ".shitenno"), "PLAN-A", status);
       expect(result.success).toBe(true);
     }

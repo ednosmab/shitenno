@@ -4,10 +4,10 @@
  * Extracted from daemon/index.ts to keep modules focused.
  */
 
+import { execSync } from "node:child_process";
 import { getEventBus } from "../event-bus.js";
 import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
 import { auditHealth } from "../health-auditor.js";
-import { isLargeCommit } from "./startup-scan.js";
 import { recordEvent, persistState } from "./state.js";
 import { runSemanticCycle } from "./semantic-runner.js";
 import { daemonLog } from "./log-rotation.js";
@@ -28,10 +28,25 @@ export function getAuditLevel(ctx: DaemonContext): "quick" | "standard" | "code-
   return "code-review";
 }
 
+function getChangedFiles(projectRoot: string): string[] | undefined {
+  try {
+    const output = execSync("git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached", {
+      cwd: projectRoot,
+      encoding: "utf-8",
+      timeout: 5000,
+    });
+    const files = output.trim().split("\n").filter(Boolean);
+    return files.length > 0 ? files : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function runPeriodicAudit(ctx: DaemonContext): Promise<void> {
   try {
     const level = getAuditLevel(ctx);
-    const report = await auditHealth(ctx.projectRoot, ctx.shitennoDir, level);
+    const changedFiles = getChangedFiles(ctx.projectRoot);
+    const report = await auditHealth(ctx.projectRoot, ctx.shitennoDir, level, changedFiles);
 
     ctx.state.health = {
       score: report.healthScore,
@@ -83,26 +98,15 @@ function setupAuditTimer(ctx: DaemonContext, runPeriodicAuditFn: () => Promise<v
 export function setupPeriodicTimers(
   ctx: DaemonContext,
   runPeriodicAuditFn: () => Promise<void>,
-): { persistTimer: NodeJS.Timeout; largeCommitTimer: NodeJS.Timeout; auditTimer: NodeJS.Timeout; consolidationTimer: NodeJS.Timeout; cleanupAudit: () => void } {
+): { persistTimer: NodeJS.Timeout; auditTimer: NodeJS.Timeout; consolidationTimer: NodeJS.Timeout; cleanupAudit: () => void } {
   const persistTimer = setInterval(() => {
     persistState(ctx.state, ctx.statePath);
   }, 30_000);
 
-  const largeCommitTimer = setInterval(() => {
-    try {
-      if (isLargeCommit(ctx.shitennoDir, 50)) {
-        daemonLog(ctx.logPath, "WARN", `Large commit detected (50+ staged files) — triggering standard audit`);
-        runPeriodicAuditFn();
-      }
-    } catch (err) {
-      daemonLog(ctx.logPath, "ERROR", `Large commit check failed: ${err}`);
-    }
-  }, 5 * 60 * 1000);
-
   const consolidationTimer = setupConsolidationTimer(ctx);
   const { timer: auditTimer, cleanup: cleanupAudit } = setupAuditTimer(ctx, runPeriodicAuditFn);
 
-  return { persistTimer, largeCommitTimer, auditTimer, consolidationTimer, cleanupAudit };
+  return { persistTimer, auditTimer, consolidationTimer, cleanupAudit };
 }
 
 // ── Check Nag ───────────────────────────────────────────────────────────────

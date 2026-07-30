@@ -167,6 +167,19 @@ function handleBriefingGenerated(): void {
   );
 }
 
+function handlePlanArchived(payload: Record<string, unknown>): void {
+  const planId = String(payload.planId ?? payload.planName ?? "unknown");
+  const newStatus = String(payload.newStatus ?? "");
+  if (newStatus !== "done") return;
+
+  throttledNotify(
+    `plan-archived:${planId}:${Date.now()}`,
+    "📋 Plano Concluído",
+    `${planId} foi arquivado como done`,
+    "medium",
+  );
+}
+
 // ── Initialization ───────────────────────────────────────────────────────
 
 export function initDesktopNotifier(shitennoDir: string): void {
@@ -185,6 +198,7 @@ export function initDesktopNotifier(shitennoDir: string): void {
   bus.subscribe("workdir.large_uncommitted_drift", handleDriftDetected);
   bus.subscribe("plan.inconsistency_detected", handlePlanInconsistency);
   bus.subscribe("briefing.generated", handleBriefingGenerated);
+  bus.subscribe("plan.archived", handlePlanArchived);
 
-  logger.info("desktop-notifier", "Initialized — subscribed to task.completed, session.end, challenge.generated, drift, plan.inconsistency, briefing.generated");
+  logger.info("desktop-notifier", "Initialized — subscribed to task.completed, session.end, challenge.generated, drift, plan.inconsistency, briefing.generated, plan.archived");
 }

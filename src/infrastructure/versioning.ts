@@ -94,6 +94,7 @@ export const EVENT_VERSIONS: Record<ShitennoEventType, EventVersion> = {
   "source.file_deleted": 1,
   "git.branch_changed": 1,
   "git.commit_detected": 1,
+  "git.large_commit_detected": 1,
   "git.ref_updated": 1,
   "semantic.pattern_detected": 1,
   "semantic.insight_detected": 1,

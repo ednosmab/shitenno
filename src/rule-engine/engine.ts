@@ -242,7 +242,7 @@ const EVENT_TO_TRIGGER: Partial<Record<ShitennoEventType, TriggerType>> = {
   "recommendation.rejected": "file_change",
   "governance.policy_applied": "file_change",
   "entropy.calculated": "file_change",
-  "command.completed": "task_completed",
+  "command.completed": "command_completed",
   "doc.lifecycle.audited": "file_change",
   "system.updated": "file_change",
   "pipeline.started": "file_change",

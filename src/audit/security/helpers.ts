@@ -50,8 +50,11 @@ export function extractPackageName(spec: string): string {
 export function isUndeclaredDependency(
   pkgName: string,
   declaredDeps: Set<string>,
+  workspaceRoot: string,
   projectRoot: string,
 ): boolean {
   if (!pkgName || NODE_BUILTINS.has(pkgName) || declaredDeps.has(pkgName)) return false;
-  return !existsSync(join(projectRoot, "node_modules", pkgName));
+  if (existsSync(join(workspaceRoot, "node_modules", pkgName))) return false;
+  if (workspaceRoot !== projectRoot && existsSync(join(projectRoot, "node_modules", pkgName))) return false;
+  return true;
 }

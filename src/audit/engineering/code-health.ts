@@ -69,7 +69,7 @@ export function detectComplexityHotspots(_projectRoot: string, files: SourceFile
 
 function buildImportGraph(files: SourceFileInfo[]): Map<string, Set<string>> {
   const importRegex = /(?:from|import)\s+["']([^"']+)["']/g;
-  const pathToKey = (p: string) => p.replace(/\.ts$/, "").replace(/\.js$/, "").replace(/\/\.\//g, "/");
+  const pathToKey = (p: string) => p.replace(/\.ts$/, "").replace(/\.js$/, "");
   const importGraph = new Map<string, Set<string>>();
   for (const file of files) {
     const deps = new Set<string>();
@@ -80,7 +80,14 @@ function buildImportGraph(files: SourceFileInfo[]): Map<string, Set<string>> {
       if (!spec) continue;
       if (spec.startsWith(".") || spec.startsWith("/")) {
         const dirOfCurrentFile = file.relPath.split("/").slice(0, -1).join("/");
-        const resolved = pathToKey(dirOfCurrentFile + "/" + spec.replace(/\.js$/, ""));
+        const raw = `${dirOfCurrentFile}/${spec.replace(/\.js$/, "")}`;
+        const segments = raw.split("/");
+        const normalized: string[] = [];
+        for (const seg of segments) {
+          if (seg === "..") { normalized.pop(); }
+          else if (seg !== "." && seg !== "") { normalized.push(seg); }
+        }
+        const resolved = pathToKey(normalized.join("/"));
         if (resolved && resolved !== pathToKey(file.relPath)) deps.add(resolved);
       }
     }

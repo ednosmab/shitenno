@@ -5,8 +5,7 @@
  */
 
 import { readFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
-import { logger } from "../../logger.js";
+import { join, dirname } from "node:path";
 import type { HealthIssue, SourceFileInfo } from "../types.js";
 import { isDetectorDefinitionFile, shannonEntropy, extractPackageName, isUndeclaredDependency } from "./helpers.js";
 
@@ -87,38 +86,64 @@ export function detectConsoleSecrets(_projectRoot: string, files: SourceFileInfo
 /**
  * Detect dependency confusion (importing undeclared packages).
  */
+function findNearestPackageJson(filePath: string, projectRoot: string): string | null {
+  let dir = dirname(filePath);
+  while (dir.startsWith(projectRoot)) {
+    const candidate = join(dir, "package.json");
+    if (existsSync(candidate)) return candidate;
+    if (dir === projectRoot) break;
+    dir = dirname(dir);
+  }
+  return null;
+}
+
 export function detectDependencyConfusion(projectRoot: string, files: SourceFileInfo[]): HealthIssue[] {
   const issues: HealthIssue[] = [];
-  const pkgPath = join(projectRoot, "package.json");
-  if (!existsSync(pkgPath)) return issues;
+  const declaredDepsCache = new Map<string, Set<string>>();
 
-  try {
-    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
-    const declaredDeps = new Set([
-      ...Object.keys(pkg.dependencies ?? {}),
-      ...Object.keys(pkg.devDependencies ?? {}),
-    ]);
-
-    const importRegex = /(?:from|import)\s+["']([^"'./][^"']*)["']/g;
-
-    for (const file of files) {
-      let match;
-      importRegex.lastIndex = 0;
-      while ((match = importRegex.exec(file.content)) !== null) {
-        const spec = match[1];
-        if (!spec || spec.includes("${")) continue;
-        const pkgName = extractPackageName(spec);
-        if (!isUndeclaredDependency(pkgName, declaredDeps, projectRoot)) continue;
-        issues.push({
-          type: "dep_confusion",
-          severity: 2,
-          description: `Dependência "${pkgName}" importada em "${file.relPath}" mas não existe em node_modules nem em package.json`,
-          location: file.relPath,
-          recommendation: `Adicionar "${pkgName}" ao package.json ou verificar se o nome está correcto`,
-          confidence: 0.7,
-        });
-      }
+  function getDeclaredDeps(pkgJsonPath: string): Set<string> {
+    const cached = declaredDepsCache.get(pkgJsonPath);
+    if (cached) return cached;
+    try {
+      const pkg = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
+      const deps = new Set([
+        ...Object.keys(pkg.dependencies ?? {}),
+        ...Object.keys(pkg.devDependencies ?? {}),
+        ...Object.keys(pkg.peerDependencies ?? {}),
+      ]);
+      declaredDepsCache.set(pkgJsonPath, deps);
+      return deps;
+    } catch {
+      const empty = new Set<string>();
+      declaredDepsCache.set(pkgJsonPath, empty);
+      return empty;
     }
-  } catch (err) { logger.debug("security/secrets", "Error in detectDependencyConfusion:", err); }
+  }
+
+  const importRegex = /(?:from|import)\s+["']([^"'./][^"']*)["']/g;
+
+  for (const file of files) {
+    const nearestPkgPath = findNearestPackageJson(file.fullPath, projectRoot);
+    if (!nearestPkgPath) continue;
+    const declaredDeps = getDeclaredDeps(nearestPkgPath);
+    const workspaceRoot = dirname(nearestPkgPath);
+
+    let match;
+    importRegex.lastIndex = 0;
+    while ((match = importRegex.exec(file.content)) !== null) {
+      const spec = match[1];
+      if (!spec || spec.includes("${")) continue;
+      const pkgName = extractPackageName(spec);
+      if (!isUndeclaredDependency(pkgName, declaredDeps, workspaceRoot, projectRoot)) continue;
+      issues.push({
+        type: "dep_confusion",
+        severity: 2,
+        description: `Dependência "${pkgName}" importada em "${file.relPath}" mas não existe em node_modules nem em ${nearestPkgPath.replace(projectRoot + "/", "")}`,
+        location: file.relPath,
+        recommendation: `Adicionar "${pkgName}" ao package.json correto ou remover o import`,
+        confidence: 0.6,
+      });
+    }
+  }
   return issues;
 }

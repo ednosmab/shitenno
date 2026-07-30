@@ -125,6 +125,13 @@ export function subscribeTier1Events(
     runPeriodicAuditFn();
   });
 
+  bus.subscribe("git.large_commit_detected", (payload) => {
+    const p = payload as { count?: number } | undefined;
+    recordEvent(ctx.state, "git.large_commit_detected");
+    daemonLog(ctx.logPath, "WARN", `Large commit detected (${p?.count ?? "?"} files) — triggering audit`);
+    runPeriodicAuditFn();
+  });
+
   subscribeSessionAndStateTracking(ctx);
 }
 

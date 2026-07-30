@@ -19,7 +19,6 @@ export type ShutdownTimers = {
   checkNagTimer: NodeJS.Timeout;
   persistTimer: NodeJS.Timeout;
   auditTimer: NodeJS.Timeout;
-  largeCommitTimer: NodeJS.Timeout;
   consolidationTimer: NodeJS.Timeout;
   cleanupAudit: () => void;
 };
@@ -29,7 +28,6 @@ export function clearAllTimers(timers: ShutdownTimers): void {
   clearTimeout(timers.checkNagTimer);
   clearInterval(timers.persistTimer);
   clearInterval(timers.auditTimer);
-  clearInterval(timers.largeCommitTimer);
   clearInterval(timers.consolidationTimer);
   timers.cleanupAudit();
 }

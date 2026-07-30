@@ -157,13 +157,21 @@ export class MarkdownPlanEngine {
       throw new Error(`Plan not found: ${id}`);
     }
 
-    let content = readFileSync(plan.filePath, "utf-8");
-    const yamlResult = updateYamlStatus(content, newStatus);
+    const originalContent = readFileSync(plan.filePath, "utf-8");
+    const yamlResult = updateYamlStatus(originalContent, newStatus);
 
+    let content: string;
     if (!yamlResult.updated) {
-      content = updateLegacyStatus(content, newStatus);
+      content = updateLegacyStatus(originalContent, newStatus);
     } else {
       content = yamlResult.content;
+    }
+
+    if (content === originalContent && newStatus !== plan.status) {
+      throw new Error(
+        `updateStatus: não foi possível localizar ou inserir o campo Status em ${plan.filePath}. ` +
+        `Verifique se o arquivo tem um cabeçalho "# Título" ou bloco YAML válido.`
+      );
     }
 
     writeFileSync(plan.filePath, content, "utf-8");

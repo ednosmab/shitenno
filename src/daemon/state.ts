@@ -87,6 +87,12 @@ export const MAX_EVENTS = 100;
 export const MAX_SESSIONS = 50;
 export const MAX_CHALLENGES = 20;
 
+let dirty = false;
+
+export function markDirty(): void {
+  dirty = true;
+}
+
 export function createDaemonState(): DaemonState {
   return {
     drift: null,
@@ -112,11 +118,14 @@ export function recordEvent(state: DaemonState, eventType: string): void {
   if (state.events.length > MAX_EVENTS) {
     state.events.shift();
   }
+  markDirty();
 }
 
-export function persistState(state: DaemonState, statePath: string): void {
+export function persistState(state: DaemonState, statePath: string, force = false): void {
+  if (!dirty && !force) return;
   try {
     writeFileSync(statePath, JSON.stringify(state, null, 2), "utf-8");
+    dirty = false;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     logger.warn("daemon", `Failed to persist daemon state: ${msg}`);
@@ -148,4 +157,5 @@ export function recordNotificationStat(state: DaemonState, sent: boolean): void 
   } else {
     state.notificationStats.throttled++;
   }
+  markDirty();
 }

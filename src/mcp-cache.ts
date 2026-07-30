@@ -58,8 +58,8 @@ function evictOldEntries(): void {
 // ── Public API ────────────────────────────────────────────────────────────
 
 export interface CacheOptions {
+  key: string;
   ttlMs?: number;
-  key?: string;
 }
 
 /**
@@ -67,10 +67,10 @@ export interface CacheOptions {
  */
 export async function withCache<T>(
   handler: () => Promise<T>,
-  options: CacheOptions = {},
+  options: CacheOptions,
 ): Promise<T> {
   const ttlMs = options.ttlMs ?? DEFAULT_TTL_MS;
-  const cacheKey = options.key ?? handler.toString().slice(0, 64);
+  const cacheKey = options.key;
   
   // Check cache
   const cached = cacheStore.get(cacheKey);

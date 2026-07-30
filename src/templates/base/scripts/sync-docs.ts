@@ -89,91 +89,83 @@ function regenerateSystemMap(): boolean {
 
 // ── MANDATORY_CONTEXT.md Regeneration ───────────────────────────────────
 
-/**
- * Parse YAML entries from a manifest file under a given key.
- * Minimal parsing — only extracts id, path, mandatory, when fields.
- */
-function readManifestEntries(
-  manifestPath: string,
-  key: string
-): Array<{ id: string; path: string; mandatory?: boolean; when?: Record<string, string> }> {
+type ManifestEntry = { id: string; path: string; mandatory?: boolean; when?: Record<string, string> };
+
+function finalizeEntry(current: Record<string, string>, when: Record<string, string> | undefined): ManifestEntry | null {
+  if (!current.id) return null;
+  return {
+    id: current.id,
+    path: current.path || "",
+    mandatory: current.mandatory === "true" ? true : undefined,
+    when,
+  };
+}
+
+function parseManifestLine(
+  line: string,
+  state: { inBlock: boolean; inWhen: boolean; indent: number; current: Record<string, string>; when: Record<string, string> | undefined },
+  key: string,
+  entries: ManifestEntry[],
+): "continue" | "break" {
+  const trimmed = line.trim();
+
+  if (trimmed === `${key}:`) {
+    state.inBlock = true;
+    return "continue";
+  }
+  if (!state.inBlock) return "continue";
+
+  if (trimmed.startsWith("- id:")) {
+    const finalized = finalizeEntry(state.current, state.when);
+    if (finalized) entries.push(finalized);
+    state.current = { id: trimmed.replace("- id:", "").trim() };
+    state.when = undefined;
+    state.inWhen = false;
+    state.indent = line.search(/\S/);
+    return "continue";
+  }
+
+  if (line.search(/\S/) <= state.indent && trimmed && !trimmed.startsWith("-")) {
+    const finalized = finalizeEntry(state.current, state.when);
+    if (finalized) entries.push(finalized);
+    return "break";
+  }
+
+  if (trimmed === "when:") {
+    state.inWhen = true;
+    state.when = {};
+    return "continue";
+  }
+
+  if (trimmed.includes(":")) {
+    const [k, ...v] = trimmed.split(":");
+    if (!k || !v.length) return "continue";
+    const value = v.join(":").trim();
+    if (state.inWhen) {
+      state.when![k.trim()] = value;
+    } else {
+      state.current[k.trim()] = value;
+      if (trimmed.startsWith("when:")) {
+        state.inWhen = true;
+        state.when = {};
+      }
+    }
+  }
+  return "continue";
+}
+
+function readManifestEntries(manifestPath: string, key: string): ManifestEntry[] {
   if (!existsSync(manifestPath)) return [];
   try {
     const raw = readFileSync(manifestPath, "utf-8");
-    // Minimal YAML extraction: find the key block, then parse entries.
-    // We use a simple regex approach since this is a template script
-    // that should not depend on a YAML library.
-    const lines = raw.split("\n");
-    let inBlock = false;
-    let indent = 0;
-    const entries: Array<{ id: string; path: string; mandatory?: boolean; when?: Record<string, string> }> = [];
-    let current: Record<string, string> = {};
-    let currentWhen: Record<string, string> | undefined;
-    let inWhen = false;
+    const entries: ManifestEntry[] = [];
+    const state = { inBlock: false, inWhen: false, indent: 0, current: {} as Record<string, string>, when: undefined as Record<string, string> | undefined };
 
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed === `${key}:`) {
-        inBlock = true;
-        continue;
-      }
-      if (inBlock && trimmed.startsWith("- id:")) {
-        // Save previous entry
-        if (current.id) {
-          entries.push({
-            id: current.id,
-            path: current.path || "",
-            mandatory: current.mandatory === "true" ? true : undefined,
-            when: currentWhen,
-          });
-        }
-        current = { id: trimmed.replace("- id:", "").trim() };
-        currentWhen = undefined;
-        inWhen = false;
-        indent = line.search(/\S/);
-        continue;
-      }
-      if (inBlock && line.search(/\S/) <= indent && trimmed && !trimmed.startsWith("-")) {
-        // Back to top-level — end of entries block
-        if (current.id) {
-          entries.push({
-            id: current.id,
-            path: current.path || "",
-            mandatory: current.mandatory === "true" ? true : undefined,
-            when: currentWhen,
-          });
-        }
-        break;
-      }
-      if (inBlock && trimmed === "when:") {
-        inWhen = true;
-        currentWhen = {};
-        continue;
-      }
-      if (inBlock && inWhen && trimmed.includes(":")) {
-        const [k, ...v] = trimmed.split(":");
-        if (k && v.length) currentWhen![k.trim()] = v.join(":").trim();
-        continue;
-      }
-      if (inBlock && trimmed.includes(":")) {
-        const [k, ...v] = trimmed.split(":");
-        if (k && v.length) current[k.trim()] = v.join(":").trim();
-        if (trimmed.startsWith("when:")) {
-          inWhen = true;
-          currentWhen = {};
-        }
-        continue;
-      }
+    for (const line of raw.split("\n")) {
+      if (parseManifestLine(line, state, key, entries) === "break") break;
     }
-    // Save last entry
-    if (current.id) {
-      entries.push({
-        id: current.id,
-        path: current.path || "",
-        mandatory: current.mandatory === "true" ? true : undefined,
-        when: currentWhen,
-      });
-    }
+    const last = finalizeEntry(state.current, state.when);
+    if (last) entries.push(last);
     return entries;
   } catch {
     return [];
