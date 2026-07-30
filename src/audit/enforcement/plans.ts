@@ -32,7 +32,7 @@ export function detectInvalidBacklogStates(shitennoDir: string): HealthIssue[] {
         type: "invalid_backlog_state",
         severity: 2,
         description: `${invalidStates.length} estado(s) inválido(s) no BACKLOG.md: ${[...new Set(invalidStates)].join(", ")}`,
-        location: "shitenno/docs/BACKLOG.md",
+        location: "shitenno/docs/backlog/ACTIVE.md",
         recommendation: `Estados válidos: ${[...VALID_BACKLOG_STATES].join(", ")}. Actualizar para um dos estados permitidos.`,
         confidence: 0.65,
       });

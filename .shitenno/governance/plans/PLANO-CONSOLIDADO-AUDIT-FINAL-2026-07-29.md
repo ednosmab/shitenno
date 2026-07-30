@@ -1,6 +1,6 @@
 # Plano Consolidado Final — `shugo audit` (Engine + Achados Reais)
 
-**Status:** In Progress
+**Status:** Refused
 
 **Base:** commit `cdc9d44531c52cfe0c5355d3fccf41fc5e7be2a1`. Junta os dois planos anteriores (`PLANO-MELHORAR-AUDIT-ENGINE-2026-07-29.md` e `PLANO-ACHADOS-REAIS-2026-07-29.md`) num só, sem duplicar nada. Estrutura em duas partes bem separadas, porque são coisas diferentes:
 

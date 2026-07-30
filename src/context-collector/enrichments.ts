@@ -3,7 +3,7 @@
  */
 
 import type { Briefing } from "../briefing.js";
-import type { PatternDetectionReport, DetectedPattern } from "../pattern-detector.js";
+import type { PatternDetectionReport, DetectedPattern } from "../domain/entities/engineering-state.js";
 import { listAdrs, listSkills } from "../knowledge-loader.js";
 import { getFeedbackRecords, computeFeedbackSummary } from "../session-feedback.js";
 import { readPersistedEvents, type EventEnvelope } from "../event-bus.js";

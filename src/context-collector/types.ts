@@ -9,7 +9,7 @@ import type { DynamicRule } from "../dynamic-rules.js";
 import type { Briefing, BriefingOptions } from "../briefing.js";
 import type { MaturityProfile } from "../maturity-profile.js";
 import type { ProjectAnalysis } from "../analyser.js";
-import type { PatternDetectionReport } from "../pattern-detector.js";
+import type { PatternDetectionReport } from "../domain/entities/engineering-state.js";
 
 export interface ContextDeps {
   loadFingerprint: (shitennoDir: string) => ProjectFingerprint | null;

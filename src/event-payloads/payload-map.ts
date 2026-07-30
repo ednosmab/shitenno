@@ -27,7 +27,7 @@ import type {
   ResourceClaimedPayload, ResourceReleasedPayload,
   StateMutatedPayload, EntropyCalculatedPayload,
   DocsSyncTriggeredPayload, DocLifecycleAuditPayload,
-  SystemUpdatedPayload, PipelinePartialFailurePayload,
+  SystemUpdatedPayload,
 } from "./types.js";
 
 export interface EventPayloadMap {
@@ -75,5 +75,4 @@ export interface EventPayloadMap {
   "docs.sync.triggered": DocsSyncTriggeredPayload;
   "doc.lifecycle.audited": DocLifecycleAuditPayload;
   "system.updated": SystemUpdatedPayload;
-  "pipeline.partial_failure": PipelinePartialFailurePayload;
 }

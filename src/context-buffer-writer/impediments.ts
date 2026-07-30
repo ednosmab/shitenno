@@ -2,7 +2,7 @@
  * impediments.ts — Impediment buffer operations.
  */
 
-import { readBuffer, writeBuffer } from "./buffer-io.js";
+import { readBufferObject, writeBufferObject } from "./buffer-io.js";
 
 export interface Impediment {
   description: string;
@@ -15,65 +15,59 @@ export function addImpediment(
   shitennoDir: string,
   impediment: Impediment
 ): { success: boolean; message: string } {
-  const content = readBuffer(shitennoDir);
-  if (content === null) {
+  const obj = readBufferObject(shitennoDir);
+  if (obj === null) {
     return { success: false, message: "context_buffer.yaml not found" };
   }
 
-  const entry = `  - description: "${impediment.description}"
-    priority: "${impediment.priority}"
-    createdAt: "${impediment.createdAt}"
-${impediment.category ? `    category: "${impediment.category}"\n` : ""}`;
-
-  const impedimentsRegex = /^impediments:\s*\n/m;
-  const match = impedimentsRegex.exec(content);
-
-  if (match) {
-    const insertPos = match.index + match[0].length;
-    const updated = content.slice(0, insertPos) + entry + content.slice(insertPos);
-    writeBuffer(shitennoDir, updated);
-    return { success: true, message: `Impediment added: ${impediment.description}` };
+  if (!Array.isArray(obj.impediments)) {
+    obj.impediments = [];
   }
 
-  const updated = content.trimEnd() + "\n\nimpediments:\n" + entry;
-  writeBuffer(shitennoDir, updated);
-  return { success: true, message: `Impediment added (new section): ${impediment.description}` };
+  const entry: Record<string, unknown> = {
+    description: impediment.description,
+    priority: impediment.priority,
+    createdAt: impediment.createdAt,
+  };
+  if (impediment.category) {
+    entry.category = impediment.category;
+  }
+
+  (obj.impediments as unknown[]).push(entry);
+  writeBufferObject(shitennoDir, obj);
+  return { success: true, message: `Impediment added: ${impediment.description}` };
 }
 
 export function clearImpediments(
   shitennoDir: string,
   pattern?: string
 ): { success: boolean; message: string; removed: number } {
-  const content = readBuffer(shitennoDir);
-  if (content === null) {
+  const obj = readBufferObject(shitennoDir);
+  if (obj === null) {
     return { success: false, message: "context_buffer.yaml not found", removed: 0 };
   }
 
-  const impedimentsRegex = /^impediments:\s*\n((?:\s+- .*\n)*)/m;
-  const match = impedimentsRegex.exec(content);
-
-  if (!match?.[1]) {
+  if (!Array.isArray(obj.impediments) || obj.impediments.length === 0) {
     return { success: true, message: "No impediments found", removed: 0 };
   }
 
-  const block = match[1];
-  const entries = block.split(/(?=^\s+- )/m).filter((e) => e.trim().length > 0);
+  const before = (obj.impediments as Array<Record<string, unknown>>).length;
 
   if (!pattern) {
-    const updated = content.replace(impedimentsRegex, "impediments: []\n");
-    writeBuffer(shitennoDir, updated);
-    return { success: true, message: `Cleared all ${entries.length} impediments`, removed: entries.length };
+    obj.impediments = [];
+    writeBufferObject(shitennoDir, obj);
+    return { success: true, message: `Cleared all ${before} impediments`, removed: before };
   }
 
-  const kept = entries.filter((e) => !e.includes(pattern));
-  const removed = entries.length - kept.length;
+  obj.impediments = (obj.impediments as Array<Record<string, unknown>>).filter(
+    (e) => !(typeof e.description === "string" && e.description.includes(pattern))
+  );
+  const removed = before - (obj.impediments as Array<Record<string, unknown>>).length;
 
   if (removed === 0) {
     return { success: true, message: `No impediments matching "${pattern}"`, removed: 0 };
   }
 
-  const newBlock = kept.length > 0 ? kept.join("") : "[]\n";
-  const updated = content.replace(impedimentsRegex, `impediments:\n${newBlock}`);
-  writeBuffer(shitennoDir, updated);
+  writeBufferObject(shitennoDir, obj);
   return { success: true, message: `Cleared ${removed} impediments matching "${pattern}"`, removed };
 }

@@ -85,7 +85,7 @@ Esta regra é um **BLOQUEADOR**. Nenhuma resposta operacional pode ser enviada s
 
 O Quick Board é alimentado por:
 - `governance/context/context_buffer.yaml` — estado actual da sessão
-- `docs/BACKLOG.md` — prioridades e dívidas
+- `docs/backlog/ACTIVE.md` — prioridades e dívidas
 - `reports/` — saúde e complexidade do projecto
 
 ### Skill de Enforcement

@@ -25,7 +25,7 @@ Antes de declarar uma sessão como completa, ejecutar `pnpm run close:session` e
 - [ ] Technical debt registado (se existente)
 
 ### 4. Backlog Actualizado
-- [ ] Item processado marcado como `[x]` em `docs/BACKLOG.md`
+- [ ] Item processado marcado como `[x]` em `docs/backlog/ACTIVE.md`
 - [ ] Novos itens descobertos adicionados ao backlog
 - [ ] Estados actualizados (concluído/pausado/adiado)
 

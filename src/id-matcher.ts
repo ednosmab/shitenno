@@ -2,8 +2,8 @@
  * id-matcher.ts — Exact ID matching with separator boundary.
  *
  * Replaces the fragile bidirectional substring matching
- * (`a.includes(b) || b.includes(a)`) used across task-completion-pipeline,
- * task-completion, and backlog-state-machine.
+ * (`a.includes(b) || b.includes(a)`) used across task-completion
+ * and backlog-state-machine.
  *
  * "TASK-1" matches "TASK-1" and "TASK-1-retry" but NEVER "TASK-10".
  */

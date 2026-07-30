@@ -2,6 +2,7 @@
  * session-bootstrapper.ts — Lazy Loading for Session Context
  *
  * Reduces token usage at session start by loading only essential files.
+ * Supports loading profiles: minimal, lite (default), full.
  * Other files are loaded on-demand via MCP or explicit requests.
  */
 
@@ -9,30 +10,61 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { logger } from "./logger.js";
 
-// ── Essential Files (loaded at session start) ─────────────────────────────
+// ── Loading Profiles ───────────────────────────────────────────────────────
 
-const ESSENTIAL_FILES = [
-  "docs/AGENTS.md",
-  "governance/context/context_buffer.yaml",
-] as const;
+export type LoadingProfile = "minimal" | "lite" | "full";
+
+interface ProfileConfig {
+  essential: string[];
+  optional: string[];
+  maxTokens: number;
+}
+
+const PROFILES: Record<LoadingProfile, ProfileConfig> = {
+  minimal: {
+    essential: [
+      "docs/AGENTS.md",
+      "governance/context/context_buffer.yaml",
+    ],
+    optional: [],
+    maxTokens: 1500,
+  },
+  lite: {
+    essential: [
+      "docs/AGENTS.md",
+      "governance/context/context_buffer.yaml",
+    ],
+    optional: [
+      "opencode-context",
+      "mandatory-context",
+    ],
+    maxTokens: 3000,
+  },
+  full: {
+    essential: [
+      "docs/AGENTS.md",
+      "governance/context/context_buffer.yaml",
+    ],
+    optional: [
+      "opencode-context",
+      "mandatory-context",
+      "skill-manifest",
+      "rule-manifest",
+      "agent-contracts",
+    ],
+    maxTokens: 5000,
+  },
+};
 
 // ── Optional Files (loaded on-demand) ─────────────────────────────────────
 
-const OPTIONAL_FILES = {
+const OPTIONAL_FILES: Record<string, string> = {
   "opencode-context": "docs/opencode-context.md",
   "mandatory-context": "governance/MANDATORY_CONTEXT.md",
   "skill-manifest": "governance/skill-manifest.yaml",
   "rule-manifest": "governance/rule-manifest.yaml",
   "agent-contracts": "governance/agents/*.yaml",
-} as const;
-
-// ── Token Budget ──────────────────────────────────────────────────────────
-
-const TOKEN_BUDGET = {
-  essential: 2000,    // ~2000 tokens for essential files
-  optional: 1000,     // ~1000 tokens for optional files
-  total: 3000,        // Total budget per session
-} as const;
+};
 
 // ── Cache ─────────────────────────────────────────────────────────────────
 
@@ -70,8 +102,6 @@ function loadFileWithCache(shitennoDir: string, relativePath: string): string | 
   }
 }
 
-// ── Public API ────────────────────────────────────────────────────────────
-
 function loadGlobFiles(
   shitennoDir: string,
   relativePath: string,
@@ -95,21 +125,31 @@ function loadGlobFiles(
   }
 }
 
+// ── Public API ────────────────────────────────────────────────────────────
+
 export interface SessionContext {
+  profile: LoadingProfile;
   essential: Record<string, string>;
+  optional: Record<string, string>;
   tokensUsed: number;
   budgetRemaining: number;
 }
 
 /**
- * Load essential session context (minimal token usage).
+ * Load session context based on a loading profile.
  * This replaces the heavy instructions[] in opencode.json.
  */
-export function loadEssentialContext(shitennoDir: string): SessionContext {
+export function loadSessionContext(
+  shitennoDir: string,
+  profile: LoadingProfile = "lite",
+): SessionContext {
+  const config = PROFILES[profile];
   const essential: Record<string, string> = {};
+  const optional: Record<string, string> = {};
   let tokensUsed = 0;
   
-  for (const file of ESSENTIAL_FILES) {
+  // Load essential files
+  for (const file of config.essential) {
     const content = loadFileWithCache(shitennoDir, file);
     if (content) {
       essential[file] = content;
@@ -117,13 +157,46 @@ export function loadEssentialContext(shitennoDir: string): SessionContext {
     }
   }
   
-  logger.info("session-bootstrapper", `Loaded essential context: ${tokensUsed} tokens used`);
+  // Load optional files for the profile
+  for (const key of config.optional) {
+    const relativePath = OPTIONAL_FILES[key];
+    if (!relativePath) continue;
+    
+    if (relativePath.includes("*")) {
+      loadGlobFiles(shitennoDir, relativePath, key, optional);
+      const globTokens = Object.entries(optional)
+        .filter(([k]) => k.startsWith(key))
+        .reduce((sum, [, content]) => sum + estimateTokens(content), 0);
+      tokensUsed += globTokens;
+    } else {
+      const content = loadFileWithCache(shitennoDir, relativePath);
+      if (content) {
+        optional[key] = content;
+        tokensUsed += estimateTokens(content);
+      }
+    }
+  }
+  
+  logger.info(
+    "session-bootstrapper",
+    `Loaded profile "${profile}": ${tokensUsed} tokens used, ${config.maxTokens - tokensUsed} remaining`,
+  );
   
   return {
+    profile,
     essential,
+    optional,
     tokensUsed,
-    budgetRemaining: TOKEN_BUDGET.essential - tokensUsed,
+    budgetRemaining: config.maxTokens - tokensUsed,
   };
+}
+
+/**
+ * Load essential session context (minimal token usage).
+ * @deprecated Use loadSessionContext() instead.
+ */
+export function loadEssentialContext(shitennoDir: string): SessionContext {
+  return loadSessionContext(shitennoDir, "minimal");
 }
 
 /**

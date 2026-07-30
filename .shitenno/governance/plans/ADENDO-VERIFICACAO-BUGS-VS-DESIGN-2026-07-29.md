@@ -1,6 +1,6 @@
 # Adendo de Verificação — Bugs vs. Design (2026-07-29)
 
-**Status:** In Progress
+**Status:** Refused
 
 > Antes de mandar qualquer coisa pro agente, verifiquei cada achado dos blocos S–V contra o resto do sistema, procurando por um mecanismo que eu pudesse ter deixado passar (rule engine, hooks reativos, scripts de template, ADRs antigas). Resultado: **quase tudo é bug real**, mas um achado (S1) tinha uma causa raiz diferente da que eu descrevi, e o relatório do agente (Bloco W) usou um método que perdeu um terceiro mecanismo genérico de escuta — o que muda a contagem de "eventos órfãos".
 

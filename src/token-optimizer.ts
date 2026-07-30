@@ -14,7 +14,8 @@ export type { Briefing };
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-export type BriefingDepth = "minimal" | "standard" | "full";
+export type { BriefingDepth } from "./domain/types/briefing.js";
+import type { BriefingDepth } from "./domain/types/briefing.js";
 
 export interface OptimizationHints {
   /** Suggested briefing depth based on task analysis */

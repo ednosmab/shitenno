@@ -56,7 +56,7 @@ async function runBriefing(options: BriefingOptions, forcedDepth?: BriefingDepth
     const { briefing, cacheHit, inputHash, previousBriefing } = cacheBriefing(ctx.shitennoDir, initialBriefing, snapshot, options.invalidate === true);
     if (options.invalidate) spinner.text = "Cache invalidated, using fresh briefing...";
     spinner.stop();
-    if (options.diff) { handleDiffMode(briefing, previousBriefing, isJson, options.compact === true); return; }
+    if (options.diff) { handleDiffMode(briefing, previousBriefing, isJson); return; }
     if (options.summary) { handleSummaryMode(briefing, isJson, cacheHit); return; }
     const depth = determineBriefingDepth(briefing, forcedDepth, options.profile as string | undefined);
     displayFullBriefing({ briefing, isJson, cacheHit, inputHash, depth, projectRoot: ctx.projectRoot, write: options.write === true, noInteractive: options.noInteractive === true, shitennoDir: ctx.shitennoDir });

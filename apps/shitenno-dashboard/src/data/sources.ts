@@ -4,7 +4,7 @@ export const SOURCES = {
   fingerprint: `${SHITENNO_ROOT}/fingerprint.json`,
   maturityProfile: `${SHITENNO_ROOT}/maturity-profile.json`,
   contextBuffer: `${SHITENNO_ROOT}/governance/context/context_buffer.yaml`,
-  backlog: `${SHITENNO_ROOT}/docs/BACKLOG.md`,
+  backlog: `${SHITENNO_ROOT}/docs/backlog/ACTIVE.md`,
   feedbackSummary: `${SHITENNO_ROOT}/feedback/summary.json`,
   feedbackRecords: `${SHITENNO_ROOT}/feedback/records`,
   operationalState: `${SHITENNO_ROOT}/cognition/memory/MEM-operational-state-v1.json`,

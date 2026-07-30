@@ -225,7 +225,7 @@ As regras não são todas do mesmo nível. Existem três camadas de dependência
    d. **Correção Automática de Erros Críticos:** Se qualquer um dos comandos acima falhar, você DEVE executar as correções sugeridas pelo próprio terminal e repetir os testes até que todos passem, documentando cada tentativa no buffer, antes de prosseguir para a próxima tarefa.
 10. **CHECKLIST DE AMBIENTE PRÉ-DEPLOY:** Antes de commitar qualquer alteração em configs de deploy, secrets ou env vars, valide que nenhuma flag de teste foi propagada para ficheiros de configuração de produção. Ver regra ENV-01 em FORBIDDEN_OPERATIONS (se aplicável).
 
-11. **PRIORIDADE DE ENTRADA DE SESSÃO:** Ao iniciar qualquer nova sessão, a PRIMEIRA tarefa a ser atacada é o item P0 activo no `docs/BACKLOG.md`. Itens P1/P2 só podem ser iniciados após (a) concluir o P0, ou (b) registar adiamento datado (ver DT-01 em FORBIDDEN_OPERATIONS). A IA NÃO DEVE iniciar tarefa de prioridade inferior sem antes mostrar a justificação de adiamento.
+11. **PRIORIDADE DE ENTRADA DE SESSÃO:** Ao iniciar qualquer nova sessão, a PRIMEIRA tarefa a ser atacada é o item P0 activo no `docs/backlog/ACTIVE.md`. Itens P1/P2 só podem ser iniciados após (a) concluir o P0, ou (b) registar adiamento datado (ver DT-01 em FORBIDDEN_OPERATIONS). A IA NÃO DEVE iniciar tarefa de prioridade inferior sem antes mostrar a justificação de adiamento.
 
 12. **INVARIANTE DE FIM DE SESSÃO:** Nenhuma sessão pode ser declarada "concluída" sem antes executar o ritual de fim de sessão: `pnpm run close:session` (verifica working tree, buffer, testes, UI governance e build), buffer podado (≤ 50 linhas activas), backlog actualizado, testes verdes (`tsc --noEmit`, `pnpm run test`, `pnpm run build`). Ver template detalhado em `docs/session-template.md` e política DT-02 em FORBIDDEN_OPERATIONS.
 13. **QUICK BOARD DE AVISO (LEMBRETES PERMANENTES):** Ao iniciar QUALQUER sessão, a IA DEVE apresentar ao usuário o **Quick Board** do `governance/context/context_buffer.yaml` antes da primeira resposta operacional. O Quick Board lista: tarefa em curso, parado, próximo, dívidas P1 com due date. Este lembrete NÃO substitui a leitura completa dos P0 — é apenas um aviso de contexto. A omissão do Quick Board na primeira resposta é violação desta regra.
@@ -346,7 +346,7 @@ Em reconhecimento ao desempenho excepcional, os 3 papéis foram consolidados em 
 - **Regra:** Sempre que identificar código frágil, ausência de tratamento de erro, falta de tipos ou violação de boas práticas, DEVE refatorar imediatamente.
 
 ### 📋 GESTÃO DE STATUS DO BACKLOG (OBRIGATÓRIO)
-- Ao iniciar a implementação de qualquer item no `docs/BACKLOG.md`, marque-o como `em andamento`.
+- Ao iniciar a implementação de qualquer item no `docs/backlog/ACTIVE.md`, marque-o como `em andamento`.
 - Ao concluir, substitua `[ ]` por `[x]`.
 - Se precisar pausar (bloqueio externo, dependência, decisão pendente), registre o motivo e marque como `pausado`.
 

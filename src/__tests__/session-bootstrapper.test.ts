@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { loadEssentialContext, loadOptionalContext, getTokenStats, clearCache } from "../session-bootstrapper.js";
+import { loadSessionContext, loadEssentialContext, loadOptionalContext, getTokenStats, clearCache } from "../session-bootstrapper.js";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -20,9 +20,82 @@ describe("session-bootstrapper", () => {
     rmSync(testDir, { recursive: true, force: true });
   });
 
+  describe("loadSessionContext", () => {
+    it("should load minimal profile with only essential files", () => {
+      const docsDir = join(shitennoDir, "docs");
+      mkdirSync(docsDir, { recursive: true });
+      writeFileSync(join(docsDir, "AGENTS.md"), "# Test AGENTS.md");
+      
+      const contextDir = join(shitennoDir, "governance", "context");
+      mkdirSync(contextDir, { recursive: true });
+      writeFileSync(join(contextDir, "context_buffer.yaml"), "test: value");
+      
+      const result = loadSessionContext(shitennoDir, "minimal");
+      
+      expect(result.profile).toBe("minimal");
+      expect(result.essential["docs/AGENTS.md"]).toBe("# Test AGENTS.md");
+      expect(result.essential["governance/context/context_buffer.yaml"]).toBe("test: value");
+      expect(result.optional).toEqual({});
+      expect(result.tokensUsed).toBeGreaterThan(0);
+      expect(result.budgetRemaining).toBeGreaterThan(0);
+    });
+
+    it("should load lite profile with essential + optional files", () => {
+      const docsDir = join(shitennoDir, "docs");
+      mkdirSync(docsDir, { recursive: true });
+      writeFileSync(join(docsDir, "AGENTS.md"), "# Test AGENTS.md");
+      writeFileSync(join(docsDir, "opencode-context.md"), "# OpenCode Context");
+      
+      const contextDir = join(shitennoDir, "governance", "context");
+      mkdirSync(contextDir, { recursive: true });
+      writeFileSync(join(contextDir, "context_buffer.yaml"), "test: value");
+      
+      const govDir = join(shitennoDir, "governance");
+      writeFileSync(join(govDir, "MANDATORY_CONTEXT.md"), "# Mandatory");
+      
+      const result = loadSessionContext(shitennoDir, "lite");
+      
+      expect(result.profile).toBe("lite");
+      expect(result.essential["docs/AGENTS.md"]).toBe("# Test AGENTS.md");
+      expect(result.optional["opencode-context"]).toBe("# OpenCode Context");
+      expect(result.optional["mandatory-context"]).toBe("# Mandatory");
+    });
+
+    it("should load full profile with all files", () => {
+      const docsDir = join(shitennoDir, "docs");
+      mkdirSync(docsDir, { recursive: true });
+      writeFileSync(join(docsDir, "AGENTS.md"), "# Test AGENTS.md");
+      writeFileSync(join(docsDir, "opencode-context.md"), "# OpenCode Context");
+      
+      const contextDir = join(shitennoDir, "governance", "context");
+      mkdirSync(contextDir, { recursive: true });
+      writeFileSync(join(contextDir, "context_buffer.yaml"), "test: value");
+      
+      const govDir = join(shitennoDir, "governance");
+      writeFileSync(join(govDir, "MANDATORY_CONTEXT.md"), "# Mandatory");
+      writeFileSync(join(govDir, "skill-manifest.yaml"), "skills: []");
+      writeFileSync(join(govDir, "rule-manifest.yaml"), "rules: []");
+      
+      const agentsDir = join(govDir, "agents");
+      mkdirSync(agentsDir, { recursive: true });
+      writeFileSync(join(agentsDir, "test.yaml"), "agent: test");
+      
+      const result = loadSessionContext(shitennoDir, "full");
+      
+      expect(result.profile).toBe("full");
+      expect(result.optional["skill-manifest"]).toBe("skills: []");
+      expect(result.optional["rule-manifest"]).toBe("rules: []");
+      expect(result.optional["agent-contracts:test.yaml"]).toBe("agent: test");
+    });
+
+    it("should default to lite profile", () => {
+      const result = loadSessionContext(shitennoDir);
+      expect(result.profile).toBe("lite");
+    });
+  });
+
   describe("loadEssentialContext", () => {
     it("should load essential files", () => {
-      // Create test files
       const docsDir = join(shitennoDir, "docs");
       mkdirSync(docsDir, { recursive: true });
       writeFileSync(join(docsDir, "AGENTS.md"), "# Test AGENTS.md");

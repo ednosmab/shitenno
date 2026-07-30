@@ -1,6 +1,7 @@
 import { existsSync, writeFileSync, readFileSync } from "node:fs";
 import { logger } from "../logger.js";
 import { getEventBus } from "../event-bus.js";
+import { isDaemonState } from "../schema-validators.js";
 
 // ── Daemon State ──────────────────────────────────────────────────────────────
 
@@ -140,7 +141,12 @@ export function loadState(statePath: string): DaemonState | null {
   try {
     if (!existsSync(statePath)) return null;
     const raw = readFileSync(statePath, "utf-8");
-    return JSON.parse(raw) as DaemonState;
+    const parsed = JSON.parse(raw);
+    if (!isDaemonState(parsed)) {
+      logger.warn("daemon", "Invalid daemon state shape, ignoring");
+      return null;
+    }
+    return parsed as unknown as DaemonState;
   } catch {
     return null;
   }

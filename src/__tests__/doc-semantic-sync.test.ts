@@ -82,8 +82,8 @@ describe("runSemanticDocSync", () => {
       "utf-8"
     );
     expect(content).toContain('Doc desatualizada: docs/README.md');
-    expect(content).toContain('priority: "high"');
-    expect(content).toContain('category: "docs"');
+    expect(content).toMatch(/priority:\s*"?high"?/);
+    expect(content).toMatch(/category:\s*"?docs"?/);
   });
 
   it("deduplicates on second run", () => {

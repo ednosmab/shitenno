@@ -6,7 +6,7 @@
 
 import { collectContext, type ContextSnapshot } from "../../context-collector.js";
 import { computeInputHash, setCachedBriefing, invalidateBriefingCache, readCache } from "../../briefing-cache.js";
-import { type Briefing, generateDiff } from "../../briefing.js";
+import { type Briefing } from "../../briefing.js";
 import { compressedSummary, differentialBriefing, suggestDepth, type BriefingDepth } from "../../token-optimizer.js";
 import { outputJson } from "../../formatting.js";
 import { output } from "../../output.js";
@@ -94,8 +94,7 @@ export function determineBriefingDepth(
 export function handleDiffMode(
   briefing: Briefing,
   previousBriefing: Briefing | null,
-  isJson: boolean,
-  compact: boolean
+  isJson: boolean
 ): boolean {
   if (!previousBriefing || previousBriefing.generatedAt === briefing.generatedAt) {
     const msg = "No previous briefing to diff against.";
@@ -107,31 +106,16 @@ export function handleDiffMode(
     return true;
   }
 
-  if (compact) {
-    const compactDiff = differentialBriefing(previousBriefing, briefing);
-    if (isJson) {
-      outputJson({
-        type: "diff",
-        format: "compact",
-        oldTimestamp: previousBriefing.generatedAt,
-        newTimestamp: briefing.generatedAt,
-        diff: compactDiff,
-      });
-    } else {
-      output(`  Compact diff: ${compactDiff}`);
-    }
+  const compactDiff = differentialBriefing(previousBriefing, briefing);
+  if (isJson) {
+    outputJson({
+      type: "diff",
+      oldTimestamp: previousBriefing.generatedAt,
+      newTimestamp: briefing.generatedAt,
+      diff: compactDiff,
+    });
   } else {
-    const diff = generateDiff(previousBriefing, briefing);
-    if (isJson) {
-      outputJson({
-        type: "diff",
-        oldTimestamp: previousBriefing.generatedAt,
-        newTimestamp: briefing.generatedAt,
-        diff,
-      });
-    } else {
-      output(diff);
-    }
+    output(compactDiff);
   }
   return true;
 }

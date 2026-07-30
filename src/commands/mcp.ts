@@ -17,9 +17,13 @@ import { SHITENNO_DIR_NAME } from "../constants.js";
 import { outputError } from "../output.js";
 
 async function startServerAction(projectRoot: string, shitennoDir: string): Promise<void> {
-  const toolNames = TOOLS.map((t) => t.name).join(", ");
   console.error(chalk.dim(`  shitenno-mcp: Starting MCP server over stdio...`));
-  console.error(chalk.dim(`  Tools: ${toolNames}`));
+  console.error(chalk.dim(`  Project: ${projectRoot}`));
+  console.error(chalk.dim(`  Tools (${TOOLS.length}):`));
+  for (const tool of TOOLS) {
+    const desc = tool.description.split(".")[0];
+    console.error(chalk.dim(`    - ${tool.name}: ${desc}`));
+  }
   try {
     await startMcpServer(projectRoot, shitennoDir);
   } catch (error) {

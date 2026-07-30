@@ -56,9 +56,11 @@ export const TOOLS = [
   {
     name: "getBriefing",
     description:
-      "Generate a pre-session briefing for the project. Includes project identity, " +
+      "Generate a full pre-session briefing for the project. Includes project identity, " +
       "risk status, test coverage, context rules, dynamic rules, and recommendations. " +
-      "Pass `task` (e.g. implementation, refactor) to auto-attach mandatory skills for that scope.",
+      "Use this when you need a comprehensive overview before starting work. " +
+      "Pass `task` (e.g. implementation, refactor) to auto-attach mandatory skills for that scope. " +
+      "For lightweight context loading (MANDATORY_CONTEXT.md + buffer + rules + skills), use getMandatoryContext instead.",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -195,7 +197,11 @@ export const TOOLS = [
   },
   {
     name: "getMandatoryContext",
-    description: "Return the full mandatory context for the current session: MANDATORY_CONTEXT.md, context_buffer.yaml, mandatory rules, and unconditional mandatory skills.",
+    description:
+      "Load essential context files for the current session: MANDATORY_CONTEXT.md, context_buffer.yaml, " +
+      "mandatory rules (from rule-manifest.yaml), and mandatory skills (from skill-manifest.yaml). " +
+      "This is a lightweight operation — use this instead of getBriefing when you only need the core " +
+      "context files without analysis, risk maps, or recommendations.",
     inputSchema: {
       type: "object" as const,
       properties: {

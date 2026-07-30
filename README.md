@@ -96,7 +96,7 @@ That's it. Your project now has governed context for you and your AI agents.
 
 ---
 
-## All Commands (39)
+## All Commands (41)
 
 ### Core Commands
 
@@ -233,9 +233,9 @@ shitenno-cli/
 
 | Metric | Count |
 |--------|-------|
-| CLI Commands | 39 |
+| CLI Commands | 41 |
 | Source Files | 269 |
-| Test Files | 163 |
+| Test Files | 165 |
 | Audit Detectors | 100+ |
 | Engine Modules | 12 |
 
@@ -350,6 +350,13 @@ npm run bench         # Run benchmarks
 - **Test job** — Build + test across Node 18/20/22
 - **Coverage job** — Code coverage report
 - **Release job** — Version verification + npm publish + GitHub release
+
+---
+
+## Documentation
+
+- [Known Limitations](docs/KNOWN_LIMITATIONS.md) — Known issues and workarounds
+- [ROI Analysis](docs/ROI.md) — Return on investment analysis and metrics
 
 ---
 

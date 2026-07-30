@@ -57,7 +57,7 @@ export function detectVisionAlignment(projectRoot: string): HealthIssue[] {
         type: "vision_roadmap_gap",
         severity: 1,
         description: "BACKLOG.md não tem itens P0/P1 — roadmap pode estar desalinhado com visão",
-        location: "shitenno/docs/BACKLOG.md",
+        location: "shitenno/docs/backlog/ACTIVE.md",
         recommendation: "Adicionar itens P0/P1 ao BACKLOG alinhados com a visão do produto.",
         confidence: 0.7,
       });
@@ -216,7 +216,7 @@ export function detectOrphanRequirements(projectRoot: string, files: SourceFileI
       type: "orphan_requirement",
       severity: 1,
       description: `${orphanCount} feature(s) documentada(s) sem correspondência óbvia no código exportado`,
-      location: "docs/BACKLOG.md, docs/BRIEFING.md",
+      location: "docs/backlog/ACTIVE.md, docs/BRIEFING.md",
       recommendation: "Verificar se requisitos documentados foram implementados ou estão pendentes.",
       confidence: 0.8,
     });
@@ -241,7 +241,7 @@ export function detectRequirementTraceability(projectRoot: string, _files: Sourc
       type: "broken_traceability",
       severity: 1,
       description: "BACKLOG.md não contém links de rastreabilidade para código ou tickets",
-      location: "shitenno/docs/BACKLOG.md",
+      location: "shitenno/docs/backlog/ACTIVE.md",
       recommendation: "Adicionar links para commits, PRs ou tickets em cada item do backlog.",
       confidence: 0.75,
     });
@@ -286,7 +286,7 @@ export function detectAmbiguityPatterns(projectRoot: string): HealthIssue[] {
       type: "ambiguous_requirement",
       severity: 1,
       description: `${ambiguityCount} expressão(ões) ambígua(s) encontrada(s) na documentação`,
-      location: "docs/BACKLOG.md, BRIEFING.md, README.md",
+      location: "docs/backlog/ACTIVE.md, BRIEFING.md, README.md",
       recommendation: "Substituir linguagem ambígua por especificações concretas e mensuráveis.",
       confidence: 0.75,
     });

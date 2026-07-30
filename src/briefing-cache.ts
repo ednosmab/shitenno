@@ -17,6 +17,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync, renameS
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import type { Briefing } from "./briefing.js";
+import { isBriefingCache } from "./schema-validators.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -113,9 +114,9 @@ export function readCache(shitennoDir: string): BriefingCache | null {
 
   try {
     const content = readFileSync(cachePath, "utf-8");
-    const parsed = JSON.parse(content) as BriefingCache;
-    if (parsed.version !== 1) return null;
-    return parsed;
+    const parsed = JSON.parse(content);
+    if (!isBriefingCache(parsed)) return null;
+    return parsed as unknown as BriefingCache;
   } catch {
     return null;
   }

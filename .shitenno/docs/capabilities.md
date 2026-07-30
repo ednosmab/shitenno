@@ -50,7 +50,7 @@
 - `docs/KNOWLEDGE_LIFECYCLE.md`
 - `docs/FORBIDDEN_OPERATIONS.md`
 - `docs/DESDO.md`
-- `docs/BACKLOG.md`
+- `docs/backlog/ACTIVE.md`
 - `core/complexity/types.ts`
 - `governance/SYSTEM_MAP.md`
 

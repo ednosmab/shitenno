@@ -1,10 +1,10 @@
 /**
- * buffer-io.ts — Low-level buffer I/O and section-aware field replacement.
+ * buffer-io.ts — Low-level buffer I/O with YAML.parse/stringify.
  */
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { escapeRegex } from "../validation.js";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
 export function getBufferPath(shitennoDir: string): string {
   return join(shitennoDir, "governance", "context", "context_buffer.yaml");
@@ -14,6 +14,37 @@ export function readBuffer(shitennoDir: string): string | null {
   const path = getBufferPath(shitennoDir);
   if (!existsSync(path)) return null;
   return readFileSync(path, "utf-8");
+}
+
+/**
+ * Read buffer and parse into a JavaScript object.
+ * Returns null if file doesn't exist or is invalid YAML.
+ */
+export function readBufferObject(shitennoDir: string): Record<string, unknown> | null {
+  const content = readBuffer(shitennoDir);
+  if (content === null) return null;
+  try {
+    const parsed = parseYaml(content);
+    return typeof parsed === "object" && parsed !== null ? (parsed as Record<string, unknown>) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Write a JavaScript object back to the buffer file.
+ * Automatically increments contextVersion.
+ */
+export function writeBufferObject(shitennoDir: string, obj: Record<string, unknown>): void {
+  const path = getBufferPath(shitennoDir);
+  const dir = join(shitennoDir, "governance", "context");
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+  }
+  const version = typeof obj.contextVersion === "number" ? obj.contextVersion + 1 : 1;
+  obj.contextVersion = version;
+  const content = stringifyYaml(obj, null, { lineWidth: 0 });
+  writeFileSync(path, content, "utf-8");
 }
 
 export function writeBuffer(shitennoDir: string, content: string): void {
@@ -36,9 +67,7 @@ function ensureContextVersion(content: string): string {
 }
 
 /**
- * Replace a scalar YAML value within a section.
- * For field "current_task.status", matches `status: "..."` only after
- * the `current_task:` block anchor — never touches session.status.
+ * Replace a scalar YAML value within a section (legacy, kept for backward compat).
  */
 export function replaceSectionField(
   content: string,
@@ -66,4 +95,8 @@ export function replaceSectionField(
     return { updated: true, content: content.replace(pattern, `$1${newValue}$2`) };
   }
   return { updated: false, content };
+}
+
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

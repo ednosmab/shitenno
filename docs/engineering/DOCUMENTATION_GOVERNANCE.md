@@ -50,7 +50,7 @@ lifecycle: Active
 | Domain glossary | docs/domain/ubiquitous-language.md |
 | Engineering principles | docs/handbook/philosophy/principles.md |
 | Module validation | docs/architecture/validation-matrix.md |
-| Active work | shitenno/docs/BACKLOG.md |
+| Active work | shitenno/docs/backlog/ACTIVE.md |
 
 ## Quality Gates
 

@@ -1,12 +1,11 @@
 /**
- * context-buffer-writer.ts — Centralised, section-aware buffer updates.
+ * context-buffer-writer.ts — Centralised buffer updates using YAML.parse/stringify.
  *
  * All writes to context_buffer.yaml MUST go through this module.
- * Regex operations are section-scoped to prevent cross-section collisions
- * (e.g. updating session.status instead of current_task.status).
+ * Uses proper YAML parsing instead of regex to prevent corruption.
  */
 
-export { replaceSectionField } from "./context-buffer-writer/buffer-io.js";
+export { replaceSectionField, readBufferObject, writeBufferObject } from "./context-buffer-writer/buffer-io.js";
 
 export type { SessionUpdate, CurrentTaskUpdate } from "./context-buffer-writer/updates.js";
 export {
