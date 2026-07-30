@@ -8,7 +8,7 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { guardNotInitialized } from "../shared.js";
-import { sendDesktopNotification } from "../notify.js";
+import { getEventBus } from "../event-bus.js";
 import { outputJson } from "../formatting.js";
 import { printDaemonBanner } from "../daemon-context-banner.js";
 import { output, outputBlank } from "../output.js";
@@ -129,7 +129,11 @@ async function handleAddReminder(message: string, opts: Record<string, unknown>)
   saveReminders(ctx.projectRoot, reminders);
 
   if (opts.notify) {
-    sendDesktopNotification(ctx.shitennoDir, "Shugo Reminder Added", message, priority);
+    getEventBus().publish("user.notification", {
+      title: "🔔 Reminder Added",
+      message,
+      priority: priority as "high" | "medium" | "low",
+    });
   }
 
   if (isJson) {

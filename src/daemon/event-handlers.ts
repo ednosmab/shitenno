@@ -180,7 +180,7 @@ function subscribeSessionAndStateTracking(ctx: DaemonContext): void {
 
 // ── Tier 2 Events (medium priority) ─────────────────────────────────────────
 
-export function subscribeTier2Events(ctx: DaemonContext, runPeriodicAuditFn: () => Promise<void>): void {
+export function subscribeTier2Events(ctx: DaemonContext): void {
   const bus = getEventBus();
 
   bus.subscribe("challenge.generated", (payload) => {
@@ -215,13 +215,11 @@ export function subscribeTier2Events(ctx: DaemonContext, runPeriodicAuditFn: () 
       const backlog = moveCompletedBacklogToDone(ctx.shitennoDir, ctx.shitennoDir);
       if (backlog.moved > 0) {
         daemonLog(ctx.logPath, "INFO", `backlog.updated: moved ${backlog.moved} completed item(s)`);
-        // Notify user about completed backlog items
-        bus.publish("backlog.updated", { itemId: "batch", movedCount: backlog.moved });
       }
     } catch (err) {
       daemonLog(ctx.logPath, "ERROR", `backlog.updated handler failed: ${err}`);
     }
-    runPeriodicAuditFn();
+    // No audit here — task.completed already triggers runPeriodicAuditFn.
   });
 
   bus.subscribe("plan.inconsistency_detected", (payload) => {
@@ -263,7 +261,7 @@ export function subscribeAllEvents(
   runPeriodicAuditFn: () => Promise<void>,
 ): string[] {
   subscribeTier1Events(ctx, verifyAllPendingPlans, runPeriodicAuditFn);
-  subscribeTier2Events(ctx, runPeriodicAuditFn);
+  subscribeTier2Events(ctx);
   subscribeGenericLogEvents(ctx);
 
   // Track proactive engine and audit state

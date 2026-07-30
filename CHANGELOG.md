@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.3.0] — 2026-07-30
+
+### Fixed
+
+- **Notification: plan.archived payload mismatch** — `handlePlanArchived` checked `newStatus` but payload published `finalStatus`; now accepts both for backward compat
+- **Notification: backlog done silent** — `shugo backlog done` published no event; now publishes `task.completed` to trigger desktop notification and daemon audit
+- **Notification: health check missing** — No handler for `health.checked`; added `handleHealthChecked` that notifies on critical (<40) or recovered (>=80) scores
+- **Notification: direct calls bypassing cooldown** — `plan.ts` and `reminders.ts` called `sendDesktopNotification` directly; replaced with `user.notification` event to respect global cooldown
+- **Notification: duplicate audit runs** — `cmdDone` published both `task.completed` and `backlog.updated`, causing daemon audit to run twice; removed redundant `backlog.updated` publish
+- **Notification: recursive event loop** — `backlog.updated` handler republished `backlog.updated` inside itself; removed recursive publish
+- **Event bus: missing type** — Added `user.notification` to `ShitennoEventType` union and `EVENT_VERSIONS` registry
+
+### Added
+
+- **Notification: health monitoring** — Desktop notifications for health score changes (critical alert + recovery confirmation)
+- **Notification: backlog sync** — Desktop notifications when daemon moves completed backlog items to done
+- **Notification: user.notification event** — Dedicated event type for direct CLI notifications (bypasses `challenge.generated` rate-limiting)
+- **E2E notification tests** — 17 end-to-end tests covering all notification scenarios: backlog done, daemon sync, health check, plan archived, user notification, cooldown, and event isolation
+
+### Changed
+
+- **Notification routing** — `plan.ts` and `reminders.ts` now use event bus (`user.notification`) instead of direct `sendDesktopNotification` calls
+- **Daemon event handlers** — `subscribeTier2Events` no longer takes `runPeriodicAuditFn` parameter (audit only via `task.completed`)
+
 ## [1.2.0] — 2026-07-18
 
 ### Added

@@ -180,11 +180,11 @@ function handleHealthChecked(payload: Record<string, unknown>): void {
   }
 }
 
-function handleBacklogCompleted(payload: Record<string, unknown>): void {
+function handleBacklogUpdated(payload: Record<string, unknown>): void {
   const itemId = String(payload.itemId ?? payload.taskId ?? "desconhecido");
   const count = Number(payload.movedCount ?? payload.count ?? 1);
   throttledNotify(
-    `backlog-done:${Date.now()}`,
+    `backlog-updated:${Date.now()}`,
     "✅ Tarefa do Backlog Concluída",
     `${count} item(ns) movido(s) para done — ${itemId}`,
     "medium",
@@ -244,7 +244,7 @@ export function initDesktopNotifier(shitennoDir: string): void {
 
   // Health & backlog
   bus.subscribe("health.checked", handleHealthChecked);
-  bus.subscribe("backlog.updated", handleBacklogCompleted as (payload: Record<string, unknown>) => void);
+  bus.subscribe("backlog.updated", handleBacklogUpdated);
 
   // Direct user notifications (bypass challenge rate-limiting)
   bus.subscribe("user.notification", handleUserNotification);

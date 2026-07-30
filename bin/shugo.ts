@@ -414,6 +414,7 @@ program.addCommand((await import("../src/commands/context.js")).contextCommand);
 program.addCommand((await import("../src/commands/handbook.js")).handbookCommand);
 program.addCommand((await import("../src/commands/hooks.js")).hooksCommand);
 program.addCommand((await import("../src/commands/backlog.js")).backlogCommand);
+program.addCommand((await import("../src/commands/skill.js")).skillCommand());
 program.addCommand((await import("../src/commands/daemon.js")).daemonCommand());
 program.addCommand((await import("../src/commands/scheduled-check.js")).internalScheduledCheckCommand);
 program.addCommand((await import("../src/commands/large-commit-check.js")).largeCommitCheckCommand);
