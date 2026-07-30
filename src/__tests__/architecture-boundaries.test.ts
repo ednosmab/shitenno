@@ -21,6 +21,7 @@ const commandsWithFsAccess = new Set([
   "daemon.ts",  // daemon logs command reads log files
   "hooks.ts",  // Hooks installer legitimately needs fs for reading/writing hook files
   "audit.ts",  // --full-sweep writes last-verify.json
+  "skill.ts",  // Skill management needs fs for creating/reading/validating skill files
 ]);
 
 describe("boundary: commands do not read filesystem directly", () => {
