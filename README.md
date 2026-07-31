@@ -117,6 +117,7 @@ That's it. Your project now has governed context for you and your AI agents.
 | `shugo evolve` | Adaptive recommendations | Get next-step suggestions |
 | `shugo assess` | Re-evaluate maturity profile | After major changes |
 | `shugo doctor` | System diagnostics | When something feels off |
+| `shugo pipeline` | Run phase-based validation pipeline | Validate specific phases or full pipeline |
 | `shugo scheduled-check` | Check uncommitted drift | Detect stale uncommitted changes |
 | `shugo large-commit-check` | Check recent commit size | Trigger audit for large commits (internal) |
 
@@ -155,6 +156,7 @@ That's it. Your project now has governed context for you and your AI agents.
 | `shugo profile` | View maturity profile | Detailed maturity analysis |
 | `shugo reminders` | Track pending tasks and follow-ups | Never forget action items |
 | `shugo mcp` | MCP server for AI integration | Connect AI agents |
+| `shugo skill` | Manage AI agent skills | Configure agent capabilities |
 | `shugo update` | Update Shugo system | Keep governance current |
 | `shugo shell-init` | Shell integration setup | Configure shell completions |
 | `shugo docs-audit` | Audit documentation sync | Validate docs match code |
@@ -235,7 +237,7 @@ shitenno-cli/
 |--------|-------|
 | CLI Commands | 41 |
 | Source Files | 269 |
-| Test Files | 165 |
+| Test Files | 166 |
 | Audit Detectors | 100+ |
 | Engine Modules | 12 |
 

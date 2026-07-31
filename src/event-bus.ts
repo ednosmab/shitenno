@@ -66,7 +66,6 @@ export type ShitennoEventType =
   | "state.mutated"
   | "workdir.large_uncommitted_drift"
   | "context.p4_loaded"
-  | "context.tier_mismatch"
   | "watcher.error"
   | "daemon.ready"
   | "briefing.generated"

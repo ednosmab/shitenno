@@ -238,9 +238,16 @@ export class MarkdownPlanEngine {
 
     const lines = content.split("\n");
     const titleIndex = lines.findIndex((l) => l.startsWith("# "));
-    if (titleIndex === -1) return content;
 
-    lines.splice(titleIndex + 1, 0, "", `**Status:** ${status}`);
+    let insertAt: number;
+    if (titleIndex !== -1) {
+      insertAt = titleIndex + 1;
+    } else {
+      const firstNonEmpty = lines.findIndex((l) => l.trim().length > 0);
+      insertAt = firstNonEmpty === -1 ? 0 : firstNonEmpty + 1;
+    }
+
+    lines.splice(insertAt, 0, "", `**Status:** ${status}`);
     const updated = lines.join("\n");
 
     writeFileSync(filePath, updated, "utf-8");

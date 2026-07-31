@@ -30,7 +30,6 @@ import {
 
 import {
   detectMisclassifiedTier,
-  detectTierMismatches,
 } from "../context-tier-detectors.js";
 
 import {
@@ -66,7 +65,6 @@ export function buildGitEnforcementDetectors(ctx: DetectorContext): Record<strin
     detectMissingAdrForChanges: () => detectMissingAdrForChanges(ctx.shitennoDir),
     detectDonePlanIntegrity: () => detectDonePlanIntegrity(ctx.shitennoDir),
     detectMisclassifiedTier: () => detectMisclassifiedTier(ctx.shitennoDir),
-    detectTierMismatches: () => detectTierMismatches(ctx.shitennoDir),
     detectJSDocCoverage: () => detectJSDocCoverage(ctx.projectRoot, ctx.sourceFiles),
     detectUnsafeTypeAssertions: () => detectUnsafeTypeAssertions(ctx.projectRoot, ctx.sourceFiles),
     detectUnreachableCode: () => detectUnreachableCode(ctx.projectRoot, ctx.sourceFiles),

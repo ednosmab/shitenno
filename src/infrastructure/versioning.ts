@@ -79,7 +79,6 @@ export const EVENT_VERSIONS: Record<ShitennoEventType, EventVersion> = {
   "state.mutated": 1,
   "workdir.large_uncommitted_drift": 1,
   "context.p4_loaded": 1,
-  "context.tier_mismatch": 1,
   "watcher.error": 1,
   "daemon.ready": 1,
   "briefing.generated": 1,

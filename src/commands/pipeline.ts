@@ -46,6 +46,69 @@ function displayPhaseReport(report: ValidationReport, isJson: boolean): void {
   }
 }
 
+// ── Action ──────────────────────────────────────────────────────────────────
+
+function publishComplete(bus: ReturnType<typeof getEventBus>, report: ValidationReport): void {
+  bus.publish("pipeline.complete", {
+    stage: report.phase,
+    duration: new Date(report.completedAt).getTime() - new Date(report.startedAt).getTime(),
+    status: report.passed ? "success" : "failed",
+    timestamp: new Date().toISOString(),
+  });
+}
+
+function runSinglePhase(phase: ValidationPhase, isJson: boolean, bus: ReturnType<typeof getEventBus>): void {
+  const report = runValidationPhase(phase);
+  displayPhaseReport(report, isJson);
+  publishComplete(bus, report);
+}
+
+async function runPipeline(options: { json?: boolean; full?: boolean; phase?: string; dir?: string }): Promise<void> {
+  const isJson = options.json === true;
+  if (isJson) muteLogs();
+
+  if (!isJson) {
+    outputBlank();
+    banner("shugo pipeline", "Validation Pipeline");
+    outputBlank();
+  }
+
+  const ctx = guardNotInitialized(options, isJson);
+  if (!ctx) return;
+
+  void printDaemonBanner(ctx.shitennoDir, isJson);
+
+  if (!checkLifecycleGate("pipeline", ctx.projectRoot, ctx.shitennoDir, isJson)) return;
+
+  const bus = getEventBus();
+
+  if (options.full) {
+    const reports = runFullValidation();
+    for (const report of reports) {
+      displayPhaseReport(report, isJson);
+      publishComplete(bus, report);
+    }
+    const allPassed = reports.every((r) => r.passed);
+    if (!isJson) {
+      console.log(`\n${allPassed ? "✅ All phases passed" : "❌ Some phases failed"}`);
+    }
+    return;
+  }
+
+  if (options.phase) {
+    const phase = options.phase as ValidationPhase;
+    const config = getPhaseConfig(phase);
+    if (!config) {
+      console.error(`Invalid phase: ${phase}. Valid phases: phase1, phase2, phase3`);
+      return;
+    }
+    runSinglePhase(phase, isJson, bus);
+    return;
+  }
+
+  runSinglePhase("phase1", isJson, bus);
+}
+
 // ── Command ────────────────────────────────────────────────────────────────
 
 export const pipelineCommand = new Command("pipeline")
@@ -54,73 +117,4 @@ export const pipelineCommand = new Command("pipeline")
   .option("-p, --phase <phase>", "Run specific phase (phase1, phase2, phase3)")
   .option("--full", "Run all phases")
   .option("--json", "Output results as JSON")
-  .action(async (options) => {
-    const isJson = options.json === true;
-    if (isJson) muteLogs();
-
-    if (!isJson) {
-      outputBlank();
-      banner("shugo pipeline", "Validation Pipeline");
-      outputBlank();
-    }
-
-    const ctx = guardNotInitialized(options, isJson);
-    if (!ctx) return;
-
-    void printDaemonBanner(ctx.shitennoDir, isJson);
-
-    if (!checkLifecycleGate("pipeline", ctx.projectRoot, ctx.shitennoDir, isJson)) return;
-
-    const bus = getEventBus();
-
-    if (options.full) {
-      // Run all phases
-      const reports = runFullValidation();
-      
-      for (const report of reports) {
-        displayPhaseReport(report, isJson);
-        
-        bus.publish("pipeline.complete", {
-          stage: report.phase,
-          duration: new Date(report.completedAt).getTime() - new Date(report.startedAt).getTime(),
-          status: report.passed ? "success" : "failed",
-          timestamp: new Date().toISOString(),
-        });
-      }
-
-      const allPassed = reports.every((r) => r.passed);
-      if (!isJson) {
-        console.log(`\n${allPassed ? "✅ All phases passed" : "❌ Some phases failed"}`);
-      }
-    } else if (options.phase) {
-      // Run specific phase
-      const phase = options.phase as ValidationPhase;
-      const config = getPhaseConfig(phase);
-      
-      if (!config) {
-        console.error(`Invalid phase: ${phase}. Valid phases: phase1, phase2, phase3`);
-        return;
-      }
-
-      const report = runValidationPhase(phase);
-      displayPhaseReport(report, isJson);
-
-      bus.publish("pipeline.complete", {
-        stage: report.phase,
-        duration: new Date(report.completedAt).getTime() - new Date(report.startedAt).getTime(),
-        status: report.passed ? "success" : "failed",
-        timestamp: new Date().toISOString(),
-      });
-    } else {
-      // Default: run phase1
-      const report = runValidationPhase("phase1");
-      displayPhaseReport(report, isJson);
-
-      bus.publish("pipeline.complete", {
-        stage: report.phase,
-        duration: new Date(report.completedAt).getTime() - new Date(report.startedAt).getTime(),
-        status: report.passed ? "success" : "failed",
-        timestamp: new Date().toISOString(),
-      });
-    }
-  });
+  .action(runPipeline);

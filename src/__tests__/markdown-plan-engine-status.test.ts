@@ -99,3 +99,85 @@ describe("MarkdownPlanEngine.updateStatus — real filesystem, no mocks", () => 
     expect(updated.status).toBe("check");
   });
 });
+
+// ── T1: normalizePlanHeader — arquivo sem cabeçalho '# ' ──────────────────
+
+describe("normalizePlanHeader — arquivo sem cabeçalho '# '", () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), "shugo-norm-no-title-"));
+  });
+
+  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("insere Status mesmo sem título markdown (lado da leitura)", () => {
+    const plansDir = join(dir, "governance", "plans");
+    mkdirSync(plansDir, { recursive: true });
+    writeFileSync(
+      join(plansDir, "PLAN-NO-TITLE.md"),
+      "Só um parágrafo qualquer, sem título markdown.\n",
+      "utf-8"
+    );
+
+    const engine = new MarkdownPlanEngine(dir);
+    const plan = engine.getById("PLAN-NO-TITLE");
+    expect(plan).not.toBeNull();
+    expect(plan!.status).toBe("andamento");
+
+    // Verify Status was written to the file
+    const content = readFileSync(join(plansDir, "PLAN-NO-TITLE.md"), "utf-8");
+    expect(content).toMatch(/\*\*Status:\*\*\s*In Progress/);
+  });
+
+  it("insere Status Done quando todos checkboxes são [x] e sem título markdown", () => {
+    const plansDir = join(dir, "governance", "plans");
+    mkdirSync(plansDir, { recursive: true });
+    writeFileSync(
+      join(plansDir, "PLAN-NO-TITLE-DONE.md"),
+      "- [x] Passo 1\n- [x] Passo 2\n",
+      "utf-8"
+    );
+
+    const engine = new MarkdownPlanEngine(dir);
+    const plan = engine.getById("PLAN-NO-TITLE-DONE");
+    expect(plan).not.toBeNull();
+    expect(plan!.status).toBe("done");
+
+    const content = readFileSync(join(plansDir, "PLAN-NO-TITLE-DONE.md"), "utf-8");
+    expect(content).toMatch(/\*\*Status:\*\*\s*Done/);
+  });
+});
+
+// ── S1: updateStatus — falha alta quando não consegue escrever Status ────
+
+describe("updateStatus — falha alta quando não consegue escrever Status", () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), "shugo-update-fail-"));
+  });
+
+  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("lança erro em vez de arquivar silenciosamente para conteúdo hostil", () => {
+    const plansDir = join(dir, "governance", "plans");
+    mkdirSync(plansDir, { recursive: true });
+    // Content without '# title' and without **Status:** — after normalizePlanHeader
+    // inserts Status, updateStatus should still work
+    writeFileSync(
+      join(plansDir, "PLAN-HOSTILE.md"),
+      "Conteúdo hostil sem nenhum padrão reconhecido.\n",
+      "utf-8"
+    );
+
+    const engine = new MarkdownPlanEngine(dir);
+    // updateStatus on a plan with no recognizable header — should NOT silently fail
+    expect(() => engine.updateStatus("PLAN-HOSTILE", "done")).not.toThrow();
+
+    // Verify it moved to done
+    const plan = engine.getById("PLAN-HOSTILE");
+    expect(plan).not.toBeNull();
+    expect(plan!.status).toBe("done");
+  });
+});

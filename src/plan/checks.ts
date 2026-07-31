@@ -5,11 +5,12 @@
  */
 
 import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
 import type { CompletionCheck } from "../plan-lifecycle.js";
 import { logger } from "../logger.js";
 import { validatePlanFormat } from "../plan-format-validator.js";
+import { ensureLegacyFields } from "../commands/plan.js";
 
 export interface PackageJson {
   scripts?: Record<string, string>;
@@ -124,11 +125,48 @@ function describeExecError(err: unknown, label: string): string {
 
 // ── Plan format check ───────────────────────────────────────────────────────
 
+function extractDateFromFilename(filePath: string): string {
+  const name = basename(filePath);
+  const match = name.match(/(\d{4}-\d{2}-\d{2})/);
+  return match?.[1] ?? new Date().toISOString().slice(0, 10);
+}
+
+function tryAutoFixPlanFormat(filePath: string): boolean {
+  try {
+    const content = readFileSync(filePath, "utf-8");
+    if (content.match(/\*\*Date:\*\*/) && content.match(/\*\*Status:\*\*/)) return false;
+    const date = extractDateFromFilename(filePath);
+    const patched = ensureLegacyFields(content);
+    if (!patched.updated) return false;
+    const finalContent = patched.content.replace(
+      /\*\*Date:\*\*\s*\d{4}-\d{2}-\d{2}/,
+      `**Date:** ${date}`
+    );
+    writeFileSync(filePath, finalContent, "utf-8");
+    logger.info("plan-checks", `Auto-fixed missing header fields in ${basename(filePath)}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function checkPlanFormat(filePath: string): CompletionCheck {
   try {
     const content = readFileSync(filePath, "utf-8");
     const result = validatePlanFormat(filePath, content);
     if (result.errors.length > 0) {
+      const fixed = tryAutoFixPlanFormat(filePath);
+      if (fixed) {
+        const retryContent = readFileSync(filePath, "utf-8");
+        const retryResult = validatePlanFormat(filePath, retryContent);
+        if (retryResult.errors.length === 0) {
+          return {
+            name: "FORMAT",
+            passed: true,
+            message: `Auto-fixed: ${result.errors.map((e) => e.message).join("; ")}`,
+          };
+        }
+      }
       return {
         name: "FORMAT",
         passed: false,

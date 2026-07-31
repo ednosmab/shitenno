@@ -138,6 +138,8 @@
 │   docs/history/2026-07-29-rule-session_end_plans.md
 │   docs/history/2026-07-30-rule-session_close.md
 │   docs/history/2026-07-30-rule-session_end_plans.md
+│   docs/history/2026-07-31-rule-session_close.md
+│   docs/history/2026-07-31-rule-session_end_plans.md
 │   docs/INDEX.md
 │   docs/KNOWLEDGE_LIFECYCLE.md
 │   docs/opencode-context.md
@@ -394,6 +396,7 @@
 │   governance/executions/EXE-0A2812DD.json
 │   governance/executions/EXE-0A36A4F8.json
 │   governance/executions/EXE-0A666525.json
+│   governance/executions/EXE-0A9808C4.json
 │   governance/executions/EXE-0AA013D0.json
 │   governance/executions/EXE-0AA21AB3.json
 │   governance/executions/EXE-0AA75C29.json
@@ -1235,6 +1238,7 @@
 │   governance/executions/EXE-5BB1A887.json
 │   governance/executions/EXE-5BC284BC.json
 │   governance/executions/EXE-5BD3A786.json
+│   governance/executions/EXE-5BEA108F.json
 │   governance/executions/EXE-5BF317B5.json
 │   governance/executions/EXE-5BF9A4F2.json
 │   governance/executions/EXE-5C1AD6D5.json
@@ -2245,6 +2249,7 @@
 │   governance/executions/EXE-BDEE3E49.json
 │   governance/executions/EXE-BDFD1B65.json
 │   governance/executions/EXE-BE1F181F.json
+│   governance/executions/EXE-BE42519F.json
 │   governance/executions/EXE-BE7F010E.json
 │   governance/executions/EXE-BEA08E82.json
 │   governance/executions/EXE-BEA39E8A.json
@@ -2273,6 +2278,7 @@
 │   governance/executions/EXE-C1AF8B15.json
 │   governance/executions/EXE-C1E32172.json
 │   governance/executions/EXE-C1F8BA58.json
+│   governance/executions/EXE-C204D929.json
 │   governance/executions/EXE-C2292800.json
 │   governance/executions/EXE-C2405228.json
 │   governance/executions/EXE-C2A31469.json
@@ -2387,6 +2393,7 @@
 │   governance/executions/EXE-CB291C51.json
 │   governance/executions/EXE-CB2DD03E.json
 │   governance/executions/EXE-CB4450D4.json
+│   governance/executions/EXE-CB4ED323.json
 │   governance/executions/EXE-CB7AB5DE.json
 │   governance/executions/EXE-CB807FEB.json
 │   governance/executions/EXE-CB8E0D18.json
@@ -2421,6 +2428,7 @@
 │   governance/executions/EXE-CEE9ECE1.json
 │   governance/executions/EXE-CEEAF8E4.json
 │   governance/executions/EXE-CEF062A9.json
+│   governance/executions/EXE-CEFE816E.json
 │   governance/executions/EXE-CF21E4DE.json
 │   governance/executions/EXE-CF5CD519.json
 │   governance/executions/EXE-CF8070A8.json
@@ -3147,7 +3155,10 @@
 │   governance/plans/pipeline/living-fase2-hooks.md
 │   governance/plans/pipeline/living-fase3-daemon.md
 │   governance/plans/PLANO-CONSOLIDADO-AUDIT-FINAL-2026-07-29.md
+│   governance/plans/PLANO-CORRECAO-ACHADOS-ABERTOS-2026-07-30.md
+│   governance/plans/PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4.md
 │   governance/plans/PLANO-FINAL-CONSOLIDADO-2026-07-29.md
+│   governance/plans/PLANO-MCP-DAEMON-2026-07-30.md
 │   governance/plans/README.md
 │   governance/plans/reference/
 │   governance/plans/reference/ENTERPRISE_AUDIT_PLAN.md
@@ -3281,6 +3292,7 @@
 │   reports/doc-sync-2026-07-28.json
 │   reports/doc-sync-2026-07-29.json
 │   reports/doc-sync-2026-07-30.json
+│   reports/doc-sync-2026-07-31.json
 │   reports/evolution-2026-07-18.json
 │   reports/evolution-2026-07-25.json
 │   reports/health-2026-07-16.json
@@ -3364,6 +3376,7 @@
 │   telemetry/events-2026-07-28.jsonl
 │   telemetry/events-2026-07-29.jsonl
 │   telemetry/events-2026-07-30.jsonl
+│   telemetry/events-2026-07-31.jsonl
 │   telemetry/maturity-2026-06-30.json
 │   telemetry/maturity-2026-07-01.json
 │   telemetry/maturity-2026-07-06.json

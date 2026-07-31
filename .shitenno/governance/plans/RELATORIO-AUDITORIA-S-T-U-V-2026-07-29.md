@@ -1,6 +1,7 @@
 # Auditoria Shitenno — Blocos S/T/U/V (2026-07-29)
 
 **Status:** Refused
+**Date:** 2026-07-29
 
 > Continuação da auditoria de ponta a ponta (após R1–R6, Bloco P e Bloco Q).
 > Todos os achados abaixo foram confirmados **lendo o código-fonte real** do zip `shitenno-feat-refactor__8_.zip`, não por inferência. Onde relevante, o rastro de chamadas (quem chama quem) foi seguido até a origem.

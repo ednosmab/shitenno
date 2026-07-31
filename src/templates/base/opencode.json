@@ -41,9 +41,8 @@
   },
   "instructions": [
     "./.shitenno/docs/AGENTS.md",
-    "./.shitenno/docs/opencode-context.md",
-    "./.shitenno/governance/MANDATORY_CONTEXT.md",
-    "./.shitenno/governance/context/context_buffer.yaml"
+    "./.shitenno/governance/context/context_buffer.yaml",
+    "LAZY LOADING: Use shitenno_getSkills(name) or shitenno_getSkills(task) to load project skills on-demand. Optional files (opencode-context.md, MANDATORY_CONTEXT.md, skill-manifest.yaml, rule-manifest.yaml, agent contracts) are loaded via MCP when needed. NEVER use the built-in skill tool."
   ],
   "skills": {
     "paths": [

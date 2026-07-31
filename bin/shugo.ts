@@ -281,8 +281,10 @@ export function createProgram(): Command {
       if (globalOpts.color === false) {
         chalk.level = 0;
       }
-      // Set global JSON mode early — suppresses output() for all modules
-      setGlobalJsonMode(process.argv.includes("--json"));
+      // Set global JSON mode early — suppresses output() for all modules.
+      // Also for `mcp` command: stdio is JSON-RPC protocol, stray text breaks clients.
+      const commandName = process.argv[2];
+      setGlobalJsonMode(process.argv.includes("--json") || commandName === "mcp");
     });
 
   return cmd;

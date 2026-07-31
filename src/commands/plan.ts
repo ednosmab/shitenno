@@ -73,7 +73,7 @@ function formatYamlHeader(content: string): string {
  * Ensure the legacy header has Status, Date, and Updated_at fields.
  * Returns true if the content was modified.
  */
-function ensureLegacyFields(content: string): { content: string; updated: boolean } {
+export function ensureLegacyFields(content: string): { content: string; updated: boolean } {
   const lines = content.split("\n");
   let updated = false;
 

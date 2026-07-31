@@ -52,3 +52,10 @@
 {"tool":"getBacklog","timestamp":"2026-07-30T13:40:34.684Z"}
 {"tool":"getBacklog","timestamp":"2026-07-30T14:25:04.005Z"}
 {"tool":"getSkills","timestamp":"2026-07-30T14:45:54.479Z"}
+{"tool":"getMandatoryContext","timestamp":"2026-07-31T03:31:31.044Z"}
+{"tool":"getPlans","timestamp":"2026-07-31T03:33:55.639Z"}
+{"tool":"getPlans","timestamp":"2026-07-31T04:20:16.949Z"}
+{"tool":"getPlans","timestamp":"2026-07-31T04:20:20.468Z"}
+{"tool":"getADRs","timestamp":"2026-07-31T04:21:01.207Z"}
+{"tool":"getADRs","timestamp":"2026-07-31T04:21:07.618Z"}
+{"tool":"getADRs","timestamp":"2026-07-31T04:21:07.971Z"}

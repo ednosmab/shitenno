@@ -81,6 +81,12 @@ function getSourceFiles(dir: string, extensions = [".ts", ".tsx", ".js", ".jsx"]
   return files;
 }
 
+function isTestFile(filePath: string): boolean {
+  return /\.(test|spec)\.(ts|tsx|js|jsx)$/.test(filePath) ||
+    filePath.includes("__tests__/") ||
+    filePath.includes("__tests\\");
+}
+
 function hasTestFile(filePath: string): boolean {
   const base = filePath.replace(/\.(ts|tsx|js|jsx)$/, "");
   const testPatterns = [
@@ -140,7 +146,7 @@ function evaluateFileRisk(
   const factors: RiskFactor[] = [];
   let score = 0;
 
-  if (!hasTestFile(file)) {
+  if (!isTestFile(file) && !hasTestFile(file)) {
     factors.push({ type: "no-tests", description: `No test file for ${relPath}`, weight: 0.3 });
     score += 15;
   }

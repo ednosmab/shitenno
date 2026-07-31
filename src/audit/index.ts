@@ -66,5 +66,4 @@ export {
 
 export {
   detectMisclassifiedTier,
-  detectTierMismatches,
 } from "./context-tier-detectors.js";

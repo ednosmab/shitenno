@@ -1,6 +1,7 @@
 # Plano Final Consolidado (2026-07-29) — respostas às duas perguntas
 
 **Status:** Refused
+**Date:** 2026-07-29
 
 ## 1. "Vamos corrigir o mecanismo de notificação nesse último plano?"
 
