@@ -2,9 +2,9 @@
 name: design-patterns
 description: >
   Utilizar soluções comprovadas para problemas recorrentes, padronizando a comunicação entre componentes e serviços.
----
 category: product
 lifecycle: Active
+---
 
 # 🧩 SKILL: DESIGN PATTERNS APLICADOS
 

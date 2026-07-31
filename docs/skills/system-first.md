@@ -5,9 +5,9 @@ description: >
   (planos, buffer, feedback, sessão). Implementa GOV-01 e GOV-02 do
   FORBIDDEN_OPERATIONS.md. O agente DEVE usar comandos shugo em vez
   de edição manual de governance files.
----
 category: product
 lifecycle: Active
+---
 
 # 🖥️ SYSTEM FIRST — Protocolo de Operações via Shugo CLI
 

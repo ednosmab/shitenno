@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Agent Modes — Regras de Modo Plan/Build/Review
 
 > **Gatilho:** agent=plan, agent=build, agent=review

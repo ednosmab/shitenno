@@ -1,6 +1,7 @@
 # Plano — Correção MCP + Daemon (achados da validação ao vivo)
 
-**Status:** Refused
+**Status:** Done
+**Updated_at:** 2026-07-31T05:11:16.594Z
 **Date:** 2026-07-30
 
 **Base:** commit `92f000a32391d155034f7dac34b0efbd22bc73cf`. Os dois achados abaixo vieram de execução real — servidor MCP conversando por JSON-RPC de verdade sobre stdio, daemon consultado direto via socket Unix — não de leitura de código isolada.

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-001: Single Agent Architecture
 
 **Status:** Accepted

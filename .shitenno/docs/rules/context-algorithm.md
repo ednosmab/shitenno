@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Context Algorithm — Algoritmo de Gestão de Contexto
 
 > **Gatilho:** Tarefa de implementação, refactor, bug fix

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # 🛠️ AGENTS.md - REGRAS DO TIME DE ENGENHARIA DE IA
 
 ## 📐 ARQUITETURA E PADRÕES DO REPOSITÓRIO (OBRIGATÓRIO)

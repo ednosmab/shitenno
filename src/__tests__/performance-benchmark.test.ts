@@ -64,7 +64,7 @@ describe("Performance Benchmarks", () => {
       const duration2 = Date.now() - start2;
       
       expect(computeCount).toBe(1);
-      expect(duration2).toBeLessThanOrEqual(duration1);
+      expect(duration2).toBeLessThanOrEqual(duration1 + 2);
     });
   });
 

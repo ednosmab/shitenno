@@ -2,6 +2,8 @@
 name: domain-driven-design
 description: >
   Modelar o software com base no negocio real atraves de isolamento arquitetural, mantendo as regras de negocio puras (sem efeitos colaterais) e independentes de frameworks.
+category: engineering
+lifecycle: Active
 ---
 
 # 🏗️ SKILL: DOMAIN-DRIVEN DESIGN (DDD)

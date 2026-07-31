@@ -11,7 +11,7 @@ export interface HealthIssue {
   type:
     | "tainted_input" | "open_redirect" | "ssrf" | "log_injection"
     | "code_injection" | "command_injection" | "path_traversal"
-    | "sql_injection" | "xss_risk"
+    | "sql_injection" | "nosql_injection" | "xss_risk" | "ssti"
     | string; // Allow other issue types from health-auditor
   severity: 1 | 2 | 3;
   description: string;
@@ -27,10 +27,12 @@ export function taintIssueToHealthIssue(issue: TaintIssue): HealthIssue {
     ssrf: "ssrf",
     log_injection: "log_injection",
     code_injection: "unsafe_eval",
-    command_injection: "hardcoded_secret", // Reuse for now, will add proper types later
+    command_injection: "hardcoded_secret",
     path_traversal: "path_traversal",
     sql_injection: "sql_injection",
+    nosql_injection: "nosql_injection",
     xss_risk: "xss_risk",
+    ssti: "ssti",
   };
 
   return {

@@ -128,7 +128,7 @@ export function preReadHistory(
     try {
       scanHistoryFile(readFileSync(join(historyDir, file), "utf-8"), i, ctx);
     } catch {
-      // skip
+      logger.debug("git-churn", `Failed to read history file: ${file}`);
     }
   }
 

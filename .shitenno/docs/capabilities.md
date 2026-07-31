@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # CAPABILITIES — Mapeamento Capacidade → Regras → Arquivos
 
 > **Versão:** 1.0

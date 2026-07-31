@@ -5,6 +5,8 @@ description: >
   Use quando o agente for implementar interações que devem parecer instantâneas ao utilizador,
   como likes, toggle de estados, adição/remoção de itens, ou qualquer acção que aceite um
   curto atraso de rede em favor de uma experiência fluida.
+category: engineering
+lifecycle: Active
 ---
 
 # Optimistic UI

@@ -55,7 +55,17 @@ export function detectDependencyVulnerabilities(projectRoot: string): HealthIssu
     { file: "yarn.lock", cmd: "yarn audit --json" },
   ];
   const found = lockFiles.find((l) => existsSync(join(projectRoot, l.file)));
-  if (!found) return issues;
+  if (!found) {
+    issues.push({
+      type: "audit_check_skipped",
+      severity: 1,
+      description: "Dependency vulnerability check skipped — no lock file found (package-lock.json, pnpm-lock.yaml, or yarn.lock)",
+      location: "package.json",
+      recommendation: "Create a lock file by running npm/pnpm/yarn install",
+      confidence: 1.0,
+    });
+    return issues;
+  }
 
   try {
     const output = execSync(`${found.cmd} 2>/dev/null`, {
@@ -76,7 +86,17 @@ export function detectDependencyVulnerabilities(projectRoot: string): HealthIssu
 export function detectIncompatibleLicenses(projectRoot: string): HealthIssue[] {
   const issues: HealthIssue[] = [];
   const nodeModules = join(projectRoot, "node_modules");
-  if (!existsSync(nodeModules)) return issues;
+  if (!existsSync(nodeModules)) {
+    issues.push({
+      type: "audit_check_skipped",
+      severity: 1,
+      description: "License compatibility check skipped — node_modules directory not found",
+      location: "package.json",
+      recommendation: "Run npm/pnpm/yarn install to create node_modules",
+      confidence: 1.0,
+    });
+    return issues;
+  }
 
   try {
     const entries = readdirSync(nodeModules, { withFileTypes: true });

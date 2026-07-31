@@ -9,16 +9,20 @@ import { isDetectorDefinitionFile } from "./helpers.js";
 
 /**
  * Detect weak cryptographic algorithms (MD5, SHA1, createCipher).
+ * Matches both `.createHash("md5")` (property access) and `createHash("md5")` (destructured import).
+ * Excludes detector definition files to avoid self-reporting.
  */
 export function detectWeakCrypto(_projectRoot: string, files: SourceFileInfo[]): HealthIssue[] {
   const issues: HealthIssue[] = [];
   const weakPatterns = [
-    /\.createHash\s*\(\s*["'](?:md5|sha1)["']\)/i,
-    /\.createCipher(?!iv)\s*\(/i, /\.createDecipher(?!iv)\s*\(/i,
+    /(?:^|[.\s(])createHash\s*\(\s*["'](?:md5|sha1)["']\)/i,
+    /(?:^|[.\s(])createCipher(?!iv)\s*\(/i,
+    /(?:^|[.\s(])createDecipher(?!iv)\s*\(/i,
     /crypto\.createCipheriv\s*\([^)]*[^"']md5/i,
   ];
 
   for (const file of files) {
+    if (isDetectorDefinitionFile(file.relPath)) continue;
     const lines = file.content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # session_close
 
 Date: 2026-07-29T15:02:41.239Z

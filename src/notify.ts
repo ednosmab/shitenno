@@ -209,8 +209,12 @@ export function sendDesktopNotification(
     return false;
   }
 
+  // Skip real OS notifications during tests — log only
+  const isTest = process.env.NODE_ENV === "test" || Boolean(process.env.VITEST);
   const urgency = priority === "high" ? "critical" : priority === "low" ? "low" : "normal";
-  const { delivered, channel } = deliverByPlatform(detectPlatform(), title, message, urgency);
+  const { delivered, channel } = isTest
+    ? { delivered: false, channel: "log" as const }
+    : deliverByPlatform(detectPlatform(), title, message, urgency);
   logNotification({ shitennoDir, title, message, severity: priority, delivered, channel });
   return delivered;
 }

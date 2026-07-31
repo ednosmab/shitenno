@@ -108,6 +108,8 @@ export function detectUnsafeEval(_projectRoot: string, files: SourceFileInfo[]):
 
 /**
  * Detect unsafe deserialization patterns.
+ * Separates real RCE sinks (js-yaml.load, vm.runInNewContext) from
+ * unvalidated JSON.parse (missing schema validation, not RCE).
  */
 export function detectUnsafeDeserialization(_projectRoot: string, files: SourceFileInfo[]): HealthIssue[] {
   const issues: HealthIssue[] = [];
@@ -122,7 +124,7 @@ export function detectUnsafeDeserialization(_projectRoot: string, files: SourceF
   const unvalidatedJsonPatterns = [
     /JSON\.parse\s*\(.*req\./,
     /JSON\.parse\s*\(.*process\.argv/,
-    /JSON\.parse\s*\(.*readFile/,
+    /JSON\.parse\s*\(.*\.body\b/,
   ];
 
   for (const file of files) {
@@ -142,12 +144,12 @@ export function detectUnsafeDeserialization(_projectRoot: string, files: SourceF
         });
       } else if (unvalidatedJsonPatterns.some((p) => p.test(line))) {
         issues.push({
-          type: "unsafe_deserialize",
+          type: "missing_schema_validation",
           severity: 1,
-          description: `JSON.parse com input não validado em "${file.relPath}:${i + 1}" — sem schema validation`,
+          description: `JSON.parse de fonte externa sem schema validation em "${file.relPath}:${i + 1}"`,
           location: `${file.relPath}:${i + 1}`,
           recommendation: "Validar JSON com schema (zod/joi) antes de processar",
-          confidence: 0.65,
+          confidence: 0.6,
         });
       }
     }

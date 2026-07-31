@@ -15,19 +15,20 @@ import { startMcpServer, TOOLS } from "../mcp-server.js";
 import { consolidateEngineeringState } from "../engineering-state.js";
 import { SHITENNO_DIR_NAME } from "../constants.js";
 import { outputError } from "../output.js";
+import { logger } from "../logger.js";
 
 async function startServerAction(projectRoot: string, shitennoDir: string): Promise<void> {
-  console.error(chalk.dim(`  shitenno-mcp: Starting MCP server over stdio...`));
-  console.error(chalk.dim(`  Project: ${projectRoot}`));
-  console.error(chalk.dim(`  Tools (${TOOLS.length}):`));
+  logger.info("mcp", `Starting MCP server over stdio...`);
+  logger.info("mcp", `Project: ${projectRoot}`);
+  logger.info("mcp", `Tools (${TOOLS.length}):`);
   for (const tool of TOOLS) {
     const desc = tool.description.split(".")[0];
-    console.error(chalk.dim(`    - ${tool.name}: ${desc}`));
+    logger.info("mcp", `  - ${tool.name}: ${desc}`);
   }
   try {
     await startMcpServer(projectRoot, shitennoDir);
   } catch (error) {
-    console.error(chalk.red(`  MCP server error: ${error instanceof Error ? error.message : String(error)}`));
+    logger.error("mcp", `MCP server error: ${error instanceof Error ? error.message : String(error)}`);
     process.exitCode = 1;
   }
 }

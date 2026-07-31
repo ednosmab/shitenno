@@ -2,9 +2,9 @@
 name: clean-code-standards
 description: >
   Manter o código legível, testável e fácil de manter por qualquer membro do time.
----
 category: product
 lifecycle: Active
+---
 
 # 🧼 SKILL: PADRÕES DE CÓDIGO E CLEAN ARCHITECTURE (GLOBAL)
 

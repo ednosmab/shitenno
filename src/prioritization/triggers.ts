@@ -26,9 +26,15 @@ const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes between same challenge type
 const MAX_SAME_CHALLENGE_PER_HOUR = 3;
 let challengeCooldowns = new Map<string, ChallengeCooldown>();
 
-/** Reset cooldowns (for testing) */
+// ── Content-based Dedup ───────────────────────────────────────────────────
+
+/** Cache of last-generated description per challenge type. Skips publish if unchanged. */
+const lastChallengeDescriptions = new Map<string, string>();
+
+/** Reset cooldowns and dedup state (for testing) */
 export function resetChallengeCooldowns(): void {
   challengeCooldowns = new Map();
+  lastChallengeDescriptions.clear();
 }
 
 function canGenerateChallenge(type: string): boolean {
@@ -84,6 +90,25 @@ function safePublishChallenge(
 }
 
 /**
+ * Content-based dedup: only publishes if the description changed since last time.
+ * Prevents identical challenges from being generated on every state consolidation.
+ */
+function safePublishChallengeIfChanged(
+  bus: EventBus,
+  type: string,
+  severity: string,
+  description: string
+): void {
+  const lastDesc = lastChallengeDescriptions.get(type);
+  if (lastDesc === description) {
+    logger.debug("proactive-engine", `Challenge "${type}" unchanged — skipping`);
+    return;
+  }
+  lastChallengeDescriptions.set(type, description);
+  safePublishChallenge(bus, type, severity, description);
+}
+
+/**
  * Load historical engineering state snapshots for trend analysis.
  */
 function loadHistoricalStates(shitennoDir: string): EngineeringState[] {
@@ -111,17 +136,17 @@ function processForecastTrends(bus: EventBus, state: EngineeringState, forecast:
     const healthTrend = forecast.trends.find((t) => t.metric === "health");
 
     if (entropyTrend?.direction === "degrading") {
-      safePublishChallenge(bus, "entropy_reduction", entropyTrend.rate > 2 ? "high" : "medium",
-        `Entropy is degrading at rate ${entropyTrend.rate.toFixed(1)}/snapshot`);
+      const desc = `Entropy is degrading at rate ${entropyTrend.rate.toFixed(1)}/snapshot`;
+      safePublishChallengeIfChanged(bus, "entropy_reduction", entropyTrend.rate > 2 ? "high" : "medium", desc);
     }
 
     if (healthTrend?.direction === "degrading") {
-      safePublishChallenge(bus, "knowledge_gap", healthTrend.rate > 3 ? "high" : "medium",
-        `Health score is degrading at rate ${healthTrend.rate.toFixed(1)}/snapshot`);
+      const desc = `Health score is degrading at rate ${healthTrend.rate.toFixed(1)}/snapshot`;
+      safePublishChallengeIfChanged(bus, "knowledge_gap", healthTrend.rate > 3 ? "high" : "medium", desc);
     }
   } else if (state.entropy.score > 30) {
-    safePublishChallenge(bus, "entropy_reduction", state.entropy.score > 50 ? "high" : "medium",
-      `Entropy score is ${state.entropy.score}/100`);
+    const desc = `Entropy score is ${state.entropy.score}/100`;
+    safePublishChallengeIfChanged(bus, "entropy_reduction", state.entropy.score > 50 ? "high" : "medium", desc);
   }
 }
 
@@ -133,13 +158,13 @@ function handleStateConsolidated(bus: EventBus, projectRoot: string, shitennoDir
   processForecastTrends(bus, state, forecast);
 
   if (state.knowledgeDebt && state.knowledgeDebt.totalGaps > 10) {
-    safePublishChallenge(bus, "knowledge_gap", state.knowledgeDebt.totalGaps > 20 ? "high" : "medium",
-      `${state.knowledgeDebt.totalGaps} knowledge gaps detected`);
+    const desc = `${state.knowledgeDebt.totalGaps} knowledge gaps detected`;
+    safePublishChallengeIfChanged(bus, "knowledge_gap", state.knowledgeDebt.totalGaps > 20 ? "high" : "medium", desc);
   }
 
   if (state.capabilityDrift.detectedNotRegistered.length > 0) {
-    safePublishChallenge(bus, "capability_stale", "medium",
-      `${state.capabilityDrift.detectedNotRegistered.length} capabilities detected but not registered`);
+    const desc = `${state.capabilityDrift.detectedNotRegistered.length} capabilities detected but not registered`;
+    safePublishChallengeIfChanged(bus, "capability_stale", "medium", desc);
   }
 }
 

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Branch Policy — Política de Branches e Pipeline de Merge
 
 > **Gatilho:** Operações git (push, merge, criação de branch), pipeline de CI/CD

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-010: DOCS Check Auto-Fix Side Effect
 
 **Status:** Accepted

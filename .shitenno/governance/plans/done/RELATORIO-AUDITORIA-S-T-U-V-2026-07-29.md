@@ -1,6 +1,7 @@
 # Auditoria Shitenno — Blocos S/T/U/V (2026-07-29)
 
-**Status:** Refused
+**Status:** Done
+**Updated_at:** 2026-07-31T05:20:43.048Z
 **Date:** 2026-07-29
 
 > Continuação da auditoria de ponta a ponta (após R1–R6, Bloco P e Bloco Q).

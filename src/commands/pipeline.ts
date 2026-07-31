@@ -9,7 +9,7 @@ import { outputJson, banner } from "../formatting.js";
 import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
 import { getEventBus } from "../event-bus.js";
 import { printDaemonBanner } from "../daemon-context-banner.js";
-import { outputBlank } from "../output.js";
+import { outputBlank, output, outputError } from "../output.js";
 import { muteLogs } from "../logger.js";
 import {
   runValidationPhase,
@@ -30,18 +30,18 @@ function displayPhaseReport(report: ValidationReport, isJson: boolean): void {
   const config = getPhaseConfig(report.phase);
   const status = report.passed ? "✅ PASSED" : "❌ FAILED";
 
-  console.log(`\n${config.name}`);
-  console.log(`${config.description}`);
-  console.log(`Status: ${status}`);
-  console.log(`Duration: ${report.completedAt}`);
-  console.log(`Results: ${report.summary.passed}/${report.summary.total} passed`);
+  output(`\n${config.name}`);
+  output(`${config.description}`);
+  output(`Status: ${status}`);
+  output(`Duration: ${report.completedAt}`);
+  output(`Results: ${report.summary.passed}/${report.summary.total} passed`);
 
   for (const result of report.results) {
     const icon = result.passed ? "✓" : "✗";
     const gate = result.gate === "common" ? "[common]" : "[phase]";
-    console.log(`  ${icon} ${gate} ${result.name} (${result.duration}ms)`);
+    output(`  ${icon} ${gate} ${result.name} (${result.duration}ms)`);
     if (result.error) {
-      console.log(`    Error: ${result.error.slice(0, 100)}`);
+      output(`    Error: ${result.error.slice(0, 100)}`);
     }
   }
 }
@@ -90,7 +90,7 @@ async function runPipeline(options: { json?: boolean; full?: boolean; phase?: st
     }
     const allPassed = reports.every((r) => r.passed);
     if (!isJson) {
-      console.log(`\n${allPassed ? "✅ All phases passed" : "❌ Some phases failed"}`);
+      output(`\n${allPassed ? "✅ All phases passed" : "❌ Some phases failed"}`);
     }
     return;
   }
@@ -99,7 +99,7 @@ async function runPipeline(options: { json?: boolean; full?: boolean; phase?: st
     const phase = options.phase as ValidationPhase;
     const config = getPhaseConfig(phase);
     if (!config) {
-      console.error(`Invalid phase: ${phase}. Valid phases: phase1, phase2, phase3`);
+      outputError(`Invalid phase: ${phase}. Valid phases: phase1, phase2, phase3`);
       return;
     }
     runSinglePhase(phase, isJson, bus);

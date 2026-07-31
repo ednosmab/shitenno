@@ -9,6 +9,8 @@ import { isDetectorDefinitionFile, isSkippableFile, collectMissingFlags } from "
 
 /**
  * Detect insecure CORS wildcard configuration.
+ * Also detects the dangerous cors({origin:'*', credentials:true}) combination
+ * that violates the CORS spec and enables credential theft.
  */
 export function detectInsecureCORS(_projectRoot: string, files: SourceFileInfo[]): HealthIssue[] {
   const issues: HealthIssue[] = [];
@@ -20,6 +22,8 @@ export function detectInsecureCORS(_projectRoot: string, files: SourceFileInfo[]
   for (const file of files) {
     if (file.relPath.includes("__tests__")) continue;
     if (isDetectorDefinitionFile(file.relPath)) continue;
+
+    // Line-by-line patterns (existing)
     const lines = file.content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
@@ -31,6 +35,26 @@ export function detectInsecureCORS(_projectRoot: string, files: SourceFileInfo[]
           location: `${file.relPath}:${i + 1}`,
           recommendation: "Especificar origens permitidas em vez de usar wildcard *",
           confidence: 0.65,
+        });
+      }
+    }
+
+    // Multi-line cors({...}) config block — detect wildcard origin + credentials
+    const corsCallRegex = /\bcors\s*\(\s*\{([\s\S]{0,300}?)\}\s*\)/g;
+    let match: RegExpExecArray | null;
+    while ((match = corsCallRegex.exec(file.content)) !== null) {
+      const body = match[1]!;
+      const hasWildcardOrigin = /origin\s*:\s*["']\*["']/.test(body);
+      const hasCredentials = /credentials\s*:\s*true/.test(body);
+      if (hasWildcardOrigin && hasCredentials) {
+        const lineNum = file.content.substring(0, match.index).split("\n").length;
+        issues.push({
+          type: "insecure_cors",
+          severity: 3,
+          description: `CORS wildcard + credentials em "${file.relPath}:${lineNum}" — combinação viola a spec do CORS e permite roubo de credenciais cross-origin`,
+          location: `${file.relPath}:${lineNum}`,
+          recommendation: "Nunca combinar origin:'*' com credentials:true — especificar lista de origens permitidas",
+          confidence: 0.8,
         });
       }
     }

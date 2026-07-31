@@ -69,6 +69,7 @@ export function publishPlanFileEvents(
   try {
     fileContent = readFileSync(filePath, "utf-8");
   } catch {
+    logger.debug("file-watcher", `Failed to read file content: ${relativePath}`);
   }
   bus.publish("plan.file_changed", {
     planId,

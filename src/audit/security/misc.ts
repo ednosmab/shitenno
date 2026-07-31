@@ -48,6 +48,8 @@ export function detectRegexDos(_projectRoot: string, files: SourceFileInfo[]): H
 
 /**
  * Detect prototype pollution patterns.
+ * Uses multi-line regex on full file content for the generic for...in pattern
+ * (matching the approach used by detectEmptyCatchBlocks in hygiene.ts).
  */
 export function detectPrototypePollution(_projectRoot: string, files: SourceFileInfo[]): HealthIssue[] {
   const issues: HealthIssue[] = [];
@@ -56,9 +58,10 @@ export function detectPrototypePollution(_projectRoot: string, files: SourceFile
     /\.\[\s*["']constructor["']\s*\]/, /\.\[\s*["']prototype["']\s*\]/,
     /merge\s*\([^)]*req\./, /deepMerge\s*\([^)]*req\./,
   ];
-  const genericPollPattern = /for\s*\(\s*(?:const|let|var)\s+\w+\s+in\s+\w+\s*\)[\s\S]{0,80}\[\s*\w+\s*\]\s*=/;
+  const genericPollPattern = /for\s*\(\s*(?:const|let|var)\s+\w+\s+in\s+\w+\s*\)[\s\S]{0,80}\[\s*\w+\s*\]\s*=/g;
 
   for (const file of files) {
+    // Single-line patterns (per-line scan)
     const lines = file.content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
@@ -71,16 +74,21 @@ export function detectPrototypePollution(_projectRoot: string, files: SourceFile
           recommendation: "Validar/chavear input antes de Object.assign — nunca usar input directo em merge",
           confidence: 0.6,
         });
-      } else if (genericPollPattern.test(line)) {
-        issues.push({
-          type: "proto_pollution",
-          severity: 2,
-          description: `Atribuição por chave dinâmica em "${file.relPath}:${i + 1}" — for...in sem verificar __proto__/constructor`,
-          location: `${file.relPath}:${i + 1}`,
-          recommendation: "Verificar se a chave não é __proto__ ou constructor antes de atribuir",
-          confidence: 0.6,
-        });
       }
+    }
+
+    // Multi-line pattern (full file content scan — matches cross-line for...in blocks)
+    let match: RegExpExecArray | null;
+    while ((match = genericPollPattern.exec(file.content)) !== null) {
+      const lineNum = file.content.substring(0, match.index).split("\n").length;
+      issues.push({
+        type: "proto_pollution",
+        severity: 2,
+        description: `Atribuição por chave dinâmica em "${file.relPath}:${lineNum}" — for...in sem verificar __proto__/constructor`,
+        location: `${file.relPath}:${lineNum}`,
+        recommendation: "Verificar se a chave não é __proto__ ou constructor antes de atribuir",
+        confidence: 0.6,
+      });
     }
   }
   return issues;

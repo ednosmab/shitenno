@@ -46,7 +46,7 @@ export function gracefulShutdown(ctx: DaemonContext, timers: ShutdownTimers, sig
   ctx.socket.close(() => {
     cleanup(ctx.pidPath, ctx.sockPath);
     daemonLog(ctx.logPath, "INFO", "Daemon stopped cleanly");
-    process.exit(0);
+    process.exitCode = 0;
   });
   setTimeout(() => {
     cleanup(ctx.pidPath, ctx.sockPath);

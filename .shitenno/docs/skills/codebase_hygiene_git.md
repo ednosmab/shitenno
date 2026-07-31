@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # 🧹 SKILL: CODEBASE HYGIENE & GIT WORKFLOW
 
 ## 🎯 Objetivo

@@ -12,7 +12,8 @@ import {
   detectLicenseConflicts,
   detectTransitiveVulns,
   detectMalwarePatterns,
-} from "../security-advanced-detectors.js";
+  detectDependencyStaleness,
+} from "../security-advanced-detectors/index.js";
 
 import {
   detectTechDebtCost,
@@ -46,6 +47,7 @@ export function buildSupplyChainTechDebtDetectors(ctx: DetectorContext): Record<
     detectLicenseConflicts: () => detectLicenseConflicts(ctx.projectRoot, ctx.sourceFiles),
     detectTransitiveVulns: () => detectTransitiveVulns(ctx.projectRoot, ctx.sourceFiles),
     detectMalwarePatterns: () => detectMalwarePatterns(ctx.projectRoot, ctx.sourceFiles),
+    detectDependencyStaleness: () => detectDependencyStaleness(ctx.projectRoot, ctx.sourceFiles),
     detectTechDebtCost: () => detectTechDebtCost(ctx.projectRoot, ctx.sourceFiles, []),
     detectTDR: () => detectTDR(ctx.projectRoot, ctx.sourceFiles, []),
     detectRemediationEffort: () => detectRemediationEffort(ctx.projectRoot, ctx.sourceFiles, []),

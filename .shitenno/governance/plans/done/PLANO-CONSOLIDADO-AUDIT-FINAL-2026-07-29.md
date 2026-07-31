@@ -1,6 +1,7 @@
 # Plano Consolidado Final — `shugo audit` (Engine + Achados Reais)
 
-**Status:** Refused
+**Status:** Done
+**Updated_at:** 2026-07-31T05:05:00.240Z
 **Date:** 2026-07-29
 
 **Base:** commit `cdc9d44531c52cfe0c5355d3fccf41fc5e7be2a1`. Junta os dois planos anteriores (`PLANO-MELHORAR-AUDIT-ENGINE-2026-07-29.md` e `PLANO-ACHADOS-REAIS-2026-07-29.md`) num só, sem duplicar nada. Estrutura em duas partes bem separadas, porque são coisas diferentes:

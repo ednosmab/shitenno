@@ -156,11 +156,11 @@ export function detectExtensionMismatch(shitennoDir: string): HealthIssue[] {
  */
 export function detectSystemMapMismatch(shitennoDir: string): HealthIssue[] {
   const issues: HealthIssue[] = [];
-  const systemMapPath = join(shitennoDir, "governance/SYSTEM_MAP.md");
-  if (!existsSync(systemMapPath)) return issues;
+  const systemMapTreePath = join(shitennoDir, "governance/SYSTEM_MAP_TREE.md");
+  if (!existsSync(systemMapTreePath)) return issues;
 
   try {
-    const content = readFileSync(systemMapPath, "utf-8");
+    const content = readFileSync(systemMapTreePath, "utf-8");
     const treeEntryRegex = /[├└]──\s+`?([^\s`]+)`?/g;
     const mapEntries = new Set<string>();
     let match;
@@ -176,9 +176,9 @@ export function detectSystemMapMismatch(shitennoDir: string): HealthIssue[] {
           issues.push({
             type: "system_map_mismatch",
             severity: 1,
-            description: `Directório "docs/${entry.name}" existe mas não está listado no SYSTEM_MAP.md`,
-            location: "shitenno/governance/SYSTEM_MAP.md",
-            recommendation: `Adicionar "docs/${entry.name}" à árvore em SYSTEM_MAP.md`,
+          description: `Directório "docs/${entry.name}" existe mas não está listado no SYSTEM_MAP_TREE.md`,
+          location: "shitenno/governance/SYSTEM_MAP_TREE.md",
+          recommendation: `Adicionar "docs/${entry.name}" à árvore em SYSTEM_MAP_TREE.md`,
             confidence: 0.75,
           });
         }

@@ -6,13 +6,15 @@
  */
 
 import * as ts from "typescript";
-import { statSync } from "node:fs";
+import { statSync, existsSync } from "node:fs";
+import { join } from "node:path";
 import { createHash } from "node:crypto";
 import type { TaintIssue } from "./types.js";
 import { DataFlowGraph } from "./graph.js";
 import { logger } from "../../logger.js";
 import {
   visit,
+  visitSinksOnly,
   type VariableInfo,
 } from "./ast-visitor.js";
 import { collectIssues } from "./issue-builder.js";
@@ -26,6 +28,16 @@ export interface TaintAnalyzerOptions {
   crossFile?: boolean;
   /** Only report issues above this severity */
   minSeverity?: 1 | 2 | 3;
+  /** Override for source directory detection */
+  srcDirOverride?: string;
+}
+
+function findLikelySourceDir(projectRoot: string): string | null {
+  const candidates = ["src", "app", "lib", "source"];
+  for (const c of candidates) {
+    if (existsSync(join(projectRoot, c))) return join(projectRoot, c);
+  }
+  return null;
 }
 
 export class TaintAnalyzer {
@@ -46,9 +58,13 @@ export class TaintAnalyzer {
   constructor(options: TaintAnalyzerOptions) {
     this.options = {
       maxDepth: options.maxDepth ?? 20,
-      crossFile: options.crossFile ?? false,
+      /** Enable cross-file analysis (default: true).
+       *  May increase analysis time on large projects. Disable via { crossFile: false } if needed. */
+      // Enable cross-file analysis (default: true). May increase analysis time on large projects.
+      crossFile: options.crossFile ?? true,
       minSeverity: options.minSeverity ?? 1,
       projectRoot: options.projectRoot,
+      srcDirOverride: options.srcDirOverride ?? "",
     };
 
     // Create TypeScript program
@@ -80,8 +96,10 @@ export class TaintAnalyzer {
       }
     }
 
-    // Collect all .ts files in src/
-    const srcDir = this.options.projectRoot + "/src";
+    // Detect source directory: explicit override > auto-detect > fallback to "/src"
+    const srcDir = this.options.srcDirOverride
+      || findLikelySourceDir(this.options.projectRoot)
+      || this.options.projectRoot + "/src";
     const fileNames = this.collectSourceFiles(srcDir);
 
     // Build cache key from tsconfig hash + file mtimes so cache invalidates on changes
@@ -134,6 +152,7 @@ export class TaintAnalyzer {
   }
 
   private analyzeSourceFiles(sourceFiles: readonly ts.SourceFile[]): void {
+    // Pass 1: collect sources, propagate through assignments and call parameters
     for (const sourceFile of sourceFiles) {
       if (sourceFile.isDeclarationFile) continue;
       if (sourceFile.fileName.includes("node_modules")) continue;
@@ -142,6 +161,17 @@ export class TaintAnalyzer {
         variableTaint: this.variableTaint,
         checker: this.checker,
         sourceFile,
+        nextNodeId: () => this.nextNodeId(),
+      });
+    }
+    // Pass 2: re-visit sinks now that parameters may be tainted from call sites
+    for (const sourceFile of sourceFiles) {
+      if (sourceFile.isDeclarationFile) continue;
+      if (sourceFile.fileName.includes("node_modules")) continue;
+      visitSinksOnly(sourceFile, {
+        graph: this.graph,
+        variableTaint: this.variableTaint,
+        checker: this.checker,
         nextNodeId: () => this.nextNodeId(),
       });
     }

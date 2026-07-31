@@ -35,6 +35,15 @@ export function _resetForTesting(): void {
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
+/** Simple djb2 hash for content-based dedup keys. */
+function simpleHash(str: string): number {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
 function canNotify(): boolean {
   const now = Date.now();
   return now - lastGlobalNotification >= GLOBAL_COOLDOWN_MS;
@@ -126,8 +135,9 @@ function handleChallengeGenerated(payload: Record<string, unknown>): void {
   };
   const icon = sevLabel[severity] ?? "⚪";
 
+  const contentKey = simpleHash(`${type}:${description}`);
   throttledNotify(
-    `challenge:${type}:${Date.now()}`,
+    `challenge:${contentKey}`,
     `${icon} Proactive Alert`,
     description,
     severity as "high" | "medium" | "low",
@@ -181,7 +191,7 @@ function handleHealthChecked(payload: Record<string, unknown>): void {
 }
 
 function handleBacklogUpdated(payload: Record<string, unknown>): void {
-  const itemId = String(payload.itemId ?? payload.taskId ?? "desconhecido");
+  const itemId = String(payload.itemId ?? payload.taskId ?? payload.planId ?? "desconhecido");
   const count = Number(payload.movedCount ?? payload.count ?? 1);
   throttledNotify(
     `backlog-updated:${Date.now()}`,

@@ -1,5 +1,5 @@
 # Pre-Session Briefing
-*Generated: 2026-07-30T06:33:42.547Z*
+*Generated: 2026-07-31T14:24:44.902Z*
 
 ---
 
@@ -11,7 +11,7 @@
 | Campo | Estado |
 |---|---|
 | **Tarefa em curso** | LIVING-007 LIVING-007 Sistema de Pipelines de Validação (In Progress) |
-| **Próximo P0** | Define next P0 item from backlog |
+| **Próximo P0** | SA7 — God modules refactoring (rule-engine 1307L, scorer 947L, engineering-state 908L, feedback-engine 756L). No P0 items exist; SA7 is highest-impact P1. |
 | **Dívidas P1** | Nenhuma |
 | **Impedimentos** | Retroactive sync failed for TEST-FILE-WATCHER-001: 2 errors |
 | **Estado última sessão** | Em curso |
@@ -38,14 +38,14 @@
 - **Areas Without Tests:** 5
 
 ## Context Rules (Top)
-- Area "src" has 6 file(s) without tests. Prioritize test coverage here.
 - Area "src" contains sensitive keywords (auth, payment, security). Apply extra security review.
 - Area "apps" has 8 file(s) without tests. Prioritize test coverage here.
 - Area "apps" contains sensitive keywords (auth, payment, security). Apply extra security review.
 - This is a monorepo. When modifying shared packages, ensure backward compatibility.
+- Large codebase: Always run tests before committing. Consider impact on other modules.
 
 ## Dynamic Rules (From History)
-- [high] This project has 152 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
+- [high] This project has 153 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
 - [medium] This project has 7 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
 
 
@@ -57,8 +57,8 @@
 1. Improve test coverage in 5 area(s)
 
 ## Token Economy
-- **Estimated tokens saved:** ~12.000
-- **Context rules:** 8
+- **Estimated tokens saved:** ~11.600
+- **Context rules:** 7
 - **Dynamic rules:** 2
 - **Cache hit:** No
 

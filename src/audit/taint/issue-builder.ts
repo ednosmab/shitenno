@@ -6,6 +6,7 @@
  */
 
 import type { TaintNode, TaintIssue } from "./types.js";
+import { cvssToSeverity } from "./types.js";
 import { findTaintSink } from "./sinks.js";
 import { isSanitizer } from "./sanitizers.js";
 import { DataFlowGraph } from "./graph.js";
@@ -48,17 +49,37 @@ function formatTaintDescription(
   return `Tainted data from ${sourceNames} reaches ${sinkDescription} without sanitization`;
 }
 
+function looksLikeHtml(sinkNode: TaintNode): boolean {
+  return /<[a-z][\s\S]*>/i.test(sinkNode.text);
+}
+
+function resolveSeverity(
+  sinkDef: ReturnType<typeof findTaintSink>,
+): 1 | 2 | 3 {
+  const cvssSeverity = sinkDef?.cvss ? cvssToSeverity(sinkDef.cvss) : undefined;
+  return cvssSeverity ?? sinkDef?.severity ?? 2;
+}
+
+function shouldSkipIssue(
+  sink: TaintNode,
+  sinkDef: ReturnType<typeof findTaintSink>,
+): boolean {
+  const isHttpResponseSink = ["res.send", "res.write", "res.end"].includes(sinkDef?.name ?? "");
+  return isHttpResponseSink && !looksLikeHtml(sink);
+}
+
 function buildIssue(
   sink: TaintNode,
   sourceNodes: TaintNode[],
   graph: DataFlowGraph,
   options: IssueBuilderOptions
-): TaintIssue {
+): TaintIssue | null {
   const sinkDef = findTaintSink(sink.variableName ?? "");
+  if (shouldSkipIssue(sink, sinkDef)) return null;
   const hasSanitizer = checkPathHasSanitizer(sourceNodes[0]?.id ?? "", sink.id, graph);
   return {
     type: sinkDef?.issueType ?? "tainted_input",
-    severity: sinkDef?.severity ?? 2,
+    severity: resolveSeverity(sinkDef),
     description: formatTaintDescription(sourceNodes, sinkDef, sink.text),
     location: sink.sourceFile.replace(options.projectRoot + "/", "") + ":" + sink.line,
     sourceType: sourceNodes[0]?.variableName ?? "unknown",
@@ -80,7 +101,7 @@ export function collectIssues(
     const sourceNodes = findSourceNodesReaching(sink, nodes, graph, options.maxDepth);
     if (sourceNodes.length === 0) continue;
     const issue = buildIssue(sink, sourceNodes, graph, options);
-    if (issue.severity >= options.minSeverity) {
+    if (issue && issue.severity >= options.minSeverity) {
       issues.push(issue);
     }
   }

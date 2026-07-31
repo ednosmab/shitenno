@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Session Template — Encerramento de Sessão
 
 > **Versão:** 1.0

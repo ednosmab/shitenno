@@ -2,7 +2,7 @@
 /**
  * sync-docs.ts — Documentation Sync Script (Template)
  *
- * Regenerates SYSTEM_MAP.md from the current directory structure
+ * Regenerates SYSTEM_MAP_TREE.md from the current directory structure
  * under shitenno/. Called automatically by doc-sync-hook or
  * manually via `shugo sync-docs`.
  *
@@ -23,10 +23,12 @@ const __dirname = dirname(__filename);
 
 const ROOT = join(__dirname, "..", "..");
 const SHITENNO_DIR = join(ROOT, "shitenno");
-const SYSTEM_MAP_PATH = join(SHITENNO_DIR, "governance", "SYSTEM_MAP.md");
+const SYSTEM_MAP_TREE_PATH = join(SHITENNO_DIR, "governance", "SYSTEM_MAP_TREE.md");
 const MANDATORY_CONTEXT_PATH = join(SHITENNO_DIR, "governance", "MANDATORY_CONTEXT.md");
 
 // ── Helpers ─────────────────────────────────────────────────────────────
+
+const RUNTIME_DIRS = new Set(["executions", "records", "telemetry", "daemon", "checkpoints"]);
 
 function walkDir(dir: string, prefix = ""): string[] {
   const entries: string[] = [];
@@ -34,11 +36,12 @@ function walkDir(dir: string, prefix = ""): string[] {
   if (!existsSync(dir)) return entries;
 
   for (const item of readdirSync(dir, { withFileTypes: true })) {
-    if (item.name.startsWith(".") || item.name === "node_modules" || item.name === "checkpoints") continue;
+    if (item.name.startsWith(".") || item.name === "node_modules") continue;
 
     const relPath = prefix ? `${prefix}/${item.name}` : item.name;
 
     if (item.isDirectory()) {
+      if (RUNTIME_DIRS.has(item.name)) continue;
       entries.push(`${relPath}/`);
       entries.push(...walkDir(join(dir, item.name), relPath));
     } else {
@@ -57,8 +60,8 @@ function regenerateSystemMap(): boolean {
     return false;
   }
 
-  if (!existsSync(SYSTEM_MAP_PATH)) {
-    console.log("  ⚠ SYSTEM_MAP.md not found, skipping");
+  if (!existsSync(SYSTEM_MAP_TREE_PATH)) {
+    console.log("  ⚠ SYSTEM_MAP_TREE.md not found, skipping");
     return false;
   }
 
@@ -67,7 +70,7 @@ function regenerateSystemMap(): boolean {
     .map((f) => `│   ${f}`)
     .join("\n");
 
-  let content = readFileSync(SYSTEM_MAP_PATH, "utf-8");
+  let content = readFileSync(SYSTEM_MAP_TREE_PATH, "utf-8");
 
   const startMarker = "<!-- SYNC:START -->";
   const endMarker = "<!-- SYNC:END -->";
@@ -83,7 +86,7 @@ function regenerateSystemMap(): boolean {
     );
   }
 
-  writeFileSync(SYSTEM_MAP_PATH, content, "utf-8");
+  writeFileSync(SYSTEM_MAP_TREE_PATH, content, "utf-8");
   return true;
 }
 
@@ -247,7 +250,7 @@ function main(): void {
   const updated = regenerateSystemMap();
 
   if (updated && !quiet) {
-    console.log("  ✔ SYSTEM_MAP.md updated");
+    console.log("  ✔ SYSTEM_MAP_TREE.md updated");
   }
 
   // Phase 4: Generate MANDATORY_CONTEXT.md from manifests

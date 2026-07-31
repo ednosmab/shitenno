@@ -33,7 +33,8 @@ export function checkDuplicateDaemon(ctx: DaemonContext): void {
       try {
         process.kill(existingPid, 0);
         daemonLog(ctx.logPath, "WARN", `Daemon already running (pid ${existingPid}). Exiting.`);
-        process.exit(0);
+        process.exitCode = 0;
+        return;
       } catch {
         daemonLog(ctx.logPath, "INFO", `Stale PID file (pid ${existingPid} not running). Overwriting.`);
       }
@@ -53,7 +54,8 @@ export function writePidAtomically(ctx: DaemonContext): void {
       const writtenPid = parseInt(readFileSync(ctx.pidPath, "utf-8").trim(), 10);
       if (writtenPid !== process.pid) {
         daemonLog(ctx.logPath, "WARN", `Another daemon (pid ${writtenPid}) took over. Exiting.`);
-        process.exit(0);
+        process.exitCode = 0;
+        return;
       }
     } catch {
       // PID file corrupted — proceed

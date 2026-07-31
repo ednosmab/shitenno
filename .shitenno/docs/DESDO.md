@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # DESDO — Diretrizes de Engenharia
 
 > **Versão:** 1.1

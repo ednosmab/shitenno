@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # session_end_plans
 
 Date: 2026-07-22T13:11:10.282Z

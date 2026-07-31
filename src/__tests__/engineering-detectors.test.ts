@@ -384,7 +384,7 @@ describe("detectUnsafeDeserialization", () => {
     const files = [makeFile("src/routes.ts", "JSON.parse(req.body)")];
     const issues = detectUnsafeDeserialization(tempDir, files);
     expect(issues.length).toBe(1);
-    expect(issues[0]!.type).toBe("unsafe_deserialize");
+    expect(issues[0]!.type).toBe("missing_schema_validation");
     // JSON.parse unvalidated is severity 1 (info); real RCE sinks (js-yaml.load, vm.runInNewContext) are severity 3
     expect(issues[0]!.severity).toBe(1);
   });

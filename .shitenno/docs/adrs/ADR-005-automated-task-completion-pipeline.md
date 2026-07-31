@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-005: Automated Task Completion Pipeline
 
 **Status:** Accepted

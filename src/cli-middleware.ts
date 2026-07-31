@@ -113,7 +113,7 @@ function tryAutoStartDaemon(shitennoDir: string, command: Command) {
     const breaker = new DaemonCircuitBreaker(shitennoDir);
     const approvedPath = getApprovedPath(shitennoDir);
     if (existsSync(approvedPath) && !breaker.isTripped() && !isDaemonRunning(shitennoDir)) {
-      startDaemon(shitennoDir).catch(() => {});
+      startDaemon(shitennoDir).catch((err) => logger.debug("middleware", `Daemon auto-start failed: ${err}`));
     }
   } catch (err) {
     logger.debug("middleware", `Auto-start daemon check failed: ${err}`);

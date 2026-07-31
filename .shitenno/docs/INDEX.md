@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Shitenno — Knowledge Organization
 
 > This is the Constitution of the Shitenno. Every document here is a source of truth for humans and AI agents.

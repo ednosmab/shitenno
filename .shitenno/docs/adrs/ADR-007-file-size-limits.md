@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-007: File Size and Complexity Limits
 
 **Status:** Accepted

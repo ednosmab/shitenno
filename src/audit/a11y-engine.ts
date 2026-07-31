@@ -31,9 +31,11 @@ function getSkippedResult(): HealthIssue[] {
 
 function createESLintInstance(eslintModule: typeof import("eslint"), jsxA11yModule: unknown) {
   const { ESLint } = eslintModule;
+  const a11y = jsxA11yModule as { configs?: { recommended?: { rules: Record<string, unknown> } } };
+  const rules = a11y?.configs?.recommended?.rules ?? {};
   return new ESLint({ overrideConfigFile: true, baseConfig: {
     plugins: { "jsx-a11y": jsxA11yModule },
-    rules: (jsxA11yModule as { configs: { recommended: { rules: Record<string, unknown> } } }).configs.recommended.rules,
+    rules,
     languageOptions: { parserOptions: { ecmaFeatures: { jsx: true }, ecmaVersion: 2022, sourceType: "module" } },
   } } as never);
 }

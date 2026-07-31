@@ -2,9 +2,9 @@
 name: pnpm-management
 description: >
   Manter o monorepo organizado, rápido e com dependências bem geridas usando pnpm.
----
 category: product
 lifecycle: Active
+---
 
 # 📦 SKILL: GESTÃO DE MONOREPO COM PNPM
 

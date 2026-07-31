@@ -1,6 +1,8 @@
 # Plano de Correção — Achados em Aberto (2026-07-30)
 
-**Status:** Refused
+**Status:** Done
+**Updated_at:** 2026-07-31T05:06:57.510Z
+**Date:** 2026-07-30
 
 > Confirmado antes de tudo: `task-completion-pipeline.ts` foi **substituído por completo**, não parcialmente — arquivo apagado, zero import residual em `.ts`, só menções em documentação histórica (ADRs arquivadas, planos `done/`), que é o esperado. Não precisa de nenhuma ação aqui.
 

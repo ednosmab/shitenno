@@ -1,7 +1,7 @@
 import * as ts from "typescript";
 import type { TaintNode } from "./types.js";
 import { isTaintSource } from "./sources.js";
-import { findTaintSink } from "./sinks.js";
+import { findTaintSink, findTaintPropertySink } from "./sinks.js";
 import { DataFlowGraph } from "./graph.js";
 import {
   getPropertyAccessName,
@@ -59,8 +59,13 @@ export function findTaintedArgument(
 ): string | undefined {
   for (const arg of node.arguments) {
     const argName = getSymbolName(arg, checker, variableTaint);
-    if (argName && variableTaint.get(argName)?.tainted) {
-      return argName;
+    if (!argName) continue;
+    // Exact match
+    if (variableTaint.get(argName)?.tainted) return argName;
+    // Prefix match: req.query.name → req.query is tainted
+    const dotIdx = argName.lastIndexOf(".");
+    if (dotIdx > 0 && variableTaint.get(argName.slice(0, dotIdx))?.tainted) {
+      return argName.slice(0, dotIdx);
     }
   }
   return undefined;
@@ -80,6 +85,35 @@ export function visitSink(
 
   if (!sourceVar) return;
   const sourceNode = findExistingSourceNode(sourceVar, ctx.graph);
+  if (sourceNode) {
+    ctx.graph.addEdge({ from: sourceNode.id, to: taintNode.id, kind: "parameter" });
+  }
+}
+
+/**
+ * Detect property assignment sinks (e.g. element.innerHTML = tainted).
+ * The TypeScript AST represents `a.b = c` as a BinaryExpression with EqualsToken,
+ * where the left side is a PropertyAccessExpression.
+ */
+export function visitPropertySink(
+  node: ts.BinaryExpression,
+  ctx: Pick<AstVisitorContext, "graph" | "variableTaint" | "checker" | "nextNodeId">
+): void {
+  if (node.operatorToken.kind !== ts.SyntaxKind.EqualsToken) return;
+  if (!ts.isPropertyAccessExpression(node.left)) return;
+
+  const propName = getPropertyAccessName(node.left);
+  const sinkDef = findTaintPropertySink(propName);
+  if (!sinkDef) return;
+
+  const rightName = getSymbolName(node.right, ctx.checker, ctx.variableTaint);
+  const rightInfo = rightName ? ctx.variableTaint.get(rightName) : undefined;
+
+  const taintNode = createTaintNodeAt({ variableName: propName, kind: "sink", text: propName, tsNode: node, nextNodeId: ctx.nextNodeId });
+  ctx.graph.addNode(taintNode);
+
+  if (!rightInfo?.tainted) return;
+  const sourceNode = findExistingSourceNode(rightName!, ctx.graph);
   if (sourceNode) {
     ctx.graph.addEdge({ from: sourceNode.id, to: taintNode.id, kind: "parameter" });
   }
@@ -224,8 +258,29 @@ export function visit(
   }
   if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
     visitAssignment(node, ctx);
+    visitPropertySink(node, ctx);
   }
   if (ts.isVariableDeclaration(node) && node.initializer) {
     visitVarDeclaration(node, ctx);
+  }
+}
+
+/**
+ * Second pass: re-visit call expressions and property assignments to detect
+ * sinks that were missed because the source wasn't tainted yet during the first pass.
+ * This handles the case where a function is declared before it's called:
+ *   function runQuery(sql) { pool.query(sql); }
+ *   app.get("/search", (req, res) => { runQuery(req.query.term); });
+ */
+export function visitSinksOnly(
+  node: ts.Node,
+  ctx: Pick<AstVisitorContext, "graph" | "variableTaint" | "checker" | "nextNodeId">
+): void {
+  ts.forEachChild(node, (child) => visitSinksOnly(child, ctx));
+  if (ts.isCallExpression(node)) {
+    visitSink(node, ctx);
+  }
+  if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+    visitPropertySink(node, ctx);
   }
 }

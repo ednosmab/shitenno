@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Skill: MCP Server Interaction
 
 ## ⚡ Mandatory Rule

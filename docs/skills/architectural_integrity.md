@@ -2,9 +2,9 @@
 name: architectural-integrity
 description: >
   Proteger a arquitetura limpa (Clean Architecture) e o isolamento do domínio, garantindo que as dependências fluam na direção correta.
----
 category: product
 lifecycle: Active
+---
 
 # 🏛️ SKILL: ARCHITECTURAL INTEGRITY & DEPENDENCY GUARD
 

@@ -3,9 +3,9 @@ name: security_xss_prevention
 description: >
   Guidelines for preventing XSS in CLI output and web interfaces. Load before any
   feature that renders user-supplied data or external input.
----
 category: product
 lifecycle: Active
+---
 
 # Security: XSS Prevention
 

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Engineering Standards
 
 > Single source of truth for code quality rules. Referenced by AGENTS.md, DESDO.md, and MANDATORY_CONTEXT.md.

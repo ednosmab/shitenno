@@ -60,7 +60,9 @@ export type HealthIssueType =
   | "command_injection"
   | "path_traversal"
   | "sql_injection"
+  | "nosql_injection"
   | "xss_risk"
+  | "ssti"
   // Security pattern types (SEC-*)
   | "hardcoded_secret"
   | "unsafe_eval"
@@ -70,6 +72,7 @@ export type HealthIssueType =
   | "proto_pollution"
   | "regex_dos"
   | "unsafe_deserialize"
+  | "missing_schema_validation"
   | "dep_confusion"
   // New detectors (Fase 5)
   | "dependency_vulnerability"
@@ -208,6 +211,8 @@ export type HealthIssueType =
   | "tier_promotion_candidate"
   // Detector failure
   | "detector_failure"
+  // Audit check skipped
+  | "audit_check_skipped"
   // Accessibility (A11y)
   | "accessibility_gap"
   | "orphan_skill"

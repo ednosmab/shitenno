@@ -47,7 +47,7 @@ export async function attachToDaemonLog(logPath: string, numLines: number): Prom
   process.on("SIGINT", () => {
     unwatchFile(logPath, stream);
     output(chalk.gray("\n  Detached (daemon continues running in background)."));
-    process.exit(0);
+    process.exitCode = 0;
   });
 }
 

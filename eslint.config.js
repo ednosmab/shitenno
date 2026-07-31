@@ -3,7 +3,7 @@ import tsparser from "@typescript-eslint/parser";
 
 export default [
   {
-    ignores: ["dist/", "node_modules/", "src/templates/", "src/__tests__/", "shitenno/"],
+    ignores: ["dist/", "node_modules/", "src/templates/", "src/__tests__/", "shitenno/", "src/audit/__fixtures__/"],
   },
   {
     files: ["src/**/*.ts", "bin/**/*.ts"],
@@ -94,6 +94,13 @@ export default [
     ],
     rules: {
       "no-restricted-imports": "off",
+    },
+  },
+  // Exception: sbom-generator uses 'shitenno' as CycloneDX vendor name, not directory
+  {
+    files: ["src/audit/supply/sbom-generator.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
     },
   },
 ];

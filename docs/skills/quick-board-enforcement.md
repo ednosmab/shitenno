@@ -5,9 +5,9 @@ description: >
   do AGENTS.md (BLOQUEADOR DE SESSÃO). Sem esta skill ativa, nenhuma resposta operacional
   pode ser enviada ao utilizador. A skill garante que o Quick Board é exibido antes de
   QUALQUER mensagem, incluindo saudações triviais como "oi" ou "olá".
----
 category: product
 lifecycle: Active
+---
 
 # 🚫 QUICK BOARD ENFORCEMENT — BLOQUEADOR DE SESSÃO
 

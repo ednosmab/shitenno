@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Feedback Protocol — Regra de Feedback de Sessão
 
 > **Gatilho:** Keywords: "vamos parar", "sessão fechada", "até amanhã", "feedback da sessão"

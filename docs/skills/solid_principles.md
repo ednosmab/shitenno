@@ -2,9 +2,9 @@
 name: solid-principles
 description: >
   Garantir que o código seja robusto, fácil de testar e resiliente a mudanças através dos 5 princípios SOLID.
----
 category: product
 lifecycle: Active
+---
 
 # 🏗️ SKILL: PRINCÍPIOS SOLID NO TYPESCRIPT
 

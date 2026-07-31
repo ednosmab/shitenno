@@ -21,6 +21,7 @@ export function detectHardcodedSecrets(_projectRoot: string, files: SourceFileIn
     { regex: /(?:private[_-]?key)\s*[=:]\s*["'][^"']{16,}["']/gi, name: "private key" },
     { regex: /(?:aws[_-]?access[_-]?key[_-]?id)\s*[=:]\s*["'][A-Z0-9]{16,}["']/gi, name: "AWS key" },
     { regex: /(?:bearer)\s+[A-Za-z0-9_\-\.]{20,}/gi, name: "bearer token" },
+    { regex: /(?:secret|token|key|password)\w*\s*[=:]\s*process\.env\.\w+\s*\|\|\s*["'][^"']{8,}["']/gi, name: "secret com fallback hardcoded" },
   ];
 
   const skipPatterns = [/\.test\.ts$/, /\.spec\.ts$/, /__tests__/];

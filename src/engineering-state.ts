@@ -261,11 +261,6 @@ export function initializeEngineeringState(
   const reconsolidate = () => {
     const state = consolidateEngineeringState(projectRoot, shitennoDir);
     saveEngineeringState(shitennoDir, state);
-    bus.publish("engineering_state.consolidated", {
-      consolidatedAt: state.consolidatedAt,
-      lifecycle: state.lifecycle,
-      overallHealth: state.healthScores.overall,
-    });
   };
 
   const unsubscribers = [

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-NNN: [Title of Decision]
 
 **Status:** Proposed | Accepted | Deprecated | Superseded by ADR-NNN

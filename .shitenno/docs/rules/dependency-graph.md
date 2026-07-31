@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Dependency Graph — Regras de Dependências
 
 > **Gatilho:** loading_profile=full, dependência circular detectada, nova dependência adicionada

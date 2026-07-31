@@ -45,14 +45,23 @@ import {
   detectWeakRandomness,
 } from "../engineering-detectors.js";
 
+/** Lower confidence for truly generic sink names that overlap with non-security methods
+ *  (e.g. React.render(), Angular.compile()). The taint engine guards against false
+ *  positives by only flagging when tainted data flows to the sink. */
+const GENERIC_SINK_PATTERNS = /^(where|render|compile)$/;
+
 function buildTaintDetector(ctx: DetectorContext) {
   return () => {
     try {
       const analyzer = new TaintAnalyzer({ projectRoot: ctx.projectRoot });
-      return analyzer.analyze().map((ti: TaintIssue) => ({
-        type: "tainted_input" as const, severity: ti.severity, description: ti.description,
-        location: ti.location, recommendation: ti.recommendation, confidence: 0.95,
-      }));
+      return analyzer.analyze().map((ti: TaintIssue) => {
+        const isGeneric = GENERIC_SINK_PATTERNS.test(ti.sinkType);
+        return {
+          type: ti.type as HealthIssue["type"], severity: ti.severity, description: ti.description,
+          location: ti.location, recommendation: ti.recommendation,
+          confidence: isGeneric ? 0.55 : 0.95,
+        };
+      });
     } catch (err) {
       return [{ type: "tainted_input" as const, severity: 2 as const,
         description: `Taint analysis não pôde ser executada — resultados de segurança incompletos: ${err instanceof Error ? err.message : String(err)}`,

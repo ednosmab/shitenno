@@ -5,9 +5,9 @@ description: >
   RULE-HB-001 no session_start ou por pedido manual do utilizador ("preenche handbook",
   "fill handbook"). A skill lê o template em docs/handbook/*.template.md, extrai dados
   reais do código, e escreve o handbook final em docs/handbook/.
----
 category: product
 lifecycle: Active
+---
 
 # 📚 HANDBOOK FILL — Sincronização Semântica
 

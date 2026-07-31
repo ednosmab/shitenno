@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # FORBIDDEN_OPERATIONS — Regras Vinculantes
 
 > **Versão:** 1.1

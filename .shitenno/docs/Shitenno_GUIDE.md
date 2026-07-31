@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Shitenno — Guia Completo do Sistema de Governança de Conhecimento
 
 > **Nome público:** Shitenno

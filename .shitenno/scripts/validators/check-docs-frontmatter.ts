@@ -124,11 +124,11 @@ export function checkDocsFrontmatter(ctx: ValidatorContext) {
           apply: () => {
             const current = readFileSync(fullPath, "utf-8");
             const lines = current.split("\n");
-            const insertIdx = lines.indexOf("---", 1) + 1;
+            const closingIdx = lines.indexOf("---", 1);
             const additions = missingFields
               .map((f) => `${f}: ${f === "category" ? category : lifecycle}`)
               .join("\n");
-            lines.splice(insertIdx, 0, additions);
+            lines.splice(closingIdx, 0, additions);
             writeFileSync(fullPath, lines.join("\n"), "utf-8");
           },
         };

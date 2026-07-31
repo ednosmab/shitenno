@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # plan_archived
 
 Date: 2026-07-25T04:37:34.354Z

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # opencode — Contexto Operacional do Projecto
 
 > Este arquivo preserva metadados semânticos que **não fazem parte do schema do opencode** (`https://opencode.ai/config.json`), mas que descrevem o contrato operacional do projecto. Está incluído em `opencode.json → instructions[]` para ser carregado em toda sessão.

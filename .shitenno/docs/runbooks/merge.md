@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Runbook: Merge de Feature → Develop
 
 ## Pré-condições

@@ -153,8 +153,8 @@ export interface PlanFormatWarningPayload extends EventMeta {
 }
 
 export interface BacklogUpdatedPayload extends EventMeta {
-  path: string;
-  timestamp: string;
+  path?: string;
+  planId?: string;
 }
 
 // ── Challenge Events ──────────────────────────────────────────────────────
