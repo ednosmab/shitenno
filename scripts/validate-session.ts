@@ -6,8 +6,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..', '..');
-const GOV = resolve(ROOT, 'shitenno', 'governance');
-const DOCS = resolve(ROOT, 'shitenno', 'docs');
+const GOV = resolve(ROOT, '.shitenno', 'governance');
+const DOCS = resolve(ROOT, '.shitenno', 'docs');
 
 let exitCode = 0;
 

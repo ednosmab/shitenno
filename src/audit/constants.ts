@@ -32,7 +32,12 @@ export const BLOCKED_LICENSES = ["GPL-3.0", "AGPL-3.0", "SSPL-1.0", "EUPL-1.1"];
 
 export const SECURITY_DETECTOR_SELF_PATHS = [
   "src/health-auditor.ts",
-  "src/audit/taint/",
+  "src/audit/taint/analyzer.ts",
+  "src/audit/taint/ast-visitor.ts",
+  "src/audit/taint/sinks.ts",
+  "src/audit/taint/sources.ts",
+  "src/audit/taint/sanitizers.ts",
+  "src/audit/taint/issue-builder.ts",
   "src/audit/security/",
   "src/audit/engineering-detectors.ts",
   "src/audit/engineering-detectors-security.ts",

@@ -5,7 +5,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..', '..');
-const BACKLOG = resolve(ROOT, 'shitenno', 'docs', 'BACKLOG.md');
+const BACKLOG_MODULAR = resolve(ROOT, '.shitenno', 'docs', 'backlog', 'ACTIVE.md');
+const BACKLOG_LEGACY = resolve(ROOT, '.shitenno', 'docs', 'BACKLOG.md');
+const BACKLOG = existsSync(BACKLOG_MODULAR) ? BACKLOG_MODULAR : BACKLOG_LEGACY;
 
 // ── CLI Flags ──────────────────────────────────────────────────────────────
 
@@ -86,7 +88,6 @@ function parseBacklog(content: string): BacklogItem[] {
           case 'Owner':
             currentItem.owner = val;
             break;
-          case 'Descricao':
           case 'Descricao':
             currentItem.description = val;
             break;

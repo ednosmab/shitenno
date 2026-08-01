@@ -14,15 +14,32 @@ function extractFileExports(files: SourceFileInfo[]): Map<string, Set<string>> {
   return fileExports;
 }
 
+const isTestFile = (f: SourceFileInfo) => f.relPath.includes("__tests__/") || f.relPath.endsWith(".test.ts");
+
+function hasImportPathMatch(content: string, basename: string, baseNoExt: string): boolean {
+  const names = [basename, baseNoExt];
+  const exts = ["", ".js", ".ts", ".tsx"];
+  for (const name of names) {
+    for (const ext of exts) {
+      if (content.includes(`/${name}${ext}"`) || content.includes(`/${name}${ext}'`)) return true;
+    }
+  }
+  return false;
+}
+
 function isFileReferenced(file: SourceFileInfo, files: SourceFileInfo[], exports: Set<string>): boolean {
+  const baseNoExt = file.basename.replace(/\.(ts|tsx|js|jsx)$/, "");
+
   const isImportedByPath = files.some((other) => {
     if (other.fullPath === file.fullPath) return false;
-    return other.content.includes(`/${file.basename}.js"`) || other.content.includes(`/${file.basename}"`) || other.content.includes(`/${file.basename}.ts"`);
+    if (isTestFile(other) && !isTestFile(file)) return false;
+    return hasImportPathMatch(other.content, file.basename, baseNoExt);
   });
   if (isImportedByPath) return true;
   if (exports.size === 0) return false;
   return [...exports].some((symbol) => files.some((other) => {
     if (other.fullPath === file.fullPath) return false;
+    if (isTestFile(other) && !isTestFile(file)) return false;
     return new RegExp(`\\b${symbol}\\b`).test(other.content);
   }));
 }
@@ -138,6 +155,7 @@ export function detectUnusedExports(_projectRoot: string, files: SourceFileInfo[
   const issues: HealthIssue[] = [];
   if (files.length === 0) return issues;
 
+  const isTestFile = (f: SourceFileInfo) => f.relPath.includes("__tests__/") || f.relPath.endsWith(".test.ts");
   const exportRegex = /^export\s+(?:function|const|class|interface|type|enum)\s+(\w+)/gm;
 
   for (const file of files) {
@@ -152,6 +170,7 @@ export function detectUnusedExports(_projectRoot: string, files: SourceFileInfo[
     for (const symbol of exports) {
       const isImported = files.some((other) => {
         if (other.fullPath === file.fullPath) return false;
+        if (isTestFile(other) && !isTestFile(file)) return false;
         const wordBoundary = new RegExp(`\\b${symbol}\\b`);
         return wordBoundary.test(other.content);
       });

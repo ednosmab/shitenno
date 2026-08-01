@@ -53,7 +53,7 @@ const GENERIC_SINK_PATTERNS = /^(where|render|compile)$/;
 function buildTaintDetector(ctx: DetectorContext) {
   return () => {
     try {
-      const analyzer = new TaintAnalyzer({ projectRoot: ctx.projectRoot });
+      const analyzer = new TaintAnalyzer({ projectRoot: ctx.projectRoot, crossFile: false });
       return analyzer.analyze().map((ti: TaintIssue) => {
         const isGeneric = GENERIC_SINK_PATTERNS.test(ti.sinkType);
         return {

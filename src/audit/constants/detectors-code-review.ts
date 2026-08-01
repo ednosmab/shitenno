@@ -70,6 +70,9 @@ export const CODE_REVIEW_DETECTORS: string[] = [
   "detectDependencyVulnerabilities",
   "detectIncompatibleLicenses",
   "detectConfigSecrets",
+  "detectInsecureCORS",
+  "detectInsecureCookies",
+  "detectWeakRandomness",
   // Git Intelligence (GIT-*)
   "detectCommitFormat",
   "detectBranchNaming",
@@ -89,6 +92,7 @@ export const CODE_REVIEW_DETECTORS: string[] = [
   "detectMissingPremortem",
   "detectMissingAdrForChanges",
   "detectDonePlanIntegrity",
+  "detectMisclassifiedTier",
   // Code Quality Intelligence (CQ-*)
   "detectJSDocCoverage",
   "detectUnsafeTypeAssertions",

@@ -126,4 +126,62 @@ describe("installMiddleware", () => {
       expect.objectContaining({ command: "audit", projectRoot: "/project" })
     );
   });
+
+  it("preAction publishes action.pre_sensitive for sensitive commands", async () => {
+    const handlers: Record<string, Function[]> = {};
+    const mockHook = vi.fn((event: string, handler: Function) => {
+      if (!handlers[event]) handlers[event] = [];
+      handlers[event].push(handler);
+    });
+    const program = { hook: mockHook } as any;
+    const ctx: MiddlewareContext = {
+      projectRoot: "/project",
+      shitennoDir: "/project/shitenno",
+      sessionId: "session-123",
+    };
+
+    installMiddleware(program, ctx);
+
+    const mockProgram = { name: vi.fn().mockReturnValue("shugo") };
+    const mockActionCommand = { name: vi.fn().mockReturnValue("commit"), args: ["-m", "test"] };
+    for (const handler of handlers["preAction"] || []) {
+      await handler.call(mockProgram, mockProgram, mockActionCommand);
+    }
+
+    const { getEventBus } = await import("../event-bus.js");
+    const bus = vi.mocked(getEventBus)();
+    expect(bus.publish).toHaveBeenCalledWith(
+      "action.pre_sensitive",
+      expect.objectContaining({ command: "commit" })
+    );
+  });
+
+  it("preAction does NOT publish action.pre_sensitive for non-sensitive commands", async () => {
+    const handlers: Record<string, Function[]> = {};
+    const mockHook = vi.fn((event: string, handler: Function) => {
+      if (!handlers[event]) handlers[event] = [];
+      handlers[event].push(handler);
+    });
+    const program = { hook: mockHook } as any;
+    const ctx: MiddlewareContext = {
+      projectRoot: "/project",
+      shitennoDir: "/project/shitenno",
+      sessionId: "session-123",
+    };
+
+    installMiddleware(program, ctx);
+
+    const mockProgram = { name: vi.fn().mockReturnValue("shugo") };
+    const mockActionCommand = { name: vi.fn().mockReturnValue("status"), args: [] };
+    for (const handler of handlers["preAction"] || []) {
+      await handler.call(mockProgram, mockProgram, mockActionCommand);
+    }
+
+    const { getEventBus } = await import("../event-bus.js");
+    const bus = vi.mocked(getEventBus)();
+    expect(bus.publish).not.toHaveBeenCalledWith(
+      "action.pre_sensitive",
+      expect.anything()
+    );
+  });
 });

@@ -64,11 +64,11 @@ session:
   status: active
 
 current_task:
-  id: audit-security-evolution-v4
-  description: "PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4 — 14 items: taint engine fixes, fixture corpus, regex fixes, SCA signals"
+  id: plano-unico-consolidado-final
+  description: "PLANO-UNICO-CONSOLIDADO final — Fases B/C/D: dead code removal, 8 observability handlers, regression tests"
   status: "completed"
-  started_at: "2026-07-31T01:30:00.000Z"
-  completed_at: "2026-07-31T01:40:00.000Z"
+  started_at: "2026-08-01T02:25:00.000Z"
+  completed_at: "2026-08-01T02:35:00.000Z"
 
 next_p0: "SA7 — God modules refactoring (rule-engine 1307L, scorer 947L, engineering-state 908L, feedback-engine 756L). No P0 items exist; SA7 is highest-impact P1."
 
@@ -108,6 +108,7 @@ completed_tasks:
   - EFFICIENCY-IMPROVEMENTS Phase 3: MCP response caching
   - EFFICIENCY-IMPROVEMENTS Phase 4: Inference engine caching
   - PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4 (Items 0-8: fixtures corpus, findTaintSink suffix, WeakCrypto fix, XSS sinks, req.file, deserialize separation, CORS+secrets, srcDir auto-detect, SCA skip signal, regex multiline fix, taint 2-pass, self-mutation script)
+  - PLANO-UNICO-CONSOLIDADO-FINAL: pipeline.started removal, 8 observability handlers, 15 regression tests
 
 impediments:
   - description: "Retroactive sync failed for TEST-FILE-WATCHER-001: 2 errors"

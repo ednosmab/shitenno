@@ -13,6 +13,7 @@ import { recordEvent, recordNotificationStat, MAX_SESSIONS } from "./state.js";
 import { daemonLog } from "./log-rotation.js";
 import type { DaemonContext } from "./pid-manager.js";
 import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
+import { subscribeObservabilityEvents } from "./observability-handlers.js";
 
 // ── Resource Arbitration ────────────────────────────────────────────────────
 
@@ -155,7 +156,9 @@ function subscribeSessionAndStateTracking(ctx: DaemonContext): void {
   bus.subscribe("session.end", (payload) => {
     recordEvent(ctx.state, "session.end");
     const p = payload as { sessionId?: string; duration?: number } | undefined;
-    const session = ctx.state.sessions.find((s) => !s.endedAt);
+    const session = p?.sessionId
+      ? ctx.state.sessions.find((s) => s.id === p.sessionId && !s.endedAt)
+      : ctx.state.sessions.find((s) => !s.endedAt);
     if (session) {
       session.endedAt = new Date().toISOString();
       session.duration = p?.duration ?? Math.round((Date.now() - new Date(session.startedAt).getTime()) / 60000);
@@ -227,6 +230,7 @@ export function subscribeTier2Events(ctx: DaemonContext): void {
     const p = payload as { planId?: string; message?: string } | undefined;
     daemonLog(ctx.logPath, "WARN", `Plan inconsistency detected: ${p?.planId ?? "unknown"} — ${p?.message ?? ""}`);
   });
+
 }
 
 // ── Generic Log Events ──────────────────────────────────────────────────────
@@ -263,6 +267,7 @@ export function subscribeAllEvents(
   subscribeTier1Events(ctx, verifyAllPendingPlans, runPeriodicAuditFn);
   subscribeTier2Events(ctx);
   subscribeGenericLogEvents(ctx);
+  subscribeObservabilityEvents(ctx);
 
   // Track proactive engine and audit state
   const bus = getEventBus();

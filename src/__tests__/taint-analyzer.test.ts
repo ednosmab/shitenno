@@ -249,6 +249,42 @@ describe("TaintAnalyzer", () => {
     expect(sqlIssues.length).toBeGreaterThanOrEqual(1);
   });
 
+  it("does not confuse same-named variables across files when crossFile is disabled", () => {
+    mkdirSync(join(tempDir, "src", "commands"), { recursive: true });
+    writeFileSync(join(tempDir, "src", "commands", "dummy.ts"), "# dummy");
+    mkdirSync(join(tempDir, "src", "__tests__"), { recursive: true });
+    writeFileSync(join(tempDir, "src", "__tests__", "dummy.test.ts"), "# dummy test");
+    writeFileSync(
+      join(tempDir, "tsconfig.json"),
+      JSON.stringify({
+        compilerOptions: { target: "ES2022", module: "ESNext", moduleResolution: "Bundler", esModuleInterop: true, strict: true, skipLibCheck: true, noEmit: true },
+        include: ["src/**/*.ts"],
+        exclude: ["node_modules", "__tests__", "dist"],
+      })
+    );
+
+    // File A: genuinely tainted data flowing to exec()
+    writeFileSync(join(tempDir, "src", "tainted-source.ts"), [
+      'const cmd = process.argv[2];',
+      'exec(cmd);',
+    ].join("\n"));
+
+    // File B: NOT tainted — local variable only
+    writeFileSync(join(tempDir, "src", "clean-local.ts"), [
+      'const cmd = "echo hello";',
+      'exec(cmd);',
+    ].join("\n"));
+
+    const analyzer = new TaintAnalyzer({ projectRoot: tempDir, crossFile: false });
+    const issues = analyzer.analyze();
+
+    const taintedIssues = issues.filter((i) => i.location.includes("tainted-source"));
+    const cleanIssues = issues.filter((i) => i.location.includes("clean-local"));
+
+    expect(taintedIssues.length).toBeGreaterThanOrEqual(1);
+    expect(cleanIssues.length).toBeLessThan(taintedIssues.length);
+  });
+
   describe("cvssToSeverity", () => {
     it("returns severity 3 for high-impact CVSS vectors (score >= 5)", () => {
       // AV:N(0.85) + AC:L(0.77) + PR:N(0.85) + UI:N(0.85) + C:H(0.56) + I:H(0.56) + A:H(0.56) = 5.0

@@ -51,3 +51,20 @@ jobs:
 
       - name: Known-risk pattern scan
         run: bash scripts/scan-risk-patterns.sh
+
+      - name: Security wiring gates
+        run: pnpm run test:wiring
+
+      - name: Security detection matrix
+        run: pnpm run test:matrix
+
+      - name: Self-audit baseline diff
+        run: npx tsx scripts/security/baseline-diff.ts
+        continue-on-error: true
+        id: baseline_diff
+
+      - name: LLM triage (only if baseline flagged anomaly)
+        if: steps.baseline_diff.outcome == 'failure'
+        run: npx tsx scripts/security/llm-triage-anomaly.ts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

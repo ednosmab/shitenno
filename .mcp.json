@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "shitenno": {
+      "command": "node",
+      "args": ["./dist/bin/shugo.js", "mcp"]
+    }
+  }
+}

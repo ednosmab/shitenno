@@ -120,14 +120,22 @@ export function detectImportConsistency(_projectRoot: string, files: SourceFileI
 
 // ── 4.7 Test Structure Validation ───────────────────────────────────────────
 
+function findSourceDir(projectRoot: string): string {
+  for (const candidate of ["src", "app", "lib", "source"]) {
+    const dir = join(projectRoot, candidate);
+    if (existsSync(dir)) return dir;
+  }
+  return join(projectRoot, "src");
+}
+
 export function detectTestStructure(projectRoot: string): HealthIssue[] {
   const issues: HealthIssue[] = [];
-  const testsDir = join(projectRoot, "src", "__tests__");
+  const srcDir = findSourceDir(projectRoot);
+  const testsDir = join(srcDir, "__tests__");
   if (!existsSync(testsDir)) return issues;
 
   try {
     const testFiles = readdirSync(testsDir).filter((f) => f.endsWith(".test.ts"));
-    const srcDir = join(projectRoot, "src");
     const srcDirs = readdirSync(srcDir, { withFileTypes: true })
       .filter((d) => d.isDirectory())
       .map((d) => d.name)

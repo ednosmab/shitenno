@@ -32,6 +32,7 @@ import {
   detectInsecureCookies,
   detectWeakRandomness,
 } from "../audit/engineering-detectors.js";
+import { detectNPlusOne } from "../audit/performance-detectors.js";
 
 let tempDir: string;
 
@@ -464,6 +465,36 @@ describe("detectOrphanModules", () => {
     const issues = detectOrphanModules(tempDir, []);
     expect(issues.length).toBe(0);
   });
+
+  it("does not flag module referenced via dynamic import()", () => {
+    const files = [
+      makeFile("src/routes.ts", 'const page = () => import("./pages/Home.tsx")'),
+      makeFile("src/pages/Home.tsx", "export default function Home() {}"),
+    ];
+    const issues = detectOrphanModules(tempDir, files);
+    const orphanHome = issues.find((i) => i.description.includes("Home.tsx"));
+    expect(orphanHome).toBeUndefined();
+  });
+
+  it("does not flag module referenced via dynamic import with .js extension", () => {
+    const files = [
+      makeFile("src/routes.ts", 'const page = () => import("./pages/Home.js")'),
+      makeFile("src/pages/Home.tsx", "export default function Home() {}"),
+    ];
+    const issues = detectOrphanModules(tempDir, files);
+    const orphanHome = issues.find((i) => i.description.includes("Home.tsx"));
+    expect(orphanHome).toBeUndefined();
+  });
+
+  it("does not flag module only imported by test files", () => {
+    const files = [
+      makeFile("src/utils.ts", "export function helper() { return 1; }"),
+      makeFile("src/__tests__/utils.test.ts", 'import { helper } from "../utils.js"\ntest("helper", () => helper());'),
+    ];
+    const issues = detectOrphanModules(tempDir, files);
+    const orphanUtils = issues.find((i) => i.description.includes("utils.ts"));
+    expect(orphanUtils).toBeDefined();
+  });
 });
 
 // ── detectComplexityHotspots ─────────────────────────────────────────────────
@@ -527,10 +558,11 @@ describe("detectEmptyCatchBlocks", () => {
     expect(issues[0]!.severity).toBe(2);
   });
 
-  it("detects catch with only comments", () => {
+  it("detects catch with only comments (reduced severity)", () => {
     const files = [makeFile("src/app.ts", "try {\n  run()\n} catch (e) {\n  // ignored\n}")];
     const issues = detectEmptyCatchBlocks(tempDir, files);
     expect(issues.length).toBe(1);
+    expect(issues[0]!.severity).toBe(1);
   });
 
   it("does not flag catch with error handling", () => {
@@ -539,10 +571,11 @@ describe("detectEmptyCatchBlocks", () => {
     expect(issues.length).toBe(0);
   });
 
-  it("detects catch with multiple consecutive comments", () => {
+  it("detects catch with multiple consecutive comments (reduced severity)", () => {
     const files = [makeFile("src/app.ts", "try {\n  run()\n} catch (e) {\n  /* a */ // b\n}")];
     const issues = detectEmptyCatchBlocks(tempDir, files);
     expect(issues.length).toBe(1);
+    expect(issues[0]!.severity).toBe(1);
   });
 
   it("does not hang on adversarial whitespace-only catch body (ReDoS resistance)", () => {
@@ -619,6 +652,29 @@ describe("detectUnusedExports", () => {
     ];
     const issues = detectUnusedExports(tempDir, files);
     expect(issues.length).toBe(0);
+  });
+
+  it("flags exports only used by test files as unused", () => {
+    const files = [
+      makeFile("src/utils.ts", "export function helper() { return 1; }"),
+      makeFile("src/__tests__/utils.test.ts", 'import { helper } from "../utils.js"\ntest("helper", () => helper());'),
+    ];
+    const issues = detectUnusedExports(tempDir, files);
+    expect(issues.length).toBeGreaterThanOrEqual(1);
+    expect(issues[0]!.description).toContain("helper");
+  });
+
+  it("flags exports not used by any non-test file", () => {
+    const files = [
+      makeFile("src/utils.ts", "export function helper() { return 1; }\nexport function trulyUnused() { return 2; }"),
+      makeFile("src/__tests__/utils.test.ts", 'import { helper } from "../utils.js"\ntest("helper", () => helper());'),
+      makeFile("src/main.ts", 'import { helper } from "./utils.js"\nhelper();'),
+    ];
+    const issues = detectUnusedExports(tempDir, files);
+    const unusedIssue = issues.find((i) => i.description.includes("trulyUnused"));
+    expect(unusedIssue).toBeDefined();
+    const helperIssue = issues.find((i) => i.description.includes("helper"));
+    expect(helperIssue).toBeUndefined();
   });
 });
 
@@ -978,6 +1034,60 @@ describe("detectDependencyConfusion", () => {
     writeFileSync(join(tempDir, "package.json"), "{}");
     const files = [makeFile("src/app.ts", 'import { join } from "path"')];
     const issues = detectDependencyConfusion(tempDir, files);
+    expect(issues.length).toBe(0);
+  });
+});
+
+// ── detectNPlusOne ──────────────────────────────────────────────────────────
+
+describe("detectNPlusOne", () => {
+  it("detects db.query inside a for loop", () => {
+    const files = [makeFile("src/app.ts", `for (const user of users) {
+  const result = db.query("SELECT * FROM orders WHERE userId = " + user.id);
+}`)];
+    const issues = detectNPlusOne(tempDir, files);
+    expect(issues.length).toBe(1);
+    expect(issues[0]!.type).toBe("n_plus_one_query");
+  });
+
+  it("detects pool.find inside a for-of loop", () => {
+    const files = [makeFile("src/app.ts", `for (const item of items) {
+  const found = pool.find(filter);
+}`)];
+    const issues = detectNPlusOne(tempDir, files);
+    expect(issues.length).toBe(1);
+  });
+
+  it("does not flag Array.prototype.find on a constant array", () => {
+    const files = [makeFile("src/app.ts", `const CAPABILITIES = [{ id: "a" }, { id: "b" }];
+for (const cap of installedCapabilities) {
+  const info = CAPABILITIES.find((c) => c.id === cap);
+}`)];
+    const issues = detectNPlusOne(tempDir, files);
+    expect(issues.length).toBe(0);
+  });
+
+  it("does not flag non-DB objects with .find in a loop", () => {
+    const files = [makeFile("src/app.ts", `for (const item of items) {
+  const match = myList.find((x) => x.id === item.id);
+}`)];
+    const issues = detectNPlusOne(tempDir, files);
+    expect(issues.length).toBe(0);
+  });
+
+  it("detects prisma.query inside a while loop", () => {
+    const files = [makeFile("src/app.ts", `while (cursor) {
+  const rows = prisma.query("SELECT * FROM users");
+}`)];
+    const issues = detectNPlusOne(tempDir, files);
+    expect(issues.length).toBe(1);
+  });
+
+  it("skips test files", () => {
+    const files = [makeFile("src/__tests__/app.test.ts", `for (const user of users) {
+  const result = db.query("SELECT * FROM orders");
+}`)];
+    const issues = detectNPlusOne(tempDir, files);
     expect(issues.length).toBe(0);
   });
 });

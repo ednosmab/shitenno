@@ -1,12 +1,12 @@
 import { execSync } from 'child_process';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..', '..');
-const GOV = resolve(ROOT, 'shitenno', 'governance');
+const GOV = resolve(ROOT, '.shitenno', 'governance');
 
 let exitCode = 0;
 let warnings: string[] = [];
@@ -41,16 +41,32 @@ function checkWorkingTree() {
 }
 
 // ── 2. Tests executed? ────────────────────────────────────────────────────
-function checkTests() {
+function checkTestsLocal() {
   try {
-    execSync('pnpm run test --recursive --if-present --filter=core 2>/dev/null | tail -1', {
+    const pkgPath = resolve(ROOT, 'package.json');
+    if (!existsSync(pkgPath)) {
+      warn('TESTS', 'No package.json found — cannot run tests');
+      return;
+    }
+    let testScript = '';
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      testScript = pkg.scripts?.test ?? '';
+    } catch { /* no-op */ }
+
+    if (!testScript) {
+      warn('TESTS', 'No test script in package.json — cannot verify');
+      return;
+    }
+
+    execSync('pnpm run test 2>/dev/null | tail -1', {
       encoding: 'utf-8',
       cwd: ROOT,
-      timeout: 60000,
+      timeout: 120000,
     });
-    pass('TESTS', 'Core tests passed');
+    pass('TESTS', 'Tests passed');
   } catch {
-    warn('TESTS', 'Tests not executed or failed — run pnpm run test');
+    warn('TESTS', 'Tests not executed or failed — run your project test command');
   }
 }
 
@@ -71,16 +87,19 @@ function checkBuffer() {
 
 // ── 4. Backlog updated? ───────────────────────────────────────────────────
 function checkBacklog() {
-  const backlogPath = resolve(ROOT, 'shitenno', 'docs', 'BACKLOG.md');
+  const modularPath = resolve(ROOT, '.shitenno', 'docs', 'backlog', 'ACTIVE.md');
+  const legacyPath = resolve(ROOT, '.shitenno', 'docs', 'BACKLOG.md');
+  const backlogPath = existsSync(modularPath) ? modularPath : legacyPath;
+
   if (!existsSync(backlogPath)) {
-    warn('BACKLOG', 'BACKLOG.md not found');
+    warn('BACKLOG', 'Backlog not found');
     return;
   }
   const content = readFileSync(backlogPath, 'utf-8');
   if (content.includes('Concluído') || content.includes('Done') || content.includes('In Progress')) {
-    pass('BACKLOG', 'BACKLOG.md has tracked items');
+    pass('BACKLOG', 'Backlog has tracked items');
   } else {
-    warn('BACKLOG', 'BACKLOG.md may need updating');
+    warn('BACKLOG', 'Backlog may need updating');
   }
 }
 
@@ -95,58 +114,99 @@ function checkCommit() {
 }
 
 // ── 6. Build verification ───────────────────────────────────────────────
-function checkBuild() {
+function checkBuildLocal() {
   try {
-    execSync('pnpm run build:verify 2>/dev/null | tail -5', {
+    const pkgPath = resolve(ROOT, 'package.json');
+    let buildScript = '';
+    if (existsSync(pkgPath)) {
+      try {
+        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+        buildScript = pkg.scripts?.build ?? '';
+      } catch { /* no-op */ }
+    }
+
+    if (!buildScript) {
+      pass('BUILD', 'No build script — skipped');
+      return;
+    }
+
+    execSync('pnpm run build 2>/dev/null | tail -5', {
       encoding: 'utf-8',
       cwd: ROOT,
       timeout: 180000,
     });
     pass('BUILD', 'Build verification passed');
   } catch {
-    warn('BUILD', 'Build failed — run pnpm run build:verify');
+    warn('BUILD', 'Build failed — run your project build command');
   }
 }
 
-// ── 7. Completion Pipeline (legacy fallback) ─────────────────────────────
-async function checkCompletionPipeline() {
-  await checkCompletionGateLegacy();
-  await checkPlanLifecycle();
-}
-
-// ── 7b. Legacy completion gate (fallback) ─────────────────────────────────
-async function checkCompletionGateLegacy() {
-  try {
-    const mod = await import(resolve(ROOT, 'dist', 'task-completion.js'));
-    const result = mod.validateCompletionGate({
-      projectRoot: ROOT,
-      shitennoDir: resolve(ROOT, 'shitenno'),
-      taskId: 'session-close',
-    });
-    if (result.passed) {
-      pass('COMPLETION_GATE', 'All 5 gates passed (tests, lint, docs, backlog, plan_status)');
-    } else {
-      const failures = result.gates
-        .filter((g: { passed: boolean }) => !g.passed)
-        .map((g: { name: string; message: string }) => `${g.name}: ${g.message}`);
-      fail('COMPLETION_GATE', `Gate(s) failed: ${failures.join('; ')}`);
-    }
-  } catch {
-    warn('COMPLETION_GATE', 'Completion gate module not available — skipping (run pnpm build first)');
-  }
-}
-
-// ── 8. Plan lifecycle — detect active plans ────────────────────────────────
+// ── 7. Plan lifecycle — detect active plans ────────────────────────────────
 async function checkPlanLifecycle() {
   try {
-    const { detectActivePlans } = await import(resolve(ROOT, 'dist', 'plan-lifecycle.js'));
-    const plans = detectActivePlans(resolve(GOV, 'plans'));
-    if (plans.length > 0) {
-      warn('PLAN_LIFECYCLE', `${plans.length} active plan(s) — run "shugo plan md lifecycle" to review and archive`);
-      for (const p of plans) {
-        console.log(`         → ${p.id}: ${p.title} [${p.status}]`);
+    const { detectActivePlans, runAutoVerification } = await import(resolve(ROOT, 'dist', 'plan-lifecycle.js'));
+    const { acquireVerificationLock, releaseVerificationLock } = await import(resolve(ROOT, 'dist', 'verification-lock.js'));
+    const shitennoDir = resolve(ROOT, '.shitenno');
+
+    if (!acquireVerificationLock(shitennoDir)) {
+      warn('PLAN_LIFECYCLE', 'Verification already in progress by daemon — skipping, daemon will complete it');
+      return;
+    }
+
+    const plans = detectActivePlans(shitennoDir);
+    const pendingCheck = plans.filter((p: { status: string }) => p.status === 'check');
+
+    try {
+      if (pendingCheck.length > 0) {
+        warn('PLAN_LIFECYCLE', `${pendingCheck.length} plan(s) em 'check' ao fechar sessão — rodando verificação agora`);
+        for (const p of pendingCheck) {
+          const record = runAutoVerification(shitennoDir, ROOT, p.id);
+          if (record.passed) {
+            pass('PLAN_LIFECYCLE', `${p.id} → verificado e movido para done/`);
+          } else {
+            fail('PLAN_LIFECYCLE', `${p.id} → bloqueado (${record.checks.filter((c: { passed: boolean }) => !c.passed).map((c: { name: string }) => c.name).join(', ')})`);
+          }
+        }
       }
-    } else {
+    } finally {
+      releaseVerificationLock(shitennoDir);
+    }
+
+    if (pendingCheck.length > 0) {
+      try {
+        const bufferPath = resolve(shitennoDir, 'governance', 'context', 'context_buffer.yaml');
+        if (existsSync(bufferPath)) {
+          const bufContent = readFileSync(bufferPath, 'utf-8');
+          let updated = bufContent;
+          let changed = false;
+          for (const p of pendingCheck) {
+            const nagMsg = `Plano ${p.id} segue em 'check' — verificacao nao conseguiu resolver`;
+            const escapedMsg = nagMsg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            if (!new RegExp(`^\\s*- message: "${escapedMsg}"`, 'm').test(updated)) {
+              const priority = 'high';
+              const createdAt = new Date().toISOString();
+              const entry = `  - message: "${nagMsg}"\n    priority: "${priority}"\n    category: "infra"\n    createdAt: "${createdAt}"\n`;
+              if (/^reminders:/m.test(updated)) {
+                updated = updated.replace(/^(reminders:)\s*\n/m, `$1\n${entry}`);
+              } else {
+                updated = updated.trimEnd() + '\n\nreminders:\n' + entry;
+              }
+              changed = true;
+              warn('PLAN_LIFECYCLE', `High-priority reminder created for stale plan ${p.id}`);
+            }
+          }
+          if (changed) {
+            writeFileSync(bufferPath, updated, 'utf-8');
+          }
+        }
+      } catch { /* best effort */ }
+    }
+
+    const stillActive = plans.filter((p: { status: string }) => p.status !== 'done' && p.status !== 'check' && !pendingCheck.some((pc: { id: string }) => pc.id === p.id));
+    if (stillActive.length > 0) {
+      warn('PLAN_LIFECYCLE', `${stillActive.length} plan(s) ainda em andamento/parado — normal, não é bloqueante`);
+    }
+    if (plans.length === 0) {
       pass('PLAN_LIFECYCLE', 'No active plans — all archived');
     }
   } catch {
@@ -154,16 +214,71 @@ async function checkPlanLifecycle() {
   }
 }
 
+// ── 8. E2E suite — best-effort, never blocks session close ─────────────────
+function runE2eBestEffort() {
+  try {
+    const pkgPath = resolve(ROOT, 'package.json');
+    if (!existsSync(pkgPath)) {
+      warn('E2E_SUITE', 'No package.json found — skipping');
+      return;
+    }
+    let e2eScript = '';
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      e2eScript = pkg.scripts?.['test:e2e'] ?? '';
+    } catch { /* no-op */ }
+
+    if (!e2eScript) {
+      warn('E2E_SUITE', 'No test:e2e script — skipped (non-blocking)');
+      return;
+    }
+
+    console.log('🧪 [E2E_SUITE] Running test:e2e (best-effort, non-blocking)...');
+    execSync('pnpm run test:e2e 2>&1 | tail -20', {
+      encoding: 'utf-8',
+      cwd: ROOT,
+      timeout: 600000,
+    });
+    pass('E2E_SUITE', 'test:e2e passed');
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    warn('E2E_SUITE', `test:e2e failed (non-blocking): ${String(detail).slice(0, 200)}`);
+
+    try {
+      const shitennoDir = resolve(ROOT, '.shitenno');
+      const bufferPath = resolve(shitennoDir, 'governance', 'context', 'context_buffer.yaml');
+      if (existsSync(bufferPath)) {
+        const bufContent = readFileSync(bufferPath, 'utf-8');
+        const nagMsg = 'e2e-suite: test:e2e falhou na última sessão — investigar antes do próximo release';
+        const escapedMsg = nagMsg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (!new RegExp(`^\\s*- message: "${escapedMsg}"`, 'm').test(bufContent)) {
+          const priority = 'P1';
+          const createdAt = new Date().toISOString();
+          const entry = `  - message: "${nagMsg}"\n    priority: "${priority}"\n    category: "quality"\n    createdAt: "${createdAt}"\n`;
+          let updated = bufContent;
+          if (/^reminders:/m.test(updated)) {
+            updated = updated.replace(/^(reminders:)\s*\n/m, `$1\n${entry}`);
+          } else {
+            updated = updated.trimEnd() + '\n\nreminders:\n' + entry;
+          }
+          writeFileSync(bufferPath, updated, 'utf-8');
+        }
+      }
+    } catch { /* best effort */ }
+  }
+}
+
 // ── Execute ───────────────────────────────────────────────────────────────
 console.log('\n🔒 CLOSE SESSION — Closing session checklist\n');
 
 checkWorkingTree();
-checkTests();
+checkTestsLocal();
 checkBuffer();
 checkBacklog();
 checkCommit();
-checkBuild();
-await checkCompletionPipeline();
+checkBuildLocal();
+await checkPlanLifecycle();
+runE2eBestEffort();
 
 console.log(`\n${exitCode === 0 ? '✅ Session ready to close' : '❌ Session has issues to resolve'}`);
 if (warnings.length > 0) {

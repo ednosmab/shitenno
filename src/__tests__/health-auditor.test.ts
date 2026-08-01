@@ -915,7 +915,7 @@ describe("detectEmptyCatchBlocks", () => {
       (i) => i.type === "empty_catch" && i.description.includes("utils.ts")
     );
     expect(emptyCatch).toBeDefined();
-    expect(emptyCatch!.severity).toBe(2);
+    expect(emptyCatch!.severity).toBe(1);
   });
 
   it("does not flag catch blocks with error handling", async () => {

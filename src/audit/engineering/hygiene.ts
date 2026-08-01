@@ -45,12 +45,17 @@ export function detectEmptyCatchBlocks(_projectRoot: string, files: SourceFileIn
     let match;
     while ((match = emptyCatchRegex.exec(file.content)) !== null) {
       const lineNum = file.content.substring(0, match.index).split("\n").length;
+      const hasComment = /\/[/*]/.test(match[0]);
       issues.push({
         type: "empty_catch",
-        severity: 2,
-        description: `Catch vazio em "${file.relPath}:${lineNum}" — erros estão silenciados`,
+        severity: hasComment ? 1 : 2,
+        description: hasComment
+          ? `Catch vazio comentado em "${file.relPath}:${lineNum}" — verificar se a omissão é intencional`
+          : `Catch vazio em "${file.relPath}:${lineNum}" — erros estão silenciados`,
         location: `${file.relPath}:${lineNum}`,
-        recommendation: `Adicionar tratamento de erro ou logger.debug no catch em ${file.relPath}:${lineNum}`,
+        recommendation: hasComment
+          ? `Confirmar se a omissão intencional em ${file.relPath}:${lineNum} — adicionar logger.debug se silenciado de propósito`
+          : `Adicionar tratamento de erro ou logger.debug no catch em ${file.relPath}:${lineNum}`,
         confidence: 0.75,
       });
     }

@@ -115,6 +115,9 @@
 │   docs/history/2026-07-31-rule-plan_archived.md
 │   docs/history/2026-07-31-rule-session_close.md
 │   docs/history/2026-07-31-rule-session_end_plans.md
+│   docs/history/2026-08-01-rule-plan_archived.md
+│   docs/history/2026-08-01-rule-session_close.md
+│   docs/history/2026-08-01-rule-session_end_plans.md
 │   docs/INDEX.md
 │   docs/KNOWLEDGE_LIFECYCLE.md
 │   docs/opencode-context.md
@@ -371,12 +374,18 @@
 │   governance/plans/done/plano-daemon-kernel.verification.json
 │   governance/plans/done/Plano-de-Evolução-do-Shitenno-cli.md
 │   governance/plans/done/Plano-de-Evolução-do-Shitenno-cli.verification.json
+│   governance/plans/done/PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4.md
+│   governance/plans/done/PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4.verification.json
 │   governance/plans/done/PLANO-FINAL-CONSOLIDADO-2026-07-29.md
 │   governance/plans/done/PLANO-FINAL-CONSOLIDADO-2026-07-29.verification.json
 │   governance/plans/done/PLANO-MCP-DAEMON-2026-07-30.md
 │   governance/plans/done/PLANO-MCP-DAEMON-2026-07-30.verification.json
 │   governance/plans/done/plano-melhoria-mecanismo-contexto.md
 │   governance/plans/done/plano-melhoria-mecanismo-contexto.verification.json
+│   governance/plans/done/PLANO-QUALIDADE-EFICIENCIA-2026-08-01.md
+│   governance/plans/done/PLANO-QUALIDADE-EFICIENCIA-2026-08-01.verification.json
+│   governance/plans/done/PLANO-UNICO-CONSOLIDADO-2026-08-01-v2.md
+│   governance/plans/done/PLANO-UNICO-CONSOLIDADO-2026-08-01-v2.verification.json
 │   governance/plans/done/production-readiness.md
 │   governance/plans/done/production-readiness.verification.json
 │   governance/plans/done/RELATORIO-AUDITORIA-S-T-U-V-2026-07-29.md
@@ -394,7 +403,8 @@
 │   governance/plans/pipeline/living-fase1-cache.md
 │   governance/plans/pipeline/living-fase2-hooks.md
 │   governance/plans/pipeline/living-fase3-daemon.md
-│   governance/plans/PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4.md
+│   governance/plans/PLANO-FONTE-UNICA-MCP-2026-07-31.md
+│   governance/plans/PLANO-MCP-CROSS-HARNESS-2026-08-01.md
 │   governance/plans/README.md
 │   governance/plans/reference/
 │   governance/plans/reference/ENTERPRISE_AUDIT_PLAN.md
@@ -494,6 +504,9 @@
 │   reports/complexity-shitenno-2026-07-29-session7.json
 │   reports/complexity-shitenno-2026-07-29-session8.json
 │   reports/complexity-shitenno-2026-07-29-session9.json
+│   reports/complexity-shitenno-2026-08-01-session1.json
+│   reports/complexity-shitenno-2026-08-01-session2.json
+│   reports/complexity-shitenno-2026-08-01-session3.json
 │   reports/complexity-shitenno-cli-2026-07-12-session1.json
 │   reports/complexity-shitenno-cli-2026-07-13-session1.json
 │   reports/complexity-shitenno-cli-2026-07-14-session1.json
@@ -529,6 +542,7 @@
 │   reports/doc-sync-2026-07-29.json
 │   reports/doc-sync-2026-07-30.json
 │   reports/doc-sync-2026-07-31.json
+│   reports/doc-sync-2026-08-01.json
 │   reports/evolution-2026-07-18.json
 │   reports/evolution-2026-07-25.json
 │   reports/health-2026-07-16.json
@@ -538,6 +552,7 @@
 │   reports/health-2026-07-24.json
 │   reports/health-2026-07-25.json
 │   reports/health-2026-07-29.json
+│   reports/health-2026-08-01.json
 │   reports/patterns-2026-07-12.json
 │   reports/patterns-2026-07-13.json
 │   reports/patterns-2026-07-14.json

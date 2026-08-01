@@ -43,7 +43,13 @@
     "premortem:check": "tsx .shitenno/scripts/premortem-check.ts",
     "shugo": "node ./dist/bin/shugo.js",
     "mcp": "node scripts/mcp-client.mjs",
-    "mcp:list": "node scripts/mcp-client.mjs --list"
+    "mcp:list": "node scripts/mcp-client.mjs --list",
+    "test:wiring": "vitest run src/__tests__/detector-orphan-sweep.test.ts src/__tests__/detector-level-composition.test.ts src/__tests__/security-self-exclusion.test.ts",
+    "test:matrix": "vitest run src/__tests__/audit-level-matrix.test.ts src/__tests__/security-benchmark.test.ts",
+    "lint:sink-definitions": "npx tsx scripts/security/lint-sink-definitions.ts",
+    "baseline:diff": "npx tsx scripts/security/baseline-diff.ts",
+    "generate:mutation-corpus": "npx tsx scripts/security/generate-mutation-corpus.ts",
+    "mutate:test": "npx tsx scripts/security/mutate-and-test.ts"
   },
   "keywords": [
     "ai",

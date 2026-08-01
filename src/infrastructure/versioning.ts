@@ -51,7 +51,6 @@ export const EVENT_VERSIONS: Record<ShitennoEventType, EventVersion> = {
   "task.completed": 1,
   "pipeline.stage.start": 1,
   "pipeline.stage.complete": 1,
-  "pipeline.started": 1,
   "pipeline.complete": 1,
   "plan.archived": 1,
   "plan.created": 1,

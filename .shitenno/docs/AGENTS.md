@@ -35,7 +35,7 @@ Escreva códigos extremamente declarativos, simples e fáceis de ler. Evite otim
 
 **Override:** o campo `loading_profile` em `opencode.json` força o perfil independentemente do default.
 
-**Lazy Loading (Novo):** O `session-bootstrapper.ts` implementa carregamento lazy para optimizar tokens. Apenas ficheiros essenciais (`AGENTS.md`, `context_buffer.yaml`) são carregados no início. Outros ficheiros são carregados sob demanda via MCP quando necessário.
+**Lazy Loading:** Estado da sessão é obtido via `shitenno_getBriefing`/`shitenno_getMandatoryContext` (MCP) — nunca por leitura directa de `context_buffer.yaml`. O `session-bootstrapper.ts` foi removido; o MCP é a fonte única de estado dinâmico.
 
 **Regras detalhadas:** Ver `docs/rules/` para regras movidas (dependency-graph, agent-modes, feedback-protocol, branch-policy, lazy-loading, context-algorithm).
 

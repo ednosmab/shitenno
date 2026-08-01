@@ -1,0 +1,38 @@
+{
+  "planId": "PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4",
+  "checks": [
+    {
+      "name": "FORMAT",
+      "passed": true,
+      "message": "Passed with 3 warning(s)"
+    },
+    {
+      "name": "BUILD",
+      "passed": true,
+      "message": "TypeScript compilation succeeded"
+    },
+    {
+      "name": "TESTS",
+      "passed": true,
+      "message": "test:unit passed"
+    },
+    {
+      "name": "LINT",
+      "passed": true,
+      "message": "Lint passed"
+    },
+    {
+      "name": "GATE_SELF_TEST",
+      "passed": true,
+      "message": "Gate integrity check passed"
+    },
+    {
+      "name": "DOCS",
+      "passed": true,
+      "message": "Documentation in sync"
+    }
+  ],
+  "passed": true,
+  "verifiedAt": "2026-07-31T15:23:15.668Z",
+  "diffHash": "826ba366315279c28373e133520fc735153122490460b105a87601370f1afe7b"
+}

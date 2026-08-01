@@ -36,7 +36,6 @@ export type ShitennoEventType =
   | "task.completed"
   | "pipeline.stage.start"
   | "pipeline.stage.complete"
-  | "pipeline.started"
   | "pipeline.complete"
   | "lifecycle.state_changed"
   | "knowledge.analyzed"

@@ -1,7 +1,7 @@
 # Plano de Evolução do Audit de Segurança — v4 (consolidado, com código, testado ao vivo)
 
-**Status:** Refused
-**Updated_at:** 2026-07-31T14:41:10.094Z
+**Status:** Done
+**Updated_at:** 2026-07-31T15:23:15.702Z
 **Date:** 2026-07-31
 
 > v4 incorpora o v3 inteiro (nenhum item removido) + os achados de duas rodadas de teste de
