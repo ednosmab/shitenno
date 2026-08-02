@@ -19,6 +19,11 @@ vi.mock("../event-bus.js", () => ({
   }),
 }));
 
+vi.mock("../session-feedback.js", () => ({
+  createFileStorage: vi.fn(),
+  recordOutcome: vi.fn(),
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
 });

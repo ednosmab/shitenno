@@ -77,14 +77,14 @@ describe("Performance Benchmarks", () => {
       
       try {
         // First notification - should send
-        const start1 = Date.now();
+        const start1 = performance.now();
         sendDesktopNotification(shitennoDir, "Perf Test", "Message", "medium");
-        const duration1 = Date.now() - start1;
+        const duration1 = performance.now() - start1;
         
         // Second notification - should be deduplicated
-        const start2 = Date.now();
+        const start2 = performance.now();
         sendDesktopNotification(shitennoDir, "Perf Test", "Message", "medium");
-        const duration2 = Date.now() - start2;
+        const duration2 = performance.now() - start2;
         
         expect(duration2).toBeLessThan(duration1);
       } finally {
