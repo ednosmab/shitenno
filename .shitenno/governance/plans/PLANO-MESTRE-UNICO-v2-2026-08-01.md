@@ -1,6 +1,6 @@
 # Plano Mestre Único v2 (2026-08-01) — com código verificado contra o repositório real
 
-**Status:** Refused
+**Status:** checked
 **Updated_at:** 2026-08-02T02:53:52.951Z
 **Date:** 2026-08-01
 
