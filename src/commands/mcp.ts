@@ -52,7 +52,11 @@ export function mcpCommand(): Command {
       const shitennoDir = stateDir ?? join(projectRoot, SHITENNO_DIR_NAME);
 
       if (options.consolidateOnly) {
-        consolidateEngineeringState(projectRoot, shitennoDir);
+        try {
+          consolidateEngineeringState(projectRoot, shitennoDir);
+        } catch {
+          // best-effort: background child, parent MCP server continues regardless
+        }
         return;
       }
 
