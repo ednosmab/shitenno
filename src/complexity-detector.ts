@@ -117,6 +117,43 @@ function hasMultiplePackages(projectRoot: string): boolean {
   );
 }
 
+// ── Scoring Helpers ──────────────────────────────────────────────────────────
+
+function scoreSourceFiles(projectRoot: string, score: number, factors: ComplexityFactor[]): number {
+  const srcFiles = countSourceFiles(join(projectRoot, "src"));
+  if (srcFiles > 50) {
+    score += 3;
+    factors.push({ name: "source_files", score: 3, description: `${srcFiles} source files (>50)` });
+  } else if (srcFiles > 10) {
+    score += 2;
+    factors.push({ name: "source_files", score: 2, description: `${srcFiles} source files (>10)` });
+  } else {
+    score += 1;
+    factors.push({ name: "source_files", score: 1, description: `${srcFiles} source files (simple)` });
+  }
+  return score;
+}
+
+function scoreDependencies(projectRoot: string, score: number, factors: ComplexityFactor[]): number {
+  const deps = getDependencyCount(projectRoot);
+  if (deps > 20) {
+    score += 3;
+    factors.push({ name: "dependencies", score: 3, description: `${deps} dependencies (>20)` });
+  } else if (deps > 5) {
+    score += 2;
+    factors.push({ name: "dependencies", score: 2, description: `${deps} dependencies (>5)` });
+  } else {
+    factors.push({ name: "dependencies", score: 0, description: `${deps} dependencies (minimal)` });
+  }
+  return score;
+}
+
+function determineLevel(score: number): ProjectComplexity {
+  if (score <= 4) return "simple";
+  if (score <= 8) return "medium";
+  return "complex";
+}
+
 // ── Main Detection ─────────────────────────────────────────────────────────
 
 /**
@@ -129,64 +166,30 @@ export function detectComplexity(projectRoot: string): ComplexityResult {
   let score = 0;
   const factors: ComplexityFactor[] = [];
 
-  // Factor 1: Source file count
-  const srcFiles = countSourceFiles(join(projectRoot, "src"));
-  if (srcFiles > 50) {
-    score += 3;
-    factors.push({ name: "source_files", score: 3, description: `${srcFiles} source files (>50)` });
-  } else if (srcFiles > 10) {
-    score += 2;
-    factors.push({ name: "source_files", score: 2, description: `${srcFiles} source files (>10)` });
-  } else {
-    score += 1;
-    factors.push({ name: "source_files", score: 1, description: `${srcFiles} source files (simple)` });
-  }
+  score = scoreSourceFiles(projectRoot, score, factors);
+  score = scoreDependencies(projectRoot, score, factors);
 
-  // Factor 2: Dependencies
-  const deps = getDependencyCount(projectRoot);
-  if (deps > 20) {
-    score += 3;
-    factors.push({ name: "dependencies", score: 3, description: `${deps} dependencies (>20)` });
-  } else if (deps > 5) {
-    score += 2;
-    factors.push({ name: "dependencies", score: 2, description: `${deps} dependencies (>5)` });
-  } else {
-    factors.push({ name: "dependencies", score: 0, description: `${deps} dependencies (minimal)` });
-  }
-
-  // Factor 3: Monorepo
   if (isMonorepo(projectRoot)) {
     score += 3;
     factors.push({ name: "monorepo", score: 3, description: "Monorepo detected" });
   }
 
-  // Factor 4: Test framework
   if (hasTestFramework(projectRoot)) {
     score += 2;
     factors.push({ name: "tests", score: 2, description: "Test framework detected" });
   }
 
-  // Factor 5: CI/CD
   if (hasCICD(projectRoot)) {
     score += 2;
     factors.push({ name: "cicd", score: 2, description: "CI/CD pipeline detected" });
   }
 
-  // Factor 6: Multiple packages
   if (hasMultiplePackages(projectRoot)) {
     score += 2;
     factors.push({ name: "multi_package", score: 2, description: "Multiple packages detected" });
   }
 
-  // Determine complexity level
-  let level: ProjectComplexity;
-  if (score <= 4) {
-    level = "simple";
-  } else if (score <= 8) {
-    level = "medium";
-  } else {
-    level = "complex";
-  }
+  const level = determineLevel(score);
 
   return {
     level,

@@ -1,5 +1,22 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import * as fs from "node:fs";
 import { mkdtempSync, rmSync, writeFileSync, readFileSync } from "node:fs";
+
+// Enable spying on ESM module exports by hoisting a passthrough mock
+vi.mock("node:fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  return { ...actual };
+});
+
+// Suppress vitest-fail-on-console for logger.warn calls in error paths
+vi.mock("../logger.js", () => ({
+  logger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  },
+}));
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -35,6 +52,11 @@ const sampleItem: BacklogItem = {
   modules: ["src/test.ts"],
   description: "This is a test issue",
   correction: "Fix the test",
+  state: "planeado",
+  owner: "unassigned",
+  line: 0,
+  filePath: "",
+  format: "modular",
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -167,10 +189,43 @@ describe("formatBacklogSection", () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe("appendBacklogSection", () => {
-  it("returns empty result when file not found", () => {
-    const result = appendBacklogSection("/nonexistent/file.md", [sampleItem], "2026-06-30");
+  it("returns empty result when directory creation fails", () => {
+    const mkdirSpy = vi
+      .spyOn(fs, "mkdirSync")
+      .mockImplementation(() => {
+        throw new Error("EACCES: permission denied");
+      });
+
+    const result = appendBacklogSection(
+      join(tempDir, "no-perms", "file.md"),
+      [sampleItem],
+      "2026-06-30"
+    );
+
     expect(result.itemsAdded).toBe(0);
     expect(result.sectionInserted).toBe(false);
+    expect(result.message).toBe("Backlog path not accessible");
+
+    mkdirSpy.mockRestore();
+  });
+
+  it("returns empty result when write fails", () => {
+    const backlogPath = join(tempDir, "BACKLOG.md");
+    writeFileSync(backlogPath, "# Backlog\n", "utf-8");
+
+    const writeSpy = vi
+      .spyOn(fs, "writeFileSync")
+      .mockImplementation(() => {
+        throw new Error("ENOSPC: no space left on device");
+      });
+
+    const result = appendBacklogSection(backlogPath, [sampleItem], "2026-06-30");
+
+    expect(result.itemsAdded).toBe(0);
+    expect(result.sectionInserted).toBe(false);
+    expect(result.message).toBe("Failed to write backlog file");
+
+    writeSpy.mockRestore();
   });
 
   it("appends section to file", () => {
@@ -295,8 +350,8 @@ describe("moveItemToDone", () => {
 `
     );
 
-    const moved = moveItemToDone("BUG-001", activePath, donePath);
-    expect(moved).toBe(true);
+    const moved = moveItemToDone(activePath, donePath, "BUG-001");
+    expect(moved.success).toBe(true);
 
     const active = readFileSync(activePath, "utf-8");
     const done = readFileSync(donePath, "utf-8");
@@ -312,6 +367,6 @@ describe("moveItemToDone", () => {
     writeFileSync(activePath, "## Ativo\n");
     writeFileSync(donePath, "## Done\n");
 
-    expect(moveItemToDone("NOPE", activePath, donePath)).toBe(false);
+    expect(moveItemToDone(activePath, donePath, "NOPE").success).toBe(false);
   });
 });

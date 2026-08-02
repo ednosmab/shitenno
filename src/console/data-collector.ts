@@ -10,16 +10,11 @@
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { consolidateEngineeringState, type EngineeringState } from "../engineering-state.js";
-import { loadMaturityProfile, type MaturityProfile } from "../maturity-profile.js";
-import { loadArtifacts, loadRelations, analyzeGraph, type GraphAnalysis } from "../knowledge-graph.js";
-import { detectKnowledgeDebt, type KnowledgeDebtReport } from "../knowledge-debt.js";
 import { detectLifecycleState, type ShitennoLifecycleState } from "../shitenno-state-machine.js";
 import { getSessionMetrics, type SessionMetrics } from "../session-tracker.js";
 import { getEventBus, type EventEnvelope } from "../event-bus.js";
-import { detectCapabilitySignalsFromFilesystem, type Capability } from "../maturity-profile.js";
-import { evaluateCapabilities, type CapabilityEntity } from "../capability-engine.js";
-import { loadGrowthProfile, type GrowthProfile } from "../growth-profile.js";
+import type { GrowthProfile } from "../growth-profile.js";
+import type { EngineeringState } from "../engineering-state.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -32,20 +27,20 @@ export interface ConsoleData {
   lifecycle: ShitennoLifecycleState;
 
   // Engineering State
-  engineering: EngineeringState;
+  engineering: import("../engineering-state.js").EngineeringState;
 
   // Maturity
-  maturity: MaturityProfile | null;
+  maturity: import("../maturity-profile.js").MaturityProfile | null;
 
   // Knowledge Graph
-  graph: GraphAnalysis;
+  graph: import("../knowledge-graph.js").GraphAnalysis;
 
   // Knowledge Debt
-  debt: KnowledgeDebtReport | null;
+  debt: import("../knowledge-debt.js").KnowledgeDebtReport | null;
 
   // Capabilities
-  capabilities: Capability[];
-  capabilityEntities: CapabilityEntity[];
+  capabilities: import("../maturity-profile.js").Capability[];
+  capabilityEntities: import("../capability-engine.js").CapabilityEntity[];
 
   // Goals (raw JSON files)
   goals: GoalData[];
@@ -118,71 +113,38 @@ export interface DecisionData {
 
 // ── Data Collection ────────────────────────────────────────────────────────
 
-export function collectConsoleData(projectRoot: string, shitennoDir: string): ConsoleData {
+export async function collectConsoleData(projectRoot: string, shitennoDir: string): Promise<ConsoleData> {
   const timestamp = new Date().toISOString();
-
-  // Lifecycle
   const lifecycle = detectLifecycleState(projectRoot, shitennoDir);
 
-  // Engineering State
-  const engineering = consolidateEngineeringState(projectRoot, shitennoDir);
+  // Lazy-load heavy modules
+  const { loadMaturityProfile, detectCapabilitySignalsFromFilesystem } = await import("../maturity-profile.js");
+  const { consolidateEngineeringState } = await import("../engineering-state.js");
+  const { loadArtifacts, loadRelations, analyzeGraph } = await import("../knowledge-graph.js");
+  const { detectKnowledgeDebt } = await import("../knowledge-debt.js");
+  const { evaluateCapabilities } = await import("../capability-engine.js");
+  const { loadGrowthProfile } = await import("../growth-profile.js");
 
-  // Maturity
   const maturity = loadMaturityProfile(shitennoDir);
+  const engineering = consolidateEngineeringState(projectRoot, shitennoDir, maturity);
 
-  // Knowledge Graph
   const artifacts = loadArtifacts(shitennoDir);
   const relations = loadRelations(shitennoDir);
   const graph = analyzeGraph(artifacts, relations);
 
-  // Knowledge Debt
   const debt = detectKnowledgeDebt(projectRoot, shitennoDir);
-
-  // Capabilities
   const capabilities = detectCapabilitySignalsFromFilesystem(shitennoDir);
-
-  // Capability Entities (with full metadata)
   const capabilityResult = evaluateCapabilities(engineering, shitennoDir);
   const capabilityEntities = capabilityResult.capabilities;
 
-  // Goals
   const goals = loadGoals(shitennoDir);
-
-  // Decisions
   const decisions = loadDecisions(shitennoDir);
-
-  // Session Metrics
   const session = getSessionMetrics(shitennoDir);
-
-  // Recent Events (last 20)
   const recentEvents = getEventBus().getHistory().slice(-20);
-
-  // Growth Profile
   const growth = loadGrowthProfile(shitennoDir);
-
-  // Entropy
   const entropy = engineering.entropy;
-
-  // Health Scores
-  const health = {
-    overall: engineering.healthScores.overall,
-    knowledgeDebt: engineering.healthScores.knowledgeDebt,
-    knowledgeGraph: engineering.healthScores.knowledgeGraph,
-    entropy: 100 - entropy.score, // Invert so higher = better
-  };
-
-  // Quick Stats
-  const stats = {
-    totalAssets: engineering.assets.length,
-    totalRules: engineering.activeRules,
-    totalSkills: countByType(artifacts, "skill"),
-    totalAdrs: countByType(artifacts, "adr"),
-    totalContracts: countByType(artifacts, "contract"),
-    totalSessions: session.totalSessions,
-    totalEvents: recentEvents.length,
-    totalGoals: goals.length,
-    totalDecisions: decisions.length,
-  };
+  const health = buildHealth(engineering);
+  const stats = buildStats({ engineering, artifacts, session, recentEvents, goals, decisions });
 
   return {
     timestamp,
@@ -219,11 +181,11 @@ const cache = new Map<string, CacheEntry>();
  * Get cached data or collect fresh data.
  * TTL defaults to 5 seconds to avoid excessive file I/O during rapid tab switches.
  */
-export function getOrCollectConsoleData(
+export async function getOrCollectConsoleData(
   projectRoot: string,
   shitennoDir: string,
   ttlMs: number = 5000,
-): ConsoleData {
+): Promise<ConsoleData> {
   const key = `${projectRoot}:${shitennoDir}`;
   const now = Date.now();
   const entry = cache.get(key);
@@ -232,7 +194,7 @@ export function getOrCollectConsoleData(
     return entry.data;
   }
 
-  const data = collectConsoleData(projectRoot, shitennoDir);
+  const data = await collectConsoleData(projectRoot, shitennoDir);
   cache.set(key, { data, timestamp: now });
   return data;
 }
@@ -245,6 +207,38 @@ export function clearConsoleDataCache(): void {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
+
+function buildHealth(engineering: EngineeringState): ConsoleData["health"] {
+  return {
+    overall: engineering.healthScores.overall,
+    knowledgeDebt: engineering.healthScores.knowledgeDebt,
+    knowledgeGraph: engineering.healthScores.knowledgeGraph,
+    entropy: 100 - engineering.entropy.score,
+  };
+}
+
+interface BuildStatsOptions {
+  engineering: EngineeringState;
+  artifacts: Array<{ type: string }>;
+  session: SessionMetrics;
+  recentEvents: EventEnvelope[];
+  goals: GoalData[];
+  decisions: DecisionData[];
+}
+
+function buildStats(options: BuildStatsOptions): ConsoleData["stats"] {
+  return {
+    totalAssets: options.engineering.assets.length,
+    totalRules: options.engineering.activeRules,
+    totalSkills: countByType(options.artifacts, "skill"),
+    totalAdrs: countByType(options.artifacts, "adr"),
+    totalContracts: countByType(options.artifacts, "contract"),
+    totalSessions: options.session.totalSessions,
+    totalEvents: options.recentEvents.length,
+    totalGoals: options.goals.length,
+    totalDecisions: options.decisions.length,
+  };
+}
 
 function countByType(artifacts: Array<{ type: string }>, type: string): number {
   return artifacts.filter((a) => a.type === type).length;

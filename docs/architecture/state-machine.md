@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 18 — STATE MACHINE
 
 > Shugo lifecycle gates.

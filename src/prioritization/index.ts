@@ -39,6 +39,7 @@ export {
   type RecommendationSource,
   type Recommendation,
   type RecommendationEngineResult,
+  type RecommendationEngineOptions,
   runRecommendationEngine,
   saveRecommendationResult,
   loadRecommendationResult,

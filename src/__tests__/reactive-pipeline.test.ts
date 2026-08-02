@@ -561,5 +561,12 @@ describe("reactive-pipeline", () => {
         expect(VALID_TRIGGERS).toContain(rule.trigger);
       }
     });
+
+    it("pipeline.started is not in EVENT_TO_TRIGGER (dead code removed)", () => {
+      const { readFileSync } = require("node:fs");
+      const { join } = require("node:path");
+      const engineSource = readFileSync(join(process.cwd(), "src", "rule-engine", "engine.ts"), "utf-8");
+      expect(engineSource).not.toMatch(/"pipeline\.started"\s*:/);
+    });
   });
 });

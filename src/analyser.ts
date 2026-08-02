@@ -228,12 +228,19 @@ function countTotalCommits(rootDir: string): number {
   }
 }
 
+let cachedPkgRoot: string | null = null;
+let cachedPkg: { dependencies?: Record<string, string>; devDependencies?: Record<string, string>; scripts?: Record<string, string>; workspaces?: unknown } | null = null;
+
 function readPackageJson(rootDir: string): { dependencies?: Record<string, string>; devDependencies?: Record<string, string>; scripts?: Record<string, string>; workspaces?: unknown } | null {
+  if (cachedPkgRoot === rootDir) return cachedPkg;
+  cachedPkgRoot = rootDir;
   const path = join(rootDir, "package.json");
-  if (!existsSync(path)) return null;
+  if (!existsSync(path)) { cachedPkg = null; return null; }
   try {
-    return JSON.parse(readFileSync(path, "utf-8"));
+    cachedPkg = JSON.parse(readFileSync(path, "utf-8"));
+    return cachedPkg;
   } catch {
+    cachedPkg = null;
     return null;
   }
 }

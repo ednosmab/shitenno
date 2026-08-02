@@ -3,7 +3,7 @@ status: andamento
 date: 2026-07-15
 priority: P1
 owner: executor
-updated_at: 2026-07-20T04:11:01.039Z
+updated_at: 2026-07-21T15:11:11.060Z
 ---
 
 # Plano: migrar o formato de status dos planos para frontmatter YAML

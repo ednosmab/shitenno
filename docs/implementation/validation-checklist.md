@@ -1,3 +1,8 @@
+---
+category: implementation
+lifecycle: Active
+---
+
 # 28 — VALIDATION CHECKLIST
 
 > Validation checklist per capability.
@@ -11,7 +16,7 @@
 - [ ] `shitenno/docs/DESDO.md` exists
 - [ ] `shitenno/docs/CONCEPTUAL_MODEL.md` exists
 - [ ] `shitenno/docs/KNOWLEDGE_LIFECYCLE.md` exists
-- [ ] `shitenno/docs/BACKLOG.md` exists
+- [ ] `shitenno/docs/backlog/ACTIVE.md` exists
 - [ ] `shitenno/governance/SYSTEM_MAP.md` exists
 - [ ] `shitenno/docs/opencode-context.md` exists
 - [ ] `shitenno/docs/Shitenno_GUIDE.md` exists

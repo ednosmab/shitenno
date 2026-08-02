@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 02 — UBIQUITOUS LANGUAGE
 
 > Every term in this document has exactly one meaning. When in doubt, refer here.

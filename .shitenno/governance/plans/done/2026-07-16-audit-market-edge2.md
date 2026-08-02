@@ -2,7 +2,7 @@
 
 **Status:** In Progress
 **Date:** 2026-07-16
-**Updated_at:** 2026-07-20T04:11:01.042Z
+**Updated_at:** 2026-07-21T15:11:11.067Z
 **Priority:** P1
 **Owner:** AI Agent
 **Estimated Time:** 8-10h (3 sub-planos independentes, podem ser feitos em paralelo)

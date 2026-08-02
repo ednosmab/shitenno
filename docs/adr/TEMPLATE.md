@@ -1,3 +1,8 @@
+---
+category: adr
+lifecycle: Active
+---
+
 # ADR Template
 
 > Use this template when creating a new Architecture Decision Record.

@@ -42,8 +42,9 @@ export function scheduledCheck(projectRoot: string, _shitennoDir: string): void 
   }
 }
 
-export const internalScheduledCheckCommand = new Command("internal-scheduled-check")
-  .description("Internal command to run scheduled checks (e.g. via cron)")
+export const internalScheduledCheckCommand = new Command("scheduled-check")
+  .alias("internal-scheduled-check")
+  .description("Run scheduled checks — detect uncommitted drift (e.g. via cron)")
   .option("-d, --dir <path>", "Project root directory (default: current)")
   .action((options) => {
     const projectRoot = options.dir ? resolve(options.dir) : process.cwd();

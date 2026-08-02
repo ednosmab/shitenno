@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # System
 
 Comandos de sistema e utilitários.

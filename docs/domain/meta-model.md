@@ -1,3 +1,8 @@
+---
+category: domain
+lifecycle: Active
+---
+
 # Meta Model
 
 > How the Shitenno interprets a project of engineering.

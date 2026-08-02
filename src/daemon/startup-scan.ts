@@ -219,3 +219,51 @@ function moveFromBacklog(
     archivedPath: archivePath,
   };
 }
+
+// ── Plan Sidecar Orphan Recovery ────────────────────────────────────────────
+
+import { readdirSync, unlinkSync } from "node:fs";
+
+/**
+ * Remove orphan .verification.json files in plans/ directory.
+ * An orphan is a sidecar whose corresponding .md plan is not in "check" or "done" status,
+ * or whose .md file doesn't exist at all.
+ */
+export function recoverOrphanSidecars(
+  shitennoDir: string
+): { checked: number; removed: number; removedIds: string[] } {
+  const plansDir = join(shitennoDir, "governance", "plans");
+  if (!existsSync(plansDir)) return { checked: 0, removed: 0, removedIds: [] };
+
+  let files: string[];
+  try {
+    files = readdirSync(plansDir);
+  } catch {
+    return { checked: 0, removed: 0, removedIds: [] };
+  }
+
+  const verificationFiles = files.filter((f) => f.endsWith(".verification.json"));
+  const removedIds: string[] = [];
+
+  for (const vf of verificationFiles) {
+    const planId = vf.replace(".verification.json", "");
+    const planMd = join(plansDir, `${planId}.md`);
+
+    // If the .md file doesn't exist, the sidecar is orphaned
+    if (!existsSync(planMd)) {
+      try {
+        unlinkSync(join(plansDir, vf));
+        removedIds.push(planId);
+        logger.info("daemon", `Removed orphan sidecar: ${vf} (no matching .md)`);
+      } catch (err) {
+        logger.warn("daemon", `Failed to remove orphan sidecar ${vf}: ${err}`);
+      }
+    }
+  }
+
+  if (removedIds.length > 0) {
+    logger.info("daemon", `Orphan recovery: removed ${removedIds.length} orphan sidecar(s)`);
+  }
+
+  return { checked: verificationFiles.length, removed: removedIds.length, removedIds };
+}

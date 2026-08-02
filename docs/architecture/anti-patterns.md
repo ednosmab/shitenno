@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 27 — ANTI-PATTERNS
 
 > What NOT to do when working on Shugo.

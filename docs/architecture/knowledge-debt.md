@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 11 — KNOWLEDGE DEBT
 
 > The silent killer of engineering productivity.
@@ -5,6 +10,8 @@
 ## Definition
 
 **Knowledge Debt** is the accumulated cost of missing, stale, or disconnected engineering knowledge. It compounds over time, just like technical debt.
+
+> For the formal domain definition, see [ubiquitous-language.md](../domain/ubiquitous-language.md#knowledge-debt).
 
 ## The 10 Debt Types
 

@@ -49,7 +49,7 @@ interface HandbookTopic {
 
 const TOPICS: HandbookTopic[] = [
   // Level 1 — Fundamentals
-  { level: 1, levelName: "Fundamentos", file: "01-fundamentals/what-is-shitenno.md", title: "O que é Shugo", description: "Definição, problema que resolve, para quem serve" },
+  { level: 1, levelName: "Fundamentos", file: "01-fundamentals/what-is-shugo.md", title: "O que é Shugo", description: "Definição, problema que resolve, para quem serve" },
   { level: 1, levelName: "Fundamentos", file: "01-fundamentals/installation.md", title: "Instalação", description: "Pré-requisitos, métodos de instalação, verificação" },
   { level: 1, levelName: "Fundamentos", file: "01-fundamentals/quick-start.md", title: "Primeiros Passos", description: "Init, status, detect, briefing, feedback" },
   { level: 1, levelName: "Fundamentos", file: "01-fundamentals/concepts.md", title: "Conceitos", description: "Maturity, capabilities, governance, knowledge debt" },

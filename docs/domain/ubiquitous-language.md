@@ -1,3 +1,8 @@
+---
+category: domain
+lifecycle: Active
+---
+
 # Ubiquitous Language
 
 > Official domain specification of the Shitenno. Every term here has exactly one meaning. When in doubt, refer here.

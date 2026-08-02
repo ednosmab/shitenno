@@ -78,13 +78,23 @@ export function checkpointBuffer(shitennoDir: string): CheckpointResult {
     };
   }
 
-  // Clean up old checkpoints
+  const removedCount = cleanupOldCheckpoints(checkpointDir);
+
+  return {
+    success: true,
+    checkpointPath,
+    message: `Checkpoint created: ${checkpointPath}${removedCount > 0 ? ` (${removedCount} old checkpoints removed)` : ""}`,
+    removedCount,
+  };
+}
+
+function cleanupOldCheckpoints(checkpointDir: string): number {
   let removedCount = 0;
   try {
     const checkpoints = readdirSync(checkpointDir)
       .filter((f) => f.endsWith(".yaml"))
       .sort()
-      .reverse(); // Newest first
+      .reverse();
 
     if (checkpoints.length > MAX_CHECKPOINTS) {
       const toRemove = checkpoints.slice(MAX_CHECKPOINTS);
@@ -100,13 +110,7 @@ export function checkpointBuffer(shitennoDir: string): CheckpointResult {
   } catch {
     logger.debug("buffer-checkpoint", "Checkpoint cleanup failed — best-effort");
   }
-
-  return {
-    success: true,
-    checkpointPath,
-    message: `Checkpoint created: ${checkpointPath}${removedCount > 0 ? ` (${removedCount} old checkpoints removed)` : ""}`,
-    removedCount,
-  };
+  return removedCount;
 }
 
 /**

@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Status & Analysis
 
 Comandos para verificar saúde do projeto, maturidade e padrões.

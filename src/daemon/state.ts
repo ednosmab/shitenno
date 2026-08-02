@@ -1,5 +1,7 @@
 import { existsSync, writeFileSync, readFileSync } from "node:fs";
 import { logger } from "../logger.js";
+import { getEventBus } from "../event-bus.js";
+import { isDaemonState } from "../schema-validators.js";
 
 // ── Daemon State ──────────────────────────────────────────────────────────────
 
@@ -18,6 +20,7 @@ export interface SessionInfo {
 
 export interface HealthInfo {
   score: number;
+  previousScore: number | null;
   checkedAt: string;
 }
 
@@ -39,6 +42,20 @@ export interface EventEntry {
   timestamp: string;
 }
 
+/** Timer state for scheduled periodic tasks. */
+export interface TimerInfo {
+  /** When the timer last fired */
+  lastFiredAt: string | null;
+  /** Interval in milliseconds */
+  intervalMs: number;
+}
+
+/** Timer info with computed next-fire time for IPC responses. */
+export interface TimerInfoResponse extends TimerInfo {
+  /** When the timer will next fire (computed from lastFiredAt + intervalMs) */
+  nextFireAt: string | null;
+}
+
 export interface DaemonState {
   drift: DriftInfo | null;
   sessions: SessionInfo[];
@@ -51,11 +68,31 @@ export interface DaemonState {
   riskMapCache: { computedAt: string; data: unknown } | null;
   lastCommandName: string | null;
   lastCommandAt: string | null;
+  proactiveEngine: { lastCheck: string | null; challengesTriggered: number; cooldownUntil: string | null } | null;
+  audit: { lastAuditTime: string | null; auditCount: number; notificationsSent: number } | null;
+  /** Timer tracking for next-fire display */
+  timers: {
+    audit: TimerInfo;
+    consolidation: TimerInfo;
+    proactiveDigest: TimerInfo;
+  } | null;
+  /** Notification stats for last 24h */
+  notificationStats: {
+    sent: number;
+    throttled: number;
+    last24hWindow: string;
+  } | null;
 }
 
 export const MAX_EVENTS = 100;
 export const MAX_SESSIONS = 50;
 export const MAX_CHALLENGES = 20;
+
+let dirty = false;
+
+export function markDirty(): void {
+  dirty = true;
+}
 
 export function createDaemonState(): DaemonState {
   return {
@@ -70,6 +107,10 @@ export function createDaemonState(): DaemonState {
     riskMapCache: null,
     lastCommandName: null,
     lastCommandAt: null,
+    proactiveEngine: null,
+    audit: null,
+    timers: null,
+    notificationStats: null,
   };
 }
 
@@ -78,13 +119,21 @@ export function recordEvent(state: DaemonState, eventType: string): void {
   if (state.events.length > MAX_EVENTS) {
     state.events.shift();
   }
+  markDirty();
 }
 
-export function persistState(state: DaemonState, statePath: string): void {
+export function persistState(state: DaemonState, statePath: string, force = false): void {
+  if (!dirty && !force) return;
   try {
     writeFileSync(statePath, JSON.stringify(state, null, 2), "utf-8");
-  } catch {
-    logger.debug("daemon", "Failed to persist daemon state");
+    dirty = false;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    logger.warn("daemon", `Failed to persist daemon state: ${msg}`);
+    getEventBus().publish("watcher.error" as never, {
+      error: `State persistence failed: ${msg}`,
+      timestamp: new Date().toISOString(),
+    } as never);
   }
 }
 
@@ -92,8 +141,27 @@ export function loadState(statePath: string): DaemonState | null {
   try {
     if (!existsSync(statePath)) return null;
     const raw = readFileSync(statePath, "utf-8");
-    return JSON.parse(raw) as DaemonState;
+    const parsed = JSON.parse(raw);
+    if (!isDaemonState(parsed)) {
+      logger.warn("daemon", "Invalid daemon state shape, ignoring");
+      return null;
+    }
+    return parsed as unknown as DaemonState;
   } catch {
     return null;
   }
+}
+
+// ── Notification Stats ──────────────────────────────────────────────────────
+
+export function recordNotificationStat(state: DaemonState, sent: boolean): void {
+  if (!state.notificationStats) {
+    state.notificationStats = { sent: 0, throttled: 0, last24hWindow: new Date().toISOString() };
+  }
+  if (sent) {
+    state.notificationStats.sent++;
+  } else {
+    state.notificationStats.throttled++;
+  }
+  markDirty();
 }

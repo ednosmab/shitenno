@@ -1,3 +1,8 @@
+---
+category: domain
+lifecycle: Active
+---
+
 # Decisions
 
 > How decisions are modeled in the Shitenno.

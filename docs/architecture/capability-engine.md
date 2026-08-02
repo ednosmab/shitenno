@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # Capability Engine
 
 > Implementation of the Capability Model in software.

@@ -123,7 +123,7 @@ describe("detectPatterns", () => {
   it("generates a summary", () => {
     const report = detectPatterns(tempDir, shitennoDir);
     expect(report.summary).toBeTruthy();
-    expect(report.summary).toContain("histórico");
+    expect(report.summary).toContain("historico");
   });
 });
 

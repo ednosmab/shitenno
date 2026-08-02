@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Documentation
 
 Comandos para auditoria e manutenção da documentação.

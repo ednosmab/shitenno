@@ -20,11 +20,11 @@ describe("collectConsoleData", () => {
     rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it("should return an object with all required fields", () => {
+  it("should return an object with all required fields", async () => {
     const shitennoDir = join(tempDir, "shitenno");
     mkdirSync(shitennoDir, { recursive: true });
 
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     expect(data).toHaveProperty("timestamp");
     expect(data).toHaveProperty("projectRoot");
@@ -46,25 +46,25 @@ describe("collectConsoleData", () => {
     expect(data).toHaveProperty("stats");
   });
 
-  it("should return valid timestamp", () => {
+  it("should return valid timestamp", async () => {
     const shitennoDir = join(tempDir, "shitenno");
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     const timestamp = new Date(data.timestamp);
     expect(timestamp.getTime()).not.toBeNaN();
   });
 
-  it("should return correct projectRoot and shitennoDir", () => {
+  it("should return correct projectRoot and shitennoDir", async () => {
     const shitennoDir = join(tempDir, "shitenno");
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     expect(data.projectRoot).toBe(tempDir);
     expect(data.shitennoDir).toBe(shitennoDir);
   });
 
-  it("should return engineering state with maturity", () => {
+  it("should return engineering state with maturity", async () => {
     const shitennoDir = join(tempDir, "shitenno");
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     expect(data.engineering).toBeDefined();
     // maturity can be null if no profile exists
@@ -74,9 +74,9 @@ describe("collectConsoleData", () => {
     }
   });
 
-  it("should return health scores between 0 and 100", () => {
+  it("should return health scores between 0 and 100", async () => {
     const shitennoDir = join(tempDir, "shitenno");
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     expect(data.health.overall).toBeGreaterThanOrEqual(0);
     expect(data.health.overall).toBeLessThanOrEqual(100);
@@ -88,9 +88,9 @@ describe("collectConsoleData", () => {
     expect(data.health.entropy).toBeLessThanOrEqual(100);
   });
 
-  it("should return graph with required fields", () => {
+  it("should return graph with required fields", async () => {
     const shitennoDir = join(tempDir, "shitenno");
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     expect(data.graph).toBeDefined();
     expect(typeof data.graph.totalArtifacts).toBe("number");
@@ -101,9 +101,9 @@ describe("collectConsoleData", () => {
     expect(Array.isArray(data.graph.cycles)).toBe(true);
   });
 
-  it("should return session with required fields", () => {
+  it("should return session with required fields", async () => {
     const shitennoDir = join(tempDir, "shitenno");
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     expect(data.session).toBeDefined();
     expect(typeof data.session.totalSessions).toBe("number");
@@ -112,17 +112,17 @@ describe("collectConsoleData", () => {
     expect(typeof data.session.challengingRatio).toBe("number");
   });
 
-  it("should return arrays for goals and decisions", () => {
+  it("should return arrays for goals and decisions", async () => {
     const shitennoDir = join(tempDir, "shitenno");
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     expect(Array.isArray(data.goals)).toBe(true);
     expect(Array.isArray(data.decisions)).toBe(true);
   });
 
-  it("should return entropy with required fields", () => {
+  it("should return entropy with required fields", async () => {
     const shitennoDir = join(tempDir, "shitenno");
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     expect(data.entropy).toBeDefined();
     expect(typeof data.entropy.orphanedAssets).toBe("number");
@@ -131,9 +131,9 @@ describe("collectConsoleData", () => {
     expect(typeof data.entropy.score).toBe("number");
   });
 
-  it("should return stats with required fields", () => {
+  it("should return stats with required fields", async () => {
     const shitennoDir = join(tempDir, "shitenno");
-    const data = collectConsoleData(tempDir, shitennoDir);
+    const data = await collectConsoleData(tempDir, shitennoDir);
 
     expect(data.stats).toBeDefined();
     expect(typeof data.stats.totalAssets).toBe("number");
@@ -142,11 +142,11 @@ describe("collectConsoleData", () => {
     expect(typeof data.stats.totalAdrs).toBe("number");
   });
 
-  it("should handle non-existent directory gracefully", () => {
+  it("should handle non-existent directory gracefully", async () => {
     const fakeDir = join(tempDir, "non-existent");
     const fakeShitenno = join(fakeDir, "shitenno");
 
-    const data = collectConsoleData(fakeDir, fakeShitenno);
+    const data = await collectConsoleData(fakeDir, fakeShitenno);
 
     expect(data).toBeDefined();
     expect(data.projectRoot).toBe(fakeDir);

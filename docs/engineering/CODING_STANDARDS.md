@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Coding Standards
 
 > Code style and quality rules for the Shugo CLI codebase.

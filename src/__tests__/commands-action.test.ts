@@ -239,6 +239,40 @@ describe("evolve command action handler", () => {
     expect(output).toHaveProperty("summary");
   });
 
+  it("includes semantic layer data in JSON output", () => {
+    setupShitennoDirGoverned(tempDir);
+
+    evolveCommand.parse(["node", "test", "--dir", tempDir, "--json"], { from: "user" });
+
+    const output = getJsonOutput();
+    expect(output).toHaveProperty("semantic");
+    const semantic = output.semantic as Record<string, unknown>;
+    expect(semantic).toHaveProperty("patterns");
+    expect(semantic).toHaveProperty("insights");
+    expect(semantic).toHaveProperty("correlations");
+    expect(semantic).toHaveProperty("growthProfile");
+    expect(Array.isArray(semantic.patterns)).toBe(true);
+    expect(Array.isArray(semantic.insights)).toBe(true);
+    expect(Array.isArray(semantic.correlations)).toBe(true);
+    const gp = semantic.growthProfile as Record<string, unknown>;
+    expect(gp).toHaveProperty("growthCapacity");
+    expect(gp).toHaveProperty("challengeLevel");
+    expect(gp).toHaveProperty("domainChallengeLevels");
+  });
+
+  it("semantic growth profile has numeric values", () => {
+    setupShitennoDirGoverned(tempDir);
+
+    evolveCommand.parse(["node", "test", "--dir", tempDir, "--json"], { from: "user" });
+
+    const output = getJsonOutput();
+    const semantic = output.semantic as Record<string, unknown>;
+    const gp = semantic.growthProfile as Record<string, unknown>;
+    expect(typeof gp.growthCapacity).toBe("number");
+    expect(typeof gp.challengeLevel).toBe("number");
+    expect(typeof gp.domainChallengeLevels).toBe("object");
+  });
+
   it("accept records feedback", () => {
     setupShitennoDirGoverned(tempDir);
 

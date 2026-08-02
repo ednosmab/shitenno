@@ -104,7 +104,7 @@ Itens planeados mas ainda não iniciados, extraídos do BACKLOG:
 
 ### P3 — Baixa prioridade (sem SLA)
 - Shell completion, i18n, structured logging, metrics export, etc.
-- Ver [BACKLOG.md](../../../docs/BACKLOG.md) para lista completa.
+- Ver [ACTIVE.md](../../../docs/backlog/ACTIVE.md) para lista completa.
 
 ---
 

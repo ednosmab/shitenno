@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # AI Integration
 
 Comandos para integração com agentes AI e workflows.

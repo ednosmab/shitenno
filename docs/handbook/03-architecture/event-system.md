@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # Event System
 
 O sistema de eventos do Shugo é a base para comunicação entre componentes.

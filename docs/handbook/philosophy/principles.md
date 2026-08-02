@@ -1,3 +1,8 @@
+---
+category: philosophy
+lifecycle: Active
+---
+
 # Principles
 
 > Immutable principles that govern every decision in the Shitenno.

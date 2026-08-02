@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # SHUGO EVOLUTION PLAN
 
 > **Status:** Draft v1.0

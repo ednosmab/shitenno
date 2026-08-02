@@ -29,11 +29,12 @@ if [ $TSC_EXIT -ne 0 ]; then
 fi
 
 echo "🔍 Checking documentation sync..."
-pnpm run sync:docs --quiet || true
+pnpm run sync:docs --quiet
 SYNC_EXIT=$?
 
 if [ $SYNC_EXIT -ne 0 ]; then
-  echo "⚠️  Documentation sync has warnings. Run 'pnpm run sync:docs:fix' to auto-fix."
+  echo "❌ Documentation sync failed. Run 'pnpm run sync:docs:fix' to auto-fix."
+  exit 1
 fi
 
 echo "🔍 Verifying done plans have valid verification records..."

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # 🚀 SKILL: CI/CD PIPELINE & GITHUB ACTIONS
 
 ## 🎯 Objetivo

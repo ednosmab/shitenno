@@ -66,6 +66,15 @@ function ShitennoConsoleInner({
 
   const contentRef = useRef(null);
 
+  // Show loading state while data is being fetched
+  if (!data) {
+    return (
+      <Box flexDirection="column" padding={1}>
+        <Text color="cyan">Loading dashboard data...</Text>
+      </Box>
+    );
+  }
+
   // Mouse wheel scroll
   useOnWheel(contentRef, (event) => {
     if (event.button === "wheel-up") {

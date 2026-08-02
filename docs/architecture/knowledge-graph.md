@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 14 — KNOWLEDGE GRAPH
 
 > Artifacts, relations, graph analysis.

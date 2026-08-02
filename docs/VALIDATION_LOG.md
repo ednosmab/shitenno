@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Validation Log — Cross-Project & Cross-Platform
 
 This document records manual validation of Shitenno in third-party projects. The goal: verify the tool works end-to-end outside the author's own Node/TS repo.

@@ -94,80 +94,49 @@ function getStateFilePath(shitennoDir: string): string {
   return join(shitennoDir, "lifecycle-state.json");
 }
 
-/** Create a state machine instance. */
+function loadPersistedState(stateFilePath: string): { state: ShitennoLifecycleState; history: StateTransition[] } {
+  if (!existsSync(stateFilePath)) {
+    return { state: "uninitialized", history: [] };
+  }
+  try {
+    const file: StateMachineFile = JSON.parse(readFileSync(stateFilePath, "utf-8"));
+    return { state: file.currentState, history: file.history || [] };
+  } catch {
+    return { state: "uninitialized", history: [] };
+  }
+}
+
+function persistState(stateFilePath: string, shitennoDir: string, currentState: ShitennoLifecycleState, history: StateTransition[]): void {
+  const dir = join(shitennoDir);
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  const file: StateMachineFile = { currentState, history, lastUpdated: new Date().toISOString() };
+  writeFileSync(stateFilePath, JSON.stringify(file, null, 2));
+}
+
 export function createStateMachine(shitennoDir: string): ShitennoStateMachine {
   const stateFilePath = getStateFilePath(shitennoDir);
-
-  // Load or detect initial state
-  let currentState: ShitennoLifecycleState = "uninitialized";
-  let history: StateTransition[] = [];
-
-  if (existsSync(stateFilePath)) {
-    try {
-      const file: StateMachineFile = JSON.parse(readFileSync(stateFilePath, "utf-8"));
-      currentState = file.currentState;
-      history = file.history || [];
-    } catch {
-      // use defaults
-    }
-  }
+  const initial = loadPersistedState(stateFilePath);
+  let currentState = initial.state;
+  const history = initial.history;
 
   return {
-    getState(): ShitennoLifecycleState {
-      return currentState;
-    },
-
-    canTransition(to: ShitennoLifecycleState): boolean {
-      return isValidTransition(currentState, to);
-    },
+    getState() { return currentState; },
+    canTransition(to: ShitennoLifecycleState) { return isValidTransition(currentState, to); },
 
     transition(to: ShitennoLifecycleState, trigger: string): boolean {
-      if (!isValidTransition(currentState, to)) {
-        return false;
-      }
-
+      if (!isValidTransition(currentState, to)) return false;
       const from = currentState;
       currentState = to;
-
-      history.push({
-        from,
-        to,
-        trigger,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Persist
+      history.push({ from, to, trigger, timestamp: new Date().toISOString() });
       this.save();
-
-      // Publish lifecycle event to the event bus
       getEventBus().publish("lifecycle.state_changed", {
-        capabilityId: "lifecycle",
-        previousState: from,
-        newState: to,
-        reason: trigger,
+        capabilityId: "lifecycle", previousState: from, newState: to, reason: trigger,
       });
-
       return true;
     },
 
-    getHistory(): StateTransition[] {
-      return [...history];
-    },
-
-    save(): void {
-      const dir = join(shitennoDir);
-      if (!existsSync(dir)) {
-        mkdirSync(dir, { recursive: true });
-      }
-
-      const file: StateMachineFile = {
-        currentState,
-        history,
-        lastUpdated: new Date().toISOString(),
-      };
-
-      writeFileSync(stateFilePath, JSON.stringify(file, null, 2));
-    },
+    getHistory() { return [...history]; },
+    save() { persistState(stateFilePath, shitennoDir, currentState, history); },
   };
 }
 

@@ -40,7 +40,7 @@ export class CreateReminderExecutor implements ActionExecutor {
     const escapedReminder = reminder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const dedupeRegex = new RegExp(`^\\s*- message: "${escapedReminder}"`, "m");
     if (dedupeRegex.test(content)) {
-      return { created: true, message: `Reminder already exists: ${reminder} — skipped` };
+      return { success: true, created: true, message: `Reminder already exists: ${reminder} — skipped` };
     }
 
     const createdAt = new Date().toISOString();
@@ -49,6 +49,6 @@ export class CreateReminderExecutor implements ActionExecutor {
       `reminders:\n  - message: "${reminder}"\n    priority: "${priority}"\n    category: "${category}"\n    createdAt: "${createdAt}"\n`
     );
     writeFileSync(bufferPath, content, "utf-8");
-    return { created: true, message: `Created reminder: ${reminder} [${priority}/${category}]` };
+    return { success: true, created: true, message: `Created reminder: ${reminder} [${priority}/${category}]` };
   }
 }

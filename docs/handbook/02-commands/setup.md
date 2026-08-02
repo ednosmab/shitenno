@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Setup & Configuration
 
 Comandos para inicializar e configurar o projeto Shugo.

@@ -30,6 +30,28 @@ vi.mock("../daemon-client.js", () => ({
   queryDaemon: vi.fn(() => Promise.resolve(null)),
 }));
 
+vi.mock("../briefing-cache.js", () => ({
+  computeRequestHash: vi.fn(() => "test-hash"),
+  getCachedBriefingByRequest: vi.fn(() => null),
+  setCachedBriefing: vi.fn(),
+  getCachedBriefing: vi.fn(() => null),
+  readCache: vi.fn(() => null),
+  computeInputHash: vi.fn(() => "test-input-hash"),
+}));
+
+vi.mock("../mcp-cache.js", () => ({
+  withCache: vi.fn(async (handler: () => Promise<unknown>) => handler()),
+  clearCache: vi.fn(),
+  invalidateCache: vi.fn(),
+  getCacheStats: vi.fn(() => ({ size: 0, hitRate: 0, totalHits: 0, totalMisses: 0 })),
+}));
+
+vi.mock("../cache-metrics.js", () => ({
+  recordHit: vi.fn(),
+  recordMiss: vi.fn(),
+  recordEviction: vi.fn(),
+}));
+
 import { collectContext } from "../context-collector.js";
 import { generateRiskMap } from "../risk-map.js";
 import { loadRules } from "../rule-engine.js";
@@ -39,6 +61,7 @@ import {
   handleGetRiskMap,
   handleGetRules,
 } from "../mcp-server.js";
+import { clearCache } from "../mcp-cache.js";
 
 const mockCollectContext = vi.mocked(collectContext);
 const mockGenerateRiskMap = vi.mocked(generateRiskMap);
@@ -143,6 +166,7 @@ const MOCK_RISK_MAP = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  clearCache();
   mockCollectContext.mockReturnValue(MOCK_CONTEXT_SNAPSHOT as any);
   mockGenerateRiskMap.mockReturnValue(MOCK_RISK_MAP as any);
   mockLoadRules.mockReturnValue([]);

@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 13 — ADAPTIVE GOVERNANCE
 
 > Rule engine formal specification.

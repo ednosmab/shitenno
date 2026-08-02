@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 Plano Estratégico - Próximo Estágio do Shitenno
 
 Objetivo

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-003: Knowledge Graph as Foundation for Documentation
 
 **Status:** Accepted

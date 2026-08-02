@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Instalação
 
 > Como instalar o Shugo no seu ambiente.

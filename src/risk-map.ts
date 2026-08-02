@@ -58,6 +58,9 @@ export interface RiskMap {
 
 const SENSITIVE_KEYWORDS = ["auth", "payment", "security", "session", "token", "password", "secret"];
 
+let churnCache: { data: Map<string, number>; computedAt: number } | null = null;
+const CHURN_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 function getSourceFiles(dir: string, extensions = [".ts", ".tsx", ".js", ".jsx"]): string[] {
   const files: string[] = [];
   if (!existsSync(dir)) return files;
@@ -78,6 +81,12 @@ function getSourceFiles(dir: string, extensions = [".ts", ".tsx", ".js", ".jsx"]
   return files;
 }
 
+function isTestFile(filePath: string): boolean {
+  return /\.(test|spec)\.(ts|tsx|js|jsx)$/.test(filePath) ||
+    filePath.includes("__tests__/") ||
+    filePath.includes("__tests\\");
+}
+
 function hasTestFile(filePath: string): boolean {
   const base = filePath.replace(/\.(ts|tsx|js|jsx)$/, "");
   const testPatterns = [
@@ -91,28 +100,18 @@ function hasTestFile(filePath: string): boolean {
   return testPatterns.some((p) => existsSync(p));
 }
 
-function getFileLineCount(filePath: string): number {
-  try {
-    const content = readFileSync(filePath, "utf-8");
-    return content.split("\n").length;
-  } catch (err) {
-    logger.debug("risk-map", `Cannot read file for line count: ${err}`);
-    return 0;
-  }
+function getFileLineCount(content: string): number {
+  return content.split("\n").length;
 }
 
-function getImportCount(filePath: string): number {
-  try {
-    const content = readFileSync(filePath, "utf-8");
-    const importMatches = content.match(/^import\s+.*from\s+["'].*["']/gm) || [];
-    return importMatches.length;
-  } catch (err) {
-    logger.debug("risk-map", `Cannot read file for import count: ${err}`);
-    return 0;
-  }
+function getImportCount(content: string): number {
+  const importMatches = content.match(/^import\s+.*from\s+["'].*["']/gm) || [];
+  return importMatches.length;
 }
 
 function getChurnData(projectRoot: string): Map<string, number> {
+  if (churnCache && Date.now() - churnCache.computedAt < CHURN_TTL_MS) return churnCache.data;
+
   const churn = new Map<string, number>();
   try {
     const output = execSync(
@@ -128,20 +127,69 @@ function getChurnData(projectRoot: string): Map<string, number> {
   } catch (err) {
     logger.debug("risk-map", `Git not available or no history: ${err}`);
   }
+
+  churnCache = { data: churn, computedAt: Date.now() };
   return churn;
 }
 
-function detectSensitiveKeywords(filePath: string): boolean {
-  try {
-    const content = readFileSync(filePath, "utf-8").toLowerCase();
-    return SENSITIVE_KEYWORDS.some((kw) => content.includes(kw));
-  } catch (err) {
-    logger.debug("risk-map", `Cannot read file for sensitive keywords: ${err}`);
-    return false;
-  }
+function detectSensitiveKeywords(content: string): boolean {
+  const lower = content.toLowerCase();
+  return SENSITIVE_KEYWORDS.some((kw) => lower.includes(kw));
 }
 
-// ── Area Analysis ──────────────────────────────────────────────────────────
+function evaluateFileRisk(
+  file: string,
+  projectRoot: string,
+  churnData: Map<string, number>
+): { factors: RiskFactor[]; score: number } {
+  const relPath = relative(projectRoot, file);
+  const factors: RiskFactor[] = [];
+  let score = 0;
+
+  if (!isTestFile(file) && !hasTestFile(file)) {
+    factors.push({ type: "no-tests", description: `No test file for ${relPath}`, weight: 0.3 });
+    score += 15;
+  }
+
+  const churn = churnData.get(relPath) || 0;
+  if (churn > 10) {
+    factors.push({ type: "high-churn", description: `${relPath} changed ${churn} times in 90 days`, weight: 0.25 });
+    score += 10;
+  }
+
+  let content: string;
+  try {
+    content = readFileSync(file, "utf-8");
+  } catch {
+    return { factors, score };
+  }
+
+  const lineCount = getFileLineCount(content);
+  if (lineCount > 300) {
+    factors.push({ type: "large-file", description: `${relPath} has ${lineCount} lines`, weight: 0.2 });
+    score += 8;
+  }
+
+  const importCount = getImportCount(content);
+  if (importCount > 15) {
+    factors.push({ type: "many-imports", description: `${relPath} has ${importCount} imports`, weight: 0.15 });
+    score += 5;
+  }
+
+  if (detectSensitiveKeywords(content)) {
+    factors.push({ type: "sensitive-keyword", description: `${relPath} contains sensitive keywords`, weight: 0.1 });
+    score += 3;
+  }
+
+  return { factors, score };
+}
+
+function determineRiskLevel(score: number): RiskLevel {
+  if (score >= 70) return "critical";
+  if (score >= 40) return "high";
+  if (score >= 15) return "medium";
+  return "low";
+}
 
 function analyzeArea(
   projectRoot: string,
@@ -153,82 +201,19 @@ function analyzeArea(
   const factors: RiskFactor[] = [];
   let totalScore = 0;
 
-  // Check each file for risk factors
   for (const file of files) {
-    const relPath = relative(projectRoot, file);
-
-    // No tests
-    if (!hasTestFile(file)) {
-      factors.push({
-        type: "no-tests",
-        description: `No test file for ${relPath}`,
-        weight: 0.3,
-      });
-      totalScore += 15;
-    }
-
-    // High churn
-    const churn = churnData.get(relPath) || 0;
-    if (churn > 10) {
-      factors.push({
-        type: "high-churn",
-        description: `${relPath} changed ${churn} times in 90 days`,
-        weight: 0.25,
-      });
-      totalScore += 10;
-    }
-
-    // Large file
-    const lineCount = getFileLineCount(file);
-    if (lineCount > 300) {
-      factors.push({
-        type: "large-file",
-        description: `${relPath} has ${lineCount} lines`,
-        weight: 0.2,
-      });
-      totalScore += 8;
-    }
-
-    // Many imports (high coupling)
-    const importCount = getImportCount(file);
-    if (importCount > 15) {
-      factors.push({
-        type: "many-imports",
-        description: `${relPath} has ${importCount} imports`,
-        weight: 0.15,
-      });
-      totalScore += 5;
-    }
-
-    // Sensitive keywords
-    if (detectSensitiveKeywords(file)) {
-      factors.push({
-        type: "sensitive-keyword",
-        description: `${relPath} contains sensitive keywords`,
-        weight: 0.1,
-      });
-      totalScore += 3;
-    }
+    const result = evaluateFileRisk(file, projectRoot, churnData);
+    factors.push(...result.factors);
+    totalScore += result.score;
   }
 
-  // Normalize score to 0-100
   const normalizedScore = Math.min(100, totalScore);
-
-  // Determine risk level
-  let riskLevel: RiskLevel;
-  if (normalizedScore >= 70) riskLevel = "critical";
-  else if (normalizedScore >= 40) riskLevel = "high";
-  else if (normalizedScore >= 15) riskLevel = "medium";
-  else riskLevel = "low";
-
-  // Deduplicate factors
-  const uniqueFactors = factors.slice(0, 10); // Top 10 factors
 
   return {
     path: areaPath,
-    riskLevel,
+    riskLevel: determineRiskLevel(normalizedScore),
     score: normalizedScore,
-    factors: uniqueFactors,
+    factors: factors.slice(0, 10),
     fileCount: files.length,
   };
 }
@@ -237,6 +222,7 @@ function analyzeArea(
 
 export function generateRiskMap(projectRoot: string, _shitennoDir: string): RiskMap {
   const areas: RiskArea[] = [];
+  const churnData = getChurnData(projectRoot);
 
   // Detect areas to analyze
   const possibleAreas = ["src", "lib", "packages", "apps", "pages", "components", "services", "utils"];
@@ -247,7 +233,7 @@ export function generateRiskMap(projectRoot: string, _shitennoDir: string): Risk
     if (existsSync(fullPath)) {
       const stat = statSync(fullPath);
       if (stat.isDirectory()) {
-        areas.push(analyzeArea(projectRoot, areaPath, getChurnData(projectRoot)));
+        areas.push(analyzeArea(projectRoot, areaPath, churnData));
       }
     }
   }
@@ -256,9 +242,9 @@ export function generateRiskMap(projectRoot: string, _shitennoDir: string): Risk
   if (areas.length === 0) {
     const srcPath = join(projectRoot, "src");
     if (existsSync(srcPath)) {
-      areas.push(analyzeArea(projectRoot, "src", getChurnData(projectRoot)));
+      areas.push(analyzeArea(projectRoot, "src", churnData));
     } else {
-      areas.push(analyzeArea(projectRoot, ".", getChurnData(projectRoot)));
+      areas.push(analyzeArea(projectRoot, ".", churnData));
     }
   }
 

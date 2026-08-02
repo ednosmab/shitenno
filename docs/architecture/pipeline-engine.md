@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 16 — PIPELINE ENGINE
 
 > Command orchestration — pipeline as first-class.

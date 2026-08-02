@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Documentation Governance
 
 > Official governance rules for all documentation maintained by the Shugo project.
@@ -40,21 +45,25 @@
 
 | Subject | Canonical Document |
 |---------|-------------------|
+| Project identity ("what is Shitenno") | docs/domain/identity.md |
+| Problem it solves | docs/domain/problem-statement.md |
 | Domain glossary | docs/domain/ubiquitous-language.md |
 | Engineering principles | docs/handbook/philosophy/principles.md |
 | Module validation | docs/architecture/validation-matrix.md |
-| Active work | shitenno/docs/BACKLOG.md |
+| Active work | shitenno/docs/backlog/ACTIVE.md |
 
 ## Quality Gates
 
 Documentation changes shall not be merged unless:
 
 - [ ] Navigation is valid (README exists, links resolve)
-- [ ] References are valid (no broken links)
-- [ ] Document category is defined
-- [ ] Lifecycle is declared
+- [x] References are valid (no broken links) — enforced via `sync:docs` + `check-broken-refs`
+- [x] Document category is defined — enforced via `sync:docs` + `check-docs-frontmatter`
+- [x] Lifecycle is declared — enforced via `sync:docs` + `check-docs-frontmatter`
 - [ ] Duplicated content is avoided
 - [ ] Language is consistent (English)
+
+> Gates 2–4 are automated in the pre-commit hook (`sync:docs`). Run `pnpm run sync:docs:fix` to auto-fix.
 
 ## Language Policy
 
@@ -64,4 +73,4 @@ Documentation changes shall not be merged unless:
 
 ---
 
-*Last updated: 2026-06-29*
+*Last updated: 2026-07-22*

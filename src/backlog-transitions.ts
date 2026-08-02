@@ -50,6 +50,15 @@ export function isValidTransition(
   return allowed.includes(to);
 }
 
+function matchStatusFromRaw(raw: string): BacklogStatus | null {
+  for (const s of BACKLOG_STATUSES) {
+    if (raw.includes(s)) return s;
+  }
+  if (raw.includes("Done")) return "concluído";
+  if (raw.includes("Backlog")) return "planeado";
+  return null;
+}
+
 export function getCurrentStatus(
   backlogPath: string,
   itemId: string
@@ -73,30 +82,39 @@ export function getCurrentStatus(
       break;
     }
 
-    if (inTargetItem) {
-      const statusMatch = trimmed.match(
-        /^\|?\s*\*\*Status\*\*\s*\|\s*(.+?)\s*\|?\s*$/
-      );
-      if (statusMatch && statusMatch[1]) {
-        const raw = statusMatch[1].trim();
-        for (const s of BACKLOG_STATUSES) {
-          if (raw.includes(s)) {
-            currentStatus = s;
-            break;
-          }
-        }
-        if (!currentStatus && raw.includes("Done")) {
-          currentStatus = "concluído";
-        }
-        if (!currentStatus && raw.includes("Backlog")) {
-          currentStatus = "planeado";
-        }
-        break;
-      }
+    if (!inTargetItem) continue;
+
+    const statusMatch = trimmed.match(
+      /^\|?\s*\*\*Status\*\*\s*\|\s*(.+?)\s*\|?\s*$/
+    );
+    if (statusMatch && statusMatch[1]) {
+      currentStatus = matchStatusFromRaw(statusMatch[1].trim());
+      break;
     }
   }
 
   return currentStatus;
+}
+
+function updateStatusLine(lines: string[], itemId: string, newStatus: BacklogStatus, date: string): boolean {
+  let inTargetItem = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) continue;
+
+    if (line.trim().startsWith(`### ${itemId}`)) { inTargetItem = true; continue; }
+    if (inTargetItem && line.trim().startsWith("### ")) break;
+
+    if (inTargetItem) {
+      const statusMatch = line.match(/^(\s*\|\s*\*\*Status\*\*\s*\|\s*).+?(\s*)$/);
+      if (statusMatch) {
+        const statusLabel = newStatus === "concluído" ? `Done — ${date}` : newStatus;
+        lines[i] = `${statusMatch[1]}${statusLabel}${statusMatch[2] ?? ""}`;
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 export function transitionBacklogStatus(
@@ -106,90 +124,28 @@ export function transitionBacklogStatus(
   options?: { date?: string }
 ): TransitionResult {
   if (!existsSync(backlogPath)) {
-    return {
-      success: false,
-      itemId,
-      previousStatus: null,
-      newStatus,
-      message: `Backlog file not found: ${backlogPath}`,
-    };
+    return { success: false, itemId, previousStatus: null, newStatus, message: `Backlog file not found: ${backlogPath}` };
   }
 
   const currentStatus = getCurrentStatus(backlogPath, itemId);
 
   if (!isValidTransition(currentStatus, newStatus)) {
     return {
-      success: false,
-      itemId,
-      previousStatus: currentStatus,
-      newStatus,
-      message: currentStatus
-        ? `Invalid transition: ${currentStatus} → ${newStatus}`
-        : `Item not found: ${itemId}`,
+      success: false, itemId, previousStatus: currentStatus, newStatus,
+      message: currentStatus ? `Invalid transition: ${currentStatus} → ${newStatus}` : `Item not found: ${itemId}`,
     };
   }
 
   const date = options?.date ?? new Date().toISOString().slice(0, 10);
 
   try {
-    const content = readFileSync(backlogPath, "utf-8");
-    const lines = content.split("\n");
-    let inTargetItem = false;
-    let modified = false;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (!line) continue;
-
-      if (line.trim().startsWith(`### ${itemId}`)) {
-        inTargetItem = true;
-        continue;
-      }
-
-      if (inTargetItem && line.trim().startsWith("### ")) {
-        break;
-      }
-
-      if (inTargetItem) {
-        const statusMatch = line.match(/^(\s*\|\s*\*\*Status\*\*\s*\|\s*).+?(\s*)$/);
-        if (statusMatch) {
-          const statusLabel =
-            newStatus === "concluído"
-              ? `Done — ${date}`
-              : newStatus;
-          lines[i] = `${statusMatch[1]}${statusLabel}${statusMatch[2] ?? ""}`;
-          modified = true;
-          break;
-        }
-      }
+    const lines = readFileSync(backlogPath, "utf-8").split("\n");
+    if (!updateStatusLine(lines, itemId, newStatus, date)) {
+      return { success: false, itemId, previousStatus: currentStatus, newStatus, message: `Could not find status field for item: ${itemId}` };
     }
-
-    if (!modified) {
-      return {
-        success: false,
-        itemId,
-        previousStatus: currentStatus,
-        newStatus,
-        message: `Could not find status field for item: ${itemId}`,
-      };
-    }
-
     writeFileSync(backlogPath, lines.join("\n"), "utf-8");
-
-    return {
-      success: true,
-      itemId,
-      previousStatus: currentStatus,
-      newStatus,
-      message: `Transitioned ${currentStatus ?? "unknown"} → ${newStatus}`,
-    };
+    return { success: true, itemId, previousStatus: currentStatus, newStatus, message: `Transitioned ${currentStatus ?? "unknown"} → ${newStatus}` };
   } catch (error) {
-    return {
-      success: false,
-      itemId,
-      previousStatus: currentStatus,
-      newStatus,
-      message: `Failed to update: ${error instanceof Error ? error.message : String(error)}`,
-    };
+    return { success: false, itemId, previousStatus: currentStatus, newStatus, message: `Failed to update: ${error instanceof Error ? error.message : String(error)}` };
   }
 }

@@ -1,0 +1,21 @@
+{
+  "executionId": "EXE-CFE8E75A",
+  "request": {
+    "id": "act-lookup",
+    "type": "log_event",
+    "params": {
+      "event": "test"
+    }
+  },
+  "executionHash": "3037a12dded70544",
+  "status": "completed",
+  "startedAt": "2026-07-28T04:44:21.304Z",
+  "result": "success",
+  "output": {
+    "logged": true,
+    "event": "test",
+    "message": ""
+  },
+  "completedAt": "2026-07-28T04:44:21.304Z",
+  "duration": 0
+}

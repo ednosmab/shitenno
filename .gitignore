@@ -34,35 +34,21 @@ coverage/
 # Shugo
 .shitenno-cache.json
 
-# Shitenno — dados privados
-shitenno/docs/feedback/
-shitenno/telemetry/
-shitenno/session-feedback/
-shitenno/user-profile.json
-shitenno/BRIEFING.md
-
-# Shitenno — auto-generated state files (mudam a cada execução)
-shitenno/docs/history/
-shitenno/reports/
-shitenno/feedback/summary.json
-shitenno/feedback/records/
-
-# Shitenno — daemon runtime state (process-specific, never version)
-shitenno/daemon/
-
-# Shitenno — checkpoints de sessão (estado local, não deve ser compartilhado entre devs)
+# Shitenno — auto-generated runtime state (muda a cada execução, não versionar)
+.shitenno/.cache/
+.shitenno/daemon/
+.shitenno/telemetry/
+.shitenno/session-feedback/
+.shitenno/feedback/summary.json
+.shitenno/feedback/records/
+.shitenno/reports/
+.shitenno/docs/generated/
+.shitenno/governance/executions/
 .shitenno/governance/context/checkpoints/
 .shitenno/governance/context/context_buffer.yaml
 
-# Shitenno — derived/computable state (rebuilt from code, not human-editable)
-shitenno/engineering-state.json
-shitenno/fingerprint.json
-shitenno/capability-engine.json
-shitenno/maturity-profile.json
-shitenno/answers.json
-
-# Shitenno — cache
-shitenno/.cache/
+# Opencode config local
+.opencode/
 
 # Images
 logo.png

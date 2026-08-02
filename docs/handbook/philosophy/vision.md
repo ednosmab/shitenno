@@ -1,3 +1,8 @@
+---
+category: philosophy
+lifecycle: Active
+---
+
 # Vision
 
 > Where the Shitenno is going.

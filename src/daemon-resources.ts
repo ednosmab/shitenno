@@ -11,70 +11,123 @@
 // ── BoundedQueue ──────────────────────────────────────────────────────────────
 
 /**
- * A FIFO queue with a hard maximum capacity.
+ * A FIFO queue with a hard maximum capacity using a ring buffer.
  * When capacity is exceeded, the oldest item is evicted silently.
+ * O(1) push/pop via head/tail pointers.
  */
 export class BoundedQueue<T> {
-  private items: T[] = [];
+  private buffer: (T | undefined)[];
+  private head = 0;
+  private tail = 0;
+  private count = 0;
 
   constructor(private readonly maxSize: number) {
     if (maxSize < 1) throw new RangeError("BoundedQueue maxSize must be >= 1");
+    this.buffer = new Array(maxSize);
   }
 
   /** Add an item. Evicts the oldest if over capacity. */
   push(item: T): void {
-    this.items.push(item);
-    if (this.items.length > this.maxSize) {
-      this.items.shift(); // evict oldest
+    this.buffer[this.tail] = item;
+    this.tail = (this.tail + 1) % this.maxSize;
+    if (this.count < this.maxSize) {
+      this.count++;
+    } else {
+      // Evict oldest — advance head
+      this.head = (this.head + 1) % this.maxSize;
     }
   }
 
   /** Return a snapshot of all items (oldest first). */
   toArray(): T[] {
-    return [...this.items];
+    const result: T[] = [];
+    for (let i = 0; i < this.count; i++) {
+      const idx = (this.head + i) % this.maxSize;
+      result.push(this.buffer[idx] as T);
+    }
+    return result;
   }
 
   /** Replace all items at once (e.g., after loading from disk). Trims to cap. */
   load(items: T[]): void {
-    this.items = items.slice(-this.maxSize);
+    this.head = 0;
+    this.count = 0;
+    this.tail = 0;
+    const toLoad = items.slice(-this.maxSize);
+    for (const item of toLoad) {
+      this.buffer[this.tail] = item;
+      this.tail = (this.tail + 1) % this.maxSize;
+      this.count++;
+    }
   }
 
   /** Number of items currently held. */
   size(): number {
-    return this.items.length;
+    return this.count;
   }
 
   /** Whether the queue is at capacity. */
   isFull(): boolean {
-    return this.items.length >= this.maxSize;
+    return this.count >= this.maxSize;
   }
 
   /** Remove and return items that match the predicate (drain). */
   drain(predicate: (item: T) => boolean): T[] {
     const drained: T[] = [];
-    this.items = this.items.filter((item) => {
+    const kept: T[] = [];
+    for (let i = 0; i < this.count; i++) {
+      const idx = (this.head + i) % this.maxSize;
+      const item = this.buffer[idx] as T;
       if (predicate(item)) {
         drained.push(item);
-        return false;
+      } else {
+        kept.push(item);
       }
-      return true;
-    });
+    }
+    // Rebuild buffer with kept items
+    this.head = 0;
+    this.count = 0;
+    this.tail = 0;
+    for (const item of kept) {
+      this.buffer[this.tail] = item;
+      this.tail = (this.tail + 1) % this.maxSize;
+      this.count++;
+    }
     return drained;
   }
 
   /** Remove all items. */
   clear(): void {
-    this.items = [];
+    this.head = 0;
+    this.count = 0;
+    this.tail = 0;
   }
 
   /** Find items matching the predicate (non-destructive). */
   filter(predicate: (item: T) => boolean): T[] {
-    return this.items.filter(predicate);
+    const result: T[] = [];
+    for (let i = 0; i < this.count; i++) {
+      const idx = (this.head + i) % this.maxSize;
+      const item = this.buffer[idx] as T;
+      if (predicate(item)) result.push(item);
+    }
+    return result;
   }
 
   /** Iterate over all items. */
   [Symbol.iterator](): Iterator<T> {
-    return this.items[Symbol.iterator]();
+    let i = 0;
+    const { head, count, maxSize, buffer } = this;
+    return {
+      next(): IteratorResult<T> {
+        if (i < count) {
+          const idx = (head + i) % maxSize;
+          i++;
+          return { value: buffer[idx] as T, done: false };
+        }
+        return { value: undefined as unknown as T, done: true };
+      },
+    };
   }
 }
 

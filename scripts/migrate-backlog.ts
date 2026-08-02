@@ -16,10 +16,9 @@ interface BacklogItem {
 }
 
 const SOURCE = ".shitenno/docs/BACKLOG.md";
-const ACTIVE_DEST = "docs/backlog/ACTIVE.md";
-const DONE_DEST = "docs/backlog/DONE.md";
-const README_DEST = "docs/backlog/README.md";
-const STUB_DEST = "docs/BACKLOG.md";
+const ACTIVE_DEST = ".shitenno/docs/backlog/ACTIVE.md";
+const DONE_DEST = ".shitenno/docs/backlog/DONE.md";
+const README_DEST = ".shitenno/docs/backlog/README.md";
 
 function parseBacklogManually(content: string): BacklogItem[] {
   const items: BacklogItem[] = [];
@@ -79,7 +78,7 @@ function parseBacklogManually(content: string): BacklogItem[] {
       currentItem = {
         id,
         title: titleRaw,
-        state: "",
+        state: currentSection === "Done" ? "Done" : "",
         severity: "",
         priority: currentSection,
         owner: "",
@@ -170,18 +169,8 @@ function renderReadme(): string {
 
 Este arquivo foi dividido para reduzir o tamanho de contexto carregado por sessão:
 
-- Itens ativos (Backlog / In Progress / Paused): \`docs/backlog/ACTIVE.md\`
-- Itens concluídos (histórico): \`docs/backlog/DONE.md\`
-`;
-}
-
-function renderStub(): string {
-  return `# BACKLOG.md (movido)
-
-Este arquivo foi dividido para reduzir o tamanho de contexto carregado por sessão:
-
-- Itens ativos (Backlog / In Progress / Paused): \`docs/backlog/ACTIVE.md\`
-- Itens concluídos (histórico): \`docs/backlog/DONE.md\`
+- Itens ativos (Backlog / In Progress / Paused): \`.shitenno/docs/backlog/ACTIVE.md\`
+- Itens concluídos (histórico): \`.shitenno/docs/backlog/DONE.md\`
 `;
 }
 
@@ -204,7 +193,7 @@ function main() {
   console.log(`Itens Ativos: ${active.length}`);
 
   // Criar diretório se não existir
-  const dir = "docs/backlog";
+  const dir = ".shitenno/docs/backlog";
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
@@ -213,19 +202,16 @@ function main() {
   const activeContent = renderBacklogSection(active, "Ativo");
   const doneContent = renderDoneSection(done);
   const readmeContent = renderReadme();
-  const stubContent = renderStub();
 
   writeFileSync(ACTIVE_DEST, activeContent, "utf-8");
   writeFileSync(DONE_DEST, doneContent, "utf-8");
   writeFileSync(README_DEST, readmeContent, "utf-8");
-  writeFileSync(STUB_DEST, stubContent, "utf-8");
 
   console.log(`Migrados: ${done.length} done, ${active.length} ativos. Total: ${items.length}.`);
   console.log(`Arquivos criados:`);
   console.log(`  - ${ACTIVE_DEST}`);
   console.log(`  - ${DONE_DEST}`);
   console.log(`  - ${README_DEST}`);
-  console.log(`  - ${STUB_DEST} (stub de redirecionamento)`);
 }
 
 main();

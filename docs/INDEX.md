@@ -1,6 +1,23 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Shitenno — Knowledge Organization
 
 > This is the Constitution of the Shitenno. Every document here is a source of truth for humans and AI agents.
+
+## Start here, depending on what you're looking for
+
+- **What is the project?** → [`docs/domain/identity.md`](domain/identity.md)
+- **Why does it exist?** → [`docs/domain/problem-statement.md`](domain/problem-statement.md)
+- **Where is it going?** → [`docs/evolution/00-EXECUTIVE-SUMMARY.md`](evolution/00-EXECUTIVE-SUMMARY.md)
+- **How do I use it?** → [`docs/handbook/01-fundamentals/quick-start.md`](handbook/01-fundamentals/quick-start.md)
+- **How do I contribute?** → [`docs/engineering/CONTRIBUTING.md`](engineering/CONTRIBUTING.md)
+- **What does Shitenno generate inside my project?** → `src/templates/base/` (product domain — distinct from the docs above, which describe Shitenno itself)
+- **Project vocabulary?** → [`docs/domain/ubiquitous-language.md`](domain/ubiquitous-language.md)
+
+---
 
 ## The Four Levels
 

@@ -11,7 +11,7 @@ export function capabilityEngineToText(result: CapabilityEngineResult): string {
   lines.push("## By Maturity Level");
   for (const [level, caps] of Object.entries(result.byMaturity)) {
     if (caps.length > 0) {
-      lines.push(`  ${level}: ${caps.join(", ")}`);
+      lines.push(`  ${level}: ${caps.map((c) => c.name).join(", ")}`);
     }
   }
   lines.push("");

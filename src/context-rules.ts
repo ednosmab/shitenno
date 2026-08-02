@@ -32,72 +32,74 @@ export interface ContextRule {
 
 // ── Rule Generation ────────────────────────────────────────────────────────
 
-function generateRiskBasedRules(riskMap: RiskMap): ContextRule[] {
+interface AreaRiskFactor {
+  type: string;
+}
+
+interface RiskArea {
+  path: string;
+  riskLevel: string;
+  factors: AreaRiskFactor[];
+}
+
+function buildRulesForArea(area: RiskArea): ContextRule[] {
+  if (area.riskLevel !== "critical" && area.riskLevel !== "high") return [];
   const rules: ContextRule[] = [];
+  const slug = area.path.replace(/[^a-z0-9]/gi, "-");
 
-  for (const area of riskMap.areas) {
-    if (area.riskLevel === "critical" || area.riskLevel === "high") {
-      // Areas without tests
-      const noTestFactors = area.factors.filter((f) => f.type === "no-tests");
-      if (noTestFactors.length > 0) {
-        rules.push({
-          id: `risk-notest-${area.path.replace(/[^a-z0-9]/gi, "-")}`,
-          rule: `Area "${area.path}" has ${noTestFactors.length} file(s) without tests. Prioritize test coverage here.`,
-          rationale: `${noTestFactors.length} files lack test coverage. This increases regression risk.`,
-          priority: 1,
-          area: area.path,
-          basedOn: "risk-map",
-        });
-      }
+  const addRule = (
+    idPrefix: string,
+    ruleText: string,
+    rationale: string,
+    priority: number,
+  ): void => {
+    rules.push({
+      id: `risk-${idPrefix}-${slug}`,
+      rule: ruleText,
+      rationale,
+      priority,
+      area: area.path,
+      basedOn: "risk-map",
+    });
+  };
 
-      // High churn areas
-      const churnFactors = area.factors.filter((f) => f.type === "high-churn");
-      if (churnFactors.length > 0) {
-        rules.push({
-          id: `risk-churn-${area.path.replace(/[^a-z0-9]/gi, "-")}`,
-          rule: `Area "${area.path}" has high churn (${churnFactors.length} frequently changed file(s)). Change with extra care.`,
-          rationale: `Frequent changes indicate active development or instability.`,
-          priority: 2,
-          area: area.path,
-          basedOn: "risk-map",
-        });
-      }
+  const noTestFactors = area.factors.filter((f) => f.type === "no-tests");
+  if (noTestFactors.length > 0) {
+    addRule("notest",
+      `Area "${area.path}" has ${noTestFactors.length} file(s) without tests. Prioritize test coverage here.`,
+      `${noTestFactors.length} files lack test coverage. This increases regression risk.`, 1);
+  }
 
-      // Large files
-      const largeFileFactors = area.factors.filter((f) => f.type === "large-file");
-      if (largeFileFactors.length > 0) {
-        rules.push({
-          id: `risk-large-${area.path.replace(/[^a-z0-9]/gi, "-")}`,
-          rule: `Area "${area.path}" contains ${largeFileFactors.length} large file(s) (>300 lines). Consider refactoring.`,
-          rationale: `Large files are harder to understand, test, and maintain.`,
-          priority: 3,
-          area: area.path,
-          basedOn: "risk-map",
-        });
-      }
+  const churnFactors = area.factors.filter((f) => f.type === "high-churn");
+  if (churnFactors.length > 0) {
+    addRule("churn",
+      `Area "${area.path}" has high churn (${churnFactors.length} frequently changed file(s)). Change with extra care.`,
+      `Frequent changes indicate active development or instability.`, 2);
+  }
 
-      // Sensitive keywords
-      const sensitiveFactors = area.factors.filter((f) => f.type === "sensitive-keyword");
-      if (sensitiveFactors.length > 0) {
-        rules.push({
-          id: `risk-sensitive-${area.path.replace(/[^a-z0-9]/gi, "-")}`,
-          rule: `Area "${area.path}" contains sensitive keywords (auth, payment, security). Apply extra security review.`,
-          rationale: `Sensitive areas require stricter review and testing.`,
-          priority: 1,
-          area: area.path,
-          basedOn: "risk-map",
-        });
-      }
-    }
+  const largeFileFactors = area.factors.filter((f) => f.type === "large-file");
+  if (largeFileFactors.length > 0) {
+    addRule("large",
+      `Area "${area.path}" contains ${largeFileFactors.length} large file(s) (>300 lines). Consider refactoring.`,
+      `Large files are harder to understand, test, and maintain.`, 3);
+  }
+
+  const sensitiveFactors = area.factors.filter((f) => f.type === "sensitive-keyword");
+  if (sensitiveFactors.length > 0) {
+    addRule("sensitive",
+      `Area "${area.path}" contains sensitive keywords (auth, payment, security). Apply extra security review.`,
+      `Sensitive areas require stricter review and testing.`, 1);
   }
 
   return rules;
 }
 
-function generateFingerprintBasedRules(fingerprint: ProjectFingerprint): ContextRule[] {
-  const rules: ContextRule[] = [];
+function generateRiskBasedRules(riskMap: RiskMap): ContextRule[] {
+  return riskMap.areas.flatMap((area) => buildRulesForArea(area as RiskArea));
+}
 
-  // Domain-specific rules
+function buildDomainRules(fingerprint: ProjectFingerprint): ContextRule[] {
+  const rules: ContextRule[] = [];
   if (fingerprint.domain === "monorepo") {
     rules.push({
       id: "fp-monorepo-packages",
@@ -108,7 +110,6 @@ function generateFingerprintBasedRules(fingerprint: ProjectFingerprint): Context
       basedOn: "fingerprint",
     });
   }
-
   if (fingerprint.domain === "api") {
     rules.push({
       id: "fp-api-contracts",
@@ -119,7 +120,6 @@ function generateFingerprintBasedRules(fingerprint: ProjectFingerprint): Context
       basedOn: "fingerprint",
     });
   }
-
   if (fingerprint.domain === "web-app") {
     rules.push({
       id: "fp-web-perf",
@@ -130,8 +130,11 @@ function generateFingerprintBasedRules(fingerprint: ProjectFingerprint): Context
       basedOn: "fingerprint",
     });
   }
+  return rules;
+}
 
-  // Scale-based rules
+function buildScaleAndToolingRules(fingerprint: ProjectFingerprint): ContextRule[] {
+  const rules: ContextRule[] = [];
   if (fingerprint.scale === "large" || fingerprint.scale === "enterprise") {
     rules.push({
       id: "fp-scale-review",
@@ -142,8 +145,6 @@ function generateFingerprintBasedRules(fingerprint: ProjectFingerprint): Context
       basedOn: "fingerprint",
     });
   }
-
-  // Tooling-based rules
   if (fingerprint.tooling.typescript && fingerprint.tooling.tests) {
     rules.push({
       id: "fp-ts-tests",
@@ -154,8 +155,11 @@ function generateFingerprintBasedRules(fingerprint: ProjectFingerprint): Context
       basedOn: "fingerprint",
     });
   }
-
   return rules;
+}
+
+function generateFingerprintBasedRules(fingerprint: ProjectFingerprint): ContextRule[] {
+  return [...buildDomainRules(fingerprint), ...buildScaleAndToolingRules(fingerprint)];
 }
 
 // ── Main Function ──────────────────────────────────────────────────────────

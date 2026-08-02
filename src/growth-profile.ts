@@ -168,46 +168,16 @@ export function detectGrowthPatterns(profile: GrowthProfile): GrowthPattern[] {
   const challengingRatio = challengingCount / total;
   const comfortableRatio = comfortableCount / total;
 
-  if (challengingRatio >= 0.7) {
-    patterns.push({
-      type: "prefers_growth",
-      confidence: challengingRatio,
-      description: `User chooses growth path ${Math.round(challengingRatio * 100)}% of the time`,
-    });
-  } else if (comfortableRatio >= 0.7) {
-    patterns.push({
-      type: "prefers_comfort",
-      confidence: comfortableRatio,
-      description: `User chooses comfortable path ${Math.round(comfortableRatio * 100)}% of the time`,
-    });
-  } else if (challengingRatio >= 0.3 && challengingRatio <= 0.7) {
-    patterns.push({
-      type: "balanced",
-      confidence: 1 - Math.abs(challengingRatio - 0.5) * 2,
-      description: "User balances between comfort and growth",
-    });
+  const dominant = detectDominantPattern(challengingRatio, comfortableRatio);
+  if (dominant) {
+    patterns.push(dominant);
   } else {
-    // Check for sporadic growth (alternating choices)
-    let alternations = 0;
-    for (let i = 1; i < recent.length; i++) {
-      const current = recent[i];
-      const previous = recent[i - 1];
-      if (current && previous && current.pathChosen !== previous.pathChosen) {
-        alternations++;
-      }
-    }
-    const alternationRatio = alternations / (recent.length - 1);
-
-    if (alternationRatio > 0.6) {
-      patterns.push({
-        type: "sporadic_growth",
-        confidence: alternationRatio,
-        description: "User alternates between comfort and growth sporadically",
-      });
+    const sporadic = detectSporadicGrowth(recent);
+    if (sporadic) {
+      patterns.push(sporadic);
     }
   }
 
-  // Default pattern if none detected
   if (patterns.length === 0) {
     patterns.push({
       type: "balanced",
@@ -217,6 +187,51 @@ export function detectGrowthPatterns(profile: GrowthProfile): GrowthPattern[] {
   }
 
   return patterns;
+}
+
+function detectDominantPattern(challengingRatio: number, comfortableRatio: number): GrowthPattern | null {
+  if (challengingRatio >= 0.7) {
+    return {
+      type: "prefers_growth",
+      confidence: challengingRatio,
+      description: `User chooses growth path ${Math.round(challengingRatio * 100)}% of the time`,
+    };
+  }
+  if (comfortableRatio >= 0.7) {
+    return {
+      type: "prefers_comfort",
+      confidence: comfortableRatio,
+      description: `User chooses comfortable path ${Math.round(comfortableRatio * 100)}% of the time`,
+    };
+  }
+  if (challengingRatio >= 0.3 && challengingRatio <= 0.7) {
+    return {
+      type: "balanced",
+      confidence: 1 - Math.abs(challengingRatio - 0.5) * 2,
+      description: "User balances between comfort and growth",
+    };
+  }
+  return null;
+}
+
+function detectSporadicGrowth(recent: PathChoice[]): GrowthPattern | null {
+  let alternations = 0;
+  for (let i = 1; i < recent.length; i++) {
+    const current = recent[i];
+    const previous = recent[i - 1];
+    if (current && previous && current.pathChosen !== previous.pathChosen) {
+      alternations++;
+    }
+  }
+  const alternationRatio = alternations / (recent.length - 1);
+  if (alternationRatio > 0.6) {
+    return {
+      type: "sporadic_growth",
+      confidence: alternationRatio,
+      description: "User alternates between comfort and growth sporadically",
+    };
+  }
+  return null;
 }
 
 // ── Validation ──────────────────────────────────────────────────────────────

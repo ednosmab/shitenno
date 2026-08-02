@@ -1,0 +1,20 @@
+{
+  "name": "shitenno-governance",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Governance scripts for shitenno project",
+  "scripts": {
+    "close:session": "tsx scripts/close-session.ts",
+    "backlog": "tsx scripts/backlog.ts",
+    "audit": "tsx scripts/audit.ts",
+    "validate": "tsx scripts/validate.ts",
+    "sync:docs": "tsx scripts/sync-docs.ts",
+    "check:file-size": "tsx scripts/check-file-size.ts",
+    "generate:changelog": "tsx scripts/generate-changelog.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -238,11 +238,11 @@ describe("calculateSizeScore", () => {
 describe("calculateSignificance", () => {
   it("returns high significance for skill file with frequent changes", () => {
     const highFreq: ChangeFrequency = { count: 12, windowStart: Date.now(), lastChange: Date.now() };
-    const result = calculateSignificance(
-      `${SHUGO}/docs/skills/tdd.md`, SHUGO, null,
-      Array.from({ length: 200 }, (_, i) => `line ${i}`).join("\n"),
-      highFreq
-    );
+    const result = calculateSignificance({
+      filePath: `${SHUGO}/docs/skills/tdd.md`, shitennoDir: SHUGO, oldContent: null,
+      newContent: Array.from({ length: 200 }, (_, i) => `line ${i}`).join("\n"),
+      frequency: highFreq,
+    });
     expect(result.level).toBe("high");
     expect(result.shouldSync).toBe(true);
     expect(result.outputLevel).toBe("verbose");
@@ -250,39 +250,41 @@ describe("calculateSignificance", () => {
   });
 
   it("returns ignore for telemetry file with no changes", () => {
-    const result = calculateSignificance(
-      `${SHUGO}/telemetry/log.json`, SHUGO, "old", "old",
-      { count: 1, windowStart: Date.now() - 120_000, lastChange: Date.now() - 120_000 }
-    );
+    const result = calculateSignificance({
+      filePath: `${SHUGO}/telemetry/log.json`, shitennoDir: SHUGO, oldContent: "old", newContent: "old",
+      frequency: { count: 1, windowStart: Date.now() - 120_000, lastChange: Date.now() - 120_000 },
+    });
     expect(result.level).toBe("ignore");
     expect(result.shouldSync).toBe(false);
     expect(result.outputLevel).toBe("silent");
   });
 
   it("returns low/medium for moderate changes", () => {
-    const result = calculateSignificance(
-      `${SHUGO}/docs/README.md`, SHUGO, "old\n".repeat(10), "new\n".repeat(15),
-      { count: 3, windowStart: Date.now(), lastChange: Date.now() }
-    );
+    const result = calculateSignificance({
+      filePath: `${SHUGO}/docs/README.md`, shitennoDir: SHUGO, oldContent: "old\n".repeat(10),
+      newContent: "new\n".repeat(15),
+      frequency: { count: 3, windowStart: Date.now(), lastChange: Date.now() },
+    });
     expect(["low", "medium"]).toContain(result.level);
     expect(result.shouldSync).toBe(true);
   });
 
   it("populates reasons array for significant factors", () => {
     const highFreq: ChangeFrequency = { count: 8, windowStart: Date.now(), lastChange: Date.now() };
-    const result = calculateSignificance(
-      `${SHUGO}/docs/skills/test.md`, SHUGO, null,
-      Array.from({ length: 100 }, (_, i) => `line ${i}`).join("\n"),
-      highFreq
-    );
+    const result = calculateSignificance({
+      filePath: `${SHUGO}/docs/skills/test.md`, shitennoDir: SHUGO, oldContent: null,
+      newContent: Array.from({ length: 100 }, (_, i) => `line ${i}`).join("\n"),
+      frequency: highFreq,
+    });
     expect(result.reasons.length).toBeGreaterThan(0);
   });
 
   it("score is between 0 and 1", () => {
-    const result = calculateSignificance(
-      `${SHUGO}/governance/rules/RULE-001.json`, SHUGO, "a\n".repeat(5), "b\n".repeat(25),
-      { count: 6, windowStart: Date.now(), lastChange: Date.now() }
-    );
+    const result = calculateSignificance({
+      filePath: `${SHUGO}/governance/rules/RULE-001.json`, shitennoDir: SHUGO,
+      oldContent: "a\n".repeat(5), newContent: "b\n".repeat(25),
+      frequency: { count: 6, windowStart: Date.now(), lastChange: Date.now() },
+    });
     expect(result.score).toBeGreaterThanOrEqual(0);
     expect(result.score).toBeLessThanOrEqual(1);
   });
@@ -291,13 +293,13 @@ describe("calculateSignificance", () => {
     const tracker = new ChangeHistoryTracker();
     const filePath = `${SHUGO}/docs/generated/ARCHITECTURE.md`;
 
-    const result = calculateSignificance(
+    const result = calculateSignificance({
       filePath,
-      SHUGO,
-      null,
-      "# Conteúdo gerado\n".repeat(50),
-      tracker.recordChange(filePath)
-    );
+      shitennoDir: SHUGO,
+      oldContent: null,
+      newContent: "# Conteúdo gerado\n".repeat(50),
+      frequency: tracker.recordChange(filePath),
+    });
 
     expect(result.shouldSync).toBe(false);
     expect(result.level).toBe("ignore");

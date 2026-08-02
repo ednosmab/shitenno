@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Conceitos
 
 > Entenda os conceitos fundamentais do Shugo.

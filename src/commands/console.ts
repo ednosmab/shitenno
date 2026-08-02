@@ -33,38 +33,32 @@ function healthBar(value: number, max: number, width = 20): string {
 
 // ── Console Display ────────────────────────────────────────────────────────
 
-function displayConsole(
-  summary: ReturnType<typeof computeFeedbackSummary>,
-  sessionMetrics: ReturnType<typeof getSessionMetrics>,
-  periodDays: number
-): void {
-  outputBlank();
-  outputSection("shugo console — Token Economy");
-  outputBlank();
-
-  // ── Session Overview ────────────────────────────────────────────
+function displaySessionOverview(summary: ReturnType<typeof computeFeedbackSummary>, periodDays: number): void {
   outputSection(`Session Overview (last ${periodDays} days)`);
   output(`     Total sessions: ${chalk.cyan(String(summary.totalSessions))}`);
   output(`     Success rate:   ${chalk.cyan(Math.round(summary.successRate * 100) + "%")}`);
   output(`     ${chalk.green("✓ Success:")} ${summary.byOutcome.success}  ${chalk.red("✗ Failure:")} ${summary.byOutcome.failure}  ${chalk.yellow("⚠ Partial:")} ${summary.byOutcome.partial}`);
   outputBlank();
+}
 
-  // ── Token Economy ──────────────────────────────────────────────
+function displayTokenEconomy(summary: ReturnType<typeof computeFeedbackSummary>): void {
   outputSection("Token Economy");
   output(`     Total saved (estimated):    ${chalk.green("~" + summary.tokenEconomy.totalTokensSaved.toLocaleString() + " tokens")}`);
   output(`     Avg per session (estimated): ${chalk.green("~" + summary.tokenEconomy.avgTokensSaved.toLocaleString() + " tokens")}`);
   output(`     Cache hits:     ${chalk.cyan(String(summary.tokenEconomy.cacheHits))} / ${summary.totalSessions}`);
   output(`     Cache hit rate: ${healthBar(summary.tokenEconomy.cacheHitRate * 100, 100)} ${Math.round(summary.tokenEconomy.cacheHitRate * 100)}%`);
   outputBlank();
+}
 
-  // ── Monthly Projection ─────────────────────────────────────────
+function displayMonthlyProjection(summary: ReturnType<typeof computeFeedbackSummary>): void {
   outputSection("Monthly Projection (10 sessions)");
   output(`     Tokens saved (estimated):   ${chalk.green("~" + summary.tokenEconomy.monthlyProjection.toLocaleString())}`);
   const monthlyCost = (summary.tokenEconomy.monthlyProjection / 1_000_000) * 5;
   output(`     Cost saved (estimated, heuristic baseline):     ${chalk.green("~$" + monthlyCost.toFixed(2) + "/month")}`);
   outputBlank();
+}
 
-  // ── Failure Hotspots ───────────────────────────────────────────
+function displayFailureHotspots(summary: ReturnType<typeof computeFeedbackSummary>): void {
   if (summary.failureHotspots.length > 0) {
     outputSection("Failure Hotspots");
     for (const area of summary.failureHotspots) {
@@ -72,15 +66,17 @@ function displayConsole(
     }
     outputBlank();
   }
+}
 
-  // ── Duration ───────────────────────────────────────────────────
+function displayDuration(summary: ReturnType<typeof computeFeedbackSummary>): void {
   if (summary.avgSuccessDuration !== null) {
     outputSection("Session Duration");
     output(`     Avg (success):  ${chalk.cyan(summary.avgSuccessDuration + " min")}`);
     outputBlank();
   }
+}
 
-  // ── Session Tracker (from session-tracker.ts) ─────────────────
+function displaySessionTracker(sessionMetrics: ReturnType<typeof getSessionMetrics>): void {
   if (sessionMetrics.totalSessions > 0) {
     outputSection("Session Tracker");
     output(`     Total sessions: ${chalk.cyan(String(sessionMetrics.totalSessions))}`);
@@ -97,8 +93,9 @@ function displayConsole(
     }
     outputBlank();
   }
+}
 
-  // ── Session Score ───────────────────────────────────────────────
+function displaySessionScore(summary: ReturnType<typeof computeFeedbackSummary>): void {
   const healthScore = Math.round(
     (summary.successRate * 40) +
     (summary.tokenEconomy.cacheHitRate * 30) +
@@ -107,8 +104,9 @@ function displayConsole(
   outputSection("Session Score");
   output(`     Score: ${healthBar(healthScore, 100)} ${healthScore}/100`);
   outputBlank();
+}
 
-  // ── Recommendations ────────────────────────────────────────────
+function displayRecommendations(summary: ReturnType<typeof computeFeedbackSummary>): void {
   outputSection("Recommendations");
   if (summary.tokenEconomy.cacheHitRate < 0.5) {
     output(chalk.cyan("     → Use `shugo briefing` more often to improve cache hit rate"));
@@ -123,6 +121,24 @@ function displayConsole(
     output(chalk.green("     ✓ Excellent! Token economy is optimized"));
   }
   outputBlank();
+}
+
+function displayConsole(
+  summary: ReturnType<typeof computeFeedbackSummary>,
+  sessionMetrics: ReturnType<typeof getSessionMetrics>,
+  periodDays: number
+): void {
+  outputBlank();
+  outputSection("shugo console — Token Economy");
+  outputBlank();
+  displaySessionOverview(summary, periodDays);
+  displayTokenEconomy(summary);
+  displayMonthlyProjection(summary);
+  displayFailureHotspots(summary);
+  displayDuration(summary);
+  displaySessionTracker(sessionMetrics);
+  displaySessionScore(summary);
+  displayRecommendations(summary);
 }
 
 // ── Command ────────────────────────────────────────────────────────────────

@@ -5,6 +5,19 @@
 import type { RuleCondition, RuleContext } from "../domain/rules/rule.js";
 import { DANGEROUS_KEYS } from "./security.js";
 
+function matchesRegex(fieldValue: unknown, targetValue: unknown): boolean {
+  try {
+    const pattern = String(targetValue);
+    if (pattern.length > 200) return false;
+    const groupCount = (pattern.match(/\(/g) || []).length;
+    if (groupCount > 10) return false;
+    const regex = new RegExp(pattern);
+    return regex.test(String(fieldValue));
+  } catch {
+    return false;
+  }
+}
+
 /** Avalia uma condição contra o contexto. */
 export function evaluateCondition(
   condition: RuleCondition,
@@ -30,18 +43,8 @@ export function evaluateCondition(
       return fieldValue !== undefined && fieldValue !== null;
     case "not_exists":
       return fieldValue === undefined || fieldValue === null;
-    case "matches_regex": {
-      try {
-        const pattern = String(targetValue);
-        if (pattern.length > 200) return false;
-        const groupCount = (pattern.match(/\(/g) || []).length;
-        if (groupCount > 10) return false;
-        const regex = new RegExp(pattern);
-        return regex.test(String(fieldValue));
-      } catch {
-        return false;
-      }
-    }
+    case "matches_regex":
+      return matchesRegex(fieldValue, targetValue);
     default:
       return false;
   }

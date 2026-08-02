@@ -142,29 +142,31 @@ export function guardNotInitialized(
 
 // ── Cache Wrapper ────────────────────────────────────────────────────────────
 
-/** Wrap cache read/write pattern. Returns data and whether cache was hit. */
-export async function withCache<T>(
-  projectRoot: string,
-  shitennoDir: string,
-  key: string,
-  compute: () => T | Promise<T>,
-  options?: { force?: boolean }
-): Promise<{ data: T; cacheHit: boolean }> {
-  // Dynamic import to avoid circular dependencies
-  const { getCached, setCache, computeKeyChecksums } = await import("./cache.js");
+export interface WithCacheOptions {
+  projectRoot: string;
+  shitennoDir: string;
+  key: string;
+  compute: () => unknown | Promise<unknown>;
+  force?: boolean;
+}
 
-  if (!options?.force) {
-    const cached = getCached(projectRoot, shitennoDir, key as "complexity" | "patterns" | "health",
-      () => computeKeyChecksums(projectRoot, shitennoDir));
-    if (cached) {
-      return { data: cached as T, cacheHit: true };
-    }
+export async function withCache<T>(
+  opts: WithCacheOptions
+): Promise<{ data: T; cacheHit: boolean }> {
+  const { getCached, setCache, computeKeyChecksums } = await import("./cache.js");
+  const { projectRoot, shitennoDir, key, compute, force } = opts;
+  const cacheKey = key as "complexity" | "patterns" | "health";
+  const checksums = () => computeKeyChecksums(projectRoot, shitennoDir);
+
+  if (!force) {
+    const cached = getCached({ projectRoot, key: cacheKey, computeChecksumsFn: checksums });
+    if (cached) return { data: cached as T, cacheHit: true };
   }
 
   const data = await compute();
-  setCache(projectRoot, shitennoDir, key as "complexity" | "patterns" | "health",
-    data as Record<string, unknown>, computeKeyChecksums(projectRoot, shitennoDir));
-  return { data, cacheHit: false };
+  setCache({ projectRoot, shitennoDir, key: cacheKey,
+    data: data as Record<string, unknown>, checksums: checksums() });
+  return { data: data as T, cacheHit: false };
 }
 
 // ── Interactive Guard ────────────────────────────────────────────────────────

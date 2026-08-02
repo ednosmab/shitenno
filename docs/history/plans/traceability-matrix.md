@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Traceability Matrix
 
 > Maps historical plan files to their canonical replacements.

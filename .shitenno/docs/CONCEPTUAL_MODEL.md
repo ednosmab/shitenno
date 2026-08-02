@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # CONCEPTUAL_MODEL — Modelo Conceitual Canónico
 
 > **Versão:** 1.0

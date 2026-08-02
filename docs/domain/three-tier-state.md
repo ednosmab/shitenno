@@ -1,3 +1,8 @@
+---
+category: domain
+lifecycle: Active
+---
+
 # Three-Tier State
 
 > Knowledge is permanent. State is current. Memory is temporary.

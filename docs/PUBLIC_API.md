@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # PUBLIC_API — Superfície Pública Estável do Shitenno
 
 > **Versão:** 1.0

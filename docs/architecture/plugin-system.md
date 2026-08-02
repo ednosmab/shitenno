@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 19 — PLUGIN SYSTEM
 
 > Hooks and extensibility.

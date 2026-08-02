@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Fase 1 — Fundação
 
 ## Objetivo

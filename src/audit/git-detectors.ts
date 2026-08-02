@@ -224,41 +224,34 @@ const SECRET_PATTERNS = [
   /(?:aws[_-]?access[_-]?key[_-]?id)\s*[=:]\s*["']?[A-Z0-9]{16,}/gi,
 ];
 
+function scanLineForSecrets(line: string, patterns: RegExp[]): boolean {
+  for (const pattern of patterns) { pattern.lastIndex = 0; if (pattern.test(line)) return true; }
+  return false;
+}
+
+function parseGitLogForSecrets(output: string): { secretsFound: number; locations: string[] } {
+  let secretsFound = 0;
+  const locations: string[] = [];
+  for (const line of output.split("\n")) {
+    if (line.startsWith("+++") || line.startsWith("---") || line.startsWith("@@")) continue;
+    if (line.startsWith("-") && scanLineForSecrets(line, SECRET_PATTERNS)) {
+      secretsFound++;
+      if (locations.length < 3) locations.push(line.trim().slice(0, 60));
+    }
+  }
+  return { secretsFound, locations };
+}
+
 export function detectSecretsInGitHistory(projectRoot: string): HealthIssue[] {
   const issues: HealthIssue[] = [];
   const output = runGit(projectRoot, 'log --all --diff-filter=A -p -n 10 -- "*.env" "*.json" "*.yaml" "*.yml" 2>/dev/null | head -200');
   if (!output) return issues;
-
-  const lines = output.split("\n");
-  let secretsFound = 0;
-  const locations: string[] = [];
-
-  for (const line of lines) {
-    if (line.startsWith("+++") || line.startsWith("---") || line.startsWith("@@")) continue;
-    if (line.startsWith("-")) {
-      for (const pattern of SECRET_PATTERNS) {
-        pattern.lastIndex = 0;
-        if (pattern.test(line)) {
-          secretsFound++;
-          if (locations.length < 3) {
-            locations.push(line.trim().slice(0, 60));
-          }
-        }
-      }
-    }
-  }
-
+  const { secretsFound, locations } = parseGitLogForSecrets(output);
   if (secretsFound > 0) {
-    issues.push({
-      type: "secret_in_git_history",
-      severity: 3,
+    issues.push({ type: "secret_in_git_history", severity: 3,
       description: `${secretsFound} possível(is) segredo(s) no histórico git: ${locations.join("; ")}`,
-      location: "git log -p",
-      recommendation: "Remover segredos do histórico com 'git filter-branch' ou BFG. Adicionar ao .gitignore.",
-      confidence: 0.9,
-    });
+      location: "git log -p", recommendation: "Remover segredos do histórico com 'git filter-branch' ou BFG. Adicionar ao .gitignore.", confidence: 0.9 });
   }
-
   return issues;
 }
 

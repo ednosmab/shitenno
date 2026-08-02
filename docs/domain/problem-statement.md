@@ -1,3 +1,8 @@
+---
+category: domain
+lifecycle: Active
+---
+
 # Problem Statement
 
 > The problem that the Shitenno exists to solve.

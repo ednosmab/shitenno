@@ -1,7 +1,7 @@
 /**
  * cache.ts — Disk cache for shugo scoring results
  *
- * Strategy: SHA256 checksum per key file.
+ * Strategy: SHA256 checksum per key file (content-based, no stat fast-paths).
  * Cache stored at project root as .shitenno-cache.json.
  * Invalidated when any tracked file changes.
  */
@@ -38,6 +38,11 @@ export interface ShitennoCache {
 }
 
 // ── Checksum Helpers ────────────────────────────────────────────────────────
+//
+// Note: no stat-based fast paths here. On filesystems with coarse timestamp
+// granularity (e.g. 1s rounding), mtime/ctime/size can all stay unchanged when
+// a file is added or modified within the same tick, which would return stale
+// checksums. Content is always re-read to guarantee cache invalidation.
 
 /** Compute SHA256 of a file's content. */
 function fileChecksum(filePath: string): string | null {
@@ -168,20 +173,14 @@ function writeCache(projectRoot: string, cache: ShitennoCache): void {
 
 // ── Public API ──────────────────────────────────────────────────────────────
 
+export type CacheKey = "complexity" | "patterns" | "health";
+
+interface GetCachedInput { projectRoot: string; key: CacheKey; computeChecksumsFn: () => Record<string, string> }
 /**
  * Try to get a cached result. Returns null if cache miss.
- *
- * @param projectRoot - Root directory of the project
- * @param shitennoDir - Path to shitenno/
- * @param key - Which cache entry to check ("complexity" | "patterns" | "health")
- * @param computeChecksumsFn - Function to compute current checksums
  */
-export function getCached<T>(
-  projectRoot: string,
-  _shitennoDir: string,
-  key: "complexity" | "patterns" | "health",
-  computeChecksumsFn: () => Record<string, string>
-): T | null {
+export function getCached<T>(input: GetCachedInput): T | null {
+  const { projectRoot, key, computeChecksumsFn } = input;
   const cache = readCache(projectRoot);
   if (!cache) return null;
 
@@ -197,34 +196,21 @@ export function getCached<T>(
 /**
  * Store a result in the cache.
  */
-export function setCache<T>(
-  projectRoot: string,
-  _shitennoDir: string,
-  key: "complexity" | "patterns" | "health",
-  data: T,
-  checksums: Record<string, string>
-): void {
-  const cache = readCache(projectRoot) || {
-    version: 1 as const,
-    projectRoot,
-  };
+interface SetCacheInput<T> { projectRoot: string; shitennoDir: string; key: CacheKey; data: T; checksums: Record<string, string> }
 
-  cache[key] = {
-    checksums,
-    computedAt: new Date().toISOString(),
-    data,
-  };
-
+export function setCache<T>(input: SetCacheInput<T>): void {
+  const { projectRoot, key, data, checksums } = input;
+  const cache = readCache(projectRoot) || { version: 1 as const, projectRoot };
+  cache[key] = { checksums, computedAt: new Date().toISOString(), data };
   writeCache(projectRoot, cache);
 }
 
 /**
  * Invalidate a specific cache entry or the entire cache.
  */
-export function invalidateCache(
-  projectRoot: string,
-  key?: "complexity" | "patterns" | "health"
-): void {
+interface InvalidateCacheInput { projectRoot: string; key?: CacheKey }
+export function invalidateCache(input: InvalidateCacheInput): void {
+  const { projectRoot, key } = input;
   const cache = readCache(projectRoot);
   if (!cache) return;
 

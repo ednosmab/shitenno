@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Roteiro de Validação E2E — Shitenno
 
 > Este roteiro NÃO contém as respostas. Ele contém o procedimento e a

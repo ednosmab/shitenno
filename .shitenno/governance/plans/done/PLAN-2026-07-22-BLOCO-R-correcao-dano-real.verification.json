@@ -1,0 +1,34 @@
+{
+  "planId": "PLAN-2026-07-22-BLOCO-R-correcao-dano-real",
+  "baseCommit": "f7ec85c95c87b8f01d139d329ed9d9db9bc2be20",
+  "diffHash": "a793ad9bc7f8de0094cd2e45dfcffc713db105b40ad86ab79e8027ad58a3564b",
+  "checks": [
+    {
+      "name": "BUILD",
+      "passed": true,
+      "message": "Build passed"
+    },
+    {
+      "name": "TESTS",
+      "passed": true,
+      "message": "Tests passed"
+    },
+    {
+      "name": "LINT",
+      "passed": true,
+      "message": "Lint passed"
+    },
+    {
+      "name": "GATE_SELF_TEST",
+      "passed": true,
+      "message": "Gate de done verificado (caso positivo + negativo)"
+    },
+    {
+      "name": "DOCS",
+      "passed": true,
+      "message": "Documentation in sync"
+    }
+  ],
+  "passed": true,
+  "timestamp": "2026-07-23T06:24:10.522Z"
+}

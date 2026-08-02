@@ -16,10 +16,12 @@ import { getEventBus, enableEventPersistence } from "../src/event-bus.js";
 import { startSession, endSession } from "../src/session-tracker.js";
 import { setSessionContext, clearSessionContext } from "../src/session-context.js";
 import { installMiddleware } from "../src/cli-middleware.js";
+import { setGlobalJsonMode, isGlobalJsonMode, output as outputCli } from "../src/output.js";
 import { stopWatching } from "../src/infrastructure/persistence/file-watcher.js";
 import { COMMAND_CATEGORIES, findCommand } from "../src/help-data.js";
 import { SHITENNO_DIR_NAME } from "../src/constants.js";
 import { initDesktopNotifier } from "../src/desktop-notifier.js";
+import { resolveBacklogPaths } from "../src/backlog-core.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -59,7 +61,8 @@ if (isInitialized) {
   setSessionContext(session.id, session.startedAt);
 
   // Desktop notifications for lifecycle events (session end, task completed, etc.)
-  initDesktopNotifier();
+  // Initialized here for CLI mode; daemon initializes its own instance in engine-init.ts.
+  initDesktopNotifier(shitennoDir);
 }
 
 // Commands whose execution actually depends on the initialized engines
@@ -77,6 +80,34 @@ const HEAVY_COMMANDS = new Set([
 
 let heavyBootstrapDone = false;
 
+// Commands that need the plan-backlog retroactive scan (plan ↔ BACKLOG.md sync).
+// Mantido separado de HEAVY_COMMANDS porque plan subcommands são leves —
+// não precisam do rule-engine, knowledge-graph etc., só da sincronia backlog.
+const PLAN_BACKLOG_COMMANDS = new Set([
+  "plan list",
+  "plan show",
+  "plan create",
+  "plan status",
+  "plan done",
+  "plan prepare",
+  "plan lifecycle",
+]);
+
+/**
+ * Full space-separated command path (ex: "plan status", "status", "daemon status").
+ * Usar isso em vez de actionCommand.name() evita colisão entre uma folha
+ * "status" de um subcomando (ex: `plan status`) e o comando raiz "status".
+ */
+function fullCommandPath(cmd: import("commander").Command): string {
+  const parts: string[] = [];
+  let c: import("commander").Command | null = cmd;
+  while (c && c.parent) {
+    parts.unshift(c.name());
+    c = c.parent;
+  }
+  return parts.join(" ");
+}
+
 /**
  * Idempotent, on-demand initialization of the heavy subsystems. Previously this
  * ran unconditionally at module top-level on every CLI invocation (even for
@@ -90,7 +121,6 @@ async function ensureHeavyBootstrap(): Promise<void> {
   const { initializeRules, initializeRuleEngine } = await import("../src/rule-engine.js");
   const { initializeKnowledgeGraph } = await import("../src/knowledge-graph.js");
   const { initializeCapabilityEngine } = await import("../src/capability-engine.js");
-  const { initializeTaskPipeline } = await import("../src/task-pipeline.js");
   const { initializeEngineeringState, consolidateEngineeringState } = await import("../src/engineering-state.js");
   const { initializeProactiveEngine } = await import("../src/prioritization/triggers.js");
   const { initializeFromAnswers } = await import("../src/model-config.js");
@@ -104,7 +134,6 @@ async function ensureHeavyBootstrap(): Promise<void> {
   initializeRuleEngine(projectRoot, shitennoDir);
   initializeKnowledgeGraph(shitennoDir);
   initializeCapabilityEngine(projectRoot, shitennoDir);
-  initializeTaskPipeline({ projectRoot, shitennoDir });
   initializeEngineeringState(projectRoot, shitennoDir);
   initializeProactiveEngine(projectRoot, shitennoDir);
   initializeFromAnswers(shitennoDir);
@@ -139,7 +168,7 @@ async function ensureHeavyBootstrap(): Promise<void> {
     // Register sync subscribers (watcher started by watch command or other long-running commands)
     initPlanBacklogSync(projectRoot, shitennoDir);
 
-    showBriefingSummary(projectRoot, shitennoDir);
+    await showBriefingSummary(projectRoot, shitennoDir);
   }
 }
 
@@ -147,103 +176,123 @@ async function ensureHeavyBootstrap(): Promise<void> {
  * Show Quick Board in the terminal from context_buffer.yaml.
  * Regenerates BRIEFING.md if stale (> 1 day old) for other consumers.
  */
-function showBriefingSummary(projectRoot: string, shitennoDir: string): void {
-  try {
-    // Auto-regenerate BRIEFING.md if stale (> 1 day old) — feeds audit detectors, opencode.json
-    const briefingPath = join(shitennoDir, "BRIEFING.md");
-    if (existsSync(briefingPath)) {
-      const stat = require("node:fs").statSync(briefingPath);
-      const ageMs = Date.now() - stat.mtimeMs;
-      if (ageMs > 86400000) {
-        try {
-          const { collectContext } = require("../src/context-collector.js");
-          const { briefingToMarkdown } = require("../src/briefing.js");
-          const snapshot = collectContext(projectRoot, shitennoDir);
-          const md = briefingToMarkdown(snapshot.briefing);
-          require("node:fs").writeFileSync(briefingPath, md, "utf-8");
-        } catch {
-          // Regeneration failed — continue with stale file
-        }
-      }
-    }
+async function autoRegenerateBriefing(projectRoot: string, shitennoDir: string): Promise<void> {
+  const briefingPath = join(shitennoDir, "BRIEFING.md");
+  if (!existsSync(briefingPath)) return;
 
-    // Read Quick Board from context_buffer.yaml
+  const { statSync } = await import("node:fs");
+  const stat = statSync(briefingPath);
+  const ageMs = Date.now() - stat.mtimeMs;
+  if (ageMs <= 86400000) return;
+
+  const { collectContext } = await import("../src/context-collector.js");
+  const { briefingToMarkdown } = await import("../src/briefing.js");
+  const { writeFileSync } = await import("node:fs");
+  const snapshot = collectContext(projectRoot, shitennoDir);
+  const md = briefingToMarkdown(snapshot.briefing);
+  writeFileSync(briefingPath, md, "utf-8");
+}
+
+function resolveSessionStatus(data: Record<string, unknown>): string {
+  const status = (data?.session as Record<string, unknown>)?.status;
+  if (status === "completed") return "Concluída";
+  if (status === "in_progress" || status === "active") return "Em curso";
+  return "Desconhecido";
+}
+
+function resolveP1Debts(data: Record<string, unknown>): string {
+  const debts = data?.technical_debt as Array<{ priority?: string; severity?: string; description: string }> | undefined;
+  if (!debts?.length) return "Nenhuma";
+  return debts
+    .filter((d) => d.priority === "P1" || d.severity === "high")
+    .map((d) => d.description)
+    .join(", ") || "Nenhuma";
+}
+
+function resolveNextP0(shitennoDir: string, fallback: string): string {
+  const { active: backlogPath } = resolveBacklogPaths(shitennoDir);
+  if (!existsSync(backlogPath)) return fallback;
+
+  const backlog = readFileSync(backlogPath, "utf-8");
+  const p0Section = backlog.split(/^## P0 /m)?.[1]?.split(/^## P1 /m)?.[0] ?? "";
+  const p0Items = p0Section.split(/^### /m).slice(1);
+
+  for (const item of p0Items) {
+    const title = item.split("\n")[0]?.trim();
+    if (title && item.includes("| **Status** | In Progress")) return title;
+  }
+  return fallback;
+}
+
+async function showBriefingSummary(projectRoot: string, shitennoDir: string): Promise<void> {
+  if (isGlobalJsonMode()) return;
+  try {
+    await autoRegenerateBriefing(projectRoot, shitennoDir);
+
     const bufferPath = join(shitennoDir, "governance", "context", "context_buffer.yaml");
     if (!existsSync(bufferPath)) return;
 
-    const { parse: parseYaml } = require("yaml");
+    const { parse: parseYaml } = await import("yaml");
     const data = parseYaml(readFileSync(bufferPath, "utf-8")) || {};
 
     const currentTask = data?.current_task?.description
       ? `${data.current_task.description} (${data.current_task.status})`
       : "Nenhuma";
 
-    const sessionStatus = data?.session?.status === "completed"
-      ? "Concluída"
-      : data?.session?.status === "in_progress" || data?.session?.status === "active"
-        ? "Em curso"
-        : "Desconhecido";
-
-    let p1Debts = "Nenhuma";
-    try {
-      if (data?.technical_debt?.length > 0) {
-        p1Debts = data.technical_debt
-          .filter((d: { priority?: string; severity?: string }) => d.priority === "P1" || d.severity === "high")
-          .map((d: { description: string }) => d.description)
-          .join(", ") || "Nenhuma";
-      }
-    } catch {
-      // Ignore parse errors
-    }
-
+    const sessionStatus = resolveSessionStatus(data);
+    const p1Debts = resolveP1Debts(data);
     let nextP0 = data?.next_p0 || "Definir";
     try {
-      const backlogPath = join(shitennoDir, "docs", "BACKLOG.md");
-      if (existsSync(backlogPath)) {
-        const backlog = readFileSync(backlogPath, "utf-8");
-        const p0Section = backlog.split(/^## P0 /m)?.[1]?.split(/^## P1 /m)?.[0] ?? "";
-        const p0Items = p0Section.split(/^### /m).slice(1);
-        for (const item of p0Items) {
-          const title = item.split("\n")[0]?.trim();
-          if (title && item.includes("| **Status** | In Progress")) {
-            nextP0 = title;
-            break;
-          }
-        }
-      }
+      nextP0 = resolveNextP0(shitennoDir, nextP0);
     } catch {
       // Ignore read errors
     }
 
-    console.log("");
-    console.log(chalk.gray("  📋 Quick Board:"));
-    console.log(chalk.gray(`     Tarefa: ${currentTask} | P0: ${nextP0}`));
-    console.log(chalk.gray(`     Dívidas P1: ${p1Debts} | Estado: ${sessionStatus}`));
-    console.log("");
+    outputCli("");
+    outputCli(chalk.gray("  📋 Quick Board:"));
+    outputCli(chalk.gray(`     Tarefa: ${currentTask} | P0: ${nextP0}`));
+    outputCli(chalk.gray(`     Dívidas P1: ${p1Debts} | Estado: ${sessionStatus}`));
+    outputCli("");
   } catch {
     // Quick Board not available — skip silently
   }
 }
 
-// ── CLI Program ─────────────────────────────────────────────────────────────
+// ── CLI Program Factory ─────────────────────────────────────────────────────
 
-const program = new Command();
+/**
+ * Create a fresh CLI program instance.
+ * Use this when importing shugo as a library to avoid state persistence issues.
+ */
+export function createProgram(): Command {
+  const cmd = new Command();
 
-program
-  .name("shugo")
-  .description("AI governance ecosystem that grows with your project")
-  .version(version)
-  .option("--quiet", "Suppress informational output (errors only)")
-  .option("--no-color", "Disable colored output")
-  .hook("preAction", () => {
-    const globalOpts = program.opts();
-    if (globalOpts.quiet) {
-      process.env.SHITENNO_QUIET = "1";
-    }
-    if (globalOpts.color === false) {
-      chalk.level = 0;
-    }
-  });
+  cmd
+    .name("shugo")
+    .description("AI governance ecosystem that grows with your project")
+    .version(version)
+    .option("--quiet", "Suppress informational output (errors only)")
+    .option("--no-color", "Disable colored output")
+    .hook("preAction", () => {
+      const globalOpts = cmd.opts();
+      if (globalOpts.quiet) {
+        process.env.SHITENNO_QUIET = "1";
+      }
+      if (globalOpts.color === false) {
+        chalk.level = 0;
+      }
+      // Set global JSON mode early — suppresses output() for all modules.
+      // Also for `mcp` command: stdio is JSON-RPC protocol, stray text breaks clients.
+      const commandName = process.argv[2];
+      setGlobalJsonMode(process.argv.includes("--json") || commandName === "mcp");
+    });
+
+  return cmd;
+}
+
+// ── CLI Program (singleton for direct execution) ────────────────────────────
+
+const program = createProgram();
 
 // ── Custom Help Formatting ──────────────────────────────────────────────────
 
@@ -291,40 +340,40 @@ const helpCmd = new Command("help")
 
     const cmd = findCommand(cmdName);
     if (!cmd) {
-      console.log(chalk.red(`  Unknown command: ${cmdName}`));
-      console.log(chalk.gray("  Run 'shugo --help' to see all available commands."));
+      outputCli(chalk.red(`  Unknown command: ${cmdName}`));
+      outputCli(chalk.gray("  Run 'shugo --help' to see all available commands."));
       process.exitCode = 1;
       return;
     }
 
-    console.log("");
-    console.log(`${chalk.bold.cyan(`shugo ${cmd.name}`)} — ${cmd.description}`);
-    console.log("");
-    console.log(`${chalk.bold("Usage:")}`);
-    console.log(`  ${cmd.usage}`);
-    console.log("");
+    outputCli("");
+    outputCli(`${chalk.bold.cyan(`shugo ${cmd.name}`)} — ${cmd.description}`);
+    outputCli("");
+    outputCli(`${chalk.bold("Usage:")}`);
+    outputCli(`  ${cmd.usage}`);
+    outputCli("");
 
     if (cmd.examples.length > 0) {
-      console.log(`${chalk.bold("Examples:")}`);
+      outputCli(`${chalk.bold("Examples:")}`);
       for (const ex of cmd.examples) {
-        console.log(`  ${chalk.gray(ex)}`);
+        outputCli(`  ${chalk.gray(ex)}`);
       }
-      console.log("");
+      outputCli("");
     }
 
     if (cmd.tips && cmd.tips.length > 0) {
-      console.log(`${chalk.bold("Tips:")}`);
+      outputCli(`${chalk.bold("Tips:")}`);
       for (const tip of cmd.tips) {
-        console.log(`  ${chalk.yellow("→")} ${tip}`);
+        outputCli(`  ${chalk.yellow("→")} ${tip}`);
       }
-      console.log("");
+      outputCli("");
     }
 
     // Show Commander.js help for options
     const registeredCmd = program.commands.find((c) => c.name() === cmdName);
     if (registeredCmd) {
-      console.log(`${chalk.bold("Options:")}`);
-      console.log(registeredCmd.helpInformation());
+      outputCli(`${chalk.bold("Options:")}`);
+      outputCli(registeredCmd.helpInformation());
     }
   });
 
@@ -334,6 +383,7 @@ program.addCommand((await import("../src/commands/init.js")).initCommand);
 program.addCommand((await import("../src/commands/status.js")).statusCommand);
 program.addCommand((await import("../src/commands/upgrade.js")).upgradeCommand);
 program.addCommand((await import("../src/commands/validate.js")).validateCommand);
+program.addCommand((await import("../src/commands/pipeline.js")).pipelineCommand);
 program.addCommand((await import("../src/commands/detect.js")).detectCommand);
 program.addCommand((await import("../src/commands/audit.js")).auditCommand);
 program.addCommand((await import("../src/commands/clean.js")).cleanCommand);
@@ -365,8 +415,11 @@ program.addCommand((await import("../src/commands/events.js")).eventsCommand);
 program.addCommand((await import("../src/commands/context.js")).contextCommand);
 program.addCommand((await import("../src/commands/handbook.js")).handbookCommand);
 program.addCommand((await import("../src/commands/hooks.js")).hooksCommand);
+program.addCommand((await import("../src/commands/backlog.js")).backlogCommand);
+program.addCommand((await import("../src/commands/skill.js")).skillCommand());
 program.addCommand((await import("../src/commands/daemon.js")).daemonCommand());
 program.addCommand((await import("../src/commands/scheduled-check.js")).internalScheduledCheckCommand);
+program.addCommand((await import("../src/commands/large-commit-check.js")).largeCommitCheckCommand);
 
 // ── Middleware Pipeline ──────────────────────────────────────────────────────
 
@@ -380,29 +433,54 @@ installMiddleware(program, {
 // pay the cost. Light commands (validate, detect, act, run, briefing, ...) skip
 // the entire initialize* chain, git branch probe, and briefing entirely.
 program.hook("preAction", async (_thisCommand, actionCommand) => {
-  if (HEAVY_COMMANDS.has(actionCommand.name())) {
+  if (HEAVY_COMMANDS.has(fullCommandPath(actionCommand))) {
     await ensureHeavyBootstrap();
   }
 });
 
-await program.parseAsync();
+// Lazy plan-backlog retroactive scan: só roda para comandos que tocam backlog
+// (plan list, plan show, plan create, etc.). Separado do HEAVY_COMMANDS porque
+// plan subcommands são leves — não precisam do bootstrap pesado, só da scan.
+let planBacklogScanDone = false;
+program.hook("preAction", async (_thisCommand, actionCommand) => {
+  if (planBacklogScanDone) return;
+  if (PLAN_BACKLOG_COMMANDS.has(fullCommandPath(actionCommand)) && isInitialized) {
+    planBacklogScanDone = true;
+    const { runRetroactiveScan } = await import("../src/plan-backlog-sync.js");
+    runRetroactiveScan(projectRoot, shitennoDir);
+  }
+});
 
-// ── Post-Execution: Session End ─────────────────────────────────────────────
+// ── Execute CLI (only when run directly, not when imported) ─────────────────
 
-if (isInitialized && currentSessionId) {
-  const bus = getEventBus();
-  const endedAt = new Date();
-  const duration = currentSessionStartedAt
-    ? Math.round((endedAt.getTime() - new Date(currentSessionStartedAt).getTime()) / 60000)
-    : 0;
-  bus.publish("session.end", {
-    sessionId: currentSessionId,
-    duration,
-    outcome: "success",
-  });
-  endSession(shitennoDir, currentSessionId);
-  clearSessionContext();
-  if (!process.env.SHITENNO_CHILD) {
-    stopWatching();
+const isMainModule = process.argv[1] &&
+  (process.argv[1].endsWith("/shugo") ||
+   process.argv[1].endsWith("\\shugo") ||
+   process.argv[1].endsWith("/shugo.ts") ||
+   process.argv[1].endsWith("\\shugo.ts") ||
+   process.argv[1].endsWith("/shugo.js") ||
+   process.argv[1].endsWith("\\shugo.js"));
+
+if (isMainModule) {
+  await program.parseAsync();
+
+  // ── Post-Execution: Session End ─────────────────────────────────────────────
+
+  if (isInitialized && currentSessionId) {
+    const bus = getEventBus();
+    const endedAt = new Date();
+    const duration = currentSessionStartedAt
+      ? endedAt.getTime() - new Date(currentSessionStartedAt).getTime()
+      : 0;
+    bus.publish("session.end", {
+      sessionId: currentSessionId,
+      duration,
+      outcome: "success",
+    });
+    endSession(shitennoDir, currentSessionId);
+    clearSessionContext();
+    if (!process.env.SHITENNO_CHILD) {
+      stopWatching();
+    }
   }
 }

@@ -50,16 +50,39 @@ function getSourceFiles(dir: string): string[] {
 function checkFileSizes(files: string[]): void {
   for (const file of files) {
     const content = readFileSync(file, "utf-8");
-    const lines = content.split("\n").filter(
-      (l) => l.trim() !== "" && !l.trim().startsWith("//")
-    ).length;
+    const lines = content.split("\n");
+    let inJsdocBlock = false;
+    let effectiveLines = 0;
 
-    if (lines > MAX_FILE_LINES) {
+    for (const line of lines) {
+      const trimmed = line.trim();
+
+      // Skip empty lines
+      if (trimmed === "") continue;
+
+      // Track JSDoc block state (/* ... */)
+      if (trimmed.startsWith("/*")) {
+        inJsdocBlock = true;
+      }
+      if (inJsdocBlock) {
+        if (trimmed.includes("*/")) {
+          inJsdocBlock = false;
+        }
+        continue; // Skip all lines inside JSDoc blocks
+      }
+
+      // Skip single-line comments (//)
+      if (trimmed.startsWith("//")) continue;
+
+      effectiveLines++;
+    }
+
+    if (effectiveLines > MAX_FILE_LINES) {
       violations.push({
         type: "file_too_large",
         file: relative(ROOT, file),
-        detail: `${lines} lines (max ${MAX_FILE_LINES})`,
-        lines,
+        detail: `${effectiveLines} lines (max ${MAX_FILE_LINES})`,
+        lines: effectiveLines,
       });
     }
   }

@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Contributing to Shugo CLI
 
 > How to contribute to the Shitenno.

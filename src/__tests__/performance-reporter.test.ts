@@ -172,9 +172,9 @@ describe("Performance Reporter", () => {
     seedTrends();
 
     const report = generatePerformanceReport(tempDir, shitennoDir);
-    expect(report.debtTrend.current).toBe(30);
-    expect(report.debtTrend.previous).toBe(45);
-    expect(report.debtTrend.delta).toBe(-15);
+    expect(report.debtTrend.current).toBe(70);
+    expect(report.debtTrend.previous).toBe(55);
+    expect(report.debtTrend.delta).toBe(15);
   });
 
   it("generatePerformanceReport reads maturity trend from telemetry", () => {
@@ -213,8 +213,8 @@ describe("Performance Reporter", () => {
     seedGrowthProfile();
     const telemetryDir = join(shitennoDir, "telemetry");
     mkdirSync(telemetryDir, { recursive: true });
-    writeFileSync(join(telemetryDir, "knowledge-debt-2026-06-29.json"), JSON.stringify({ healthScore: 20 }), "utf-8");
-    writeFileSync(join(telemetryDir, "knowledge-debt-2026-06-28.json"), JSON.stringify({ healthScore: 50 }), "utf-8");
+    writeFileSync(join(telemetryDir, "knowledge-debt-2026-06-29.json"), JSON.stringify({ healthScore: 50 }), "utf-8");
+    writeFileSync(join(telemetryDir, "knowledge-debt-2026-06-28.json"), JSON.stringify({ healthScore: 20 }), "utf-8");
 
     const report = generatePerformanceReport(tempDir, shitennoDir);
     const debtInsight = report.insights.find(

@@ -21,6 +21,6 @@ export async function printDaemonBanner(shitennoDir: string, isJson = false): Pr
     () => null as unknown as DaemonHealth,
   );
   if (!health) return;
-  const icon = health.trend === "degrading" ? "🟡" : "🟢";
+  const icon = health.trend === "critical" ? "🔴" : health.trend === "degrading" ? "🟡" : "🟢";
   output(chalk.gray(`  ${icon} daemon: score ${health.score ?? "N/A"} · last cmd: ${health.lastCommand ?? "—"}`));
 }

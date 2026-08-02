@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Shitenno hook
+shugo detect --auto 2>/dev/null &

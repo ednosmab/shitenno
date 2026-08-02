@@ -1,3 +1,8 @@
+---
+category: evolution
+lifecycle: Active
+---
+
 docs/
 └── evolution/
     ├── README.md                        ← índice mestre

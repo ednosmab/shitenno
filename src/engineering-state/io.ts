@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import type { EngineeringState } from "../domain/entities/engineering-state.js";
+import { isEngineeringState } from "../schema-validators.js";
 
 // ── Retention Policy ────────────────────────────────────────────────────────
 
@@ -85,7 +86,11 @@ export function loadEngineeringState(
 
   try {
     const content = readFileSync(filePath, "utf-8");
-    return JSON.parse(content) as EngineeringState;
+    const parsed = JSON.parse(content);
+    if (!isEngineeringState(parsed)) {
+      return null;
+    }
+    return parsed as unknown as EngineeringState;
   } catch {
     return null;
   }

@@ -1,245 +1,242 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { Artifact, Relation } from "./types.js";
+import type { Artifact, ArtifactType, Relation, RelationType } from "./types.js";
 
-export function discoverArtifacts(shitennoDir: string): Artifact[] {
-  const artifacts: Artifact[] = [];
-  const now = new Date().toISOString();
+type ScanConfig = {
+  dirParts: string[];
+  fileFilter: (f: string) => boolean;
+  idPrefix: string;
+  extractBase: (f: string) => string;
+  cleanName: (s: string) => string;
+  type: ArtifactType;
+  descPrefix: string;
+  tags: string[];
+};
 
-  const adrDir = join(shitennoDir, "docs", "adrs");
-  if (existsSync(adrDir)) {
-    const files = readdirSync(adrDir).filter(
-      (f) => f.endsWith(".md") && !f.startsWith("ADR-TEMPLATE")
-    );
-    for (const file of files) {
-      artifacts.push({
-        id: `adr-${file.replace(".md", "")}`,
-        type: "adr",
-        name: file.replace(".md", "").replace(/-/g, " "),
-        path: `docs/adrs/${file}`,
-        description: `Architecture Decision Record: ${file}`,
-        tags: ["adr", "decision"],
-        createdAt: now,
-        updatedAt: now,
-        status: "active",
-      });
-    }
-  }
-
-  const skillsDir = join(shitennoDir, "docs", "skills");
-  if (existsSync(skillsDir)) {
-    const files = readdirSync(skillsDir).filter((f) => f.endsWith(".md"));
-    for (const file of files) {
-      artifacts.push({
-        id: `skill-${file.replace(".md", "")}`,
-        type: "skill",
-        name: file.replace(".md", "").replace(/_/g, " "),
-        path: `docs/skills/${file}`,
-        description: `Engineering skill: ${file}`,
-        tags: ["skill", "engineering"],
-        createdAt: now,
-        updatedAt: now,
-        status: "active",
-      });
-    }
-  }
-
-  const contractsDir = join(shitennoDir, "governance", "agents");
-  if (existsSync(contractsDir)) {
-    const files = readdirSync(contractsDir).filter(
-      (f) => f.endsWith(".yaml") || f.endsWith(".yml")
-    );
-    for (const file of files) {
-      artifacts.push({
-        id: `contract-${file.replace(/\.(yaml|yml)$/, "")}`,
-        type: "contract",
-        name: file.replace(/\.(yaml|yml)$/, "").replace(/-/g, " "),
-        path: `governance/agents/${file}`,
-        description: `AI agent contract: ${file}`,
-        tags: ["contract", "agent"],
-        createdAt: now,
-        updatedAt: now,
-        status: "active",
-      });
-    }
-  }
-
-  const workflowPath = join(shitennoDir, "governance", "WORKFLOW.md");
-  if (existsSync(workflowPath)) {
-    artifacts.push({
-      id: "workflow-main",
-      type: "workflow",
-      name: "Main Workflow",
-      path: "governance/WORKFLOW.md",
-      description: "Main session workflow",
-      tags: ["workflow", "session"],
+function scanDir(shitennoDir: string, now: string, cfg: ScanConfig): Artifact[] {
+  const dir = join(shitennoDir, ...cfg.dirParts);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir).filter(cfg.fileFilter).map((file) => {
+    const base = cfg.extractBase(file);
+    return {
+      id: `${cfg.idPrefix}${base}`,
+      type: cfg.type,
+      name: cfg.cleanName(base),
+      path: `${cfg.dirParts.join("/")}/${file}`,
+      description: `${cfg.descPrefix}${file}`,
+      tags: cfg.tags,
       createdAt: now,
       updatedAt: now,
       status: "active",
-    });
-  }
+    };
+  });
+}
 
-  const runbooksDir = join(shitennoDir, "docs", "runbooks");
-  if (existsSync(runbooksDir)) {
-    const files = readdirSync(runbooksDir).filter((f) => f.endsWith(".md"));
-    for (const file of files) {
-      artifacts.push({
-        id: `runbook-${file.replace(".md", "")}`,
-        type: "runbook",
-        name: file.replace(".md", "").replace(/-/g, " "),
-        path: `docs/runbooks/${file}`,
-        description: `Operational runbook: ${file}`,
-        tags: ["runbook", "operations"],
+const dashToSpace = (s: string) => s.replace(/-/g, " ");
+const underscoreToSpace = (s: string) => s.replace(/_/g, " ");
+const stripMd = (f: string) => f.replace(".md", "");
+const stripYaml = (f: string) => f.replace(/\.(yaml|yml)$/, "");
+const stripScript = (f: string) => f.replace(/\.(ts|js)$/, "");
+const isMd = (f: string) => f.endsWith(".md");
+const isYaml = (f: string) => f.endsWith(".yaml") || f.endsWith(".yml");
+const isScript = (f: string) => f.endsWith(".ts") || f.endsWith(".js");
+
+function scanAdrs(shitennoDir: string, now: string) {
+  return scanDir(shitennoDir, now, {
+    dirParts: ["docs", "adrs"],
+    fileFilter: (f) => isMd(f) && !f.startsWith("ADR-TEMPLATE"),
+    idPrefix: "adr-",
+    extractBase: stripMd,
+    cleanName: dashToSpace,
+    type: "adr",
+    descPrefix: "Architecture Decision Record: ",
+    tags: ["adr", "decision"],
+  });
+}
+
+function scanSkills(shitennoDir: string, now: string) {
+  return scanDir(shitennoDir, now, {
+    dirParts: ["docs", "skills"],
+    fileFilter: isMd,
+    idPrefix: "skill-",
+    extractBase: stripMd,
+    cleanName: underscoreToSpace,
+    type: "skill",
+    descPrefix: "Engineering skill: ",
+    tags: ["skill", "engineering"],
+  });
+}
+
+function scanContracts(shitennoDir: string, now: string) {
+  return scanDir(shitennoDir, now, {
+    dirParts: ["governance", "agents"],
+    fileFilter: isYaml,
+    idPrefix: "contract-",
+    extractBase: stripYaml,
+    cleanName: dashToSpace,
+    type: "contract",
+    descPrefix: "AI agent contract: ",
+    tags: ["contract", "agent"],
+  });
+}
+
+function scanWorkflow(shitennoDir: string, now: string): Artifact[] {
+  const workflowPath = join(shitennoDir, "governance", "WORKFLOW.md");
+  if (!existsSync(workflowPath)) return [];
+  return [{
+    id: "workflow-main",
+    type: "workflow",
+    name: "Main Workflow",
+    path: "governance/WORKFLOW.md",
+    description: "Main session workflow",
+    tags: ["workflow", "session"],
+    createdAt: now,
+    updatedAt: now,
+    status: "active",
+  }];
+}
+
+function scanRunbooks(shitennoDir: string, now: string) {
+  return scanDir(shitennoDir, now, {
+    dirParts: ["docs", "runbooks"],
+    fileFilter: isMd,
+    idPrefix: "runbook-",
+    extractBase: stripMd,
+    cleanName: dashToSpace,
+    type: "runbook",
+    descPrefix: "Operational runbook: ",
+    tags: ["runbook", "operations"],
+  });
+}
+
+function scanPlans(shitennoDir: string, now: string) {
+  return scanDir(shitennoDir, now, {
+    dirParts: ["governance", "plans"],
+    fileFilter: (f) => isMd(f) && !f.startsWith("TEMPLATE"),
+    idPrefix: "plan-",
+    extractBase: stripMd,
+    cleanName: dashToSpace,
+    type: "plan",
+    descPrefix: "Execution plan: ",
+    tags: ["plan", "execution"],
+  });
+}
+
+function scanScripts(shitennoDir: string, now: string) {
+  return scanDir(shitennoDir, now, {
+    dirParts: ["scripts"],
+    fileFilter: isScript,
+    idPrefix: "script-",
+    extractBase: stripScript,
+    cleanName: dashToSpace,
+    type: "script",
+    descPrefix: "Automation script: ",
+    tags: ["script", "automation"],
+  });
+}
+
+function scanDocs(shitennoDir: string, now: string) {
+  return scanDir(shitennoDir, now, {
+    dirParts: ["docs"],
+    fileFilter: (f) => isMd(f) && !f.startsWith("README"),
+    idPrefix: "doc-",
+    extractBase: stripMd,
+    cleanName: underscoreToSpace,
+    type: "doc",
+    descPrefix: "Documentation: ",
+    tags: ["doc", "documentation"],
+  });
+}
+
+export function discoverArtifacts(shitennoDir: string): Artifact[] {
+  const now = new Date().toISOString();
+  return [
+    ...scanAdrs(shitennoDir, now),
+    ...scanSkills(shitennoDir, now),
+    ...scanContracts(shitennoDir, now),
+    ...scanWorkflow(shitennoDir, now),
+    ...scanRunbooks(shitennoDir, now),
+    ...scanPlans(shitennoDir, now),
+    ...scanScripts(shitennoDir, now),
+    ...scanDocs(shitennoDir, now),
+  ];
+}
+
+type RelationRule = {
+  sourceType: ArtifactType;
+  targetFilter: (a: Artifact) => boolean;
+  relationType: RelationType;
+  description: string;
+};
+
+const RELATION_RULES: RelationRule[] = [
+  {
+    sourceType: "adr",
+    targetFilter: (a) => a.type === "skill",
+    relationType: "generates",
+    description: "ADR generates skill",
+  },
+  {
+    sourceType: "skill",
+    targetFilter: (a) => a.type === "contract",
+    relationType: "uses",
+    description: "Skill uses contract",
+  },
+  {
+    sourceType: "contract",
+    targetFilter: (a) => a.type === "script",
+    relationType: "executes",
+    description: "Contract executes script",
+  },
+  {
+    sourceType: "workflow",
+    targetFilter: (a) => a.type === "adr",
+    relationType: "references",
+    description: "Workflow references ADR",
+  },
+  {
+    sourceType: "doc",
+    targetFilter: (a) => a.type === "code" || a.type === "script",
+    relationType: "documents",
+    description: "Doc documents code",
+  },
+];
+
+function matchesAdrToSkill(artifact: Artifact, target: Artifact): boolean {
+  return target.name.toLowerCase().includes(
+    artifact.name.split(" ").slice(0, 2).join(" ").toLowerCase()
+  );
+}
+
+function applyRules(
+  artifact: Artifact,
+  artifacts: Artifact[],
+  rules: RelationRule[],
+  now: string,
+): Relation[] {
+  const relations: Relation[] = [];
+  for (const rule of rules) {
+    if (artifact.type !== rule.sourceType) continue;
+    const targets = artifacts.filter(rule.targetFilter);
+    const filtered = rule.sourceType === "adr"
+      ? targets.filter((t) => matchesAdrToSkill(artifact, t))
+      : targets;
+    for (const target of filtered) {
+      relations.push({
+        source: artifact.id,
+        target: target.id,
+        type: rule.relationType,
+        description: rule.description,
         createdAt: now,
-        updatedAt: now,
-        status: "active",
       });
     }
   }
-
-  const plansDir = join(shitennoDir, "governance", "plans");
-  if (existsSync(plansDir)) {
-    const files = readdirSync(plansDir).filter(
-      (f) => f.endsWith(".md") && !f.startsWith("TEMPLATE")
-    );
-    for (const file of files) {
-      artifacts.push({
-        id: `plan-${file.replace(".md", "")}`,
-        type: "plan",
-        name: file.replace(".md", "").replace(/-/g, " "),
-        path: `governance/plans/${file}`,
-        description: `Execution plan: ${file}`,
-        tags: ["plan", "execution"],
-        createdAt: now,
-        updatedAt: now,
-        status: "active",
-      });
-    }
-  }
-
-  const scriptsDir = join(shitennoDir, "scripts");
-  if (existsSync(scriptsDir)) {
-    const files = readdirSync(scriptsDir).filter(
-      (f) => f.endsWith(".ts") || f.endsWith(".js")
-    );
-    for (const file of files) {
-      artifacts.push({
-        id: `script-${file.replace(/\.(ts|js)$/, "")}`,
-        type: "script",
-        name: file.replace(/\.(ts|js)$/, "").replace(/-/g, " "),
-        path: `scripts/${file}`,
-        description: `Automation script: ${file}`,
-        tags: ["script", "automation"],
-        createdAt: now,
-        updatedAt: now,
-        status: "active",
-      });
-    }
-  }
-
-  const docsDir = join(shitennoDir, "docs");
-  if (existsSync(docsDir)) {
-    const files = readdirSync(docsDir).filter(
-      (f) => f.endsWith(".md") && !f.startsWith("README")
-    );
-    for (const file of files) {
-      artifacts.push({
-        id: `doc-${file.replace(".md", "")}`,
-        type: "doc",
-        name: file.replace(".md", "").replace(/_/g, " "),
-        path: `docs/${file}`,
-        description: `Documentation: ${file}`,
-        tags: ["doc", "documentation"],
-        createdAt: now,
-        updatedAt: now,
-        status: "active",
-      });
-    }
-  }
-
-  return artifacts;
+  return relations;
 }
 
 export function discoverRelations(artifacts: Artifact[]): Relation[] {
-  const relations: Relation[] = [];
   const now = new Date().toISOString();
-
-  for (const artifact of artifacts) {
-    if (artifact.type === "adr") {
-      const relatedSkills = artifacts.filter(
-        (a) => a.type === "skill" && a.name.toLowerCase().includes(artifact.name.split(" ").slice(0, 2).join(" ").toLowerCase())
-      );
-      for (const skill of relatedSkills) {
-        relations.push({
-          source: artifact.id,
-          target: skill.id,
-          type: "generates",
-          description: `ADR generates skill`,
-          createdAt: now,
-        });
-      }
-    }
-
-    if (artifact.type === "skill") {
-      const relatedContracts = artifacts.filter(
-        (a) => a.type === "contract"
-      );
-      for (const contract of relatedContracts) {
-        relations.push({
-          source: artifact.id,
-          target: contract.id,
-          type: "uses",
-          description: `Skill uses contract`,
-          createdAt: now,
-        });
-      }
-    }
-
-    if (artifact.type === "contract") {
-      const relatedScripts = artifacts.filter(
-        (a) => a.type === "script"
-      );
-      for (const script of relatedScripts) {
-        relations.push({
-          source: artifact.id,
-          target: script.id,
-          type: "executes",
-          description: `Contract executes script`,
-          createdAt: now,
-        });
-      }
-    }
-
-    if (artifact.type === "workflow") {
-      const relatedAdrs = artifacts.filter(
-        (a) => a.type === "adr"
-      );
-      for (const adr of relatedAdrs) {
-        relations.push({
-          source: artifact.id,
-          target: adr.id,
-          type: "references",
-          description: `Workflow references ADR`,
-          createdAt: now,
-        });
-      }
-    }
-
-    if (artifact.type === "doc") {
-      const relatedCode = artifacts.filter(
-        (a) => a.type === "code" || a.type === "script"
-      );
-      for (const code of relatedCode) {
-        relations.push({
-          source: artifact.id,
-          target: code.id,
-          type: "documents",
-          description: `Doc documents code`,
-          createdAt: now,
-        });
-      }
-    }
-  }
-
-  return relations;
+  return artifacts.flatMap((artifact) =>
+    applyRules(artifact, artifacts, RELATION_RULES, now)
+  );
 }

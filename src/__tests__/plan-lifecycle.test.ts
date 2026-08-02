@@ -57,6 +57,11 @@ vi.mock("chalk", () => ({
   },
 }));
 
+vi.mock("node:fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  return { ...actual, existsSync: vi.fn().mockReturnValue(true) };
+});
+
 vi.mock("node:child_process", () => ({
   execSync: vi.fn().mockReturnValue(""),
 }));
@@ -113,13 +118,13 @@ describe("type exports", () => {
   });
 
   it("ValidationResult type is usable", () => {
-    const result: ValidationResult = { valid: true, checks: [] };
+    const result: ValidationResult = { valid: true, checks: [], passed: true, verifiedAt: new Date().toISOString() };
     expect(result.valid).toBe(true);
   });
 
   it("LifecycleResult type is usable", () => {
-    const result: LifecycleResult = { active: 1, archived: 0, removed: 0, skipped: 0 };
-    expect(result.active).toBe(1);
+    const result: LifecycleResult = { checked: 1, archived: 0, archivedIds: [], active: true };
+    expect(result.active).toBe(true);
   });
 });
 

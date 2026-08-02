@@ -10,8 +10,8 @@
 
 O conceito de `loading_profile` é uma convenção interna deste framework (não é campo nativo do opencode). Controla quanto contexto documental é carregado por sessão.
 
-- **`lite`** (default): carrega documentos base (AGENTS.md, context_buffer).
-- **`full`**: carrega também skills e regras adicionais sob demanda.
+- **`lite`** (default): carrega documentos base (AGENTS.md, context_buffer) + mandatory context (MANDATORY_CONTEXT.md — regras e skills sempre activas, geradas a partir do manifest).
+- **`full`**: carrega também skills e regras contextuais sob demanda via MCP `getSkills` com metadados de tarefa.
 
 ---
 
@@ -72,5 +72,5 @@ Cada agent configurado em `opencode.json → agent.*` tem um **role** interno qu
 
 O Quick Board é alimentado por:
 - `governance/context/context_buffer.yaml` — estado actual da sessão
-- `docs/BACKLOG.md` — prioridades e dívidas
+- `docs/backlog/ACTIVE.md` — prioridades e dívidas
 - `reports/` — saúde e complexidade do projecto

@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Plano de Implementação: Modernização de Layout & Design System (Shitenno Dashboard)
 
 Este documento detalha o plano estratégico para reconstruir e elevar a qualidade visual do layout do `apps/shitenno-dashboard`. O foco será a criação de uma interface premium, elegante, responsiva e moderna, integrando a logo original (`image1.png`) e derivando um **Design System** coeso baseado na paleta de cores da logo (tons profundos de dark blue/teal).

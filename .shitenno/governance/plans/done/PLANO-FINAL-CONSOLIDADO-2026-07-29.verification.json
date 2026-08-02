@@ -1,0 +1,38 @@
+{
+  "planId": "PLANO-FINAL-CONSOLIDADO-2026-07-29",
+  "checks": [
+    {
+      "name": "FORMAT",
+      "passed": true,
+      "message": "Passed with 3 warning(s)"
+    },
+    {
+      "name": "BUILD",
+      "passed": true,
+      "message": "TypeScript compilation succeeded"
+    },
+    {
+      "name": "TESTS",
+      "passed": true,
+      "message": "test:unit passed"
+    },
+    {
+      "name": "LINT",
+      "passed": true,
+      "message": "Lint passed"
+    },
+    {
+      "name": "GATE_SELF_TEST",
+      "passed": true,
+      "message": "Gate integrity check passed"
+    },
+    {
+      "name": "DOCS",
+      "passed": true,
+      "message": "Documentation in sync"
+    }
+  ],
+  "passed": true,
+  "verifiedAt": "2026-07-31T05:18:34.283Z",
+  "diffHash": "90df34a93ef676a19b885750b12ae63b55988f9ea1b97c946b566dffd7ca0847"
+}

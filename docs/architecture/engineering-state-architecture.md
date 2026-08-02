@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # Engineering State Architecture
 
 > Implementation of the Engineering State in software.

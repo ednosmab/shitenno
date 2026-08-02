@@ -6,15 +6,95 @@ import type { AreaScore, ComplexityReport } from "../entities/engineering-state.
 import type { ProjectProfile } from "./profile-loader.js";
 import { batchScoreArea, batchGitChurn, preReadHistory, countContextPressure, type AreaMetrics } from "./area-scorer.js";
 
+function normalize(value: number, thresholds: number[]): number {
+  for (let i = 0; i < thresholds.length; i++) {
+    const t = thresholds[i];
+    if (t !== undefined && value <= t) return i;
+  }
+  return thresholds.length;
+}
+
+function normalizeReverse(value: number, thresholds: number[]): number {
+  for (let i = 0; i < thresholds.length; i++) {
+    const t = thresholds[i];
+    if (t !== undefined && value >= t) return thresholds.length - i;
+  }
+  return 0;
+}
+
+interface ScoreInputs {
+  churn: number;
+  violations: number;
+  incidentFreeAge: number;
+  contextPressure: number;
+}
+
+function calculateRawScore(m: AreaMetrics, inp: ScoreInputs, w: Record<string, number | undefined>): number {
+  const churnNorm = normalize(inp.churn, [0, 5, 20]);
+  const violationsNorm = normalize(inp.violations, [0, 1, 3]);
+  const sensitiveNorm = normalize(m.sensitiveSurface, [0, 2, 5]);
+  const filesNorm = m.fileCount >= 100 ? 2 : m.fileCount >= 30 ? 1 : 0;
+  const depsNorm = normalize(m.dependencyDepth, [0, 5, 15]);
+  const ageNorm = normalizeReverse(inp.incidentFreeAge, [0, 3, 10]);
+  const pressureNorm = normalize(inp.contextPressure, [0, 50, 200]);
+
+  const rawScore =
+    churnNorm * (w.churn || 1) +
+    violationsNorm * (w.violationRate || 1) +
+    sensitiveNorm * (w.sensitiveSurface || 1) +
+    filesNorm +
+    depsNorm * 0.5 +
+    ageNorm * 0.5 +
+    pressureNorm * 0.5;
+
+  return Math.min(10, Math.round(rawScore * 10) / 10);
+}
+
+function buildAreaEvidence(m: AreaMetrics, inp: ScoreInputs, churnWindowDays: number): string {
+  const parts: string[] = [];
+  if (m.fileCount > 0) parts.push(`${m.fileCount} files`);
+  if (inp.churn > 0) parts.push(`${inp.churn} commits/${churnWindowDays}d`);
+  if (m.sensitiveSurface > 0) parts.push(`${m.sensitiveSurface} sensitive keywords`);
+  if (inp.violations > 0) parts.push(`${inp.violations} violations`);
+  if (m.dependencyDepth > 0) parts.push(`${m.dependencyDepth} cross-area imports`);
+  if (inp.incidentFreeAge > 0) parts.push(`${inp.incidentFreeAge} sessions since last incident`);
+  if (inp.contextPressure > 0) parts.push(`${inp.contextPressure}KB P2 docs`);
+  return parts.join(", ") || "no activity detected";
+}
+
+
+
 export function calculateAreaScores(
   projectRoot: string,
   shitennoDir: string,
   profile: ProjectProfile,
   cache: FileContentCache
 ): Promise<AreaScore[]> {
-
   const churnMap = batchGitChurn(projectRoot, profile.areas, profile.churnWindowDays);
   const history = preReadHistory(shitennoDir, profile.areas, profile.violationKeywords);
+  const metricsMap = new Map<string, AreaMetrics>();
+
+  const toScore = (am: { area: string; metrics: AreaMetrics }): AreaScore | null => {
+    const m = metricsMap.get(am.area);
+    if (!m) return null;
+    const inp: ScoreInputs = {
+      churn: churnMap.get(am.area) || 0,
+      violations: history.violationsByArea.get(am.area) || 0,
+      incidentFreeAge: history.incidentFreeAgeByArea.get(am.area) || 0,
+      contextPressure: countContextPressure(projectRoot, am.area),
+    };
+    const score = calculateRawScore(m, inp, profile.weights);
+    let level: "junior" | "pleno" | "senior" = "junior";
+    if (score >= 6) level = "senior";
+    else if (score >= 3) level = "pleno";
+    return {
+      area: am.area, score, level,
+      fileCount: m.fileCount, churn: inp.churn, sensitiveSurface: m.sensitiveSurface,
+      violations: inp.violations, dependencyDepth: m.dependencyDepth,
+      incidentFreeAge: inp.incidentFreeAge, contextPressure: inp.contextPressure,
+      evidence: buildAreaEvidence(m, inp, profile.churnWindowDays),
+    };
+  };
 
   const areaMetricsPromises = profile.areas.map((area) => {
     const areaPath = join(projectRoot, area);
@@ -29,68 +109,26 @@ export function calculateAreaScores(
   });
 
   return Promise.all(areaMetricsPromises).then((areaMetrics) => {
-    const metricsMap = new Map(areaMetrics.map(({ area, metrics }) => [area, metrics]));
-
-    const results = profile.areas.map((area) => {
-      const m = metricsMap.get(area);
-      if (!m) return null;
-      const churn = churnMap.get(area) || 0;
-      const violations = history.violationsByArea.get(area) || 0;
-      const incidentFreeAge = history.incidentFreeAgeByArea.get(area) || 0;
-      const contextPressure = countContextPressure(projectRoot, area);
-      const { fileCount, sensitiveSurface, dependencyDepth } = m;
-
-      const w = profile.weights;
-
-      const churnNorm = churn === 0 ? 0 : churn <= 5 ? 1 : churn <= 20 ? 2 : 3;
-      const violationsNorm = violations === 0 ? 0 : violations === 1 ? 1 : violations <= 3 ? 2 : 3;
-      const sensitiveNorm = sensitiveSurface === 0 ? 0 : sensitiveSurface <= 2 ? 1 : sensitiveSurface <= 5 ? 2 : 3;
-      const filesNorm = fileCount >= 100 ? 2 : fileCount >= 30 ? 1 : 0;
-      const depsNorm = dependencyDepth === 0 ? 0 : dependencyDepth <= 5 ? 1 : dependencyDepth <= 15 ? 2 : 3;
-      const ageNorm = incidentFreeAge === 0 ? 3 : incidentFreeAge <= 3 ? 2 : incidentFreeAge <= 10 ? 1 : 0;
-      const pressureNorm = contextPressure === 0 ? 0 : contextPressure <= 50 ? 1 : contextPressure <= 200 ? 2 : 3;
-
-      const rawScore =
-        churnNorm * (w.churn || 1) +
-        violationsNorm * (w.violationRate || 1) +
-        sensitiveNorm * (w.sensitiveSurface || 1) +
-        filesNorm +
-        depsNorm * 0.5 +
-        ageNorm * 0.5 +
-        pressureNorm * 0.5;
-
-      const score = Math.min(10, Math.round(rawScore * 10) / 10);
-
-      let level: "junior" | "pleno" | "senior" = "junior";
-      if (score >= 6) level = "senior";
-      else if (score >= 3) level = "pleno";
-
-      const evidenceParts: string[] = [];
-      if (fileCount > 0) evidenceParts.push(`${fileCount} files`);
-      if (churn > 0) evidenceParts.push(`${churn} commits/${profile.churnWindowDays}d`);
-      if (sensitiveSurface > 0) evidenceParts.push(`${sensitiveSurface} sensitive keywords`);
-      if (violations > 0) evidenceParts.push(`${violations} violations`);
-      if (dependencyDepth > 0) evidenceParts.push(`${dependencyDepth} cross-area imports`);
-      if (incidentFreeAge > 0) evidenceParts.push(`${incidentFreeAge} sessions since last incident`);
-      if (contextPressure > 0) evidenceParts.push(`${contextPressure}KB P2 docs`);
-
-      return {
-        area,
-        score,
-        level,
-        fileCount,
-        churn,
-        sensitiveSurface,
-        violations,
-        dependencyDepth,
-        incidentFreeAge,
-        contextPressure,
-        evidence: evidenceParts.join(", ") || "no activity detected",
-      };
-    });
-
-    return results.filter((r): r is AreaScore => r !== null);
+    for (const { area, metrics } of areaMetrics) metricsMap.set(area, metrics);
+    return areaMetrics.map(toScore).filter((r): r is AreaScore => r !== null);
   });
+}
+
+function buildUpgradeSuggestions(level: string, suggestions: string[]): void {
+  if (level === "junior") return;
+  if (suggestions.some((s) => s.includes("upgrade"))) return;
+  const msg = level === "senior"
+    ? "Your project complexity suggests high complexity. Run: shugo upgrade --list"
+    : "Your project complexity suggests moderate complexity. Run: shugo upgrade --list";
+  suggestions.push(msg);
+}
+
+function buildHotAreaSuggestions(areaScores: AreaScore[], suggestions: string[]): void {
+  const hotAreas = areaScores.filter((a) => a.score >= 6);
+  if (hotAreas.length === 0) return;
+  suggestions.push(
+    `High-complexity areas: ${hotAreas.map((a) => `${a.area} (${a.score})`).join(", ")} — consider governance focus here`
+  );
 }
 
 export function scoreProject(
@@ -113,29 +151,11 @@ export function scoreProject(
     .map((m) => m.suggestion!);
 
   let level: "junior" | "pleno" | "senior" = "junior";
-  if (totalScore >= 10) {
-    level = "senior";
-  } else if (totalScore >= 5) {
-    level = "pleno";
-  }
+  if (totalScore >= 10) level = "senior";
+  else if (totalScore >= 5) level = "pleno";
 
-  if (level === "pleno" && !suggestions.some((s) => s.includes("upgrade"))) {
-    suggestions.push(
-      "Your project complexity suggests moderate complexity. Run: shugo upgrade --list"
-    );
-  }
-  if (level === "senior" && !suggestions.some((s) => s.includes("upgrade"))) {
-    suggestions.push(
-      "Your project complexity suggests high complexity. Run: shugo upgrade --list"
-    );
-  }
-
-  const hotAreas = areaScores.filter((a) => a.score >= 6);
-  if (hotAreas.length > 0) {
-    suggestions.push(
-      `High-complexity areas: ${hotAreas.map((a) => `${a.area} (${a.score})`).join(", ")} — consider governance focus here`
-    );
-  }
+  buildUpgradeSuggestions(level, suggestions);
+  buildHotAreaSuggestions(areaScores, suggestions);
 
   const report = {
     score: totalScore,

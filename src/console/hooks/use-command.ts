@@ -191,6 +191,39 @@ function generateId(): string {
   return `cmd-${commandCounter}-${Date.now()}`;
 }
 
+function createExecution(definition: CommandDefinition): CommandExecution {
+  return {
+    id: generateId(),
+    command: definition.command,
+    args: definition.args,
+    label: definition.label,
+    description: definition.description,
+    status: "running",
+    output: "",
+    startTime: new Date(),
+  };
+}
+
+function createResult(
+  execution: CommandExecution,
+  error: Error | null,
+  stdout: string,
+  stderr: string
+): CommandExecution {
+  const endTime = new Date();
+  const duration = execution.startTime
+    ? (endTime.getTime() - execution.startTime.getTime()) / 1000
+    : 0;
+  return {
+    ...execution,
+    status: error ? "error" : "done",
+    output: stdout || stderr || "",
+    error: error ? error.message : undefined,
+    endTime,
+    duration,
+  };
+}
+
 export function useCommand(projectRoot: string) {
   const [executions, setExecutions] = useState<CommandExecution[]>([]);
   const [currentExecution, setCurrentExecution] = useState<CommandExecution | null>(null);
@@ -200,54 +233,19 @@ export function useCommand(projectRoot: string) {
   const executeCommand = useCallback(
     (definition: CommandDefinition) => {
       if (isRunning) return;
-
-      const execution: CommandExecution = {
-        id: generateId(),
-        command: definition.command,
-        args: definition.args,
-        label: definition.label,
-        description: definition.description,
-        status: "running",
-        output: "",
-        startTime: new Date(),
-      };
-
+      const execution = createExecution(definition);
       setCurrentExecution(execution);
       setIsRunning(true);
-
       setExecutions((prev) => [...prev, execution]);
-
       const fullCommand = `${definition.command} ${definition.args.join(" ")}`;
-
       exec(
         fullCommand,
-        {
-          cwd: projectRoot,
-          timeout: 30000,
-          maxBuffer: 1024 * 1024,
-        },
+        { cwd: projectRoot, timeout: 30000, maxBuffer: 1024 * 1024 },
         (error, stdout, stderr) => {
-          const endTime = new Date();
-          const duration = execution.startTime
-            ? (endTime.getTime() - execution.startTime.getTime()) / 1000
-            : 0;
-
-          const result: CommandExecution = {
-            ...execution,
-            status: error ? "error" : "done",
-            output: stdout || stderr || "",
-            error: error ? error.message : undefined,
-            endTime,
-            duration,
-          };
-
+          const result = createResult(execution, error, stdout, stderr);
           setCurrentExecution(result);
           setIsRunning(false);
-
-          setExecutions((prev) =>
-            prev.map((e) => (e.id === execution.id ? result : e))
-          );
-
+          setExecutions((prev) => prev.map((e) => (e.id === execution.id ? result : e)));
           setHistory((prev) => [...prev, result]);
         }
       );

@@ -35,6 +35,13 @@ export interface ManifestDiff {
   unchanged: string[];
 }
 
+export interface UpdateManifestOptions {
+  cliVersion: string;
+  shitennoDir: string;
+  capabilities: string[];
+  maturityScore: number;
+}
+
 // ── Core Functions ───────────────────────────────────────────────────────────
 
 /**
@@ -174,23 +181,19 @@ export function diffManifests(
  */
 export function updateManifest(
   currentManifest: Manifest | null,
-  cliVersion: string,
-  shitennoDir: string,
-  capabilities: string[],
-  maturityScore: number
+  options: UpdateManifestOptions
 ): Manifest {
-  const newHashes = scanTemplateHashes(shitennoDir);
+  const newHashes = scanTemplateHashes(options.shitennoDir);
 
   if (currentManifest) {
-    // Merge: keep old hashes, update with new ones
     return {
-      cliVersion,
+      cliVersion: options.cliVersion,
       installedAt: new Date().toISOString(),
       templateHashes: { ...currentManifest.templateHashes, ...newHashes },
-      capabilities,
-      maturityScore,
+      capabilities: options.capabilities,
+      maturityScore: options.maturityScore,
     };
   }
 
-  return createManifest(cliVersion, shitennoDir, capabilities, maturityScore);
+  return createManifest(options.cliVersion, options.shitennoDir, options.capabilities, options.maturityScore);
 }

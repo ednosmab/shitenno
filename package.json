@@ -1,7 +1,7 @@
 {
   "name": "shitenno",
-  "version": "1.1.0",
-  "description": "AI governance framework that grows with your project — scoring, pattern detection, health auditing",
+  "version": "1.8.0",
+  "description": "Engineering governance system for AI-assisted projects — scoring, pattern detection, health auditing, and governed context for AI agents",
   "type": "module",
   "bin": {
     "shugo": "./dist/bin/shugo.js"
@@ -19,13 +19,16 @@
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",
     "test": "vitest run",
+    "test:unit": "vitest run --exclude '**/cli-integration.test.ts' --exclude '**/dashboard.test.ts' --exclude '**/heavy-bootstrap-scoping.test.ts' --exclude '**/bench.test.ts'",
+    "test:e2e": "npm run build && vitest run src/__tests__/cli-integration.test.ts src/__tests__/dashboard.test.ts src/__tests__/heavy-bootstrap-scoping.test.ts",
     "pretest": "tsc --noEmit",
+    "pretest:e2e": "npm run build",
     "test:watch": "vitest",
     "bench": "vitest bench src/__tests__/benchmarks.bench.ts",
     "clean": "rm -rf dist node_modules *.tsbuildinfo",
     "test:coverage": "vitest run --coverage",
     "validate-publish": "npm run build && npm pack --dry-run && echo 'Ready to publish'",
-    "lint": "eslint 'src/**/*.ts' --max-warnings=300",
+    "lint": "eslint 'src/**/*.ts'",
     "lint:fix": "eslint 'src/**/*.ts' --fix",
     "prepare": "husky",
     "sync:docs": "tsx .shitenno/scripts/sync-docs.ts",
@@ -33,18 +36,29 @@
     "sync:docs:dry": "tsx .shitenno/scripts/sync-docs.ts --dry-run",
     "validate:docs": "tsx .shitenno/scripts/sync-docs.ts",
     "validate:architecture": "tsx scripts/validate-architecture.ts",
+    "validate": "npm run validate:architecture && npm run typecheck",
     "backlog": "tsx .shitenno/scripts/backlog.ts",
     "validate:session": "tsx .shitenno/scripts/validate-session.ts",
     "close:session": "tsx .shitenno/scripts/close-session.ts",
     "premortem:check": "tsx .shitenno/scripts/premortem-check.ts",
-    "shugo": "node ./dist/bin/shugo.js"
+    "shugo": "node ./dist/bin/shugo.js",
+    "mcp": "node scripts/mcp-client.mjs",
+    "mcp:list": "node scripts/mcp-client.mjs --list",
+    "test:wiring": "vitest run src/__tests__/detector-orphan-sweep.test.ts src/__tests__/detector-level-composition.test.ts src/__tests__/security-self-exclusion.test.ts",
+    "verify:detector-composition": "tsx scripts/verify/detector-composition.ts",
+    "verify:self-exclusion": "tsx scripts/verify/self-exclusion.ts",
+    "test:matrix": "vitest run src/__tests__/audit-level-matrix.test.ts src/__tests__/security-benchmark.test.ts",
+    "lint:sink-definitions": "npx tsx scripts/security/lint-sink-definitions.ts",
+    "baseline:diff": "npx tsx scripts/security/baseline-diff.ts",
+    "generate:mutation-corpus": "npx tsx scripts/security/generate-mutation-corpus.ts",
+    "mutate:test": "npx tsx scripts/security/mutate-and-test.ts"
   },
   "keywords": [
     "ai",
     "governance",
     "opencode",
     "engineering",
-    "framework",
+    "governance",
     "scoring",
     "pattern-detection",
     "health-audit"
@@ -61,6 +75,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "packageManager": "pnpm@9.15.4",
   "dependencies": {
     "@ink-tools/ink-mouse": "^2.1.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -86,7 +101,6 @@
     "@typescript-eslint/eslint-plugin": "^8.62.0",
     "@typescript-eslint/parser": "^8.62.0",
     "@vitest/coverage-v8": "^4.1.9",
-    "eslint": "^10.6.0",
     "husky": "^9.1.7",
     "ink-testing-library": "^4.0.0",
     "tsup": "^8.3.0",

@@ -8,16 +8,30 @@
  *   3. Respect for --quiet flag (suppress informational output)
  *   4. Clean separation: output() = stdout (user-facing),
  *      logger.* = stderr (diagnostic/debug)
- *
- * Usage:
- *   import { output, outputLine, outputTable, outputKV } from "../output.js";
- *   output("Hello, world!");          // stdout
- *   outputLine("Section title");      // stdout + newline
- *   outputTable(rows);                // formatted table
- *   outputKV({ key: "value" });       // key-value pairs
  */
 
 import chalk from "chalk";
+
+// ── Global JSON Mode Gate ─────────────────────────────────────────────────
+
+let globalJsonMode = false;
+
+/**
+ * Enable or disable global JSON mode. When enabled, all output() calls
+ * are suppressed to prevent human-readable text from polluting JSON streams.
+ * Must be set as early as possible (CLI bootstrap) before any hooks fire.
+ */
+export function setGlobalJsonMode(enabled: boolean): void {
+  globalJsonMode = enabled;
+}
+
+/**
+ * Check if global JSON mode is enabled. When true, all non-essential output
+ * should be suppressed to keep JSON streams clean.
+ */
+export function isGlobalJsonMode(): boolean {
+  return globalJsonMode;
+}
 
 /**
  * Check if quiet mode is enabled (suppresses informational output).
@@ -29,13 +43,13 @@ function isQuiet(): boolean {
 
 /**
  * Write a line to stdout (user-facing output).
- * Respects --quiet flag for non-essential messages.
+ * Respects --quiet flag and global JSON mode for non-essential messages.
  *
  * @param msg - The message to output.
  * @param opts - Options: { quiet: true } suppresses in quiet mode.
  */
-export function output(msg: string, opts?: { quiet?: boolean }): void {
-  if (opts?.quiet && isQuiet()) return;
+export function output(msg: string, opts?: { quiet?: boolean; force?: boolean }): void {
+  if (!opts?.force && (globalJsonMode || (opts?.quiet && isQuiet()))) return;
   process.stdout.write(msg + "\n");
 }
 
@@ -75,55 +89,6 @@ export function outputSection(title: string, opts?: { quiet?: boolean }): void {
 }
 
 /**
- * Output key-value pairs.
- *
- * @param pairs - Object with key-value pairs to display.
- * @param opts - Options: { quiet: true } suppresses in quiet mode.
- */
-export function outputKV(pairs: Record<string, string | number | boolean | null | undefined>, opts?: { quiet?: boolean }): void {
-  if (opts?.quiet && isQuiet()) return;
-  for (const [key, value] of Object.entries(pairs)) {
-    output(`  ${chalk.cyan(key + ":")} ${value ?? "N/A"}`);
-  }
-}
-
-/**
- * Output a simple table (no borders, aligned columns).
- *
- * @param headers - Column headers.
- * @param rows - Array of row arrays.
- * @param opts - Options: { quiet: true } suppresses in quiet mode.
- */
-export function outputTable(
-  headers: string[],
-  rows: (string | number | boolean | null | undefined)[][],
-  opts?: { quiet?: boolean }
-): void {
-  if (opts?.quiet && isQuiet()) return;
-  if (rows.length === 0) {
-    output(chalk.gray("  (empty)"));
-    return;
-  }
-
-  // Calculate column widths
-  const widths = headers.map((h, i) => {
-    const colValues = rows.map((r) => String(r[i] ?? ""));
-    return Math.max(h.length, ...colValues.map((v) => v.length));
-  });
-
-  // Header
-  const headerLine = headers.map((h, i) => h.padEnd(widths[i]!)).join("  ");
-  output(chalk.bold(headerLine));
-  output(chalk.gray("─".repeat(headerLine.length)));
-
-  // Rows
-  for (const row of rows) {
-    const line = row.map((cell, i) => String(cell ?? "").padEnd(widths[i]!)).join("  ");
-    output(line);
-  }
-}
-
-/**
  * Output a success message (green checkmark).
  *
  * @param msg - The success message.
@@ -151,7 +116,7 @@ export function outputWarning(msg: string, opts?: { quiet?: boolean }): void {
  * @param msg - The error message.
  */
 export function outputError(msg: string): void {
-  output(`${chalk.red("✗")} ${msg}`);
+  process.stderr.write(`${chalk.red("✗")} ${msg}\n`);
 }
 
 /**
@@ -163,13 +128,6 @@ export function outputError(msg: string): void {
 export function outputInfo(msg: string, opts?: { quiet?: boolean }): void {
   if (opts?.quiet && isQuiet()) return;
   output(`${chalk.blue("ℹ")} ${msg}`);
-}
-
-/**
- * Output a divider line.
- */
-export function outputDivider(): void {
-  output(chalk.gray("─".repeat(60)));
 }
 
 /**

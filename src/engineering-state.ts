@@ -3,10 +3,10 @@
  *
  * Consolidates all engineering information into a single canonical state.
  * Thin orchestrator — discovery in engineering-state-discovery.ts,
- * persistence in engineering-state-io.ts.
+ * persistence in engineering-state-io.ts, entropy in entropy.ts.
  */
 
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { analyseProject } from "./analyser.js";
 import { detectKnowledgeDebt, type KnowledgeDebtReport } from "./knowledge-debt.js";
@@ -22,7 +22,6 @@ import {
   loadArtifacts,
   loadRelations,
   analyzeGraph,
-  type Relation,
 } from "./knowledge-graph.js";
 
 // ── Types (re-exported from domain entities) ────────────────────────────────
@@ -39,6 +38,7 @@ export {
   loadEngineeringState,
   engineeringStateToText,
 } from "./engineering-state/io.js";
+export { calculateEntropy } from "./engineering-state/entropy.js";
 
 // ── Import from split modules ───────────────────────────────────────────────
 
@@ -47,138 +47,170 @@ import {
   saveEngineeringState,
   loadEngineeringState,
 } from "./engineering-state/io.js";
-
-// ── Entropy Calculation ────────────────────────────────────────────────────
-
-const STALE_THRESHOLDS_DAYS: Record<AssetType, number> = {
-  plan: 15,
-  checklist: 15,
-  prompt: 15,
-  decision: 15,
-  doc: 30,
-  contract: 30,
-  runbook: 30,
-  context: 30,
-  sdr: 30,
-  script: 30,
-  feedback: 30,
-  rule: 45,
-  workflow: 45,
-  skill: 45,
-  policy: 180,
-  adr: 180,
-  template: 180,
-  report: Infinity,
-};
-
-const ORPHAN_EXEMPT_TYPES = new Set<AssetType>(["report", "doc", "adr", "policy"]);
-
-function orphanWeightFor(lifecycle: ShitennoLifecycleState): number {
-  if (lifecycle === "uninitialized" || lifecycle === "discovered") return 20;
-  if (lifecycle === "governed" || lifecycle === "evolved") return 45;
-  return 40;
-}
-
-export function calculateEntropy(
-  assets: EngineeringAsset[],
-  relations: Relation[],
-  lifecycle: ShitennoLifecycleState
-): { orphanedAssets: number; staleAssets: number; missingDependencies: number; score: number } {
-  const now = Date.now();
-
-  const connectedIds = new Set<string>();
-  for (const r of relations) {
-    connectedIds.add(r.source);
-    connectedIds.add(r.target);
-  }
-
-  const orphanedAssets = assets.filter(
-    (a) => !connectedIds.has(a.id) && !ORPHAN_EXEMPT_TYPES.has(a.type)
-  ).length;
-
-  const staleAssets = assets.filter((a) => {
-    const thresholdDays = STALE_THRESHOLDS_DAYS[a.type] ?? 30;
-    if (!isFinite(thresholdDays)) return false;
-    const thresholdMs = thresholdDays * 24 * 60 * 60 * 1000;
-    return now - new Date(a.updatedAt).getTime() > thresholdMs && a.status === "active";
-  }).length;
-
-  const assetIds = new Set(assets.map((a) => a.id));
-  const missingDependencies = assets.filter((a) =>
-    a.dependencies.some((dep) => !assetIds.has(dep))
-  ).length;
-
-  const totalAssets = assets.length || 1;
-  const orphanWeight = orphanWeightFor(lifecycle);
-  const staleWeight = 100 - orphanWeight - 30;
-
-  const orphanRatio = orphanedAssets / totalAssets;
-  const staleRatio = staleAssets / totalAssets;
-  const depRatio = missingDependencies / totalAssets;
-
-  const score = Math.round(orphanRatio * orphanWeight + staleRatio * staleWeight + depRatio * 30);
-
-  return {
-    orphanedAssets,
-    staleAssets,
-    missingDependencies,
-    score: Math.min(100, score),
-  };
-}
+import { calculateEntropy } from "./engineering-state/entropy.js";
 
 // ── Main Consolidation ─────────────────────────────────────────────────────
 
 let isConsolidating = false;
 
+function tryAcquireLock(shitennoDir: string): { acquired: boolean; release: () => void } {
+  const lockPath = join(shitennoDir, "engineering-state.lock");
+  try {
+    writeFileSync(lockPath, String(process.pid), { flag: "wx" });
+    return { acquired: true, release: () => { try { unlinkSync(lockPath); } catch { /* best-effort */ } } };
+  } catch {
+    return { acquired: false, release: () => {} };
+  }
+}
+
+function buildReentrantState(projectRoot: string, shitennoDir: string): EngineeringState {
+  const cached = loadEngineeringState(shitennoDir);
+  if (cached) return cached;
+
+  return {
+    consolidatedAt: new Date().toISOString(),
+    lifecycle: detectLifecycleState(projectRoot, shitennoDir),
+    project: { name: projectRoot.split("/").pop() || "", root: projectRoot, stack: [], hasGit: false, hasCI: false, hasTests: false, hasTypeScript: false, packageCount: 0, sourceFileCount: 0, monorepo: false },
+    maturity: null,
+    capabilities: ["core"],
+    capabilityDrift: { detectedNotRegistered: [], registeredNotDetected: [] },
+    knowledgeDebt: null,
+    knowledgeGraph: null,
+    assets: [],
+    assetsByType: {} as Record<string, number>,
+    activeRules: 0,
+    activePolicies: 0,
+    healthScores: { knowledgeDebt: 100, knowledgeGraph: 100, entropy: 0, overall: 100 },
+    entropy: { score: 0, orphanedAssets: 0, staleAssets: 0, missingDependencies: 0 },
+    summary: "Re-entrancy: returning minimal state",
+  } as EngineeringState;
+}
+
+function countAssetsByType(assets: EngineeringAsset[]): Record<AssetType, number> {
+  const assetsByType = {} as Record<AssetType, number>;
+  for (const asset of assets) {
+    assetsByType[asset.type] = (assetsByType[asset.type] || 0) + 1;
+  }
+  return assetsByType;
+}
+
+function countActiveRules(shitennoDir: string): number {
+  const rulesDir = join(shitennoDir, "governance", "rules");
+  let activeRules = 0;
+  if (!existsSync(rulesDir)) return activeRules;
+  const ruleFiles = readdirSync(rulesDir).filter((f) => f.endsWith(".json"));
+  for (const file of ruleFiles) {
+    try {
+      const content = JSON.parse(readFileSync(join(rulesDir, file), "utf-8"));
+      if (content.enabled) activeRules++;
+    } catch {
+      logger.debug("engineering-state", "Failed to parse rule file:", file);
+    }
+  }
+  return activeRules;
+}
+
+function buildProjectInfo(projectRoot: string, analysis: ReturnType<typeof analyseProject>) {
+  return {
+    name: projectRoot.split("/").pop() || "",
+    root: projectRoot,
+    stack: analysis.stack,
+    hasGit: analysis.hasGit,
+    hasCI: analysis.hasCI,
+    hasTests: analysis.hasTests,
+    hasTypeScript: analysis.hasTypeScript,
+    packageCount: analysis.packageCount,
+    sourceFileCount: analysis.sourceFileCount,
+    monorepo: analysis.monorepo,
+  };
+}
+
+function buildKnowledgeDebtInfo(debtReport: KnowledgeDebtReport | null) {
+  if (!debtReport) return null;
+  return { totalGaps: debtReport.totalGaps, healthScore: debtReport.healthScore, detectedAt: debtReport.generatedAt };
+}
+
+function buildKnowledgeGraphInfo(graphAnalysis: ReturnType<typeof analyzeGraph> | null) {
+  if (!graphAnalysis) return null;
+  return { totalArtifacts: graphAnalysis.totalArtifacts, totalRelations: graphAnalysis.totalRelations, healthScore: graphAnalysis.healthScore };
+}
+
+function buildSummaryParts(stats: {
+  assetCount: number; capabilityCount: number; overall: number;
+  orphanedCount: number; knowledgeGaps: number; lifecycle: string;
+}): string {
+  const parts: string[] = [];
+  parts.push(`${stats.assetCount} assets.`);
+  parts.push(`${stats.capabilityCount} capabilities.`);
+  parts.push(`Health: ${stats.overall}/100.`);
+  if (stats.orphanedCount > 0) parts.push(`${stats.orphanedCount} orphaned.`);
+  if (stats.knowledgeGaps > 0) parts.push(`${stats.knowledgeGaps} knowledge gaps.`);
+  parts.push(`Lifecycle: ${stats.lifecycle}.`);
+  return parts.join(" ");
+}
+
+function buildConsolidatedState(ctx: {
+  projectRoot: string; shitennoDir: string; lifecycle: ShitennoLifecycleState;
+  projectAnalysis: ReturnType<typeof analyseProject>; maturityProfile: ReturnType<typeof loadMaturityProfile>;
+  assets: EngineeringAsset[]; graphAnalysis: ReturnType<typeof analyzeGraph> | null;
+  debtReport: KnowledgeDebtReport | null; entropy: ReturnType<typeof calculateEntropy>;
+}): EngineeringState {
+  const installedCapabilities = ctx.maturityProfile?.installedCapabilities ?? ["core"];
+  const fsDetected = detectCapabilitySignalsFromFilesystem(ctx.shitennoDir);
+  const knowledgeDebtScore = ctx.debtReport?.healthScore ?? 100;
+  const knowledgeGraphScore = ctx.graphAnalysis?.healthScore ?? 100;
+  const overall = getKnowledgeHealthScore(knowledgeDebtScore, knowledgeGraphScore, ctx.entropy.score).score;
+  const assetsByType = countAssetsByType(ctx.assets);
+  const activeRules = countActiveRules(ctx.shitennoDir);
+  const activePolicies = ctx.assets.filter((a) => a.type === "policy" && a.status === "active").length;
+
+  return {
+    consolidatedAt: new Date().toISOString(),
+    lifecycle: ctx.lifecycle,
+    project: buildProjectInfo(ctx.projectRoot, ctx.projectAnalysis),
+    maturity: ctx.maturityProfile,
+    capabilities: installedCapabilities,
+    capabilityDrift: {
+      detectedNotRegistered: fsDetected.filter((c) => !installedCapabilities.includes(c)),
+      registeredNotDetected: installedCapabilities.filter((c) => !fsDetected.includes(c)),
+    },
+    knowledgeDebt: buildKnowledgeDebtInfo(ctx.debtReport),
+    knowledgeGraph: buildKnowledgeGraphInfo(ctx.graphAnalysis),
+    assets: ctx.assets,
+    assetsByType,
+    activeRules,
+    activePolicies,
+    healthScores: { knowledgeDebt: knowledgeDebtScore, knowledgeGraph: knowledgeGraphScore, overall },
+    entropy: ctx.entropy,
+    summary: buildSummaryParts({
+      assetCount: ctx.assets.length, capabilityCount: installedCapabilities.length, overall,
+      orphanedCount: ctx.entropy.orphanedAssets, knowledgeGaps: ctx.debtReport?.totalGaps ?? 0,
+      lifecycle: ctx.lifecycle,
+    }),
+  };
+}
+
 export function consolidateEngineeringState(
   projectRoot: string,
-  shitennoDir: string
+  shitennoDir: string,
+  existingMaturityProfile?: ReturnType<typeof loadMaturityProfile>
 ): EngineeringState {
-  if (isConsolidating) {
-    const cached = loadEngineeringState(shitennoDir);
-    if (cached) return cached;
+  if (isConsolidating) return buildReentrantState(projectRoot, shitennoDir);
 
-    return {
-      consolidatedAt: new Date().toISOString(),
-      lifecycle: detectLifecycleState(projectRoot, shitennoDir),
-      project: { name: projectRoot.split("/").pop() || "", root: projectRoot, stack: [], hasGit: false, hasCI: false, hasTests: false, hasTypeScript: false, packageCount: 0, sourceFileCount: 0, monorepo: false },
-      maturity: null,
-      capabilities: ["core"],
-      capabilityDrift: { detectedNotRegistered: [], registeredNotDetected: [] },
-      knowledgeDebt: null,
-      knowledgeGraph: null,
-      assets: [],
-      assetsByType: {} as Record<string, number>,
-      activeRules: 0,
-      activePolicies: 0,
-      healthScores: { knowledgeDebt: 100, knowledgeGraph: 100, entropy: 0, overall: 100 },
-      entropy: { score: 0, orphanedAssets: 0, staleAssets: 0, missingDependencies: 0 },
-      summary: "Re-entrancy: returning minimal state",
-    } as EngineeringState;
-  }
+  const { acquired, release } = tryAcquireLock(shitennoDir);
+  if (!acquired) return buildReentrantState(projectRoot, shitennoDir);
 
   isConsolidating = true;
 
   try {
     const projectAnalysis = analyseProject(projectRoot);
     const lifecycle = detectLifecycleState(projectRoot, shitennoDir);
-    const maturityProfile = loadMaturityProfile(shitennoDir);
-
-    const installedCapabilities = maturityProfile?.installedCapabilities ?? ["core"];
-
-    const fsDetected = detectCapabilitySignalsFromFilesystem(shitennoDir);
-    const capabilityDrift = {
-      detectedNotRegistered: fsDetected.filter((c) => !installedCapabilities.includes(c)),
-      registeredNotDetected: installedCapabilities.filter((c) => !fsDetected.includes(c)),
-    };
-
+    const maturityProfile = existingMaturityProfile ?? loadMaturityProfile(shitennoDir);
     const assets = discoverAssets(shitennoDir);
 
     const artifacts = loadArtifacts(shitennoDir);
     const relations = loadRelations(shitennoDir);
-    const graphAnalysis = artifacts.length > 0
-      ? analyzeGraph(artifacts, relations)
-      : null;
+    const graphAnalysis = artifacts.length > 0 ? analyzeGraph(artifacts, relations) : null;
 
     let debtReport: KnowledgeDebtReport | null = null;
     try {
@@ -188,32 +220,10 @@ export function consolidateEngineeringState(
     }
 
     const entropy = calculateEntropy(assets, relations, lifecycle);
-
-    const assetsByType = {} as Record<AssetType, number>;
-    for (const asset of assets) {
-      assetsByType[asset.type] = (assetsByType[asset.type] || 0) + 1;
-    }
-
-    const rulesDir = join(shitennoDir, "governance", "rules");
-    let activeRules = 0;
-    if (existsSync(rulesDir)) {
-      const ruleFiles = readdirSync(rulesDir).filter((f) => f.endsWith(".json"));
-      for (const file of ruleFiles) {
-        try {
-          const content = JSON.parse(readFileSync(join(rulesDir, file), "utf-8"));
-          if (content.enabled) activeRules++;
-        } catch {
-          logger.debug("engineering-state", "Failed to parse rule file:", file);
-        }
-      }
-    }
-
-    const activePolicies = assets.filter((a) => a.type === "policy" && a.status === "active").length;
-
-    const knowledgeDebtScore = debtReport?.healthScore ?? 100;
-    const knowledgeGraphScore = graphAnalysis?.healthScore ?? 100;
-    const knowledgeHealth = getKnowledgeHealthScore(knowledgeDebtScore, knowledgeGraphScore, entropy.score);
-    const overall = knowledgeHealth.score;
+    const state = buildConsolidatedState({
+      projectRoot, shitennoDir, lifecycle, projectAnalysis,
+      maturityProfile, assets, graphAnalysis, debtReport, entropy,
+    });
 
     getEventBus().publish("entropy.calculated", {
       projectId: projectRoot.split("/").pop() || "",
@@ -226,65 +236,17 @@ export function consolidateEngineeringState(
       timestamp: new Date().toISOString(),
     });
 
-    const parts: string[] = [];
-    parts.push(`${assets.length} assets.`);
-    parts.push(`${installedCapabilities.length} capabilities.`);
-    parts.push(`Health: ${overall}/100.`);
-    if (entropy.orphanedAssets > 0) parts.push(`${entropy.orphanedAssets} orphaned.`);
-    if (debtReport && debtReport.totalGaps > 0) parts.push(`${debtReport.totalGaps} knowledge gaps.`);
-    parts.push(`Lifecycle: ${lifecycle}.`);
-
-    const state = {
-      consolidatedAt: new Date().toISOString(),
-      lifecycle,
-      project: {
-        name: projectRoot.split("/").pop() || "",
-        root: projectRoot,
-        stack: projectAnalysis.stack,
-        hasGit: projectAnalysis.hasGit,
-        hasCI: projectAnalysis.hasCI,
-        hasTests: projectAnalysis.hasTests,
-        hasTypeScript: projectAnalysis.hasTypeScript,
-        packageCount: projectAnalysis.packageCount,
-        sourceFileCount: projectAnalysis.sourceFileCount,
-        monorepo: projectAnalysis.monorepo,
-      },
-      maturity: maturityProfile,
-      capabilities: installedCapabilities,
-      capabilityDrift,
-      knowledgeDebt: debtReport ? {
-        totalGaps: debtReport.totalGaps,
-        healthScore: debtReport.healthScore,
-        detectedAt: debtReport.generatedAt,
-      } : null,
-      knowledgeGraph: graphAnalysis ? {
-        totalArtifacts: graphAnalysis.totalArtifacts,
-        totalRelations: graphAnalysis.totalRelations,
-        healthScore: graphAnalysis.healthScore,
-      } : null,
-      assets,
-      assetsByType,
-      activeRules,
-      activePolicies,
-      healthScores: {
-        knowledgeDebt: knowledgeDebtScore,
-        knowledgeGraph: knowledgeGraphScore,
-        overall,
-      },
-      entropy,
-      summary: parts.join(" "),
-    };
-
     getEventBus().publish("engineering_state.consolidated", {
       totalDimensions: 7,
       changedDimensions: [],
-      overallHealth: overall,
+      overallHealth: state.healthScores.overall,
       timestamp: new Date().toISOString(),
     });
 
     return state;
   } finally {
     isConsolidating = false;
+    release();
   }
 }
 
@@ -299,11 +261,6 @@ export function initializeEngineeringState(
   const reconsolidate = () => {
     const state = consolidateEngineeringState(projectRoot, shitennoDir);
     saveEngineeringState(shitennoDir, state);
-    bus.publish("engineering_state.consolidated", {
-      consolidatedAt: state.consolidatedAt,
-      lifecycle: state.lifecycle,
-      overallHealth: state.healthScores.overall,
-    });
   };
 
   const unsubscribers = [

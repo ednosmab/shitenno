@@ -197,7 +197,7 @@ describe("ActionEngine", () => {
 
   beforeEach(() => {
     repo = new InMemoryExecutionRepository();
-    engine = new ActionEngine(repo as unknown as any);
+    engine = new ActionEngine(repo as unknown as any, "");
   });
 
   it("executes an action successfully", async () => {

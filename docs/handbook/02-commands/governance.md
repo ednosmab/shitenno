@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Governance
 
 Comandos para gerenciar metas, decisões e políticas.

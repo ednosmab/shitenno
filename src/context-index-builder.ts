@@ -54,63 +54,59 @@ function extractDate(filename: string): string {
   return match?.[1] ?? "";
 }
 
-// ── Main Builder ───────────────────────────────────────────────────────────
+// ── Scan Helpers ─────────────────────────────────────────────────────────────
 
-/**
- * Build P4 compressed index from history and feedback directories.
- *
- * @param shitennoDir - Path to shitenno/ directory
- * @returns P4IndexResult with entries and metadata
- */
-export function buildP4Index(shitennoDir: string): P4IndexResult {
+function scanHistoryDir(shitennoDir: string): IndexEntry[] {
   const entries: IndexEntry[] = [];
-  const generatedAt = new Date().toISOString();
-
-  // 1. Scan history/*.md
   const historyDir = join(shitennoDir, "docs", "history");
-  if (existsSync(historyDir)) {
-    try {
-      const files = readdirSync(historyDir).filter((f) => f.endsWith(".md"));
-      for (const file of files) {
-        const content = readFileSync(join(historyDir, file), "utf-8");
-        entries.push({
-          file: `docs/history/${file}`,
-          date: extractDate(file),
-          summary: extractSummary(content),
-        });
-      }
-    } catch (err) {
-      logger.debug("buildP4Index", "Failed to read history directory:", err instanceof Error ? err.message : err);
-    }
-  }
+  if (!existsSync(historyDir)) return entries;
 
-  // 2. Scan feedback/records/*.json
+  try {
+    const files = readdirSync(historyDir).filter((f) => f.endsWith(".md"));
+    for (const file of files) {
+      const content = readFileSync(join(historyDir, file), "utf-8");
+      entries.push({
+        file: `docs/history/${file}`,
+        date: extractDate(file),
+        summary: extractSummary(content),
+      });
+    }
+  } catch (err) {
+    logger.debug("buildP4Index", "Failed to read history directory:", err instanceof Error ? err.message : err);
+  }
+  return entries;
+}
+
+function scanFeedbackDir(shitennoDir: string): IndexEntry[] {
+  const entries: IndexEntry[] = [];
   const feedbackDir = join(shitennoDir, "feedback", "records");
-  if (existsSync(feedbackDir)) {
-    try {
-      const files = readdirSync(feedbackDir).filter((f) => f.endsWith(".json"));
-      for (const file of files) {
-        const content = readFileSync(join(feedbackDir, file), "utf-8");
-        try {
-          const record = JSON.parse(content);
-          const summary = record.outcome
-            ? `Feedback: ${record.outcome}${record.failureHotspots ? ` — ${record.failureHotspots.join(", ")}` : ""}`
-            : "Feedback record";
-          entries.push({
-            file: `feedback/records/${file}`,
-            date: extractDate(file) || record.timestamp?.slice(0, 10) || "",
-            summary,
-          });
-        } catch {
-          logger.debug("context-index-builder", "Skipping invalid feedback JSON record");
-        }
-      }
-    } catch (err) {
-      logger.debug("buildP4Index", "Failed to read feedback directory:", err instanceof Error ? err.message : err);
-    }
-  }
+  if (!existsSync(feedbackDir)) return entries;
 
-  // 3. Write index file
+  try {
+    const files = readdirSync(feedbackDir).filter((f) => f.endsWith(".json"));
+    for (const file of files) {
+      const content = readFileSync(join(feedbackDir, file), "utf-8");
+      try {
+        const record = JSON.parse(content);
+        const summary = record.outcome
+          ? `Feedback: ${record.outcome}${record.failureHotspots ? ` — ${record.failureHotspots.join(", ")}` : ""}`
+          : "Feedback record";
+        entries.push({
+          file: `feedback/records/${file}`,
+          date: extractDate(file) || record.timestamp?.slice(0, 10) || "",
+          summary,
+        });
+      } catch {
+        logger.debug("context-index-builder", "Skipping invalid feedback JSON record");
+      }
+    }
+  } catch (err) {
+    logger.debug("buildP4Index", "Failed to read feedback directory:", err instanceof Error ? err.message : err);
+  }
+  return entries;
+}
+
+function writeP4IndexFile(shitennoDir: string, entries: IndexEntry[]): string {
   const indexPath = join(shitennoDir, "governance", "context", "p4_index.yaml");
   const indexDir = join(shitennoDir, "governance", "context");
 
@@ -131,12 +127,22 @@ export function buildP4Index(shitennoDir: string): P4IndexResult {
   } catch (err) {
     logger.debug("buildP4Index", "Failed to write index:", err instanceof Error ? err.message : err);
   }
+  return indexPath;
+}
 
-  return {
-    entries,
-    indexPath,
-    generatedAt,
-  };
+// ── Main Builder ───────────────────────────────────────────────────────────
+
+/**
+ * Build P4 compressed index from history and feedback directories.
+ *
+ * @param shitennoDir - Path to shitenno/ directory
+ * @returns P4IndexResult with entries and metadata
+ */
+export function buildP4Index(shitennoDir: string): P4IndexResult {
+  const generatedAt = new Date().toISOString();
+  const entries = [...scanHistoryDir(shitennoDir), ...scanFeedbackDir(shitennoDir)];
+  const indexPath = writeP4IndexFile(shitennoDir, entries);
+  return { entries, indexPath, generatedAt };
 }
 
 /**

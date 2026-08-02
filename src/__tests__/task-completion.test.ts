@@ -86,7 +86,7 @@ describe("task-completion", () => {
       const backlogGate = result.gates[3]!;
       expect(backlogGate.name).toBe("backlog");
       expect(backlogGate.passed).toBe(true);
-      expect(backlogGate.message).toContain("No BACKLOG.md found");
+      expect(backlogGate.message).toContain("No backlog found");
     });
 
     it("detects missing backlog update for existing item", () => {
@@ -159,13 +159,13 @@ describe("task-completion", () => {
     it("fails plan_status when plan has andamento status", () => {
       const dir = join(tmpdir(), `completion-test-${randomUUID()}`);
       mkdirSync(join(dir, "governance", "plans"), { recursive: true });
-      const planPath = join(dir, "governance", "plans", "2026-07-08-test-plan.md");
+      const planPath = join(dir, "governance", "plans", "TASK-1-test-plan.md");
       writeFileSync(planPath, "# Test Plan\n\n**Status:** andamento\n", "utf-8");
 
       const result = validateCompletionGate({
         projectRoot: process.cwd(),
         shitennoDir: dir,
-        taskId: "test-plan",
+        taskId: "TASK-1",
       });
       const planGate = result.gates[4]!;
       expect(planGate.name).toBe("plan_status");
@@ -178,13 +178,13 @@ describe("task-completion", () => {
     it("passes plan_status when plan has done status", () => {
       const dir = join(tmpdir(), `completion-test-${randomUUID()}`);
       mkdirSync(join(dir, "governance", "plans"), { recursive: true });
-      const planPath = join(dir, "governance", "plans", "2026-07-08-test-plan.md");
+      const planPath = join(dir, "governance", "plans", "TASK-1-test-plan.md");
       writeFileSync(planPath, "# Test Plan\n\n**Status:** Done\n", "utf-8");
 
       const result = validateCompletionGate({
         projectRoot: process.cwd(),
         shitennoDir: dir,
-        taskId: "test-plan",
+        taskId: "TASK-1",
       });
       const planGate = result.gates[4]!;
       expect(planGate.name).toBe("plan_status");

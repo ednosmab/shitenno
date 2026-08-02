@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Release Process
 
 > How releases are managed for the Shugo CLI.

@@ -77,97 +77,61 @@ export function getPreferredOutputFormat(modelId: string): "json" | "markdown" |
 /**
  * Initialize default model configurations.
  */
-export function initializeDefaultModels(): void {
-  registerModel({
+const DEFAULT_MODEL_CONFIGS: ModelConfig[] = [
+  {
     modelId: "claude-3-opus",
     displayName: "Claude 3 Opus",
     provider: "anthropic",
-    capabilities: {
-      maxTokens: 4096,
-      supportsStreaming: true,
-      supportsTools: true,
-      supportsImages: false,
-      contextWindow: 200000,
-    },
+    capabilities: { maxTokens: 4096, supportsStreaming: true, supportsTools: true, supportsImages: false, contextWindow: 200000 },
     recommendedContextLength: 8000,
     preferredOutputFormat: "json",
-  });
-
-  registerModel({
+  },
+  {
     modelId: "claude-3-sonnet",
     displayName: "Claude 3 Sonnet",
     provider: "anthropic",
-    capabilities: {
-      maxTokens: 4096,
-      supportsStreaming: true,
-      supportsTools: true,
-      supportsImages: false,
-      contextWindow: 200000,
-    },
+    capabilities: { maxTokens: 4096, supportsStreaming: true, supportsTools: true, supportsImages: false, contextWindow: 200000 },
     recommendedContextLength: 6000,
     preferredOutputFormat: "json",
-  });
-
-  registerModel({
+  },
+  {
     modelId: "gpt-4",
     displayName: "GPT-4",
     provider: "openai",
-    capabilities: {
-      maxTokens: 8192,
-      supportsStreaming: true,
-      supportsTools: true,
-      supportsImages: true,
-      contextWindow: 128000,
-    },
+    capabilities: { maxTokens: 8192, supportsStreaming: true, supportsTools: true, supportsImages: true, contextWindow: 128000 },
     recommendedContextLength: 6000,
     preferredOutputFormat: "json",
-  });
-
-  registerModel({
+  },
+  {
     modelId: "gpt-4-turbo",
     displayName: "GPT-4 Turbo",
     provider: "openai",
-    capabilities: {
-      maxTokens: 4096,
-      supportsStreaming: true,
-      supportsTools: true,
-      supportsImages: true,
-      contextWindow: 128000,
-    },
+    capabilities: { maxTokens: 4096, supportsStreaming: true, supportsTools: true, supportsImages: true, contextWindow: 128000 },
     recommendedContextLength: 8000,
     preferredOutputFormat: "json",
-  });
-
-  registerModel({
+  },
+  {
     modelId: "mimo-v2.5-free",
     displayName: "Mimo V2.5 Free",
     provider: "opencode",
-    capabilities: {
-      maxTokens: 4096,
-      supportsStreaming: true,
-      supportsTools: true,
-      supportsImages: false,
-      contextWindow: 32000,
-    },
+    capabilities: { maxTokens: 4096, supportsStreaming: true, supportsTools: true, supportsImages: false, contextWindow: 32000 },
     recommendedContextLength: 4000,
     preferredOutputFormat: "json",
-  });
-
-  registerModel({
+  },
+  {
     modelId: "deepseek-v3",
     displayName: "DeepSeek V3",
     provider: "deepseek",
-    capabilities: {
-      maxTokens: 8192,
-      supportsStreaming: true,
-      supportsTools: true,
-      supportsImages: false,
-      contextWindow: 128000,
-    },
+    capabilities: { maxTokens: 8192, supportsStreaming: true, supportsTools: true, supportsImages: false, contextWindow: 128000 },
     recommendedContextLength: 8000,
     preferredOutputFormat: "json",
-  });
+  },
+];
 
+export function initializeDefaultModels(): void {
+  for (const config of DEFAULT_MODEL_CONFIGS) {
+    registerModel(config);
+  }
   logger.debug("model-config", `Initialized ${MODEL_REGISTRY.size} default models`);
 }
 

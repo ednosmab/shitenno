@@ -96,58 +96,67 @@ export interface SessionBehaviorData {
   asksForExplanations: boolean;
 }
 
+function inferSkillLevel(
+  behaviorData: SessionBehaviorData,
+  current: SkillLevel,
+  check: (data: SessionBehaviorData) => SkillLevel
+): SkillLevel {
+  if (behaviorData.totalSessions < 10) return current;
+  return check(behaviorData);
+}
+
+function inferArchitectureLevel(data: SessionBehaviorData): SkillLevel {
+  if (data.successRate >= 0.8 && data.frequentCommands.includes("audit")) return "senior";
+  if (data.successRate >= 0.5) return "pleno";
+  return "junior";
+}
+
+function inferCodingLevel(data: SessionBehaviorData): SkillLevel {
+  if (data.successRate >= 0.8 && data.failureAreas.length <= 2) return "senior";
+  if (data.successRate >= 0.5) return "pleno";
+  return "junior";
+}
+
+function inferLeadershipLevel(data: SessionBehaviorData): SkillLevel {
+  const acceptanceRate = data.acceptedRecommendations /
+    (data.acceptedRecommendations + data.rejectedRecommendations || 1);
+  if (acceptanceRate >= 0.8 && data.frequentCommands.includes("status")) return "senior";
+  if (acceptanceRate >= 0.5) return "pleno";
+  return "junior";
+}
+
+function inferTone(
+  behaviorData: SessionBehaviorData,
+  currentTone: FeedbackTone,
+  leadership: SkillLevel
+): FeedbackTone {
+  if (behaviorData.asksForExplanations && behaviorData.successRate < 0.5) return "mentor";
+  if (behaviorData.successRate >= 0.8 && leadership === "senior") return "peer";
+  return currentTone;
+}
+
+function inferCodeFreePercent(
+  currentPercent: number,
+  architecture: SkillLevel,
+  leadership: SkillLevel
+): number {
+  if (architecture === "senior" || leadership === "senior") {
+    return Math.max(currentPercent, 70);
+  }
+  return currentPercent;
+}
+
 export function inferProfile(
   shitennoDir: string,
   behaviorData: SessionBehaviorData
 ): UserProfile {
   const currentProfile = loadUserProfile(shitennoDir);
 
-  let architecture: SkillLevel = currentProfile.architecture;
-  if (behaviorData.totalSessions >= 10) {
-    if (behaviorData.successRate >= 0.8 && behaviorData.frequentCommands.includes("audit")) {
-      architecture = "senior";
-    } else if (behaviorData.successRate >= 0.5) {
-      architecture = "pleno";
-    } else {
-      architecture = "junior";
-    }
-  }
-
-  let coding: SkillLevel = currentProfile.coding;
-  if (behaviorData.totalSessions >= 10) {
-    if (behaviorData.successRate >= 0.8 && behaviorData.failureAreas.length <= 2) {
-      coding = "senior";
-    } else if (behaviorData.successRate >= 0.5) {
-      coding = "pleno";
-    } else {
-      coding = "junior";
-    }
-  }
-
-  let leadership: SkillLevel = currentProfile.leadership;
-  if (behaviorData.totalSessions >= 10) {
-    const acceptanceRate = behaviorData.acceptedRecommendations /
-      (behaviorData.acceptedRecommendations + behaviorData.rejectedRecommendations || 1);
-    if (acceptanceRate >= 0.8 && behaviorData.frequentCommands.includes("status")) {
-      leadership = "senior";
-    } else if (acceptanceRate >= 0.5) {
-      leadership = "pleno";
-    } else {
-      leadership = "junior";
-    }
-  }
-
-  let tone: FeedbackTone = currentProfile.tone;
-  if (behaviorData.asksForExplanations && behaviorData.successRate < 0.5) {
-    tone = "mentor";
-  } else if (behaviorData.successRate >= 0.8 && leadership === "senior") {
-    tone = "peer";
-  }
-
-  let codeFreePercent = currentProfile.codeFreePercent;
-  if (architecture === "senior" || leadership === "senior") {
-    codeFreePercent = Math.max(codeFreePercent, 70);
-  }
+  const architecture = inferSkillLevel(behaviorData, currentProfile.architecture, inferArchitectureLevel);
+  const coding = inferSkillLevel(behaviorData, currentProfile.coding, inferCodingLevel);
+  const leadership = inferSkillLevel(behaviorData, currentProfile.leadership, inferLeadershipLevel);
+  const tone = inferTone(behaviorData, currentProfile.tone, leadership);
+  const codeFreePercent = inferCodeFreePercent(currentProfile.codeFreePercent, architecture, leadership);
 
   return {
     ...currentProfile,

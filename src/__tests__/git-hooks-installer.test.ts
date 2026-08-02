@@ -39,11 +39,13 @@ describe("installReactiveHooks", () => {
     expect(pcContent).toContain("#!/bin/sh");
     expect(pcContent).toContain("# shugo-managed-hook");
     expect(pcContent).toContain("shugo detect --auto 2>/dev/null &");
+    expect(pcContent).toContain("shugo internal large-commit-check 2>/dev/null &");
 
     const pmContent = readFileSync(join(dir, ".husky", "post-merge"), "utf-8");
     expect(pmContent).toContain("#!/bin/sh");
     expect(pmContent).toContain("# shugo-managed-hook");
     expect(pmContent).toContain("shugo detect --auto 2>/dev/null &");
+    expect(pmContent).toContain("shugo internal large-commit-check 2>/dev/null &");
   });
 
   it("is idempotent — running twice does not duplicate the hook content", () => {
@@ -79,6 +81,7 @@ describe("installReactiveHooks", () => {
     expect(content).toContain("npx lint-staged");
     expect(content).toContain("# shugo-managed-hook");
     expect(content).toContain("shugo detect --auto 2>/dev/null &");
+    expect(content).toContain("shugo internal large-commit-check 2>/dev/null &");
   });
 
   it("writes to .husky/ instead of .git/hooks/ when .husky/ exists", () => {

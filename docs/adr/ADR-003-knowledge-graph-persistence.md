@@ -1,3 +1,8 @@
+---
+category: adr
+lifecycle: Active
+---
+
 # ADR-003: Knowledge Graph as Foundation for Documentation
 
 > ⚠️ **Retroactive ADR** — documented 2026-07-05, decision made

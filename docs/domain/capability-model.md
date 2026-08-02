@@ -1,3 +1,8 @@
+---
+category: domain
+lifecycle: Active
+---
+
 # Capability Model
 
 > Install what you need, not what a label dictates.

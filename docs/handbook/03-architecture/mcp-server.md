@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # MCP Server
 
 O servidor MCP (Model Context Protocol) permite que agentes AI acessem o contexto do projeto em tempo real.

@@ -2,6 +2,7 @@ import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ProjectAnalysis } from "./analyser.js";
 import { FileContentCache } from "./utils.js";
+import { NodeFileSystem } from "./infrastructure/adapters/node-file-system.js";
 
 // ── Types (re-exported from domain entities) ────────────────────────────────
 
@@ -54,7 +55,7 @@ export async function calculateComplexityScore(
   const staticMetrics = collectStaticMetrics(analysis);
   const behavioralMetrics = collectBehavioralMetrics(projectRoot, shitennoDir);
 
-  const profile = loadProjectProfile(projectRoot);
+  const profile = loadProjectProfile(projectRoot, new NodeFileSystem());
   const areaScores = profile
     ? await calculateAreaScores(projectRoot, shitennoDir, profile, new FileContentCache())
     : [];

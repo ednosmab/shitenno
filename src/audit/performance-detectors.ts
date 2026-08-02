@@ -13,7 +13,13 @@ export function detectNPlusOne(_projectRoot: string, files: SourceFileInfo[]): H
   const issues: HealthIssue[] = [];
   const skipPatterns = [/\.test\.ts$/, /\.spec\.ts$/, /__tests__/];
 
-  const loopWithQueryPattern = /(?:for|while|forEach)\s*\([^)]*\)\s*\{[^}]*(?:\.find|\.findOne|\.findAll|\.query|SELECT)/g;
+  const DB_LIKE_OBJECT_NAMES = /(?:db|database|prisma|knex|mongo|mongoose|sequelize|pool|connection|conn|client|repository|repo|orm|query(?:Builder)?)\s*\.\s*/i;
+  const DB_QUERY_METHODS = /(?:find|findOne|findAll|query|findById|findMany|findFirst|execute)\s*\(/i;
+  const SELECT_PATTERN = /SELECT/i;
+  const loopWithQueryPattern = new RegExp(
+    `(?:for|while|forEach)\\s*\\([^)]*\\)\\s*\\{[^}]*${DB_LIKE_OBJECT_NAMES.source}${DB_QUERY_METHODS.source}|(?:for|while|forEach)\\s*\\([^)]*\\)\\s*\\{[^}]*${SELECT_PATTERN.source}`,
+    "g"
+  );
 
   for (const file of files) {
     if (skipPatterns.some((p) => p.test(file.relPath))) continue;

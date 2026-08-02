@@ -40,15 +40,6 @@ export function resolveWithinRoot(root: string, ...segments: string[]): string {
 }
 
 /**
- * Check if a resolved path stays within the allowed parent directory.
- * Returns true if the path is safe (no traversal).
- */
-export function isPathSafe(resolvedPath: string, allowedParent: string): boolean {
-  const rel = relative(allowedParent, resolvedPath);
-  return !rel.startsWith("..") && !rel.startsWith("/");
-}
-
-/**
  * Validate that a user-supplied ID/filename contains no path separators
  * or traversal sequences. Returns the basename only (strips any directory).
  * Throws if the ID is empty or contains unsafe characters.

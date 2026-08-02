@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-006: Restrict Filesystem Access in CLI Commands
 
 **Status:** Accepted

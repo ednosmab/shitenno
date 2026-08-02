@@ -17,6 +17,12 @@ import type { ContextRule } from "./context-rules.js";
 import type { DynamicRule } from "./dynamic-rules.js";
 import type { MaturityProfile } from "./maturity-profile.js";
 import { partitionRules, type RuleManifestEntry, type TaskMetadata } from "./rule-manifest.js";
+import { join } from "path";
+import { existsSync, readFileSync } from "fs";
+import { SHITENNO_DIR_NAME } from "./constants.js";
+// Semantic layer imports
+import { runSemanticAnalysis, type SemanticInsight, type Correlation } from "./semantic/index.js";
+import type { DetectedPattern } from "./semantic/pattern-rules.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -119,257 +125,131 @@ export interface Briefing {
     adrs: Array<{ id: string; title: string; status: string }>;
     skills: Array<{ name: string; description: string }>;
   };
+  /** Proactive alerts from daemon challenges (A.2) */
+  proactiveAlerts?: {
+    pendingChallenges: string[];
+    unresolvedHealthDips: string[];
+    pendingDebts: string[];
+  };
+  /** Daemon heartbeat status (E.3) */
+  daemonHeartbeat?: {
+    running: boolean;
+    uptime: string;
+    lastAudit: string;
+    auditCount: number;
+    notificationsSent: number;
+  };
+  /** Semantic layer analysis */
+  semantic?: {
+    /** Detected semantic patterns (architectural shifts, scope drift, etc.) */
+    patterns: DetectedPattern[];
+    /** Higher-level insights from the reasoner */
+    insights: SemanticInsight[];
+    /** Cross-system correlations */
+    correlations: Correlation[];
+    /** Semantic growth profile snapshot */
+    growthProfile: {
+      growthCapacity: number;
+      challengeLevel: number;
+      domainChallengeLevels: Record<string, number>;
+      totalChoices: number;
+    };
+  };
 }
 
 // ── Briefing Generation ────────────────────────────────────────────────────
 
-export function generateBriefing(
-  fingerprint: ProjectFingerprint,
-  riskMap: RiskMap,
-  contextRules: ContextRule[],
-  dynamicRules: DynamicRule[],
-  maturityProfile?: MaturityProfile,
+export interface BriefingOptions {
+  fingerprint: ProjectFingerprint;
+  riskMap: RiskMap;
+  contextRules: ContextRule[];
+  dynamicRules: DynamicRule[];
+  maturityProfile?: MaturityProfile;
+  projectRoot?: string;
   quickBoard?: {
     currentTask: string;
     nextP0: string;
     p1Debts: string;
     impediments: string;
     lastSessionStatus: string;
-  },
-  reminders?: Reminder[]
-): Briefing {
-  // Extract risk information
-  const criticalAreas = riskMap.areas
-    .filter((a) => a.riskLevel === "critical")
-    .map((a) => a.path);
-  const highAreas = riskMap.areas
-    .filter((a) => a.riskLevel === "high")
-    .map((a) => a.path);
+  };
+  reminders?: Reminder[];
+}
 
-  // Extract test coverage information
-  const areasWithoutTests = riskMap.areas
-    .flatMap((a) => a.factors)
-    .filter((f) => f.type === "no-tests")
-    .map((f) => f.description)
-    .slice(0, 5);
-
-  // Generate recommendations
+function generateRecommendations(
+  criticalAreas: string[],
+  areasWithoutTests: string[],
+  maturityProfile?: MaturityProfile,
+): string[] {
   const recommendations: string[] = [];
-  if (criticalAreas.length > 0) {
-    recommendations.push(`Address critical risk areas: ${criticalAreas.join(", ")}`);
-  }
-  if (areasWithoutTests.length > 0) {
-    recommendations.push(`Improve test coverage in ${areasWithoutTests.length} area(s)`);
-  }
+  if (criticalAreas.length > 0) recommendations.push(`Address critical risk areas: ${criticalAreas.join(", ")}`);
+  if (areasWithoutTests.length > 0) recommendations.push(`Improve test coverage in ${areasWithoutTests.length} area(s)`);
   if (maturityProfile?.recommendedCapabilities?.length) {
     recommendations.push(`Consider installing: ${maturityProfile.recommendedCapabilities.slice(0, 3).join(", ")}`);
   }
-  if (recommendations.length === 0) {
-    recommendations.push("Project looks healthy. Continue current practices.");
+  if (recommendations.length === 0) recommendations.push("Project looks healthy. Continue current practices.");
+  return recommendations;
+}
+
+function readDaemonState(shitennoDir: string): { proactiveAlerts?: Briefing["proactiveAlerts"]; daemonHeartbeat?: Briefing["daemonHeartbeat"] } {
+  const statePath = join(shitennoDir, "daemon", "state.json");
+  if (!existsSync(statePath)) return { daemonHeartbeat: { running: false, uptime: "N/A", lastAudit: "N/A", auditCount: 0, notificationsSent: 0 } };
+  const state = JSON.parse(readFileSync(statePath, "utf-8"));
+  const proactiveAlerts = state.challenges && Array.isArray(state.challenges) ? {
+    pendingChallenges: state.challenges.filter((c: { resolved?: boolean }) => !c.resolved).slice(0, 5).map((c: { message?: string; id?: string }) => c.message ?? c.id ?? "Unknown challenge"),
+    unresolvedHealthDips: state.health?.recentDips ?? [],
+    pendingDebts: (state.engineeringState?.debts ?? []).filter((d: { resolved?: boolean }) => !d.resolved).slice(0, 3).map((d: { description?: string }) => d.description ?? "Unknown debt"),
+  } : undefined;
+  const uptimeMs = state.startedAt ? Date.now() - new Date(state.startedAt).getTime() : 0;
+  const daemonHeartbeat = {
+    running: true, uptime: `${Math.floor(uptimeMs / 3600000)}h ${Math.floor((uptimeMs % 3600000) / 60000)}m`,
+    lastAudit: state.lastAuditTime ?? "Never", auditCount: state.auditCount ?? 0, notificationsSent: state.notificationsSent ?? 0,
+  };
+  return { proactiveAlerts, daemonHeartbeat };
+}
+
+function runSemanticBriefing(shitennoDir: string, projectRoot: string): Briefing["semantic"] | undefined {
+  const { profile, patterns, insights, correlations } = runSemanticAnalysis(shitennoDir, projectRoot);
+  return {
+    patterns, insights, correlations,
+    growthProfile: { growthCapacity: profile.growthCapacity, challengeLevel: profile.challengeLevel, domainChallengeLevels: profile.domainChallengeLevels, totalChoices: profile.semanticChoices.length },
+  };
+}
+
+export function generateBriefing(options: BriefingOptions): Briefing {
+  const { fingerprint, riskMap, contextRules, dynamicRules, maturityProfile, quickBoard } = options;
+  const reminders = options.reminders ?? [];
+  const shitennoDir = options.projectRoot ? join(options.projectRoot, SHITENNO_DIR_NAME) : undefined;
+  const criticalAreas = riskMap.areas.filter((a) => a.riskLevel === "critical").map((a) => a.path);
+  const highAreas = riskMap.areas.filter((a) => a.riskLevel === "high").map((a) => a.path);
+  const areasWithoutTests = riskMap.areas.flatMap((a) => a.factors).filter((f) => f.type === "no-tests").map((f) => f.description).slice(0, 5);
+  const recommendations = generateRecommendations(criticalAreas, areasWithoutTests, maturityProfile);
+  const estimatedTokensSaved = 8000 + (contextRules.length * 400) + (dynamicRules.length * 400);
+  let proactiveAlerts: Briefing["proactiveAlerts"] | undefined;
+  let daemonHeartbeat: Briefing["daemonHeartbeat"] | undefined;
+  let semantic: Briefing["semantic"] | undefined;
+  if (shitennoDir) {
+    try { ({ proactiveAlerts, daemonHeartbeat } = readDaemonState(shitennoDir)); } catch { daemonHeartbeat = { running: false, uptime: "Error reading state", lastAudit: "N/A", auditCount: 0, notificationsSent: 0 }; }
+    try { semantic = runSemanticBriefing(shitennoDir, options.projectRoot ?? ""); } catch { /* non-critical */ }
   }
-
-  // Token economy estimate:
-  // Without shugo, agent reads: package.json (~500) + AGENTS.md (~3k) +
-  // risk analysis (~2k) + history (~1k) + rules (~1.5k) = ~8k tokens
-  // With shugo: briefing provides all of that in ~500 tokens
-  // Rules add targeted context (~100 tokens each) vs agent discovering (~500 each)
-  const estimatedTokensSaved = 8000
-    + (contextRules.length * 400) // 500 (manual) - 100 (briefing) per rule
-    + (dynamicRules.length * 400);
-
+  const hotAreas = riskMap.areas.filter((a) => a.factors.some((f) => f.type === "high-churn")).map((a) => a.path);
+  const detected = semantic?.patterns.map((p) => ({ type: p.type, description: p.description, occurrences: 1, affectedArea: p.domain, severity: Math.round(p.confidence * 5) })) ?? [];
   return {
     generatedAt: new Date().toISOString(),
-    project: {
-      domain: fingerprint.domain,
-      scale: fingerprint.scale,
-      stack: fingerprint.stack.slice(0, 5),
-      maturityScore: maturityProfile?.overallScore ?? 0,
-    },
-    risks: {
-      overall: riskMap.overallRisk,
-      criticalAreas,
-      highAreas,
-    },
-    tests: {
-      hasTests: fingerprint.tooling.tests,
-      areasWithoutTests,
-    },
-    patterns: {
-      recurringErrors: [],
-      hotAreas: riskMap.areas
-        .filter((a) => a.factors.some((f) => f.type === "high-churn"))
-        .map((a) => a.path),
-      detected: [],
-    },
-    contextRules: contextRules.slice(0, 5),
-    dynamicRules: dynamicRules.slice(0, 3),
-    recommendations,
-    tokenEconomy: {
-      estimatedTokensSaved,
-      cacheHit: false,
-      contextRuleCount: contextRules.length,
-      dynamicRuleCount: dynamicRules.length,
-    },
-    quickBoard: quickBoard ?? {
-      currentTask: "Nenhuma",
-      nextP0: "Definir novo P0 no BACKLOG.md",
-      p1Debts: "Nenhuma",
-      impediments: "Nenhum",
-      lastSessionStatus: "Desconhecido",
-    },
-    reminders: reminders ?? [],
+    project: { domain: fingerprint.domain, scale: fingerprint.scale, stack: fingerprint.stack.slice(0, 5), maturityScore: maturityProfile?.overallScore ?? 0 },
+    risks: { overall: riskMap.overallRisk, criticalAreas, highAreas },
+    tests: { hasTests: fingerprint.tooling.tests, areasWithoutTests },
+    patterns: { recurringErrors: [], hotAreas, detected },
+    contextRules: contextRules.slice(0, 5), dynamicRules: dynamicRules.slice(0, 3), recommendations,
+    tokenEconomy: { estimatedTokensSaved, cacheHit: false, contextRuleCount: contextRules.length, dynamicRuleCount: dynamicRules.length },
+    quickBoard: quickBoard ?? { currentTask: "Nenhuma", nextP0: "Definir novo P0 no BACKLOG.md", p1Debts: "Nenhuma", impediments: "Nenhum", lastSessionStatus: "Desconhecido" },
+    reminders, proactiveAlerts, daemonHeartbeat, semantic,
   };
 }
 
-// ── Helper Functions ──────────────────────────────────────────────────────
-
-/** Get priority icon for markdown display. */
-function getPriorityIcon(priority: ReminderPriority): string {
-  switch (priority) {
-    case "high": return "🔴 **HIGH**";
-    case "medium": return "🟡 **MEDIUM**";
-    case "low": return "🟢 **LOW**";
-  }
-}
-
-/** Get category label for display. */
-function getCategoryLabel(category: ReminderCategory): string {
-  return `[${category}]`;
-}
-
-// ── Output Formats ────────────────────────────────────────────────────────
-
-/**
- * Structured JSON output for tooling consumption.
- * Pure function — easy to test.
- */
-export function briefingToJson(briefing: Briefing): Record<string, unknown> {
-  return {
-    generatedAt: briefing.generatedAt,
-    project: briefing.project,
-    risks: briefing.risks,
-    tests: briefing.tests,
-    patterns: briefing.patterns,
-    contextRules: briefing.contextRules.map((r) => ({
-      id: r.id,
-      rule: r.rule,
-      priority: r.priority,
-      area: r.area,
-    })),
-    dynamicRules: briefing.dynamicRules.map((r) => ({
-      id: r.id,
-      rule: r.rule,
-      severity: r.severity,
-    })),
-    recommendations: briefing.recommendations,
-  };
-}
-
-/**
- * One-line summary for quick consumption.
- * Pure function — easy to test.
- */
-export function briefingToSummary(briefing: Briefing): string {
-  const parts: string[] = [];
-  parts.push(`Domain: ${briefing.project.domain}`);
-  parts.push(`Scale: ${briefing.project.scale}`);
-  parts.push(`Risk: ${briefing.risks.overall}`);
-  if (briefing.risks.criticalAreas.length > 0) {
-    parts.push(`Critical: ${briefing.risks.criticalAreas.join(", ")}`);
-  }
-  if (briefing.tests.areasWithoutTests.length > 0) {
-    parts.push(`No-tests: ${briefing.tests.areasWithoutTests.length} area(s)`);
-  }
-  parts.push(`Recommendations: ${briefing.recommendations.length}`);
-  if (briefing.tokenEconomy.estimatedTokensSaved > 0) {
-    parts.push(`Tokens saved: ~${briefing.tokenEconomy.estimatedTokensSaved.toLocaleString()}`);
-  }
-  return parts.join(" | ");
-}
-
-/**
- * Generate a human-readable diff between two briefings.
- * Shows what changed between the old and new briefing.
- * Pure function — easy to test.
- */
-export function generateDiff(oldBriefing: Briefing, newBriefing: Briefing): string {
-  const lines: string[] = [];
-
-  lines.push("# Briefing Diff");
-  lines.push("");
-
-  let hasChanges = false;
-
-  // Risk changes
-  if (oldBriefing.risks.overall !== newBriefing.risks.overall) {
-    lines.push(`- Risk level changed: ${oldBriefing.risks.overall} → ${newBriefing.risks.overall}`);
-    hasChanges = true;
-  }
-
-  const oldCritical = new Set(oldBriefing.risks.criticalAreas);
-  const newCritical = new Set(newBriefing.risks.criticalAreas);
-  for (const area of newBriefing.risks.criticalAreas) {
-    if (!oldCritical.has(area)) {
-      lines.push(`+ New critical area: ${area}`);
-      hasChanges = true;
-    }
-  }
-  for (const area of oldBriefing.risks.criticalAreas) {
-    if (!newCritical.has(area)) {
-      lines.push(`- Removed critical area: ${area}`);
-      hasChanges = true;
-    }
-  }
-
-  // Test coverage changes
-  const oldNoTests = new Set(oldBriefing.tests.areasWithoutTests);
-  const newNoTests = new Set(newBriefing.tests.areasWithoutTests);
-  for (const area of newBriefing.tests.areasWithoutTests) {
-    if (!oldNoTests.has(area)) {
-      lines.push(`+ New area without tests: ${area}`);
-      hasChanges = true;
-    }
-  }
-  for (const area of oldBriefing.tests.areasWithoutTests) {
-    if (!newNoTests.has(area)) {
-      lines.push(`- Area now has tests: ${area}`);
-      hasChanges = true;
-    }
-  }
-
-  // Rule changes
-  const oldRuleIds = new Set(oldBriefing.contextRules.map((r) => r.id));
-  for (const rule of newBriefing.contextRules) {
-    if (!oldRuleIds.has(rule.id)) {
-      lines.push(`+ New rule: [${rule.area}] ${rule.rule}`);
-      hasChanges = true;
-    }
-  }
-
-  // Dynamic rule changes
-  const oldDynamicIds = new Set(oldBriefing.dynamicRules.map((r) => r.id));
-  for (const rule of newBriefing.dynamicRules) {
-    if (!oldDynamicIds.has(rule.id)) {
-      lines.push(`+ New dynamic rule: [${rule.severity}] ${rule.rule}`);
-      hasChanges = true;
-    }
-  }
-
-  // Recommendation changes
-  const oldRecs = new Set(oldBriefing.recommendations);
-  for (const rec of newBriefing.recommendations) {
-    if (!oldRecs.has(rec)) {
-      lines.push(`+ New recommendation: ${rec}`);
-      hasChanges = true;
-    }
-  }
-
-  if (!hasChanges) {
-    lines.push("No changes detected.");
-  }
-
-  return lines.join("\n");
-}
+// ── Re-exports for backward compatibility ────────────────────────────────
+export { briefingToJson, briefingToSummary, briefingToMarkdown } from "./briefing-formatter.js";
+export { generateDiff } from "./briefing-diff.js";
 
 // ── Manifest Integration ──────────────────────────────────────────────────
 
@@ -420,134 +300,6 @@ export function manifestRulesToMarkdown(section: ManifestRuleSection): string {
     }
     lines.push("");
   }
-
-  return lines.join("\n");
-}
-
-export function briefingToMarkdown(briefing: Briefing): string {
-  const lines: string[] = [];
-
-  lines.push("# Pre-Session Briefing");
-  lines.push(`*Generated: ${briefing.generatedAt}*`);
-  lines.push("");
-
-  // Quick Board — session state summary
-  if (briefing.quickBoard) {
-    lines.push("---");
-    lines.push("");
-    lines.push("## QUICK BOARD — Estado do Projecto");
-    lines.push("");
-    lines.push("> **Apresentar este quadro ao utilizador antes da primeira resposta operacional.**");
-    lines.push("> Veja regra #13 em `docs/AGENTS.md` (QUICK BOARD DE AVISO).");
-    lines.push("");
-    lines.push("| Campo | Estado |");
-    lines.push("|---|---|");
-    lines.push(`| **Tarefa em curso** | ${briefing.quickBoard.currentTask} |`);
-    lines.push(`| **Próximo P0** | ${briefing.quickBoard.nextP0} |`);
-    lines.push(`| **Dívidas P1** | ${briefing.quickBoard.p1Debts} |`);
-    lines.push(`| **Impedimentos** | ${briefing.quickBoard.impediments} |`);
-    lines.push(`| **Estado última sessão** | ${briefing.quickBoard.lastSessionStatus} |`);
-    lines.push("");
-    lines.push("---");
-    lines.push("");
-  }
-
-  // Recent Activity — last 24h events
-  if (briefing.recentActivity && briefing.recentActivity.events.length > 0) {
-    lines.push("## Actividade Recente (24h)");
-    lines.push("");
-    lines.push("| Evento | Detalhe | Hora |");
-    lines.push("|--------|---------|------|");
-
-    for (const event of briefing.recentActivity.events) {
-      const time = event.timestamp.slice(11, 16);
-      lines.push(`| ${event.type} | ${event.summary} | ${time} |`);
-    }
-
-    lines.push("");
-    lines.push(
-      `**Resumo:** ${briefing.recentActivity.syncCount} sincronizações, ${briefing.recentActivity.errorCount} erros`
-    );
-    lines.push("");
-  }
-
-  // Reminders section
-  if (briefing.reminders && briefing.reminders.length > 0) {
-    lines.push("## Active Reminders");
-    lines.push("");
-
-    // Sort reminders by priority: high → medium → low
-    const priorityOrder: Record<ReminderPriority, number> = { high: 0, medium: 1, low: 2 };
-    const sortedReminders = [...briefing.reminders].sort(
-      (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
-    );
-
-    for (const reminder of sortedReminders) {
-      const priority = getPriorityIcon(reminder.priority);
-      const category = getCategoryLabel(reminder.category);
-      lines.push(`- ${priority} — ${reminder.message} ${category}`);
-    }
-    lines.push("");
-  }
-
-  // Project identity
-  lines.push("## Project Identity");
-  lines.push(`- **Domain:** ${briefing.project.domain}`);
-  lines.push(`- **Scale:** ${briefing.project.scale}`);
-  lines.push(`- **Stack:** ${briefing.project.stack.join(", ")}`);
-  lines.push(`- **Maturity:** ${briefing.project.maturityScore}/100`);
-  lines.push("");
-
-  // Risks
-  lines.push("## Risk Status");
-  lines.push(`- **Overall:** ${briefing.risks.overall}`);
-  if (briefing.risks.criticalAreas.length > 0) {
-    lines.push(`- **Critical:** ${briefing.risks.criticalAreas.join(", ")}`);
-  }
-  if (briefing.risks.highAreas.length > 0) {
-    lines.push(`- **High:** ${briefing.risks.highAreas.join(", ")}`);
-  }
-  lines.push("");
-
-  // Tests
-  lines.push("## Test Coverage");
-  lines.push(`- **Has Tests:** ${briefing.tests.hasTests ? "Yes" : "No"}`);
-  if (briefing.tests.areasWithoutTests.length > 0) {
-    lines.push(`- **Areas Without Tests:** ${briefing.tests.areasWithoutTests.length}`);
-  }
-  lines.push("");
-
-  // Context rules
-  if (briefing.contextRules.length > 0) {
-    lines.push("## Context Rules (Top)");
-    for (const rule of briefing.contextRules) {
-      lines.push(`- ${rule.rule}`);
-    }
-    lines.push("");
-  }
-
-  // Dynamic rules
-  if (briefing.dynamicRules.length > 0) {
-    lines.push("## Dynamic Rules (From History)");
-    for (const rule of briefing.dynamicRules) {
-      lines.push(`- [${rule.severity}] ${rule.rule}`);
-    }
-    lines.push("");
-  }
-
-  // Recommendations
-  lines.push("## Recommended Next Steps");
-  for (const rec of briefing.recommendations) {
-    lines.push(`1. ${rec}`);
-  }
-
-  // Token economy
-  lines.push("");
-  lines.push("## Token Economy");
-  lines.push(`- **Estimated tokens saved:** ~${briefing.tokenEconomy.estimatedTokensSaved.toLocaleString()}`);
-  lines.push(`- **Context rules:** ${briefing.tokenEconomy.contextRuleCount}`);
-  lines.push(`- **Dynamic rules:** ${briefing.tokenEconomy.dynamicRuleCount}`);
-  lines.push(`- **Cache hit:** ${briefing.tokenEconomy.cacheHit ? "Yes" : "No"}`);
 
   return lines.join("\n");
 }

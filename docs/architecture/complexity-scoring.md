@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 09 — COMPLEXITY EVOLUTION
 
 > Scoring engine — static + behavioral, per area.

@@ -1,0 +1,29 @@
+{
+  "planId": "PLAN_quality_gates_tooling",
+  "baseCommit": "cf82d4c3f09287a6908bbfd011cb664648fb0817",
+  "diffHash": "948eaa75ba70075768ba2107ee7896bfc9f3ceb2996b2db1357cf6ead7e3eb0e",
+  "checks": [
+    {
+      "name": "BUILD",
+      "passed": true,
+      "message": "Build passed"
+    },
+    {
+      "name": "TESTS",
+      "passed": true,
+      "message": "Tests passed"
+    },
+    {
+      "name": "LINT",
+      "passed": true,
+      "message": "Lint passed"
+    },
+    {
+      "name": "GATE_SELF_TEST",
+      "passed": true,
+      "message": "Gate de done verificado (caso positivo + negativo)"
+    }
+  ],
+  "passed": true,
+  "timestamp": "2026-07-22T05:07:50.905Z"
+}

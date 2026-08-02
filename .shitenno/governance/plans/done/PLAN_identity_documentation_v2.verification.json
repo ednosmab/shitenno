@@ -1,0 +1,29 @@
+{
+  "planId": "PLAN_identity_documentation_v2",
+  "baseCommit": "ac02132add820684033c5b05ed779e2d0ed1ebb6",
+  "diffHash": "4ffc695882f319c53c87724315df70ff74cce6d29fa45b9e7479e52fc30ade0d",
+  "checks": [
+    {
+      "name": "BUILD",
+      "passed": true,
+      "message": "Build passed"
+    },
+    {
+      "name": "TESTS",
+      "passed": true,
+      "message": "Tests passed"
+    },
+    {
+      "name": "LINT",
+      "passed": true,
+      "message": "Lint passed"
+    },
+    {
+      "name": "GATE_SELF_TEST",
+      "passed": true,
+      "message": "Gate de done verificado (caso positivo + negativo)"
+    }
+  ],
+  "passed": true,
+  "timestamp": "2026-07-22T04:44:29.336Z"
+}

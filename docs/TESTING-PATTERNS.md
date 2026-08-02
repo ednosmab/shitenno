@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Testing Patterns — Console Error/Warning Convention
 
 ## The Problem

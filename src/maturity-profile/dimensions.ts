@@ -32,117 +32,146 @@ export interface ProjectAnalysis {
   sourceFileCount: number;
 }
 
+function scoreArchitecture(answers: MaturityAnswers, analysis: ProjectAnalysis): number {
+  let score = 0;
+  if (answers.hasArchitectureDocs) score += 30;
+  if (answers.hasADRs) score += 25;
+  if (answers.hasTechnicalReviews) score += 20;
+  if (analysis.monorepo) score += 15;
+  if (analysis.packageCount >= 3) score += 10;
+  return score;
+}
+
+function scoreGovernance(answers: MaturityAnswers, shitennoDir?: string): number {
+  let score = 0;
+  if (shitennoDir) score += detectGovernanceArtifactsScore(shitennoDir);
+  if (answers.hasDefinedPatterns) score += 25;
+  if (answers.hasReviewProcess) score += 25;
+  if (answers.hasDecisionControl) score += 25;
+  if (answers.usedShitennoBefore) score += 15;
+  if (answers.teamSize === "medium" || answers.teamSize === "large") score += 10;
+  return score;
+}
+
+function scoreQuality(answers: MaturityAnswers, analysis: ProjectAnalysis): number {
+  let score = 0;
+  if (answers.hasAutomatedTests) score += 30;
+  if (answers.hasCICD) score += 25;
+  if (answers.hasValidationPipeline) score += 20;
+  if (analysis.hasTests) score += 15;
+  if (analysis.hasLinter) score += 10;
+  return score;
+}
+
+function scoreAutomation(answers: MaturityAnswers, analysis: ProjectAnalysis): number {
+  let score = 0;
+  if (answers.hasCICD) score += 40;
+  if (answers.hasValidationPipeline) score += 30;
+  if (answers.hasAutomatedTests) score += 20;
+  if (analysis.hasTypeScript) score += 10;
+  return score;
+}
+
+function scoreAi(answers: MaturityAnswers): number {
+  let score = 0;
+  if (answers.intendsToUseAI) score += 30;
+  if (answers.aiWillImplement) score += 35;
+  if (answers.requiresHumanReview) score += 25;
+  if (!answers.isFirstProject) score += 10;
+  return score;
+}
+
+function scoreDocumentation(answers: MaturityAnswers, analysis: ProjectAnalysis): number {
+  let score = 0;
+  if (answers.hasArchitectureDocs) score += 30;
+  if (answers.hasADRs) score += 25;
+  if (answers.hasDefinedPatterns) score += 20;
+  if (answers.usedShitennoBefore) score += 15;
+  if (analysis.sourceFileCount >= 100) score += 10;
+  return score;
+}
+
+function scoreObservability(answers: MaturityAnswers, analysis: ProjectAnalysis): number {
+  let score = 0;
+  if (answers.hasCICD) score += 25;
+  if (answers.hasValidationPipeline) score += 25;
+  if (answers.hasAutomatedTests) score += 20;
+  if (answers.teamSize === "medium" || answers.teamSize === "large") score += 15;
+  if (analysis.monorepo) score += 15;
+  return score;
+}
+
+function clamp(value: number): number {
+  return Math.min(100, Math.max(0, value));
+}
+
 export function calculateDimensions(
   answers: MaturityAnswers,
   analysis: ProjectAnalysis,
   shitennoDir?: string
 ): MaturityDimensions {
-  let architecture = 0;
-  if (answers.hasArchitectureDocs) architecture += 30;
-  if (answers.hasADRs) architecture += 25;
-  if (answers.hasTechnicalReviews) architecture += 20;
-  if (analysis.monorepo) architecture += 15;
-  if (analysis.packageCount >= 3) architecture += 10;
-
-  let governance = 0;
-  if (shitennoDir) {
-    governance += detectGovernanceArtifactsScore(shitennoDir);
-  }
-  if (answers.hasDefinedPatterns) governance += 25;
-  if (answers.hasReviewProcess) governance += 25;
-  if (answers.hasDecisionControl) governance += 25;
-  if (answers.usedShitennoBefore) governance += 15;
-  if (answers.teamSize === "medium" || answers.teamSize === "large") governance += 10;
-
-  let quality = 0;
-  if (answers.hasAutomatedTests) quality += 30;
-  if (answers.hasCICD) quality += 25;
-  if (answers.hasValidationPipeline) quality += 20;
-  if (analysis.hasTests) quality += 15;
-  if (analysis.hasLinter) quality += 10;
-
-  let automation = 0;
-  if (answers.hasCICD) automation += 40;
-  if (answers.hasValidationPipeline) automation += 30;
-  if (answers.hasAutomatedTests) automation += 20;
-  if (analysis.hasTypeScript) automation += 10;
-
-  let ai = 0;
-  if (answers.intendsToUseAI) ai += 30;
-  if (answers.aiWillImplement) ai += 35;
-  if (answers.requiresHumanReview) ai += 25;
-  if (!answers.isFirstProject) ai += 10;
-
-  let documentation = 0;
-  if (answers.hasArchitectureDocs) documentation += 30;
-  if (answers.hasADRs) documentation += 25;
-  if (answers.hasDefinedPatterns) documentation += 20;
-  if (answers.usedShitennoBefore) documentation += 15;
-  if (analysis.sourceFileCount >= 100) documentation += 10;
-
-  let observability = 0;
-  if (answers.hasCICD) observability += 25;
-  if (answers.hasValidationPipeline) observability += 25;
-  if (answers.hasAutomatedTests) observability += 20;
-  if (answers.teamSize === "medium" || answers.teamSize === "large") observability += 15;
-  if (analysis.monorepo) observability += 15;
-
   return {
-    architecture: Math.min(100, Math.max(0, architecture)),
-    governance: Math.min(100, Math.max(0, governance)),
-    quality: Math.min(100, Math.max(0, quality)),
-    automation: Math.min(100, Math.max(0, automation)),
-    ai: Math.min(100, Math.max(0, ai)),
-    documentation: Math.min(100, Math.max(0, documentation)),
-    observability: Math.min(100, Math.max(0, observability)),
+    architecture: clamp(scoreArchitecture(answers, analysis)),
+    governance: clamp(scoreGovernance(answers, shitennoDir)),
+    quality: clamp(scoreQuality(answers, analysis)),
+    automation: clamp(scoreAutomation(answers, analysis)),
+    ai: clamp(scoreAi(answers)),
+    documentation: clamp(scoreDocumentation(answers, analysis)),
+    observability: clamp(scoreObservability(answers, analysis)),
   };
 }
 
-export function detectGovernanceArtifactsScore(shitennoDir: string): number {
-  if (!existsSync(shitennoDir)) return 0;
-
+function staticArtifactsScore(shitennoDir: string): number {
   let score = 0;
-
   if (existsSync(join(shitennoDir, "governance", "WORKFLOW.md"))) score += 10;
   if (existsSync(join(shitennoDir, "governance", "SYSTEM_MAP.md"))) score += 5;
   if (existsSync(join(shitennoDir, "governance", "context", "context_buffer.yaml"))) score += 5;
   if (existsSync(join(shitennoDir, "docs", "FORBIDDEN_OPERATIONS.md"))) score += 5;
   if (existsSync(join(shitennoDir, "docs", "DESDO.md"))) score += 5;
   if (existsSync(join(shitennoDir, "docs", "adrs"))) score += 5;
+  return score;
+}
 
-  const agentsDir = join(shitennoDir, "governance", "agents");
-  if (existsSync(agentsDir)) {
-    try {
-      const agentFiles = readdirSync(agentsDir).filter(f => f.endsWith(".yaml"));
-      if (agentFiles.length >= 3) score += 5;
-      else if (agentFiles.length >= 1) score += 3;
-    } catch (error) {
-      logger.debug("maturity-profile", "Suppressed error", { error });
-    }
+interface DirScoreConfig {
+  highThreshold: number;
+  highScore: number;
+  lowScore: number;
+}
+
+function directoryFileScore(
+  dirPath: string,
+  filterFn: (name: string) => boolean,
+  config: DirScoreConfig,
+): number {
+  if (!existsSync(dirPath)) return 0;
+  try {
+    const files = readdirSync(dirPath).filter(filterFn);
+    if (files.length >= config.highThreshold) return config.highScore;
+    if (files.length >= 1) return config.lowScore;
+  } catch (error) {
+    logger.debug("maturity-profile", "Suppressed error", { error });
   }
+  return 0;
+}
 
-  const rulesDir = join(shitennoDir, "governance", "rules");
-  if (existsSync(rulesDir)) {
-    try {
-      const ruleFiles = readdirSync(rulesDir).filter(f => f.endsWith(".json"));
-      if (ruleFiles.length >= 2) score += 5;
-      else if (ruleFiles.length >= 1) score += 3;
-    } catch (error) {
-      logger.debug("maturity-profile", "Suppressed error", { error });
-    }
-  }
-
-  const policiesDir = join(shitennoDir, "governance", "policies");
-  if (existsSync(policiesDir)) {
-    try {
-      const policyFiles = readdirSync(policiesDir).filter(f => f.endsWith(".md") && f !== "POLICY-TEMPLATE.md");
-      if (policyFiles.length >= 3) score += 10;
-      else if (policyFiles.length >= 1) score += 5;
-    } catch (error) {
-      logger.debug("maturity-profile", "Suppressed error", { error });
-    }
-  }
-
+export function detectGovernanceArtifactsScore(shitennoDir: string): number {
+  if (!existsSync(shitennoDir)) return 0;
+  let score = staticArtifactsScore(shitennoDir);
+  score += directoryFileScore(
+    join(shitennoDir, "governance", "agents"),
+    (f) => f.endsWith(".yaml"),
+    { highThreshold: 3, highScore: 5, lowScore: 3 },
+  );
+  score += directoryFileScore(
+    join(shitennoDir, "governance", "rules"),
+    (f) => f.endsWith(".json"),
+    { highThreshold: 2, highScore: 5, lowScore: 3 },
+  );
+  score += directoryFileScore(
+    join(shitennoDir, "governance", "policies"),
+    (f) => f.endsWith(".md") && f !== "POLICY-TEMPLATE.md",
+    { highThreshold: 3, highScore: 10, lowScore: 5 },
+  );
   return score;
 }
 

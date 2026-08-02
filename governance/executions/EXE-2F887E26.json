@@ -1,0 +1,18 @@
+{
+  "executionId": "EXE-2F887E26",
+  "request": {
+    "id": "act-fail-rb",
+    "type": "unknown_type",
+    "params": {}
+  },
+  "executionHash": "e7008ffdcb03c380",
+  "status": "completed",
+  "startedAt": "2026-07-28T04:44:21.325Z",
+  "result": "success",
+  "output": {
+    "success": false,
+    "message": "Unknown action type: unknown_type"
+  },
+  "completedAt": "2026-07-28T04:44:21.325Z",
+  "duration": 0
+}

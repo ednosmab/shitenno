@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # Validation Matrix
 
 > Complete alignment of all source modules to the Meta Model.

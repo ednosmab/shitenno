@@ -76,7 +76,7 @@ function makeCapResult(overrides: Partial<CapabilityEngineResult> = {}): Capabil
 
 describe("runRecommendationEngine", () => {
   it("returns a RecommendationEngineResult", () => {
-    const result = runRecommendationEngine(makeState(), makeCapResult(), SHITENNO_DIR);
+    const result = runRecommendationEngine({ state: makeState(), capResult: makeCapResult(), shitennoDir: SHITENNO_DIR });
     expect(result).toBeDefined();
     expect(Array.isArray(result.recommendations)).toBe(true);
     expect(typeof result.generatedAt).toBe("string");
@@ -85,7 +85,7 @@ describe("runRecommendationEngine", () => {
   });
 
   it("recommendations have required fields", () => {
-    const result = runRecommendationEngine(makeState(), makeCapResult(), SHITENNO_DIR);
+    const result = runRecommendationEngine({ state: makeState(), capResult: makeCapResult(), shitennoDir: SHITENNO_DIR });
     for (const rec of result.recommendations) {
       expect(typeof rec.id).toBe("string");
       expect(typeof rec.title).toBe("string");
@@ -97,7 +97,7 @@ describe("runRecommendationEngine", () => {
   });
 
   it("bySource and byPriority are populated", () => {
-    const result = runRecommendationEngine(makeState(), makeCapResult(), SHITENNO_DIR);
+    const result = runRecommendationEngine({ state: makeState(), capResult: makeCapResult(), shitennoDir: SHITENNO_DIR });
     expect(result.bySource).toBeDefined();
     expect(result.byPriority).toBeDefined();
   });

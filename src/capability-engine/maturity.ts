@@ -54,24 +54,52 @@ function checkCapabilityRules(capability: Capability, shitennoDir: string): bool
   return false;
 }
 
-function checkCapabilitySkills(_capability: Capability, shitennoDir: string): boolean {
-  const skillsDir = join(shitennoDir, "docs", "skills");
-  if (!existsSync(skillsDir)) return false;
-  return readdirSync(skillsDir).filter((f) => f.endsWith(".md")).length > 0;
+function checkCapabilitySkills(capability: Capability, shitennoDir: string): boolean {
+  const capabilityFiles = getCapabilityFilesForEngine(capability)
+    .filter((f) => f.startsWith("docs/skills/"));
+  if (capabilityFiles.length === 0) return false;
+
+  // Check if ANY of the specific skill files for this capability actually exist
+  return capabilityFiles.some((f) => {
+    // capabilityFiles use paths relative to shitennoDir (e.g. "docs/skills/")
+    // but some are directory prefixes — check if any .md file in that dir matches
+    const fullPath = join(shitennoDir, f);
+    if (f.endsWith("/")) {
+      // It's a directory prefix — check if any skill file exists in it
+      return existsSync(fullPath) && readdirSync(fullPath).some((sf) => sf.endsWith(".md"));
+    }
+    return existsSync(fullPath);
+  });
 }
 
-function checkCapabilityTemplates(_capability: Capability, shitennoDir: string): boolean {
-  const templatesDir = join(shitennoDir, "templates");
-  if (!existsSync(templatesDir)) return false;
-  return readdirSync(templatesDir).filter(
-    (f) => f.endsWith(".md") || f.endsWith(".yaml")
-  ).length > 0;
+function checkCapabilityTemplates(capability: Capability, shitennoDir: string): boolean {
+  const capabilityFiles = getCapabilityFilesForEngine(capability)
+    .filter((f) => f.startsWith("templates/"));
+  if (capabilityFiles.length === 0) return false;
+
+  // Check if the specific template directory/file for this capability exists
+  return capabilityFiles.some((f) => {
+    const fullPath = join(shitennoDir, f);
+    if (f.endsWith("/")) {
+      return existsSync(fullPath) && readdirSync(fullPath).some((tf) => tf.endsWith(".md") || tf.endsWith(".yaml"));
+    }
+    return existsSync(fullPath);
+  });
 }
 
-function checkCapabilityMetrics(_capability: Capability, shitennoDir: string): boolean {
-  const reportsDir = join(shitennoDir, "reports");
-  if (!existsSync(reportsDir)) return false;
-  return readdirSync(reportsDir).filter((f) => f.endsWith(".json")).length > 0;
+function checkCapabilityMetrics(capability: Capability, shitennoDir: string): boolean {
+  const capabilityFiles = getCapabilityFilesForEngine(capability)
+    .filter((f) => f.startsWith("reports/"));
+  if (capabilityFiles.length === 0) return false;
+
+  // Check if any report file exists in the specific reports directory
+  return capabilityFiles.some((f) => {
+    const fullPath = join(shitennoDir, f);
+    if (f.endsWith("/")) {
+      return existsSync(fullPath) && readdirSync(fullPath).some((rf) => rf.endsWith(".json"));
+    }
+    return existsSync(fullPath);
+  });
 }
 
 export function getCapabilityFilesForEngine(capability: Capability): string[] {
@@ -89,48 +117,34 @@ export function getCapabilityFilesForEngine(capability: Capability): string[] {
   return fileMap[capability] || [];
 }
 
-export function buildCapabilityEntity(
-  capInfo: CapabilityInfo,
-  shitennoDir: string,
-  installedCapabilities: Capability[],
-  assets: Array<{ type: string; path: string }>,
-  _maturityScore: number
-): CapabilityEntity {
-  const isInstalled = installedCapabilities.includes(capInfo.id);
-  const { level, score } = detectCapabilityMaturity(capInfo.id, shitennoDir, installedCapabilities);
+interface CapabilityBuildInput {
+  capInfo: CapabilityInfo;
+  shitennoDir: string;
+  installedCapabilities: Capability[];
+  assets: Array<{ type: string; path: string }>;
+  maturityScore?: number;
+}
 
-  const capabilityAssets = assets.filter((a) => {
-    const mapping = getCapabilityFilesForEngine(capInfo.id);
-    return mapping.some((m) => a.path.startsWith(m.replace(/\/$/, "")));
-  });
+function buildCapabilityMetrics(score: number, capabilityAssets: number, activePolicies: number) {
+  return { assetCount: capabilityAssets, ruleCount: activePolicies, policyCount: activePolicies, healthScore: score, lastUpdated: new Date().toISOString(), referenceCount: 0 };
+}
 
-  const activePolicies = collectCapabilityPolicies(capInfo.id, shitennoDir);
-  const activeSkills = collectCapabilitySkills(capInfo.id, shitennoDir);
-  const templates = collectCapabilityTemplates(capInfo.id, shitennoDir);
+export function buildCapabilityEntity(input: CapabilityBuildInput): CapabilityEntity {
+  const { capInfo, shitennoDir: sDir, installedCapabilities: installed, assets: allAssets } = input;
+
+  const isInstalled = installed.includes(capInfo.id);
+  const { level, score } = detectCapabilityMaturity(capInfo.id, sDir, installed);
+  const capabilityAssets = allAssets.filter((a) => getCapabilityFilesForEngine(capInfo.id).some((m) => a.path.startsWith(m.replace(/\/$/, ""))));
+  const activePolicies = collectCapabilityPolicies(capInfo.id, sDir);
+  const activeSkills = collectCapabilitySkills(capInfo.id, sDir);
+  const templates = collectCapabilityTemplates(capInfo.id, sDir);
 
   return {
-    id: capInfo.id,
-    name: capInfo.name,
-    description: capInfo.description,
-    maturity: level,
-    maturityScore: score,
-    dimensions: capInfo.dimensions,
-    dependencies: capInfo.requires,
-    activePolicies,
-    activeSkills,
-    templates,
-    recommendations: [],
-    metrics: {
-      assetCount: capabilityAssets.length,
-      ruleCount: activePolicies.length,
-      policyCount: activePolicies.length,
-      healthScore: score,
-      lastUpdated: new Date().toISOString(),
-      referenceCount: 0,
-    },
-    alwaysInstalled: capInfo.alwaysInstalled,
-    isInstalled,
-    files: getCapabilityFilesForEngine(capInfo.id),
+    id: capInfo.id, name: capInfo.name, description: capInfo.description,
+    maturity: level, maturityScore: score, dimensions: capInfo.dimensions,
+    dependencies: capInfo.requires, activePolicies, activeSkills, templates,
+    recommendations: [], metrics: buildCapabilityMetrics(score, capabilityAssets.length, activePolicies.length),
+    alwaysInstalled: capInfo.alwaysInstalled, isInstalled, files: getCapabilityFilesForEngine(capInfo.id),
   };
 }
 

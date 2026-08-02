@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-009: Núcleo Único de Execução para Engines com Autoridade de Efeito Colateral
 
 **Status:** Proposed

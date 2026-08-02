@@ -1,3 +1,8 @@
+---
+category: implementation
+lifecycle: Active
+---
+
 # 23 — CLI REFACTOR
 
 > Plan to refactor CLI commands using shared infrastructure.

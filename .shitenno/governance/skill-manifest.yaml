@@ -1,0 +1,132 @@
+# skill-manifest.yaml — Declarative skill selection by task metadata.
+# Same input -> same skill set, always (deterministic). Mirrors rule-manifest.yaml.
+
+skills:
+  # ── Implementation (mandatory for all implementation tasks) ─────────────────
+  - id: tdd_workflow
+    path: docs/skills/tdd_workflow.md
+    mandatory: true
+    priority: 0
+    when:
+      task: implementation
+
+  - id: clean_code_standards
+    path: docs/skills/clean_code_standards.md
+    mandatory: true
+    priority: 1
+    when:
+      task: implementation
+
+  - id: tdd-agent
+    path: docs/skills/tdd-agent.md
+    mandatory: true
+    priority: 1
+    when:
+      task: implementation
+
+  - id: senior-engineer
+    path: docs/skills/senior-engineer.md
+    mandatory: true
+    priority: 0
+    when:
+      task: implementation
+
+  # ── Implementation (conditional on language/framework) ──────────────────────
+  - id: solid_principles
+    path: docs/skills/solid_principles.md
+    priority: 2
+    when:
+      task: implementation
+      language: typescript
+
+  - id: design_patterns
+    path: docs/skills/design_patterns.md
+    priority: 3
+    when:
+      task: implementation
+      language: typescript
+
+  - id: error_handling_observability
+    path: docs/skills/error_handling_observability.md
+    priority: 2
+    when:
+      task: implementation
+
+  # ── Architecture / Refactoring ──────────────────────────────────────────────
+  - id: architectural_integrity
+    path: docs/skills/architectural_integrity.md
+    priority: 2
+    when:
+      task: refactor
+
+  - id: domain_driven_design_(ddd)
+    path: docs/skills/domain_driven_design_(ddd).md
+    priority: 3
+    when:
+      task: refactor
+      language: typescript
+
+  - id: system-first
+    path: docs/skills/system-first.md
+    priority: 0
+    when:
+      task: governance
+
+  # ── Frontend ────────────────────────────────────────────────────────────────
+  - id: security_xss_prevention
+    path: docs/skills/security_xss_prevention.md
+    priority: 1
+    when:
+      layer: frontend
+
+  - id: optimistic_ui
+    path: docs/skills/optimistic_ui.md
+    priority: 3
+    when:
+      layer: frontend
+
+  # ── Infrastructure / DevOps ─────────────────────────────────────────────────
+  - id: ci_cd_pipeline
+    path: docs/skills/ci_cd_pipeline.md
+    priority: 3
+    when:
+      task: infra
+
+  - id: pnpm_management
+    path: docs/skills/pnpm_management.md
+    priority: 4
+    when:
+      task: infra
+
+  - id: codebase_hygiene_git
+    path: docs/skills/codebase_hygiene_git.md
+    priority: 2
+    when:
+      task: implementation
+
+  # ── Governance / Session ────────────────────────────────────────────────────
+  - id: quick-board-enforcement
+    path: docs/skills/quick-board-enforcement.md
+    priority: 0
+    when:
+      task: governance
+
+  - id: operacao_no_shitenno
+    path: docs/skills/operacao_no_shitenno.md
+    priority: 1
+    when:
+      task: governance
+
+  - id: handbook-fill
+    path: docs/skills/handbook-fill.md
+    priority: 4
+    when:
+      task: docs
+
+  # ── MCP Integration ────────────────────────────────────────────────────────
+  - id: mcp-interaction
+    path: docs/skills/mcp-interaction.md
+    mandatory: true
+    priority: 0
+    when:
+      task: [implementation, refactor, governance, audit, docs]

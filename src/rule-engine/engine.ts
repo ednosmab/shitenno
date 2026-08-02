@@ -68,19 +68,8 @@ export function saveRule(shitennoDir: string, rule: Rule): void {
 
 // ── Engine ───────────────────────────────────────────────────────────────────
 
-/**
- * Executa o engine de regras para um determinado trigger.
- */
-export async function executeRules(
-  rules: Rule[],
-  context: RuleContext
-): Promise<EngineResult> {
-  const results: RuleResult[] = [];
-  let executed = 0;
-  let skipped = 0;
-  let failed = 0;
-
-  const applicableRules = rules
+function filterApplicableRules(rules: Rule[], context: RuleContext): Rule[] {
+  return rules
     .filter((r) => {
       if (!r.enabled) return false;
       if (r.trigger !== context.trigger) return false;
@@ -93,109 +82,102 @@ export async function executeRules(
       return true;
     })
     .sort((a, b) => a.priority - b.priority);
+}
 
-  for (const rule of applicableRules) {
-    const startTime = Date.now();
-
-    if (rule.dependencies.length > 0) {
-      const depsMet = rule.dependencies.every((depId) =>
-        results.some((r) => r.ruleId === depId && r.success)
-      );
-      if (!depsMet) {
-        results.push({
-          ruleId: rule.id,
-          success: false,
-          message: "Dependencies not met",
-          actionsExecuted: 0,
-          duration: Date.now() - startTime,
-        });
-        skipped++;
-        continue;
-      }
-    }
-
-    const conditionsMet = rule.conditions.every((cond) =>
-      evaluateCondition(cond, context)
+async function processRule(
+  rule: Rule,
+  context: RuleContext,
+  results: RuleResult[],
+  startTime: number
+): Promise<{ executed: boolean }> {
+  if (rule.dependencies.length > 0) {
+    const depsMet = rule.dependencies.every((depId) =>
+      results.some((r) => r.ruleId === depId && r.success)
     );
-
-    if (!conditionsMet) {
+    if (!depsMet) {
       results.push({
-        ruleId: rule.id,
-        success: false,
-        message: "Conditions not met",
-        actionsExecuted: 0,
-        duration: Date.now() - startTime,
+        ruleId: rule.id, success: false, message: "Dependencies not met",
+        actionsExecuted: 0, duration: Date.now() - startTime,
       });
-      skipped++;
-      continue;
+      return { executed: false };
     }
-
-    let actionsExecuted = 0;
-    let allSuccess = true;
-
-    for (const action of rule.actions) {
-      const invokeResult = await invokeAction({
-        action,
-        context,
-        mode: "autonomous",
-        ruleAutonomousFlag: rule.autonomous ?? false,
-        resourceClaimed: context.isResourceClaimed,
-      });
-      if (invokeResult.success) {
-        actionsExecuted++;
-      } else {
-        allSuccess = false;
-      }
-    }
-
-    const duration = Date.now() - startTime;
-
-    results.push({
-      ruleId: rule.id,
-      success: allSuccess,
-      message: allSuccess
-        ? `${actionsExecuted} action(s) executed`
-        : "Some actions failed",
-      actionsExecuted,
-      duration,
-    });
-
-    if (allSuccess) executed++;
-    else failed++;
   }
 
-  const total = rules.filter((r) => r.enabled && r.trigger === context.trigger).length;
+  const conditionsMet = rule.conditions.every((cond) => evaluateCondition(cond, context));
+  if (!conditionsMet) {
+    results.push({
+      ruleId: rule.id, success: false, message: "Conditions not met",
+      actionsExecuted: 0, duration: Date.now() - startTime,
+    });
+    return { executed: false };
+  }
 
+  let actionsExecuted = 0;
+  let allSuccess = true;
+  for (const action of rule.actions) {
+    const invokeResult = await invokeAction({
+      action, context, mode: "autonomous",
+      ruleAutonomousFlag: rule.autonomous ?? false,
+      resourceClaimed: context.isResourceClaimed,
+    });
+    if (invokeResult.success) actionsExecuted++;
+    else allSuccess = false;
+  }
+
+  results.push({
+    ruleId: rule.id, success: allSuccess,
+    message: allSuccess ? `${actionsExecuted} action(s) executed` : "Some actions failed",
+    actionsExecuted, duration: Date.now() - startTime,
+  });
+  return { executed: true };
+}
+
+function writeTelemetry(ctx: { context: RuleContext; total: number; executed: number; skipped: number; failed: number; results: RuleResult[] }): void {
   try {
-    const telemetryDir = join(context.shitennoDir, "telemetry");
-    if (!existsSync(telemetryDir)) {
-      mkdirSync(telemetryDir, { recursive: true });
-    }
+    const telemetryDir = join(ctx.context.shitennoDir, "telemetry");
+    if (!existsSync(telemetryDir)) mkdirSync(telemetryDir, { recursive: true });
     const traceEntry = {
-      timestamp: context.timestamp,
-      trigger: context.trigger,
-      eventType: context.eventData?.type || "unknown",
-      rulesEvaluated: total,
-      rulesExecuted: executed,
-      rulesSkipped: skipped,
-      rulesFailed: failed,
-      results: results.map((r) => ({
-        ruleId: r.ruleId,
-        success: r.success,
-        actionsExecuted: r.actionsExecuted,
-        duration: r.duration,
-      })),
+      timestamp: ctx.context.timestamp, trigger: ctx.context.trigger,
+      eventType: ctx.context.eventData?.type || "unknown",
+      rulesEvaluated: ctx.total, rulesExecuted: ctx.executed, rulesSkipped: ctx.skipped, rulesFailed: ctx.failed,
+      results: ctx.results.map((r) => ({ ruleId: r.ruleId, success: r.success, actionsExecuted: r.actionsExecuted, duration: r.duration })),
     };
     appendFileSync(join(telemetryDir, "rule-trace.jsonl"), JSON.stringify(traceEntry) + "\n", "utf-8");
   } catch {
     logger.debug("rule-engine", "Failed to write audit trail — best-effort");
   }
+}
+
+/**
+ * Executa o engine de regras para um determinado trigger.
+ */
+export async function executeRules(
+  rules: Rule[],
+  context: RuleContext
+): Promise<EngineResult> {
+  const results: RuleResult[] = [];
+  let executed = 0;
+  let skipped = 0;
+  let failed = 0;
+
+  const applicableRules = filterApplicableRules(rules, context);
+
+  for (const rule of applicableRules) {
+    const startTime = Date.now();
+    const result = await processRule(rule, context, results, startTime);
+    if (!result.executed) skipped++;
+    else {
+      const lastResult = results[results.length - 1];
+      if (lastResult?.success) executed++;
+      else failed++;
+    }
+  }
+
+  const total = rules.filter((r) => r.enabled && r.trigger === context.trigger).length;
+  writeTelemetry({ context, total, executed, skipped, failed, results });
 
   return {
-    rulesEvaluated: total,
-    rulesExecuted: executed,
-    rulesSkipped: skipped,
-    rulesFailed: failed,
+    rulesEvaluated: total, rulesExecuted: executed, rulesSkipped: skipped, rulesFailed: failed,
     results,
     summary: `${executed}/${total} rules executed, ${skipped} skipped, ${failed} failed`,
   };
@@ -244,8 +226,6 @@ const EVENT_TO_TRIGGER: Partial<Record<ShitennoEventType, TriggerType>> = {
   "asset.archived": "file_change",
   "validation.completed": "validation_pass",
   "task.completed": "task_completed",
-  "pipeline.stage.start": "file_change",
-  "pipeline.stage.complete": "file_change",
   "pipeline.complete": "pipeline_complete",
   "lifecycle.state_changed": "file_change",
   "plan.archived": "plan_archived",
@@ -260,10 +240,9 @@ const EVENT_TO_TRIGGER: Partial<Record<ShitennoEventType, TriggerType>> = {
   "recommendation.rejected": "file_change",
   "governance.policy_applied": "file_change",
   "entropy.calculated": "file_change",
-  "command.completed": "task_completed",
+  "command.completed": "command_completed",
   "doc.lifecycle.audited": "file_change",
   "system.updated": "file_change",
-  "pipeline.started": "file_change",
   "challenge.generated": "file_change",
   "docs.sync.triggered": "file_change",
   "state.mutated": "file_change",

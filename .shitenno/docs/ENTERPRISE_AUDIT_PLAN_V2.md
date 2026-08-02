@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Enterprise Audit Plan V2 — Shitenno
 
 > **Objetivo:** Nível `enterprise` com ~180 detectores (99 atuais + 22 Fase 1 + 59 novos)

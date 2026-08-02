@@ -94,61 +94,61 @@ function makeRiskMap() {
 
 describe("generateBriefing", () => {
   it("populates project from fingerprint", () => {
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], []);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [] });
     expect(b.project.domain).toBe("monorepo");
     expect(b.project.scale).toBe("medium");
     expect(b.project.stack).toEqual(["react", "typescript"]);
   });
 
   it("extracts critical areas from risk map", () => {
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], []);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [] });
     expect(b.risks.criticalAreas).toEqual(["src"]);
     expect(b.risks.highAreas).toEqual(["apps"]);
   });
 
   it("extracts areas without tests from risk factors", () => {
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], []);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [] });
     expect(b.tests.areasWithoutTests).toContain("src");
     expect(b.tests.areasWithoutTests).toContain("apps");
   });
 
   it("generates recommendations based on risks", () => {
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], []);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [] });
     expect(b.recommendations.some((r) => r.includes("src"))).toBe(true);
   });
 
   it("generates healthy recommendation when no issues", () => {
     const emptyRisk = { overallRisk: "low", areas: [] };
-    const b = generateBriefing(makeFingerprint() as any, emptyRisk as any, [], []);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: emptyRisk as any, contextRules: [], dynamicRules: [] });
     expect(b.recommendations.some((r) => r.includes("healthy"))).toBe(true);
   });
 
   it("includes maturity score when provided", () => {
     const profile = { overallScore: 73, recommendedCapabilities: ["test-coverage"] };
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], [], profile as any);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [], maturityProfile: profile as any });
     expect(b.project.maturityScore).toBe(73);
     expect(b.recommendations.some((r) => r.includes("test-coverage"))).toBe(true);
   });
 
   it("uses default quickBoard when not provided", () => {
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], []);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [] });
     expect(b.quickBoard?.currentTask).toBe("Nenhuma");
   });
 
   it("passes through quickBoard when provided", () => {
     const qb = { currentTask: "Tarefa X", nextP0: "P0-1", p1Debts: "none", impediments: "none", lastSessionStatus: "ok" };
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], [], undefined, qb);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [], quickBoard: qb });
     expect(b.quickBoard?.currentTask).toBe("Tarefa X");
   });
 
   it("defaults reminders to empty array", () => {
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], []);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [] });
     expect(b.reminders).toEqual([]);
   });
 
   it("passes through reminders", () => {
     const reminder = { message: "rem1", priority: "medium" as const, category: "feature" as const, createdAt: "2026-07-08" };
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], [], undefined, undefined, [reminder]);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [], reminders: [reminder] });
     expect(b.reminders).toHaveLength(1);
     const [first] = b.reminders;
     expect(first?.message).toBe("rem1");
@@ -159,13 +159,13 @@ describe("generateBriefing", () => {
       { id: "r1", rule: "R1", rationale: "", priority: 1, area: "a", basedOn: "risk-map" as const },
       { id: "r2", rule: "R2", rationale: "", priority: 2, area: "b", basedOn: "risk-map" as const },
     ];
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, rules, []);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: rules, dynamicRules: [] });
     expect(b.tokenEconomy.estimatedTokensSaved).toBeGreaterThan(8000);
     expect(b.tokenEconomy.contextRuleCount).toBe(2);
   });
 
   it("detects hot areas from high-churn factors", () => {
-    const b = generateBriefing(makeFingerprint() as any, makeRiskMap() as any, [], []);
+    const b = generateBriefing({ fingerprint: makeFingerprint() as any, riskMap: makeRiskMap() as any, contextRules: [], dynamicRules: [] });
     expect(b.patterns.hotAreas).toContain("src");
   });
 });

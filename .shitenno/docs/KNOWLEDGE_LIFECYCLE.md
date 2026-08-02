@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # KNOWLEDGE_LIFECYCLE — Ciclo de Vida do Conhecimento
 
 > **Versão:** 1.0

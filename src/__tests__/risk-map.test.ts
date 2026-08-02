@@ -194,6 +194,22 @@ describe("generateRiskMap", () => {
     expect(srcArea!.factors.length).toBeLessThanOrEqual(10);
   });
 
+  it("does not flag test files as 'no-tests' (self-referential bug)", () => {
+    mkdirSync(join(tempDir, "src"), { recursive: true });
+    mkdirSync(join(tempDir, "src", "__tests__"), { recursive: true });
+    writeFileSync(join(tempDir, "src", "__tests__", "app.test.ts"), "import { describe } from 'vitest';");
+    writeFileSync(join(tempDir, "src", "__tests__", "utils.spec.ts"), "import { it } from 'vitest';");
+    writeFileSync(join(tempDir, "src", "app.test.ts"), "import { it } from 'vitest';");
+    const result = generateRiskMap(tempDir, join(tempDir, "shitenno"));
+    const srcArea = result.areas.find((a) => a.path === "src");
+    expect(srcArea).toBeDefined();
+    const noTestFactors = srcArea!.factors.filter((f) => f.type === "no-tests");
+    const flaggedTestFiles = noTestFactors.filter(
+      (f) => f.description.includes(".test.ts") || f.description.includes(".spec.ts") || f.description.includes("__tests__")
+    );
+    expect(flaggedTestFiles).toHaveLength(0);
+  });
+
   it("skips node_modules and dotfiles", () => {
     mkdirSync(join(tempDir, "src"), { recursive: true });
     mkdirSync(join(tempDir, "node_modules"), { recursive: true });

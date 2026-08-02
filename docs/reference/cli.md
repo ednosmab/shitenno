@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # CLI Reference
 
 > Complete reference for all Shugo CLI commands.

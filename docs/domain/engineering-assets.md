@@ -1,3 +1,8 @@
+---
+category: domain
+lifecycle: Active
+---
+
 # Engineering Assets
 
 > What characterizes an engineering asset and how assets relate to knowledge.

@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # Custom Rules
 
 Guia para criar regras customizadas no Shugo.

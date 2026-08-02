@@ -76,15 +76,20 @@ interface BenchmarkResult {
   iterations: number;
 }
 
-function runBenchmark(
-  projectRoot: string,
-  shitennoDir: string,
-  iterations: number
-): BenchmarkResult {
-  // Warm up
-  collectContext(projectRoot, shitennoDir);
+function benchmarkCachedReads(shitennoDir: string, snapshot: ContextSnapshot | null, iterations: number): number {
+  const cachedTimes: number[] = [];
+  if (snapshot) {
+    for (let i = 0; i < iterations; i++) {
+      const start = performance.now();
+      readCache(shitennoDir);
+      cachedTimes.push(performance.now() - start);
+    }
+  }
+  return cachedTimes.length > 0 ? cachedTimes.reduce((a, b) => a + b, 0) / cachedTimes.length : 0;
+}
 
-  // Benchmark fresh briefing
+function runBenchmark(projectRoot: string, shitennoDir: string, iterations: number): BenchmarkResult {
+  collectContext(projectRoot, shitennoDir);
   const freshTimes: number[] = [];
   let lastSnapshot: ContextSnapshot | undefined;
   for (let i = 0; i < iterations; i++) {
@@ -96,33 +101,11 @@ function runBenchmark(
   }
   const avgFreshTime = freshTimes.reduce((a, b) => a + b, 0) / freshTimes.length;
   const snapshot = lastSnapshot ?? null;
-
-  // Cache the last briefing
   if (snapshot) {
-    const hash = computeInputHash({
-      fingerprintHash: snapshot.fingerprint.hash,
-      riskMapHash: snapshot.riskMap.generatedAt,
-      contextRuleCount: snapshot.contextRules.length,
-      dynamicRuleCount: snapshot.dynamicRules.length,
-      maturityScore: snapshot.maturityProfile?.overallScore ?? null,
-    });
+    const hash = computeInputHash({ fingerprintHash: snapshot.fingerprint.hash, riskMapHash: snapshot.riskMap.generatedAt, contextRuleCount: snapshot.contextRules.length, dynamicRuleCount: snapshot.dynamicRules.length, maturityScore: snapshot.maturityProfile?.overallScore ?? null });
     setCachedBriefing(shitennoDir, snapshot.briefing, hash);
   }
-
-  // Benchmark cached briefing
-  const cachedTimes: number[] = [];
-  if (snapshot) {
-    for (let i = 0; i < iterations; i++) {
-      const start = performance.now();
-      readCache(shitennoDir);
-      cachedTimes.push(performance.now() - start);
-    }
-  }
-  const avgCachedTime = cachedTimes.length > 0
-    ? cachedTimes.reduce((a, b) => a + b, 0) / cachedTimes.length
-    : 0;
-
-  // Calculate savings
+  const avgCachedTime = benchmarkCachedReads(shitennoDir, snapshot, iterations);
   const manualTokens = estimateManualTokens(projectRoot);
   const briefingTokens = snapshot ? estimateBriefingTokens(snapshot) : 500;
   const tokensSaved = manualTokens - briefingTokens;

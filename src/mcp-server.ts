@@ -10,62 +10,72 @@ import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-export {
-  handleGetBriefing,
-  handleGetRiskMap,
-  handleGetRules,
-  handleGetEngineeringState,
-  handleGetBacklog,
-  handleGetPlans,
-  handleSubmitFeedback,
-  handleGetADRs,
-  handleGetSkills,
-} from "./mcp-server-handlers.js";
-
 import {
   handleGetBriefing,
   handleGetRiskMap,
   handleGetRules,
   handleGetEngineeringState,
-  handleGetBacklog,
   handleGetPlans,
   handleSubmitFeedback,
   handleGetADRs,
   handleGetSkills,
+  handleGetKnowledgeDebt,
+  handleGetChallenges,
+  handleGetAuditReport,
+  handleGetEvolution,
+  handleGetMandatoryContext,
 } from "./mcp-server-handlers.js";
 
-const TOOLS = [
+// Re-export handlers for test compatibility
+export {
+  handleGetBriefing,
+  handleGetRiskMap,
+  handleGetRules,
+  handleGetEngineeringState,
+  handleGetPlans,
+  handleSubmitFeedback,
+  handleGetADRs,
+  handleGetSkills,
+  handleGetKnowledgeDebt,
+  handleGetChallenges,
+  handleGetAuditReport,
+  handleGetEvolution,
+  handleGetMandatoryContext,
+};
+import {
+  handleGetBacklog,
+  handleAddBacklogItem,
+  handleTransitionBacklogItem,
+  handleDeleteBacklogItem,
+  BACKLOG_MCP_TOOLS,
+} from "./backlog-mcp-tools.js";
+
+import type { ToolResponse } from "./mcp-types.js";
+
+export const TOOLS = [
   {
     name: "getBriefing",
     description:
-      "Generate a pre-session briefing for the project. Includes project identity, " +
-      "risk status, test coverage, context rules, dynamic rules, and recommendations.",
+      "Generate a full pre-session briefing for the project. Includes project identity, " +
+      "risk status, test coverage, context rules, dynamic rules, and recommendations. " +
+      "Use this when you need a comprehensive overview before starting work. " +
+      "Pass `task` (e.g. implementation, refactor) to auto-attach mandatory skills for that scope. " +
+      "For lightweight context loading (MANDATORY_CONTEXT.md + buffer + rules + skills), use getMandatoryContext instead.",
     inputSchema: {
       type: "object" as const,
       properties: {
-        format: {
-          type: "string" as const,
-          enum: ["json", "markdown", "summary"],
-          description: "Output format.",
-        },
-        depth: {
-          type: "string" as const,
-          enum: ["minimal", "standard", "full"],
-          description: "Briefing depth.",
-        },
+        format: { type: "string" as const, enum: ["json", "markdown", "summary"], description: "Output format." },
+        depth: { type: "string" as const, enum: ["minimal", "standard", "full"], description: "Briefing depth." },
+        task: { type: "string" as const, description: "e.g. implementation, refactor, audit, infra — used to resolve mandatory skills." },
       },
     },
   },
   {
     name: "getRiskMap",
-    description:
-      "Generate a risk map of the project. Analyses test coverage, code churn, " +
-      "file sizes, import complexity, and sensitive keywords.",
+    description: "Generate a risk map of the project. Analyses test coverage, code churn, file sizes, import complexity, and sensitive keywords.",
     inputSchema: {
       type: "object" as const,
-      properties: {
-        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
-      },
+      properties: { format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." } },
     },
   },
   {
@@ -86,11 +96,15 @@ const TOOLS = [
   },
   {
     name: "getBacklog",
-    description: "Get the current active tasks and backlog items.",
+    description: "Get the current active tasks and backlog items. Supports filtering by state and priority. Use recommend=true to get context-aware next-item suggestions.",
     inputSchema: {
       type: "object" as const,
       properties: {
         state: { type: "string" as const, description: "Optional filter by state." },
+        priority: { type: "string" as const, description: "Optional filter by priority (P0, P1, P2, P3)." },
+        includeDone: { type: "boolean" as const, description: "Include done items." },
+        recommend: { type: "boolean" as const, description: "Return context-aware recommended next items." },
+        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
       },
     },
   },
@@ -99,9 +113,7 @@ const TOOLS = [
     description: "List active architectural plans or read a specific plan.",
     inputSchema: {
       type: "object" as const,
-      properties: {
-        planName: { type: "string" as const, description: "Optional plan filename." },
-      },
+      properties: { planName: { type: "string" as const, description: "Optional plan filename." } },
     },
   },
   {
@@ -121,22 +133,136 @@ const TOOLS = [
     description: "List Architecture Decision Records, or get the full content of one by id (e.g. 'ADR-008')",
     inputSchema: {
       type: "object" as const,
-      properties: {
-        id: { type: "string" as const, description: "Optional ADR id (e.g. 'ADR-008'). If omitted, lists all ADRs." },
-      },
+      properties: { id: { type: "string" as const, description: "Optional ADR id (e.g. 'ADR-008'). If omitted, lists all ADRs." } },
     },
   },
   {
     name: "getSkills",
-    description: "List coding skills/guidelines, or get the full content of one by name",
+    description:
+      "Get skills. Pass `name` for a specific skill, or `task`/`language`/`framework`/`layer` " +
+      "to resolve which skills are mandatory or relevant for that scope of work — mandatory " +
+      "skills are returned in full, others as pointers.",
     inputSchema: {
       type: "object" as const,
       properties: {
-        name: { type: "string" as const, description: "Optional skill name. If omitted, lists all skills." },
+        name: { type: "string" as const, description: "Specific skill name or filename." },
+        task: { type: "string" as const, description: "e.g. implementation, refactor, audit, infra." },
+        language: { type: "string" as const },
+        framework: { type: "string" as const },
+        layer: { type: "string" as const, description: "e.g. frontend, backend, daemon, cli." },
+      },
+    },
+  },
+  ...BACKLOG_MCP_TOOLS,
+  {
+    name: "getKnowledgeDebt",
+    description: "Analyse knowledge debt in the project. Detects missing ADRs, runbooks, skills, docs, automation, contracts, workflows, and stale ADRs. Returns gaps, severity, health score, and recommendations.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
+      },
+    },
+  },
+  {
+    name: "getChallenges",
+    description: "Generate challenge alternatives for current recommendations. Shows paradigm shifts that push beyond comfortable thinking. Requires a growth profile (run shugo assess first).",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
+      },
+    },
+  },
+  {
+    name: "getAuditReport",
+    description: "Read the latest health audit report. Shows health score, dimension scores, issues by severity, and optimizations. Run 'shugo audit' first to generate a report.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
+        date: { type: "string" as const, description: "Optional date filter (YYYY-MM-DD). If omitted, returns the latest report." },
+      },
+    },
+  },
+  {
+    name: "getEvolution",
+    description: "Read maturity evolution history. Shows score trends, dimension changes, and capability additions over time. Run 'shugo assess' multiple times to build history.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["json", "summary"], description: "Output format." },
+      },
+    },
+  },
+  {
+    name: "getMandatoryContext",
+    description:
+      "Load essential context files for the current session: MANDATORY_CONTEXT.md, context_buffer.yaml, " +
+      "mandatory rules (from rule-manifest.yaml), and mandatory skills (from skill-manifest.yaml). " +
+      "This is a lightweight operation — use this instead of getBriefing when you only need the core " +
+      "context files without analysis, risk maps, or recommendations.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        format: { type: "string" as const, enum: ["markdown", "json"], description: "Output format." },
+        task: { type: "string" as const, description: "Optional task scope (e.g. implementation, refactor) to resolve task-scoped mandatory skills." },
       },
     },
   },
 ];
+
+type ToolHandler = (
+  projectRoot: string,
+  shitennoDir: string,
+  toolArgs: Record<string, unknown>
+) => ToolResponse | Promise<ToolResponse>;
+
+const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  getBriefing: handleGetBriefing,
+  getRiskMap: handleGetRiskMap,
+  getRules: handleGetRules,
+  getEngineeringState: handleGetEngineeringState,
+  getBacklog: handleGetBacklog,
+  getPlans: handleGetPlans,
+  submitFeedback: handleSubmitFeedback,
+  getADRs: handleGetADRs,
+  getSkills: handleGetSkills,
+  addBacklogItem: handleAddBacklogItem,
+  transitionBacklogItem: handleTransitionBacklogItem,
+  deleteBacklogItem: handleDeleteBacklogItem,
+  getKnowledgeDebt: handleGetKnowledgeDebt,
+  getChallenges: handleGetChallenges,
+  getAuditReport: handleGetAuditReport,
+  getEvolution: handleGetEvolution,
+  getMandatoryContext: handleGetMandatoryContext,
+};
+
+import { recordToolCall } from "./usage-tracker.js";
+
+export async function dispatchTool(
+  name: string,
+  projectRoot: string,
+  shitennoDir: string,
+  toolArgs: Record<string, unknown>
+): Promise<ToolResponse> {
+  try {
+    recordToolCall(shitennoDir, name);
+    const handler = TOOL_HANDLERS[name];
+    if (!handler) {
+      return {
+        content: [{ type: "text", text: `Unknown tool: ${name}. Available: ${TOOLS.map((t) => t.name).join(", ")}` }],
+        isError: true,
+      };
+    }
+    return await handler(projectRoot, shitennoDir, toolArgs);
+  } catch (error) {
+    return {
+      content: [{ type: "text", text: error instanceof Error ? error.message : String(error) }],
+      isError: true,
+    };
+  }
+}
 
 export function createMcpServer(projectRoot: string, shitennoDir?: string): Server {
   const resolvedShitennoDir = shitennoDir ?? `${projectRoot}/shitenno`;
@@ -148,41 +274,17 @@ export function createMcpServer(projectRoot: string, shitennoDir?: string): Serv
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
 
-  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  // Required by MCP SDK type signature
+  server.setRequestHandler(CallToolRequestSchema, async (request, _extra) => {
     const { name, arguments: args } = request.params;
     const toolArgs = (args ?? {}) as Record<string, unknown>;
-
     try {
-      switch (name) {
-        case "getBriefing":
-          return await handleGetBriefing(projectRoot, resolvedShitennoDir, toolArgs);
-        case "getRiskMap":
-          return await handleGetRiskMap(projectRoot, resolvedShitennoDir, toolArgs);
-        case "getRules":
-          return await handleGetRules(projectRoot, resolvedShitennoDir, toolArgs);
-        case "getEngineeringState":
-          return await handleGetEngineeringState(projectRoot, resolvedShitennoDir, toolArgs);
-        case "getBacklog":
-          return handleGetBacklog(projectRoot, resolvedShitennoDir, toolArgs);
-        case "getPlans":
-          return handleGetPlans(projectRoot, resolvedShitennoDir, toolArgs);
-        case "submitFeedback":
-          return handleSubmitFeedback(projectRoot, resolvedShitennoDir, toolArgs);
-        case "getADRs":
-          return await handleGetADRs(projectRoot, resolvedShitennoDir, toolArgs);
-        case "getSkills":
-          return await handleGetSkills(projectRoot, resolvedShitennoDir, toolArgs);
-        default:
-          return {
-            content: [{ type: "text", text: `Unknown tool: ${name}. Available: ${TOOLS.map((t) => t.name).join(", ")}` }],
-            isError: true,
-          };
-      }
+      return await dispatchTool(name, projectRoot, resolvedShitennoDir, toolArgs) as unknown as Record<string, unknown>;
     } catch (error) {
       return {
         content: [{ type: "text", text: `Error executing ${name}: ${error instanceof Error ? error.message : String(error)}` }],
         isError: true,
-      };
+      } as unknown as Record<string, unknown>;
     }
   });
 

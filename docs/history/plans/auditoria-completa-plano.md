@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Plano de Auditoria Completa — shitenno-cli
 
 **Data:** 2026-06-27 | **Commits planeados:** 6 fases

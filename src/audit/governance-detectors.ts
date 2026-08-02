@@ -47,3 +47,8 @@ export {
   detectCrossDocP0Contradiction,
   detectEmptyDataFiles,
 } from "./governance-detectors-rules.js";
+
+export {
+  detectOrphanSkillFiles,
+  detectBrokenSkillManifestEntries,
+} from "./skill-manifest-detectors.js";

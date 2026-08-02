@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 26 — AI AGENT GUIDELINES
 
 > Rules for AI agents that collaborate with the Shugo project.

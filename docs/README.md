@@ -1,6 +1,6 @@
 # Shitenno — Documentation
 
-> Knowledge organization for the Shugo governance framework.
+> Knowledge organization for the Shugo governance system.
 
 ## Quick Start
 

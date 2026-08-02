@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Fase: System Live — Transformar Infraestrutura em Sistema Funcional
 
 ## Contexto

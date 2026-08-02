@@ -1,3 +1,8 @@
+---
+category: philosophy
+lifecycle: Active
+---
+
 # Engineering Manifesto
 
 > Why the Shitenno exists.
@@ -64,7 +69,7 @@ Shugo is a system that thinks about how you work.
 
 It organizes knowledge so that humans and AI agents can continuously understand a project's state, make better decisions, and evolve with confidence. The organization of knowledge is the central element. The Engineering State is the source of truth. Every evolution of the project is guided by capabilities, knowledge, and informed decisions — not just by the implementation of code.
 
-Shugo means "a connection or series of connections linking two or more things." That is exactly what this system does. It connects knowledge to decisions. Decisions to implementations. Implementations to evidence. Evidence to evolution.
+Shugo (守護) means "guardian" or "protection" — consistent with "Shitenno" (四天王), the Four Heavenly Kings, guardian deities in Buddhist tradition. Shugo guards engineering knowledge. It protects decisions from being forgotten, patterns from being lost, and context from decaying. It connects knowledge to decisions. Decisions to implementations. Implementations to evidence. Evidence to evolution.
 
 The graph is the system. The system is the governance. The governance is the value.
 
@@ -72,4 +77,4 @@ The graph is the system. The system is the governance. The governance is the val
 
 *This document is the constitutional foundation of the Shitenno. All architecture, domain modeling, and implementation must be consistent with the principles expressed here.*
 
-*Last updated: 2026-06-28*
+*Last updated: 2026-07-22*

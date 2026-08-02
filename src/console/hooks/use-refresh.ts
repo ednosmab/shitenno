@@ -12,16 +12,24 @@ export function useRefresh(
   shitennoDir: string,
   intervalMs: number = 0
 ) {
-  const [data, setData] = useState<ConsoleData>(() =>
-    getOrCollectConsoleData(projectRoot, shitennoDir)
-  );
+  const [data, setData] = useState<ConsoleData | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+
+  // Initial load
+  useEffect(() => {
+    let cancelled = false;
+    getOrCollectConsoleData(projectRoot, shitennoDir).then((d) => {
+      if (!cancelled) setData(d);
+    });
+    return () => { cancelled = true; };
+  }, [projectRoot, shitennoDir]);
 
   const refresh = useCallback(() => {
     clearConsoleDataCache(); // Force fresh data on manual refresh
-    const newData = getOrCollectConsoleData(projectRoot, shitennoDir);
-    setData(newData);
-    setLastRefresh(new Date());
+    getOrCollectConsoleData(projectRoot, shitennoDir).then((newData) => {
+      setData(newData);
+      setLastRefresh(new Date());
+    });
   }, [projectRoot, shitennoDir]);
 
   useEffect(() => {

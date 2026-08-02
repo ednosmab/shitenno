@@ -1,0 +1,29 @@
+{
+  "planId": "PLAN-2026-07-19-MASTER-2-correcao-dados-e-checks",
+  "baseCommit": "afa5b346792988769df26ed9953821da842e66ca",
+  "diffHash": "44e76a899860988b8d4ca6716f2ecd9f5fac7659ed62eef36811b62465f00a6c",
+  "checks": [
+    {
+      "name": "BUILD",
+      "passed": true,
+      "message": "Build passed"
+    },
+    {
+      "name": "TESTS",
+      "passed": true,
+      "message": "Tests passed"
+    },
+    {
+      "name": "LINT",
+      "passed": true,
+      "message": "Lint passed"
+    },
+    {
+      "name": "GATE_SELF_TEST",
+      "passed": true,
+      "message": "Gate de done verificado"
+    }
+  ],
+  "passed": true,
+  "timestamp": "2026-07-22T12:48:46.847Z"
+}

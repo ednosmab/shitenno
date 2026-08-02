@@ -5,7 +5,7 @@
  * Used for incremental scanning (--changed mode).
  */
 
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -40,15 +40,16 @@ export function getChangedFiles(
 
   try {
     // Check if we're in a git repo
-    execSync("git rev-parse --git-dir", {
+    execFileSync("git", ["rev-parse", "--git-dir"], {
       cwd: projectRoot,
       stdio: "pipe",
       timeout: GIT_DIFF_TIMEOUT_MS,
     });
 
     // Get changed files
-    const output = execSync(
-      `git diff --name-only ${baseBranch}...HEAD`,
+    const output = execFileSync(
+      "git",
+      ["diff", "--name-only", `${baseBranch}...HEAD`],
       {
         cwd: projectRoot,
         encoding: "utf-8",
@@ -84,7 +85,7 @@ export function validateBaseBranch(
   baseBranch: string
 ): boolean {
   try {
-    execSync(`git rev-parse --verify ${baseBranch}`, {
+    execFileSync("git", ["rev-parse", "--verify", baseBranch], {
       cwd: projectRoot,
       stdio: "pipe",
       timeout: GIT_DIFF_TIMEOUT_MS,
@@ -100,7 +101,7 @@ export function validateBaseBranch(
  */
 export function getCurrentBranch(projectRoot: string): string | null {
   try {
-    return execSync("git rev-parse --abbrev-ref HEAD", {
+    return execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
       cwd: projectRoot,
       encoding: "utf-8",
       stdio: "pipe",

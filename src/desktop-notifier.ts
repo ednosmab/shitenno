@@ -4,212 +4,260 @@
  * Subscribes to lifecycle events and sends desktop notifications
  * with intelligent rate limiting:
  *
- * 1. PROGRESSIVE COOLDOWN: Starts at 30s, increases when burst detected
- * 2. BATCHING: Groups multiple events within a 5s window into one notification
- * 3. DEDUPLICATION: Same event key within cooldown → skip
+ * 1. GLOBAL COOLDOWN: 60s between ANY notification (not per-key)
+ * 2. PRIORITY BY SEVERITY: high/critical bypass cooldown, low never notifies
+ * 3. BROAD SCOPE: Covers challenges, drift, task completion, session end
+ * 4. PERSISTENT LOG: All notifications logged to notifications.jsonl
  *
  * PRINCIPLE: Notifications inform, never interrupt.
  */
 
 import { getEventBus } from "./event-bus.js";
-import { sendDesktopNotification } from "./notify.js";
+import { sendDesktopNotification, logNotificationOnly } from "./notify.js";
 import { logger } from "./logger.js";
 
 // ── Configuration ────────────────────────────────────────────────────────
 
-const BASE_COOLDOWN_MS = 30_000;
-const BATCH_WINDOW_MS = 5_000;
-const BURST_THRESHOLD = 3;
-const BURST_WINDOW_MS = 60_000;
-const MAX_COOLDOWN_MS = 5 * 60_000;
+const GLOBAL_COOLDOWN_MS = 60_000;    // 60s between ANY notification
+const MIN_SESSION_DURATION_MS = 60_000; // Ignore sessions shorter than 60s
 
 // ── State ────────────────────────────────────────────────────────────────
 
-interface NotificationEvent {
-  title: string;
-  message: string;
-  timestamp: number;
-}
-
-const lastNotified = new Map<string, number>();
-const recentTimestamps: number[] = [];
-let batchTimeout: ReturnType<typeof setTimeout> | null = null;
-const batchQueue: NotificationEvent[] = [];
+let lastGlobalNotification = 0;
 let initialized = false;
+let sharedShitennoDir = "";
+
+export function _resetForTesting(): void {
+  initialized = false;
+  sharedShitennoDir = "";
+  lastGlobalNotification = 0;
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
-function computeCooldown(): number {
-  const now = Date.now();
-  // Count events in burst window
-  while (recentTimestamps.length > 0 && recentTimestamps[0]! < now - BURST_WINDOW_MS) {
-    recentTimestamps.shift();
+/** Simple djb2 hash for content-based dedup keys. */
+function simpleHash(str: string): number {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash + str.charCodeAt(i)) | 0;
   }
-  const recentCount = recentTimestamps.length;
-  if (recentCount >= BURST_THRESHOLD) {
-    // Exponential backoff: 30s → 60s → 120s → 300s (max)
-    const exponent = Math.min(recentCount - BURST_THRESHOLD + 1, 4);
-    return Math.min(BASE_COOLDOWN_MS * Math.pow(2, exponent), MAX_COOLDOWN_MS);
-  }
-  return BASE_COOLDOWN_MS;
+  return Math.abs(hash);
 }
 
-function throttledNotify(key: string, title: string, message: string): void {
+function canNotify(): boolean {
   const now = Date.now();
-  const last = lastNotified.get(key) ?? 0;
-  const cooldown = computeCooldown();
+  return now - lastGlobalNotification >= GLOBAL_COOLDOWN_MS;
+}
 
-  if (now - last < cooldown) {
-    logger.debug("desktop-notifier", `Throttled: ${key} (${Math.round((cooldown - (now - last)) / 1000)}s remaining)`);
+function throttledNotify(
+  key: string,
+  title: string,
+  message: string,
+  priority: "high" | "medium" | "low" = "medium",
+): void {
+  // Low priority never notifies via desktop — log only
+  if (priority === "low") {
+    if (sharedShitennoDir) {
+      logNotificationOnly(sharedShitennoDir, title, message, "low");
+    }
+    getEventBus().publish("notification.throttled", { key, title, priority, reason: "low_priority" });
     return;
   }
 
-  lastNotified.set(key, now);
-  recentTimestamps.push(now);
-  sendDesktopNotification(title, message);
-}
-
-function flushBatch(): void {
-  if (batchQueue.length === 0) return;
-  batchTimeout = null;
-
-  if (batchQueue.length === 1) {
-    const evt = batchQueue[0]!;
-    throttledNotify(evt.title + ":" + evt.message, evt.title, evt.message);
-  } else {
-    // Group multiple events into one notification
-    const titles = [...new Set(batchQueue.map((e) => e.title))];
-    const count = batchQueue.length;
-    const summary = batchQueue
-      .slice(0, 3)
-      .map((e) => e.message)
-      .join("; ");
-    const extra = count > 3 ? ` (+${count - 3} mais)` : "";
-    throttledNotify(
-      `batch:${titles.join(",")}:${Date.now()}`,
-      titles[0] ?? "Shugo",
-      `${count} eventos: ${summary}${extra}`
-    );
+  // High/critical bypass cooldown
+  if (priority !== "high" && !canNotify()) {
+    const remaining = Math.round(((lastGlobalNotification + GLOBAL_COOLDOWN_MS) - Date.now()) / 1000);
+    logger.debug("desktop-notifier", `Throttled: ${key} (${remaining}s remaining)`);
+    if (sharedShitennoDir) {
+      logNotificationOnly(sharedShitennoDir, title, message, priority);
+    }
+    getEventBus().publish("notification.throttled", { key, title, priority, reason: "cooldown" });
+    return;
   }
-  batchQueue.length = 0;
-}
 
-function queueNotification(title: string, message: string): void {
-  batchQueue.push({ title, message, timestamp: Date.now() });
-
-  if (batchTimeout === null) {
-    batchTimeout = setTimeout(() => {
-      flushBatch();
-    }, BATCH_WINDOW_MS);
+  lastGlobalNotification = Date.now();
+  if (sharedShitennoDir) {
+    sendDesktopNotification(sharedShitennoDir, title, message, priority);
   }
+  getEventBus().publish("notification.sent", { key, title, priority });
 }
 
 // ── Event Handlers ───────────────────────────────────────────────────────
 
-function handlePlanStatusChanged(payload: Record<string, unknown>): void {
-  const planId = String(payload.planId ?? "unknown");
-  const newStatus = String(payload.newStatus ?? "");
-  const oldStatus = String(payload.oldStatus ?? "");
-
-  if (newStatus === "check") {
-    queueNotification(
-      "Shugo Plan",
-      `Plano ${planId} mudou para CHECK (era ${oldStatus}) — aguardando verificacao`
-    );
-  } else if (newStatus === "done") {
-    queueNotification(
-      "Shugo Plan",
-      `Plano ${planId} CONCLUIDO — movendo para done/`
-    );
-  } else if (newStatus === "blocked") {
-    queueNotification(
-      "Shugo Plan",
-      `Plano ${planId} BLOQUEADO — verificacao falhou, retry necessario`
-    );
-  }
-}
-
-function handlePlanArchived(payload: Record<string, unknown>): void {
-  const title = String(payload.title ?? payload.planId ?? "unknown");
-  const planId = String(payload.planId ?? "");
-  queueNotification(
-    "Shugo Plan",
-    `Plano '${title}' (${planId}) arquivado em done/`
-  );
-}
-
 function handleTaskCompleted(payload: Record<string, unknown>): void {
-  const taskId = String(payload.taskId ?? "unknown");
+  const taskId = String(payload.taskId ?? "desconhecida");
   const gatesPassed = payload.gatesPassed ?? payload.gates ?? "?";
-  const count = typeof gatesPassed === "number" ? gatesPassed : Array.isArray(gatesPassed) ? gatesPassed.length : "?";
-  queueNotification(
-    "Shugo Task",
-    `Tarefa ${taskId} concluida (${count} gates OK)`
+  const count = typeof gatesPassed === "number"
+    ? gatesPassed
+    : Array.isArray(gatesPassed)
+      ? gatesPassed.length
+      : "?";
+
+  throttledNotify(
+    `task:${taskId}:${Date.now()}`,
+    "✅ Tarefa Concluída",
+    `Tarefa ${taskId} finalizada com sucesso (${count} verificações OK)`,
+    "high",
   );
 }
 
 function handleSessionEnd(payload: Record<string, unknown>): void {
   const outcome = String(payload.outcome ?? "unknown");
-  const duration = Number(payload.duration ?? 0);
-  const mins = Math.floor(duration / 60);
-  const secs = Math.round(duration % 60);
+  const durationMs = Number(payload.duration ?? 0);
+
+  if (durationMs > 0 && durationMs < MIN_SESSION_DURATION_MS) {
+    logger.debug("desktop-notifier", `Ignored short session: ${Math.round(durationMs / 1000)}s`);
+    return;
+  }
+
+  const mins = Math.floor(durationMs / 60000);
+  const secs = Math.round((durationMs % 60000) / 1000);
   const time = mins > 0 ? `${mins}m${secs}s` : `${secs}s`;
-  const icon = outcome === "success" ? "OK" : outcome === "failed" ? "FALHOU" : "PARCIAL";
-  queueNotification(
-    "Shugo Session",
-    `Sessao encerrada: ${icon} (${time})`
+
+  const statusMap: Record<string, string> = {
+    success: "✅ Sessão encerrada",
+    failed: "❌ Sessão encerrada com falha",
+  };
+  const title = statusMap[outcome] ?? "⚠️ Sessão encerrada";
+
+  throttledNotify(`session:${outcome}:${Date.now()}`, title, `Duração: ${time}`, "high");
+}
+
+function handleChallengeGenerated(payload: Record<string, unknown>): void {
+  const type = String(payload.type ?? "unknown");
+  const severity = String(payload.severity ?? "medium");
+  const description = String(payload.description ?? "");
+
+  const sevLabel: Record<string, string> = {
+    high: "🔴",
+    medium: "🟡",
+    low: "🔵",
+  };
+  const icon = sevLabel[severity] ?? "⚪";
+
+  const contentKey = simpleHash(`${type}:${description}`);
+  throttledNotify(
+    `challenge:${contentKey}`,
+    `${icon} Proactive Alert`,
+    description,
+    severity as "high" | "medium" | "low",
   );
 }
 
-function handleValidationCompleted(payload: Record<string, unknown>): void {
-  const passed = Boolean(payload.passed);
-  const issues = Array.isArray(payload.issues) ? payload.issues.length : 0;
-  if (!passed) {
-    queueNotification(
-      "Shugo Validation",
-      `Verificacao falhou — ${issues} issue(s) encontrada(s)`
+function handleDriftDetected(payload: Record<string, unknown>): void {
+  const filesChanged = Number(payload.filesChanged ?? 0);
+  const minutes = Number(payload.minutesSinceLastCommit ?? 0);
+
+  throttledNotify(
+    `drift:${Date.now()}`,
+    "⚠️ Drift Detected",
+    `${filesChanged} files changed, ${minutes} min since last commit`,
+    "medium",
+  );
+}
+
+function handlePlanInconsistency(payload: Record<string, unknown>): void {
+  const planId = String(payload.planId ?? "unknown");
+  const message = String(payload.message ?? "Plan has inconsistent status");
+
+  throttledNotify(
+    `plan:${planId}:${Date.now()}`,
+    "⚠️ Plan Inconsistency",
+    `${planId}: ${message}`,
+    "medium",
+  );
+}
+
+function handleHealthChecked(payload: Record<string, unknown>): void {
+  const score = Number(payload.score ?? -1);
+  if (score < 0) return;
+
+  // Only notify when health is critical (<40) or improved significantly (>=80)
+  if (score < 40) {
+    throttledNotify(
+      `health:critical:${Date.now()}`,
+      "🔴 Saúde Crítica",
+      `Score de saúde: ${score}/100 — ação imediata necessária`,
+      "high",
+    );
+  } else if (score >= 80) {
+    throttledNotify(
+      `health:good:${Date.now()}`,
+      "🟢 Saúde Estável",
+      `Score de saúde recuperou para ${score}/100`,
+      "low",
     );
   }
 }
 
+function handleBacklogUpdated(payload: Record<string, unknown>): void {
+  const itemId = String(payload.itemId ?? payload.taskId ?? payload.planId ?? "desconhecido");
+  const count = Number(payload.movedCount ?? payload.count ?? 1);
+  throttledNotify(
+    `backlog-updated:${Date.now()}`,
+    "✅ Tarefa do Backlog Concluída",
+    `${count} item(ns) movido(s) para done — ${itemId}`,
+    "medium",
+  );
+}
+
+function handleBriefingGenerated(): void {
+  throttledNotify(
+    `briefing:${Date.now()}`,
+    "📋 Briefing Updated",
+    "BRIEFING.md regenerated with fresh project context",
+    "low",
+  );
+}
+
+function handlePlanArchived(payload: Record<string, unknown>): void {
+  const planId = String(payload.planId ?? payload.planName ?? "unknown");
+  // payload uses `finalStatus` (not `newStatus`) when published from
+  // markdown-plan-engine/file-operations.ts. Accept both for backward compat.
+  const finalStatus = String(payload.finalStatus ?? payload.newStatus ?? "");
+  if (finalStatus !== "done") return;
+
+  throttledNotify(
+    `plan-archived:${planId}:${Date.now()}`,
+    "📋 Plano Concluído",
+    `${planId} foi arquivado como done`,
+    "medium",
+  );
+}
+
+function handleUserNotification(payload: Record<string, unknown>): void {
+  const title = String(payload.title ?? "Shugo");
+  const message = String(payload.message ?? "");
+  const priority = String(payload.priority ?? "medium") as "high" | "medium" | "low";
+  throttledNotify(`user-notif:${Date.now()}`, title, message, priority);
+}
+
 // ── Initialization ───────────────────────────────────────────────────────
 
-export function initDesktopNotifier(): void {
+export function initDesktopNotifier(shitennoDir: string): void {
   if (initialized) return;
   initialized = true;
+  sharedShitennoDir = shitennoDir;
 
   const bus = getEventBus();
 
-  bus.subscribe("plan.status_changed", handlePlanStatusChanged);
-  bus.subscribe("plan.archived", handlePlanArchived);
+  // Core lifecycle events
   bus.subscribe("task.completed", handleTaskCompleted);
   bus.subscribe("session.end", handleSessionEnd);
-  bus.subscribe("validation.completed", handleValidationCompleted);
 
-  logger.debug("desktop-notifier", "Initialized — subscribed to plan.status_changed, plan.archived, task.completed, session.end, validation.completed");
-}
+  // Proactive events
+  bus.subscribe("challenge.generated", handleChallengeGenerated);
+  bus.subscribe("workdir.large_uncommitted_drift", handleDriftDetected);
+  bus.subscribe("plan.inconsistency_detected", handlePlanInconsistency);
+  bus.subscribe("briefing.generated", handleBriefingGenerated);
+  bus.subscribe("plan.archived", handlePlanArchived);
 
-/**
- * Direct notification for code that changes plan status outside the event bus
- * (e.g., agent editing files directly). Bypasses event subscription.
- */
-export function notifyPlanStatusChange(
-  planId: string,
-  newStatus: string,
-  oldStatus: string
-): void {
-  queueNotification(
-    "Shugo Plan",
-    `Plano ${planId} mudou para ${newStatus.toUpperCase()} (era ${oldStatus})`
-  );
-}
+  // Health & backlog
+  bus.subscribe("health.checked", handleHealthChecked);
+  bus.subscribe("backlog.updated", handleBacklogUpdated);
 
-/**
- * Direct notification for task completion outside the event bus.
- */
-export function notifyTaskCompleted(taskId: string, detail?: string): void {
-  queueNotification(
-    "Shugo Task",
-    `Tarefa ${taskId} concluida${detail ? ` — ${detail}` : ""}`
-  );
+  // Direct user notifications (bypass challenge rate-limiting)
+  bus.subscribe("user.notification", handleUserNotification);
+
+  logger.info("desktop-notifier", "Initialized — subscribed to task.completed, session.end, challenge.generated, drift, plan.inconsistency, briefing.generated, plan.archived, health.checked, backlog.updated, user.notification");
 }

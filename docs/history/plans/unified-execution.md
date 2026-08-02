@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Plano Unificado: Auditoria + Dualidade Adaptativa
 
 ## Visão

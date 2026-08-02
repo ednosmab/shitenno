@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Pipeline & Execution
 
 Comandos para executar pipelines de análise e ações de governança.

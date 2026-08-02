@@ -1,3 +1,8 @@
+---
+category: implementation
+lifecycle: Active
+---
+
 # 29 — ROADMAP
 
 > Visual roadmap with phases and milestones.

@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # Future Engines
 
 > Conceptual specification of future engines within the Meta Model.

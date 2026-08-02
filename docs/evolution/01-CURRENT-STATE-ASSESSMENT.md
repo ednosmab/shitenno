@@ -1,3 +1,8 @@
+---
+category: evolution
+lifecycle: Active
+---
+
 # Current State Assessment
 
 > Where the Shitenno stands today.

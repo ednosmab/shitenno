@@ -37,39 +37,26 @@ const SINGLE_STEP = "SINGLE_STEP";
 const NO_CONTEXT_SECTION = "NO_CONTEXT_SECTION";
 const NO_OBJECTIVE_SECTION = "NO_OBJECTIVE_SECTION";
 
-// ── Validation ───────────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Validate plan format against standard template.
- * Returns errors (must fix) and warnings (should fix).
- */
-export function validatePlanFormat(
-  filePath: string,
-  content: string
-): PlanFormatResult {
-  const errors: PlanFormatError[] = [];
-  const warnings: PlanFormatError[] = [];
-  const lines = content.split("\n");
-
-  // Skip TEMPLATE.md and README.md
-  const fileName = basename(filePath);
-  if (fileName === "TEMPLATE.md" || fileName === "README.md") {
-    return { valid: true, errors: [], warnings: [] };
-  }
-
-  // Detect YAML frontmatter block (--- ... ---) at the top of the file
+function parseYamlFrontmatter(content: string): Record<string, unknown> | null {
   const yamlBlockMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
-  let yamlFields: Record<string, unknown> | null = null;
   if (yamlBlockMatch && yamlBlockMatch[1]) {
     try {
       const parsed = parseYaml(yamlBlockMatch[1]);
-      if (parsed && typeof parsed === "object") yamlFields = parsed as Record<string, unknown>;
+      if (parsed && typeof parsed === "object") return parsed as Record<string, unknown>;
     } catch {
       logger.debug("plan-format-validator", "Malformed YAML block — treating as absent");
     }
   }
+  return null;
+}
 
-  // Rule 1: **Status:** present (or YAML status field)
+function checkStatusField(
+  lines: string[],
+  yamlFields: Record<string, unknown> | null,
+  errors: PlanFormatError[]
+): void {
   const hasStatus = yamlFields ? "status" in yamlFields : lines.some((l) => l.match(/^\*\*Status:\*\*/));
   if (!hasStatus) {
     const titleLine = lines.findIndex((l) => l.startsWith("# "));
@@ -82,8 +69,13 @@ export function validatePlanFormat(
         : "Adicionar '**Status:** Pending' após o título",
     });
   }
+}
 
-  // Rule 2: **Date:** present (or YAML date field)
+function checkDateField(
+  lines: string[],
+  yamlFields: Record<string, unknown> | null,
+  errors: PlanFormatError[]
+): void {
   const hasDate = yamlFields ? "date" in yamlFields : lines.some((l) => l.match(/^\*\*Date:\*\*/));
   if (!hasDate) {
     errors.push({
@@ -94,8 +86,13 @@ export function validatePlanFormat(
         : "Adicionar '**Date:** YYYY-MM-DD' após o campo Status",
     });
   }
+}
 
-  // Rule 3: **Updated_at:** present (or YAML updated_at field)
+function checkUpdatedField(
+  lines: string[],
+  yamlFields: Record<string, unknown> | null,
+  warnings: PlanFormatError[]
+): void {
   const hasUpdated = yamlFields ? "updated_at" in yamlFields : lines.some((l) => l.match(/^\*\*Updated_at:\*\*/));
   if (!hasUpdated) {
     warnings.push({
@@ -106,8 +103,9 @@ export function validatePlanFormat(
         : "Adicionar '**Updated_at:** YYYY-MM-DDTHH:MM:SS.000Z'",
     });
   }
+}
 
-  // Rule 4: Step headings found
+function checkSteps(content: string, warnings: PlanFormatError[]): void {
   const stepHeadings = extractStepHeadings(content);
   if (stepHeadings.length === 0) {
     warnings.push({
@@ -117,9 +115,8 @@ export function validatePlanFormat(
         "O BACKLOG será criado só com metadados — sem lista de passos.",
       fix: "Adicionar secção '## Passos de Implementação' com headings ### Passo X: Title",
     });
+    return;
   }
-
-  // Rule 5: Each step has valid format
   for (const step of stepHeadings) {
     if (!step.valid) {
       warnings.push({
@@ -130,16 +127,15 @@ export function validatePlanFormat(
       });
     }
   }
-
-  // Rule 6: Minimum 2 steps
   if (stepHeadings.length === 1) {
     warnings.push({
       rule: SINGLE_STEP,
       message: "Plano tem apenas 1 passo — considere adicionar mais passos",
     });
   }
+}
 
-  // Rule 7: Context section exists
+function checkSections(lines: string[], warnings: PlanFormatError[]): void {
   const hasContext = lines.some((l) =>
     l.match(/^##\s+(Contexto|Context|Contexto geral)/i)
   );
@@ -150,8 +146,6 @@ export function validatePlanFormat(
       fix: "Adicionar secção '## Contexto' com descrição do problema",
     });
   }
-
-  // Rule 8: Objective section exists
   const hasObjective = lines.some((l) =>
     l.match(/^##\s+(Objetivo|Objective|Goal|Resultado)/i)
   );
@@ -162,6 +156,30 @@ export function validatePlanFormat(
       fix: "Adicionar secção '## Objetivo' com critérios de aceitação",
     });
   }
+}
+
+// ── Validation ───────────────────────────────────────────────────────────────
+
+export function validatePlanFormat(
+  filePath: string,
+  content: string
+): PlanFormatResult {
+  const errors: PlanFormatError[] = [];
+  const warnings: PlanFormatError[] = [];
+  const lines = content.split("\n");
+
+  const fileName = basename(filePath);
+  if (fileName === "TEMPLATE.md" || fileName === "README.md") {
+    return { valid: true, errors: [], warnings: [] };
+  }
+
+  const yamlFields = parseYamlFrontmatter(content);
+
+  checkStatusField(lines, yamlFields, errors);
+  checkDateField(lines, yamlFields, errors);
+  checkUpdatedField(lines, yamlFields, warnings);
+  checkSteps(content, warnings);
+  checkSections(lines, warnings);
 
   return {
     valid: errors.length === 0,

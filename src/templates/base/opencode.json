@@ -2,7 +2,6 @@
   "$schema": "https://opencode.ai/config.json",
   "model": "opencode/[modelo-principal]",
   "default_agent": "plan",
-
   "agent": {
     "plan": {
       "role": "planner",
@@ -12,7 +11,7 @@
     "build": {
       "role": "executor",
       "model": "opencode/[modelo-executor]",
-      "description": "Build/executor agent. Runs the user-approved plan step-by-step. MANDATORY: execute ONLY what the plan specifies — no autonomous refactors, no JSDoc additions, no renames, no 'improvements'. If you spot something outside the plan, STOP and report (do not fix it). Allowed exceptions: (1) minimal fixes (< 5 lines) to make the current step's build pass; (2) recording out-of-scope findings in the buffer's 'technical_debt' section. See AGENTS.md rule 16 for full protocol."
+      "description": "Build/executor agent. Runs the user-approved plan step-by-step. MANDATORY: execute ONLY what the plan specifies \u2014 no autonomous refactors, no JSDoc additions, no renames, no 'improvements'. If you spot something outside the plan, STOP and report (do not fix it). Allowed exceptions: (1) minimal fixes (< 5 lines) to make the current step's build pass; (2) recording out-of-scope findings in the buffer's 'technical_debt' section. See AGENTS.md rule 16 for full protocol."
     },
     "orchestrator": {
       "role": "orchestrator",
@@ -40,27 +39,33 @@
       }
     }
   },
-
   "instructions": [
-    "./shitenno/docs/AGENTS.md",
-    "./shitenno/docs/opencode-context.md",
-    "./shitenno/docs/skills/**/*.md",
-    "./shitenno/governance/**/*.yaml",
-    "./shitenno/governance/context/context_buffer.yaml"
+    "./.shitenno/docs/AGENTS.md",
+    "./.shitenno/governance/context/context_buffer.yaml",
+    "LAZY LOADING: Use shitenno_getSkills(name) or shitenno_getSkills(task) to load project skills on-demand. Optional files (opencode-context.md, MANDATORY_CONTEXT.md, skill-manifest.yaml, rule-manifest.yaml, agent contracts) are loaded via MCP when needed. NEVER use the built-in skill tool."
   ],
   "skills": {
-    "paths": ["shitenno/docs/skills"]
+    "paths": [
+      ".shitenno/docs/skills"
+    ]
   },
   "mcp": {
-    "local-filesystem": {
+    "shitenno": {
       "type": "local",
       "command": [
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "."
+        "node",
+        "./dist/bin/shugo.js",
+        "mcp"
       ],
       "enabled": true
+    }
+  },
+  "permission": {
+    "*": "allow",
+    "edit": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny"
     }
   }
 }

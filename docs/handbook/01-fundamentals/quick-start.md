@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Primeiros Passos
 
 > Guia rápido para começar a usar o Shugo em 5 minutos.

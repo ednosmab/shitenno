@@ -32,10 +32,10 @@ Sempre que o usuário enviar uma nova mensagem ou comando, você DEVE executar r
 
 ### 🔄 PASSO 1: DIAGNÓSTICO E LEITURA PREGUIÇOSA (LAZY LOADING)
 - **Leia `governance/WORKFLOW.md` primeiro** — ele define o fluxo da sessão com base no tipo de operação (FEATURE/BUG/REFACTOR/DOCUMENTATION/PLANNING).
-- Use o MCP para ler `governance/SYSTEM_MAP.md` e localize a pasta da camada da tarefa.
+- Use o MCP tool `getSkills` com os metadados da tarefa (`task`, `language`, `framework`, `layer`) para resolver quais skills são obrigatórias ou relevantes para o escopo de trabalho — skills obrigatórias são retornadas em texto integral, outras como ponteiros.
 - Use o MCP para ler `governance/context/context_buffer.yaml` para extrair o estado da última execução.
-- **Leia TODOS os P0 obrigatórios** (já injetados como system prompt pelo `opencode.json`): AGENTS.md, FORBIDDEN_OPERATIONS.md, DESDO.md, Requisitos_plataforma.md, CONTEXT_HIERARCHY.md
-- Use o MCP para ler a Skill e o Plano de Execução específicos da camada afetada (P2).
+- **Leia TODOS os P0 obrigatórios** (já injetados como system prompt pelo `opencode.json`): AGENTS.md, FORBIDDEN_OPERATIONS.md, DESDO.md, Requisitos_plataforma.md, CONTEXT_HIERARCHY.md, MANDATORY_CONTEXT.md
+- Use o MCP para ler o Plano de Execução específico da camada afetada (P2).
 - **Registre no buffer quais documentos foram lidos** na seção `## 🕹️ Documentos Carregados via MCP`.
 
 ### 📝 PASSO 2: ATUALIZAÇÃO DA MEMÓRIA RAM (BEFORE-CODE)
@@ -121,7 +121,7 @@ Sempre que o usuário enviar uma nova mensagem ou comando, você DEVE executar r
 ## ⏳ Diretriz de Leitura Preguiçosa Otimizada (Lazy Loading)
 - Você está PROIBIDO de realizar buscas globais (globbing) ou ler múltiplos arquivos da pasta `docs/` ou `governance/` de forma simultânea no início do chat.
 - A primeira leitura obrigatória é `governance/WORKFLOW.md` — ele determina o fluxo da sessão.
-- Sempre que o usuário solicitar uma tarefa, analise o escopo e use o arquivo `governance/SYSTEM_MAP.md` para identificar os caminhos exatos dos arquivos de plano e skill necessários.
+- Sempre que o usuário solicitar uma tarefa, analise o escopo e use o MCP tool `getSkills` com os metadados da tarefa (`task`, `language`, `framework`, `layer`) para resolver quais skills são obrigatórias ou relevantes para o escopo de trabalho.
 - Use a ferramenta MCP para ler exclusivamente os arquivos mapeados para a tarefa atual e ignore as demais pastas de documentação.
 - Leia `governance/context/context_buffer.yaml` ao iniciar cada nova tarefa para obter o estado actual (exceto durante fluxos de refatoração ou correção de bugs).
 
@@ -225,7 +225,7 @@ As regras não são todas do mesmo nível. Existem três camadas de dependência
    d. **Correção Automática de Erros Críticos:** Se qualquer um dos comandos acima falhar, você DEVE executar as correções sugeridas pelo próprio terminal e repetir os testes até que todos passem, documentando cada tentativa no buffer, antes de prosseguir para a próxima tarefa.
 10. **CHECKLIST DE AMBIENTE PRÉ-DEPLOY:** Antes de commitar qualquer alteração em configs de deploy, secrets ou env vars, valide que nenhuma flag de teste foi propagada para ficheiros de configuração de produção. Ver regra ENV-01 em FORBIDDEN_OPERATIONS (se aplicável).
 
-11. **PRIORIDADE DE ENTRADA DE SESSÃO:** Ao iniciar qualquer nova sessão, a PRIMEIRA tarefa a ser atacada é o item P0 activo no `docs/BACKLOG.md`. Itens P1/P2 só podem ser iniciados após (a) concluir o P0, ou (b) registar adiamento datado (ver DT-01 em FORBIDDEN_OPERATIONS). A IA NÃO DEVE iniciar tarefa de prioridade inferior sem antes mostrar a justificação de adiamento.
+11. **PRIORIDADE DE ENTRADA DE SESSÃO:** Ao iniciar qualquer nova sessão, a PRIMEIRA tarefa a ser atacada é o item P0 activo no `docs/backlog/ACTIVE.md`. Itens P1/P2 só podem ser iniciados após (a) concluir o P0, ou (b) registar adiamento datado (ver DT-01 em FORBIDDEN_OPERATIONS). A IA NÃO DEVE iniciar tarefa de prioridade inferior sem antes mostrar a justificação de adiamento.
 
 12. **INVARIANTE DE FIM DE SESSÃO:** Nenhuma sessão pode ser declarada "concluída" sem antes executar o ritual de fim de sessão: `pnpm run close:session` (verifica working tree, buffer, testes, UI governance e build), buffer podado (≤ 50 linhas activas), backlog actualizado, testes verdes (`tsc --noEmit`, `pnpm run test`, `pnpm run build`). Ver template detalhado em `docs/session-template.md` e política DT-02 em FORBIDDEN_OPERATIONS.
 13. **QUICK BOARD DE AVISO (LEMBRETES PERMANENTES):** Ao iniciar QUALQUER sessão, a IA DEVE apresentar ao usuário o **Quick Board** do `governance/context/context_buffer.yaml` antes da primeira resposta operacional. O Quick Board lista: tarefa em curso, parado, próximo, dívidas P1 com due date. Este lembrete NÃO substitui a leitura completa dos P0 — é apenas um aviso de contexto. A omissão do Quick Board na primeira resposta é violação desta regra.
@@ -346,14 +346,14 @@ Em reconhecimento ao desempenho excepcional, os 3 papéis foram consolidados em 
 - **Regra:** Sempre que identificar código frágil, ausência de tratamento de erro, falta de tipos ou violação de boas práticas, DEVE refatorar imediatamente.
 
 ### 📋 GESTÃO DE STATUS DO BACKLOG (OBRIGATÓRIO)
-- Ao iniciar a implementação de qualquer item no `docs/BACKLOG.md`, marque-o como `em andamento`.
+- Ao iniciar a implementação de qualquer item no `docs/backlog/ACTIVE.md`, marque-o como `em andamento`.
 - Ao concluir, substitua `[ ]` por `[x]`.
 - Se precisar pausar (bloqueio externo, dependência, decisão pendente), registre o motivo e marque como `pausado`.
 
 ### ⏳ Diretriz de Leitura Preguiçosa Otimizada (Lazy Loading)
 - Você está PROIBIDO de realizar buscas globais (globbing) ou ler múltiplos arquivos da pasta `docs/` ou `governance/` de forma simultânea no início do chat.
 - A primeira leitura obrigatória é `governance/WORKFLOW.md` — ele determina o fluxo da sessão.
-- Sempre que o usuário solicitar uma tarefa, analise o escopo e use o arquivo `governance/SYSTEM_MAP.md` para identificar os caminhos exatos dos arquivos de plano e skill necessários.
+- Sempre que o usuário solicitar uma tarefa, analise o escopo e use o MCP tool `getSkills` com os metadados da tarefa (`task`, `language`, `framework`, `layer`) para resolver quais skills são obrigatórias ou relevantes para o escopo de trabalho.
 - Use a ferramenta MCP para ler exclusivamente os arquivos mapeados para a tarefa atual e ignore as demais pastas de documentação.
 - Leia `governance/context/context_buffer.yaml` ao iniciar cada nova tarefa para obter o estado actual (exceto durante fluxos de refatoração ou correção de bugs).
 
@@ -365,10 +365,10 @@ Sempre que o usuário enviar uma nova mensagem ou comando, você DEVE executar r
 
 ### 🔄 PASSO 1: DIAGNÓSTICO E LEITURA PREGUIÇOSA (LAZY LOADING)
 - **Leia `governance/WORKFLOW.md` primeiro** — ele define o fluxo da sessão com base no tipo de operação (FEATURE/BUG/REFACTOR/DOCUMENTATION/PLANNING).
-- Use o MCP para ler `governance/SYSTEM_MAP.md` e localize a pasta da camada da tarefa.
+- Use o MCP tool `getSkills` com os metadados da tarefa (`task`, `language`, `framework`, `layer`) para resolver quais skills são obrigatórias ou relevantes para o escopo de trabalho — skills obrigatórias são retornadas em texto integral, outras como ponteiros.
 - Use o MCP para ler `governance/context/context_buffer.yaml` para extrair o estado da última execução.
-- **Leia TODOS os P0 obrigatórios** (já injetados como system prompt pelo `opencode.json`): AGENTS.md, FORBIDDEN_OPERATIONS.md, DESDO.md, Requisitos_plataforma.md, CONTEXT_HIERARCHY.md
-- Use o MCP para ler a Skill e o Plano de Execução específicos da camada afetada (P2).
+- **Leia TODOS os P0 obrigatórios** (já injetados como system prompt pelo `opencode.json`): AGENTS.md, FORBIDDEN_OPERATIONS.md, DESDO.md, Requisitos_plataforma.md, CONTEXT_HIERARCHY.md, MANDATORY_CONTEXT.md
+- Use o MCP para ler o Plano de Execução específico da camada afetada (P2).
 - **Registre no buffer quais documentos foram lidos** na seção `## 🕹️ Documentos Carregados via MCP`.
 
 ### 📝 PASSO 2: ATUALIZAÇÃO DA MEMÓRIA RAM (BEFORE-CODE)

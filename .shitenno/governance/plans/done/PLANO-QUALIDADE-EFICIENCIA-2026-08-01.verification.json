@@ -1,0 +1,38 @@
+{
+  "planId": "PLANO-QUALIDADE-EFICIENCIA-2026-08-01",
+  "checks": [
+    {
+      "name": "FORMAT",
+      "passed": true,
+      "message": "Auto-fixed: Campo **Date:** em falta no header do plano"
+    },
+    {
+      "name": "BUILD",
+      "passed": true,
+      "message": "TypeScript compilation succeeded"
+    },
+    {
+      "name": "TESTS",
+      "passed": true,
+      "message": "test:unit passed"
+    },
+    {
+      "name": "LINT",
+      "passed": true,
+      "message": "Lint passed"
+    },
+    {
+      "name": "GATE_SELF_TEST",
+      "passed": true,
+      "message": "Gate integrity check passed"
+    },
+    {
+      "name": "DOCS",
+      "passed": true,
+      "message": "Documentation auto-fixed"
+    }
+  ],
+  "passed": true,
+  "verifiedAt": "2026-08-01T04:27:47.857Z",
+  "diffHash": "826ba366315279c28373e133520fc735153122490460b105a87601370f1afe7b"
+}

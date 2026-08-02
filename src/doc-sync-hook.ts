@@ -50,20 +50,13 @@ const MIN_SYNC_INTERVAL_MS = 5000; // Minimum 5 seconds between syncs
  * Execute documentation sync command.
  * Respects minimum interval to prevent rapid-fire syncs.
  */
-export function runDocSync(
-  projectRoot: string,
-  command: string = DEFAULT_SYNC_COMMAND,
-  outputLevel: "silent" | "minimal" | "verbose" = "silent"
-): DocSyncResult {
-  const now = Date.now();
-
-  // Prevent rapid-fire syncs
+function checkSyncPrerequisites(projectRoot: string): DocSyncResult | null {
   if (isSyncing) {
     logger.debug("doc-sync-hook", "Sync already in progress, skipping");
     return { success: true, output: "skipped: already syncing", exitCode: 0, duration: 0 };
   }
 
-  if (now - lastSyncTime < MIN_SYNC_INTERVAL_MS) {
+  if (Date.now() - lastSyncTime < MIN_SYNC_INTERVAL_MS) {
     logger.debug("doc-sync-hook", "Minimum interval not reached, skipping");
     return { success: true, output: "skipped: minimum interval", exitCode: 0, duration: 0 };
   }
@@ -74,19 +67,23 @@ export function runDocSync(
     return { success: false, output: "sync-docs.ts not found", exitCode: 1, duration: 0 };
   }
 
-  isSyncing = true;
-  const startTime = Date.now();
+  return null;
+}
 
+function buildCommandWithFlags(command: string, outputLevel: "silent" | "minimal" | "verbose"): string {
+  if (outputLevel === "silent" || outputLevel === "minimal") {
+    return command + " --quiet";
+  }
+  return command;
+}
+
+function executeSyncExecution(
+  projectRoot: string,
+  fullCommand: string,
+  outputLevel: "silent" | "minimal" | "verbose",
+  startTime: number
+): DocSyncResult {
   try {
-    // Build command with flags
-    let fullCommand = command;
-    if (outputLevel === "silent") {
-      fullCommand += " --quiet";
-    } else if (outputLevel === "minimal") {
-      fullCommand += " --quiet";
-    }
-    // verbose = no flags
-
     const output = execSync(fullCommand, {
       cwd: projectRoot,
       encoding: "utf-8",
@@ -105,9 +102,7 @@ export function runDocSync(
   } catch (error: unknown) {
     const duration = Date.now() - startTime;
     const err = error as { status?: number; message?: string };
-
     logger.error("doc-sync-hook", `Sync failed: ${err.message}`);
-
     return {
       success: false,
       output: err.message || "unknown error",
@@ -117,6 +112,20 @@ export function runDocSync(
   } finally {
     isSyncing = false;
   }
+}
+
+export function runDocSync(
+  projectRoot: string,
+  command: string = DEFAULT_SYNC_COMMAND,
+  outputLevel: "silent" | "minimal" | "verbose" = "silent"
+): DocSyncResult {
+  const skipped = checkSyncPrerequisites(projectRoot);
+  if (skipped) return skipped;
+
+  isSyncing = true;
+  const startTime = Date.now();
+  const fullCommand = buildCommandWithFlags(command, outputLevel);
+  return executeSyncExecution(projectRoot, fullCommand, outputLevel, startTime);
 }
 
 /**

@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Plano: Production Readiness — shitenno-cli
 
 **Data:** 2026-06-27

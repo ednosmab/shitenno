@@ -24,11 +24,11 @@ const ALLOWED_SHUGO_COMMANDS: Record<string, string> = {
 };
 
 export function isScriptAllowed(script: string): boolean {
-  return script in ALLOWED_SCRIPTS;
+  return Object.hasOwn(ALLOWED_SCRIPTS, script) && !DANGEROUS_KEYS.has(script);
 }
 
 export function isShugoCommandAllowed(command: string): boolean {
-  return command in ALLOWED_SHUGO_COMMANDS;
+  return Object.hasOwn(ALLOWED_SHUGO_COMMANDS, command) && !DANGEROUS_KEYS.has(command);
 }
 
 export function getAllowedScriptCommand(script: string): string | undefined {

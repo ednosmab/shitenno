@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 12 — CONTEXT MANAGEMENT
 
 > P0-P4 hierarchy, context buffer, loading profiles.

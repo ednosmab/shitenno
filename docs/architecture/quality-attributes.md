@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 25 — QUALITY ATTRIBUTES
 
 > Performance, security, usability, maintainability.

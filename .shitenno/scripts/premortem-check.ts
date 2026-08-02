@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..', '..');
-const ADR_DIR = resolve(ROOT, 'shitenno', 'docs', 'adrs');
+const ADR_DIR = resolve(ROOT, '.shitenno', 'docs', 'adrs');
 
 let exitCode = 0;
 

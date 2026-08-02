@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 15 — EVENT BUS
 
 > Pub/sub architecture for module communication.

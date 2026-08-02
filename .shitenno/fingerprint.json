@@ -1,13 +1,13 @@
 {
-  "hash": "bbf3d6af7223",
-  "detectedAt": "2026-07-15T06:27:40.042Z",
+  "hash": "aa59471fa052",
+  "detectedAt": "2026-07-29T14:55:53.579Z",
   "domain": "monorepo",
   "stack": [
     "typescript",
     "node",
     "react"
   ],
-  "scale": "medium",
+  "scale": "large",
   "tooling": {
     "typescript": true,
     "tests": true,

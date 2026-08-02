@@ -1,3 +1,8 @@
+---
+category: adr
+lifecycle: Active
+---
+
 # ADR-001: Single Agent Architecture
 
 > ⚠️ **Retroactive ADR** — documented 2026-07-05, decision made

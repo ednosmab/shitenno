@@ -46,14 +46,75 @@ function formatDecision(d: { id: string; request: { action: string; category: st
   return `  ${chalk.bold(d.id)}  ${reco}  score=${d.compositeScore}  conf=${d.confidence}%  ${d.request.category}: ${d.request.action.slice(0, 50)}`;
 }
 
-// ── Command ────────────────────────────────────────────────────────────────
+function buildDecisionRequest(action: string, opts: Record<string, unknown>) {
+  return {
+    id: `REQ-${Date.now().toString(36).toUpperCase()}`,
+    action,
+    category: opts.category as string,
+    targetGoalId: opts.goal as string,
+    context: {
+      riskLevel: opts.risk as RiskLevel,
+      impact: opts.impact as string,
+      introducesDebt: opts.introducesDebt === true,
+      debtSeverity: opts.debtSeverity as string,
+    },
+    timestamp: new Date().toISOString(),
+  };
+}
 
-export function decideCommand(): Command {
-  const cmd = new Command("decide")
-    .description("Evaluate proposed actions using specialized evaluators")
-    .option("-d, --dir <path>", "Project directory");
+function outputDecisionJson(decision: unknown) {
+  outputJson(decision as Record<string, unknown>);
+}
 
-  // ── evaluate (default: positional arg) ──────────────────────────────────
+function outputDecisionPretty(decision: {
+  id: string;
+  request: { action: string; category: string };
+  compositeScore: number;
+  recommendation: DecisionRecommendation;
+  confidence: number;
+  scores: Array<{
+    evaluator: string;
+    score: number;
+    reasoning: string;
+    concerns?: string[];
+    mitigations?: string[];
+  }>;
+}) {
+  outputBlank();
+  outputSection("Decision Engine Result");
+  output(chalk.dim("  " + "─".repeat(60)));
+  output(`  ${chalk.bold("ID:")}\t\t${decision.id}`);
+  output(`  ${chalk.bold("Action:")}\t${decision.request.action}`);
+  output(`  ${chalk.bold("Category:")}\t${decision.request.category}`);
+  outputBlank();
+  outputSection("Evaluator Scores:");
+  for (const score of decision.scores) {
+    const bar =
+      chalk.cyan("█".repeat(Math.round(score.score / 10))) +
+      chalk.dim("░".repeat(10 - Math.round(score.score / 10)));
+    output(
+      `    ${score.evaluator.padEnd(14)} ${bar} ${score.score}/100 — ${score.reasoning}`,
+    );
+    if (score.concerns) {
+      for (const c of score.concerns) {
+        output(chalk.red(`      ⚠ ${c}`));
+      }
+    }
+    if (score.mitigations) {
+      for (const m of score.mitigations) {
+        output(chalk.cyan(`      → ${m}`));
+      }
+    }
+  }
+  outputBlank();
+  outputSection("Result:");
+  output(`  Composite Score:  ${chalk.bold(String(decision.compositeScore))}/100`);
+  output(`  Recommendation:   ${RECO_COLORS[decision.recommendation](decision.recommendation.toUpperCase())}`);
+  output(`  Confidence:       ${decision.confidence}%`);
+  outputBlank();
+}
+
+function registerEvaluateCommand(cmd: Command) {
   cmd
     .argument("[action]", "Action to evaluate")
     .option("--category <cat>", "Action category (security, quality, architecture, etc.)", "general")
@@ -65,72 +126,25 @@ export function decideCommand(): Command {
     .option("--json", "Output as JSON")
     .action(async (action: string | undefined, opts: Record<string, unknown>) => {
       if (!action) {
-        // Show help if no action provided
         cmd.help();
         return;
       }
-
       const isJson = opts.json === true;
       const ctx = guardNotInitialized(opts, isJson);
       if (!ctx) return;
-
       void printDaemonBanner(ctx.shitennoDir, isJson);
-
       const engine = getEngine(ctx.projectRoot);
-
-      const request = {
-        id: `REQ-${Date.now().toString(36).toUpperCase()}`,
-        action,
-        category: opts.category as string,
-        targetGoalId: opts.goal as string,
-        context: {
-          riskLevel: opts.risk as RiskLevel,
-          impact: opts.impact as string,
-          introducesDebt: opts.introducesDebt === true,
-          debtSeverity: opts.debtSeverity as string,
-        },
-        timestamp: new Date().toISOString(),
-      };
-
+      const request = buildDecisionRequest(action, opts);
       const decision = await engine.decide(request);
-
       if (isJson) {
-        outputJson(decision as unknown as Record<string, unknown>);
+        outputDecisionJson(decision);
         return;
       }
-
-      outputBlank();
-      outputSection("Decision Engine Result");
-      output(chalk.dim("  " + "─".repeat(60)));
-      output(`  ${chalk.bold("ID:")}\t\t${decision.id}`);
-      output(`  ${chalk.bold("Action:")}\t${decision.request.action}`);
-      output(`  ${chalk.bold("Category:")}\t${decision.request.category}`);
-      outputBlank();
-      outputSection("Evaluator Scores:");
-      for (const score of decision.scores) {
-        const bar = chalk.cyan("█".repeat(Math.round(score.score / 10))) +
-          chalk.dim("░".repeat(10 - Math.round(score.score / 10)));
-        output(`    ${score.evaluator.padEnd(14)} ${bar} ${score.score}/100 — ${score.reasoning}`);
-        if (score.concerns) {
-          for (const c of score.concerns) {
-            output(chalk.red(`      ⚠ ${c}`));
-          }
-        }
-        if (score.mitigations) {
-          for (const m of score.mitigations) {
-            output(chalk.cyan(`      → ${m}`));
-          }
-        }
-      }
-      outputBlank();
-      outputSection("Result:");
-      output(`  Composite Score:  ${chalk.bold(String(decision.compositeScore))}/100`);
-      output(`  Recommendation:   ${RECO_COLORS[decision.recommendation](decision.recommendation.toUpperCase())}`);
-      output(`  Confidence:       ${decision.confidence}%`);
-      outputBlank();
+      outputDecisionPretty(decision);
     });
+}
 
-  // ── list ────────────────────────────────────────────────────────────────
+function registerListCommand(cmd: Command) {
   cmd
     .command("list")
     .description("List past decisions")
@@ -142,21 +156,17 @@ export function decideCommand(): Command {
       const isJson = opts.json === true;
       const ctx = guardNotInitialized(opts, isJson);
       if (!ctx) return;
-
       void printDaemonBanner(ctx.shitennoDir, isJson);
-
       const engine = getEngine(ctx.projectRoot);
       const decisions = engine.list({
         category: opts.category as string,
         recommendation: opts.recommendation as DecisionRecommendation,
         since: opts.since as string,
       });
-
       if (isJson) {
         outputJson(decisions as unknown as Record<string, unknown>);
         return;
       }
-
       outputBlank();
       if (decisions.length === 0) {
         output(chalk.dim("  No decisions recorded."));
@@ -169,8 +179,9 @@ export function decideCommand(): Command {
       }
       outputBlank();
     });
+}
 
-  // ── show ────────────────────────────────────────────────────────────────
+function registerShowCommand(cmd: Command) {
   cmd
     .command("show")
     .description("Show decision details")
@@ -180,12 +191,9 @@ export function decideCommand(): Command {
       const isJson = opts.json === true;
       const ctx = guardNotInitialized(opts, isJson);
       if (!ctx) return;
-
       void printDaemonBanner(ctx.shitennoDir, isJson);
-
       const engine = getEngine(ctx.projectRoot);
       const decision = engine.get(id);
-
       if (!decision) {
         if (isJson) {
           outputJson({ error: "Decision not found" });
@@ -194,12 +202,10 @@ export function decideCommand(): Command {
         }
         return;
       }
-
       if (isJson) {
         outputJson(decision as unknown as Record<string, unknown>);
         return;
       }
-
       outputBlank();
       output(chalk.bold(`  ${decision.id}`));
       output(`  Action:     ${decision.request.action}`);
@@ -216,8 +222,9 @@ export function decideCommand(): Command {
       output(`  Confidence: ${decision.confidence}%`);
       outputBlank();
     });
+}
 
-  // ── stats ───────────────────────────────────────────────────────────────
+function registerStatsCommand(cmd: Command) {
   cmd
     .command("stats")
     .description("Show decision statistics")
@@ -226,34 +233,27 @@ export function decideCommand(): Command {
       const isJson = opts.json === true;
       const ctx = guardNotInitialized(opts, isJson);
       if (!ctx) return;
-
       void printDaemonBanner(ctx.shitennoDir, isJson);
-
       const engine = getEngine(ctx.projectRoot);
       const all = engine.list();
-
       const byReco: Record<string, number> = {};
       let totalScore = 0;
       let totalConf = 0;
-
       for (const d of all) {
         byReco[d.recommendation] = (byReco[d.recommendation] ?? 0) + 1;
         totalScore += d.compositeScore;
         totalConf += d.confidence;
       }
-
       const stats = {
         total: all.length,
         byRecommendation: byReco,
         avgCompositeScore: all.length > 0 ? Math.round(totalScore / all.length) : 0,
         avgConfidence: all.length > 0 ? Math.round(totalConf / all.length) : 0,
       };
-
       if (isJson) {
         outputJson(stats as unknown as Record<string, unknown>);
         return;
       }
-
       outputBlank();
       outputSection("Decision Statistics");
       output(chalk.dim("  " + "─".repeat(40)));
@@ -266,6 +266,15 @@ export function decideCommand(): Command {
       }
       outputBlank();
     });
+}
 
+export function decideCommand(): Command {
+  const cmd = new Command("decide")
+    .description("Evaluate proposed actions using specialized evaluators")
+    .option("-d, --dir <path>", "Project directory");
+  registerEvaluateCommand(cmd);
+  registerListCommand(cmd);
+  registerShowCommand(cmd);
+  registerStatsCommand(cmd);
   return cmd;
 }

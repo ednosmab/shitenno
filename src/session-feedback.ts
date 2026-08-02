@@ -196,84 +196,85 @@ export function getLatestFeedback(shitennoDir: string): SessionFeedbackRecord | 
 export function computeFeedbackSummary(
   records: SessionFeedbackRecord[]
 ): SessionFeedbackSummary {
-  const byOutcome: Record<SessionOutcome, number> = {
-    success: 0,
-    failure: 0,
-    partial: 0,
-    "session-start": 0,
-    "session-end": 0,
+  const aggregated = aggregateRecords(records);
+  return buildSummary(records.length, aggregated);
+}
+
+interface AggregatedData {
+  byOutcome: Record<SessionOutcome, number>;
+  totalDuration: number;
+  successDurationCount: number;
+  failureAreas: Record<string, number>;
+  totalUserRating: number;
+  ratedSessions: number;
+  totalTokensSaved: number;
+  cacheHits: number;
+  tokenSessions: number;
+}
+
+function aggregateRecords(records: SessionFeedbackRecord[]): AggregatedData {
+  const data: AggregatedData = {
+    byOutcome: { success: 0, failure: 0, partial: 0, "session-start": 0, "session-end": 0 },
+    totalDuration: 0,
+    successDurationCount: 0,
+    failureAreas: {},
+    totalUserRating: 0,
+    ratedSessions: 0,
+    totalTokensSaved: 0,
+    cacheHits: 0,
+    tokenSessions: 0,
   };
 
-  let totalDuration = 0;
-  let successDurationCount = 0;
-  const failureAreas: Record<string, number> = {};
-  let totalUserRating = 0;
-  let ratedSessions = 0;
-
-  // Token economy aggregation
-  let totalTokensSaved = 0;
-  let cacheHits = 0;
-  let tokenSessions = 0;
-
   for (const record of records) {
-    byOutcome[record.outcome]++;
-
+    data.byOutcome[record.outcome]++;
     if (record.outcome === "success" && record.durationMinutes) {
-      totalDuration += record.durationMinutes;
-      successDurationCount++;
+      data.totalDuration += record.durationMinutes;
+      data.successDurationCount++;
     }
-
     if (record.outcome === "failure" && record.modifiedAreas) {
       for (const area of record.modifiedAreas) {
-        failureAreas[area] = (failureAreas[area] || 0) + 1;
+        data.failureAreas[area] = (data.failureAreas[area] || 0) + 1;
       }
     }
-
     if (record.tokenEconomy) {
-      totalTokensSaved += record.tokenEconomy.tokensSaved;
-      if (record.tokenEconomy.cacheHit) cacheHits++;
-      tokenSessions++;
+      data.totalTokensSaved += record.tokenEconomy.tokensSaved;
+      if (record.tokenEconomy.cacheHit) data.cacheHits++;
+      data.tokenSessions++;
     }
-
     if (record.userRating) {
-      totalUserRating += record.userRating;
-      ratedSessions++;
+      data.totalUserRating += record.userRating;
+      data.ratedSessions++;
     }
   }
 
-  const totalSessions = records.length;
-  const successRate = totalSessions > 0 ? byOutcome.success / totalSessions : 0;
-  const avgSuccessDuration = successDurationCount > 0
-    ? Math.round(totalDuration / successDurationCount)
-    : null;
+  return data;
+}
 
-  const failureHotspots = Object.entries(failureAreas)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5)
-    .map(([area]) => area);
-
-  const avgUserRating = ratedSessions > 0
-    ? Math.round((totalUserRating / ratedSessions) * 10) / 10
-    : null;
-
-  const avgTokensSaved = tokenSessions > 0 ? Math.round(totalTokensSaved / tokenSessions) : 0;
-  const cacheHitRate = tokenSessions > 0 ? cacheHits / tokenSessions : 0;
-  const monthlyProjection = avgTokensSaved * 10; // 10 sessions/month
+function buildSummary(totalSessions: number, agg: AggregatedData): SessionFeedbackSummary {
+  const successRate = totalSessions > 0 ? agg.byOutcome.success / totalSessions : 0;
+  const avgSuccessDuration = agg.successDurationCount > 0
+    ? Math.round(agg.totalDuration / agg.successDurationCount) : null;
+  const failureHotspots = Object.entries(agg.failureAreas)
+    .sort(([, a], [, b]) => b - a).slice(0, 5).map(([area]) => area);
+  const avgUserRating = agg.ratedSessions > 0
+    ? Math.round((agg.totalUserRating / agg.ratedSessions) * 10) / 10 : null;
+  const avgTokensSaved = agg.tokenSessions > 0 ? Math.round(agg.totalTokensSaved / agg.tokenSessions) : 0;
+  const cacheHitRate = agg.tokenSessions > 0 ? agg.cacheHits / agg.tokenSessions : 0;
 
   return {
     totalSessions,
-    byOutcome,
+    byOutcome: agg.byOutcome,
     successRate,
     avgSuccessDuration,
     failureHotspots,
     avgUserRating,
-    ratedSessions,
+    ratedSessions: agg.ratedSessions,
     tokenEconomy: {
-      totalTokensSaved,
+      totalTokensSaved: agg.totalTokensSaved,
       avgTokensSaved,
-      cacheHits,
+      cacheHits: agg.cacheHits,
       cacheHitRate,
-      monthlyProjection,
+      monthlyProjection: avgTokensSaved * 10,
     },
   };
 }

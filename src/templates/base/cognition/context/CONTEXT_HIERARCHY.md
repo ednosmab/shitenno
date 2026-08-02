@@ -41,9 +41,12 @@
 | Arquivo | Propósito | Quando Ler |
 |---|---|---|
 | `shitenno/docs/layers/[camada]/execution_plan.md` | Plano técnico da camada | Por tarefa |
-| `shitenno/docs/skills/[skill].md` | Skill operacional | Por tarefa |
+| MCP `getSkills` (com task metadata) | Skills obrigatórias e contextuais resolvidas pelo manifest | Por tarefa |
+| `shitenno/docs/skills/[skill].md` | Skill operacional (lookup directo) | Por tarefa |
 
-**Regra:** P2 é carregado **apenas quando** se trabalha numa camada específica.
+**Regra:** P2 é carregado **apenas quando** se trabalha numa camada específica. As skills são resolvidas via MCP `getSkills` passando `task`/`language`/`framework`/`layer` — mandatory skills são retornadas em texto integral, contextual skills como ponteiros.
+
+> **Nota:** Mandatory skills também chegam pré-anexadas ao output de `getBriefing` quando o parâmetro `task` é fornecido, criando dois caminhos independentes para as mesmas skills obrigatórias.
 
 ---
 

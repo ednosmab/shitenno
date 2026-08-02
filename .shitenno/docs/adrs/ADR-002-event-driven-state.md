@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-002: Event-Driven Architecture with Centralized Engineering State
 
 **Status:** Accepted

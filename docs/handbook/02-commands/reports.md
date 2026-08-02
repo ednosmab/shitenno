@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Reports & Dashboards
 
 Comandos para visualizar relatórios, dashboards e resumos.

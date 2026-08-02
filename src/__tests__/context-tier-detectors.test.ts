@@ -10,8 +10,7 @@
  * so even 1 event today = 1 load, which is below the threshold of 3.
  * We add enough events to exceed the threshold.
  *
- * For detectTierMismatches: each event produces one issue, so the count
- * matches the number of events pushed (not multiplied by days).
+
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
@@ -36,7 +35,7 @@ vi.mock("../logger.js", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
-import { detectMisclassifiedTier, detectTierMismatches } from "../audit/context-tier-detectors.js";
+import { detectMisclassifiedTier } from "../audit/context-tier-detectors.js";
 
 const makeEvent = (type: string, payload: Record<string, unknown>): MockEvent => ({
   type,
@@ -102,39 +101,4 @@ describe("detectMisclassifiedTier", () => {
   });
 });
 
-describe("detectTierMismatches", () => {
-  it("returns empty array when no events exist", () => {
-    expect(detectTierMismatches(tempDir)).toEqual([]);
-  });
 
-  it("returns empty array when no tier_mismatch events exist", () => {
-    mockEvents.push(makeEvent("context.p4_loaded", { docPath: "test.md" }));
-    expect(detectTierMismatches(tempDir)).toEqual([]);
-  });
-
-  it("flags documents with tier mismatches", () => {
-    // 1 event → 1 issue (no day multiplication since mock returns events only for today)
-    mockEvents.push(makeEvent("context.tier_mismatch", {
-      docPath: "WORKFLOW.md",
-      declaredTier: "P4",
-      actualTier: "P2",
-    }));
-    const issues = detectTierMismatches(tempDir);
-    expect(issues.length).toBe(1);
-    expect(issues[0]!.type).toBe("tier_promotion_candidate");
-    expect(issues[0]!.description).toContain("WORKFLOW.md");
-  });
-
-  it("handles events with missing fields", () => {
-    mockEvents.push(makeEvent("context.tier_mismatch", { docPath: "test.md" }));
-    expect(detectTierMismatches(tempDir)).toEqual([]);
-  });
-
-  it("detects multiple mismatches", () => {
-    // 2 events → 2 issues (no day multiplication since mock returns events only for today)
-    mockEvents.push(makeEvent("context.tier_mismatch", { docPath: "doc-a.md", declaredTier: "P4", actualTier: "P2" }));
-    mockEvents.push(makeEvent("context.tier_mismatch", { docPath: "doc-b.md", declaredTier: "P3", actualTier: "P1" }));
-    const issues = detectTierMismatches(tempDir);
-    expect(issues.length).toBe(2);
-  });
-});

@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Publish-Readiness Checklist
 
 > **Data:** 2026-07-05

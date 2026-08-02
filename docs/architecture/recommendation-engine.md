@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 20 — RECOMMENDATION ENGINE
 
 > Auto-evolution formal specification.

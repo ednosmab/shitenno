@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # ADR-008: Precedência Humana sobre Execução Autônoma (CLI vs Daemon)
 
 **Status:** Proposed

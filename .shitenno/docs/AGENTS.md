@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # 🛠️ AGENTS.md - REGRAS DO TIME DE ENGENHARIA DE IA
 
 ## 📐 ARQUITETURA E PADRÕES DO REPOSITÓRIO (OBRIGATÓRIO)
@@ -16,6 +21,8 @@
 
 Escreva códigos extremamente declarativos, simples e fáceis de ler. Evite otimizações prematuras ou sintaxes excessivamente complexas. Prefira legibilidade à concisão. Código deve ser autoexplicativo para um desenvolvedor pleno — se precisar de um comentário para explicar o fluxo, o código provavelmente está complexo demais.
 
+> Padrões completos (SOLID, TDD, limites, segurança): `docs/engineering-standards.md`
+
 ---
 
 ## 🪜 Loading Profiles (Otimização de Tokens)
@@ -28,6 +35,8 @@ Escreva códigos extremamente declarativos, simples e fáceis de ler. Evite otim
 
 **Override:** o campo `loading_profile` em `opencode.json` força o perfil independentemente do default.
 
+**Lazy Loading:** Estado da sessão é obtido via `shitenno_getBriefing`/`shitenno_getMandatoryContext` (MCP) — nunca por leitura directa de `context_buffer.yaml`. O `session-bootstrapper.ts` foi removido; o MCP é a fonte única de estado dinâmico.
+
 **Regras detalhadas:** Ver `docs/rules/` para regras movidas (dependency-graph, agent-modes, feedback-protocol, branch-policy, lazy-loading, context-algorithm).
 
 ---
@@ -38,13 +47,15 @@ Escreva códigos extremamente declarativos, simples e fáceis de ler. Evite otim
 2. **COMMITS CURTOS EM INGLÊS:** Quando um commit for autorizado, a mensagem de commit gerada ou sugerida DEVE ser escrita em inglês. Ela deve ser altamente concisa, resumida e seguir rigorosamente a especificação do Conventional Commits (ex: `feat: add text block schema`, `chore: update database rules`).
 3. **BOOTSTRAP E SETUP PROATIVO:** Ao receber guias de início rápido (Quick Starts) ou iniciar a fase estrutural (Semanas 1-8), o agente DEVE sempre validar e instalar dependências (pnpm), limpar cache se necessário, testar a instalação e criar fisicamente a estrutura de pastas base do monorepo (scaffolding) seguindo a estrutura de pastas definida no `governance/SYSTEM_MAP.md` antes de começar a codificar.
 4. **REFINAMENTO CONTÍNUO (LEAN FLOW):** Ao identificar código repetido, desorganizado, mal nomeado ou que viola as regras de arquitetura (DRY, KISS, SOLID), você TEM A OBRIGAÇÃO de executar refatoração imediatamente. Documente o processo e as melhorias realizadas no `governance/context/context_buffer.yaml` na seção `technical_debt`.
-5. **TDD ESTRITO — TEST-FIRST (RED-GREEN-REFACTOR):** Você DEVE seguir o ciclo TDD estrito. Primeiro escreva o teste (RED), depois a implementação mínima (GREEN), depois refatore (REFACTOR). Só após GREEN você pode enviar o código. Consulte `docs/skills/tdd_workflow.md` para o protocolo completo.
-6. **VALIDAÇÃO DE SEGURANÇA (SECURITY BY DEFAULT):** Antes de implementar qualquer funcionalidade que envolva dados do usuário, você DEVE verificar o `docs/skills/security_xss_prevention.md`.
-7. **POSTURA DE ENGENHARIA SÊNIOR (SKILL OBRIGATÓRIO):** Em TODA sessão que envolva escrita ou modificação de código, a skill `docs/skills/senior-engineer.md` DEVE estar activa.
-8. **TDD ESTRITO — TEST-FIRST (SKILL OBRIGATÓRIO):** Em TODA sessão que envolva escrita de testes ou implementação de funcionalidades com cobertura, a skill `docs/skills/tdd-agent.md` DEVE estar activa.
+5. **TDD ESTRITO — TEST-FIRST (RED-GREEN-REFACTOR):** Você DEVE seguir o ciclo TDD estrito. Primeiro escreva o teste (RED), depois a implementação mínima (GREEN), depois refatore (REFACTOR). Só após GREEN você pode enviar o código. Consulte `docs/engineering-standards.md` §3 para o protocolo completo.
+6. **VALIDAÇÃO DE SEGURANÇA (SECURITY BY DEFAULT):** Antes de implementar qualquer funcionalidade que envolva dados do usuário, você DEVE consultar `docs/engineering-standards.md` §5.
+7. **POSTURA DE ENGENHARIA SÊNIOR (SKILL OBRIGATÓRIO):** Em TODA sessão que envolva escrita ou modificação de código, a skill `senior-engineer` DEVE estar activa. **Carregar via `shitenno_getSkills(name="senior-engineer")`** — NUNCA usar o tool `skill` do opencode.
+8. **TDD ESTRITO — TEST-FIRST (SKILL OBRIGATÓRIO):** Em TODA sessão que envolva escrita de testes ou implementação de funcionalidades com cobertura, a skill `tdd-agent` DEVE estar activa. **Carregar via `shitenno_getSkills(name="tdd-agent")`** — NUNCA usar o tool `skill` do opencode.
 9. **TESTE DE INTEGRIDADE POST-COMMIT (POST-MORTEM):** Após realizar qualquer commit, você DEVE executar imediatamente: (a) `pnpm run lint`, (b) `pnpm ls <dependencias-core>`, (c) `pnpm run test`. Se qualquer um falhar, corrigir e repetir até todos passarem.
 10. **CHECKLIST DE AMBIENTE PRÉ-DEPLOY:** Antes de commitar qualquer alteração em configs de deploy, secrets ou env vars, valide que nenhuma flag de teste foi propagada para ficheiros de configuração de produção.
-11. **PRIORIDADE DE ENTRADA DE SESSÃO:** Ao iniciar qualquer nova sessão, a PRIMEIRA tarefa a ser atacada é o item P0 activo no `docs/BACKLOG.md`. Itens P1/P2 só podem ser iniciados após (a) concluir o P0, ou (b) registar adiamento datado.
+11. **PRIORIDADE DE ENTRADA DE SESSÃO:** Ao iniciar qualquer nova sessão, a PRIMEIRA tarefa a ser atacada é o item P0 activo no `docs/backlog/ACTIVE.md`. Itens P1/P2 só podem ser iniciados após (a) concluir o P0, ou (b) registar adiamento datado.
+12. **MCP TOOLS — PATH DO `.shitenno`:** O directório `.shitenno` é **oculto**. Para aceder a ficheiros em `.shitenno/` (planos, governance, rules, skills), use **SEMPRE** o MCP `shitenno` (`getPlans`, `getRules`, `getSkills`, `getBacklog`, etc.) — NUNCA o `local-filesystem` (que já foi removido). Se precisar de ler um ficheiro `.shitenno/` específico, use o tool `read` com path explícito (ex: `.shitenno/governance/plans/PLAN-YYYY-MM-DD-<slug>.md`). **VIOLAÇÃO = sessão inválida.**
+13. **SKILLS — CARREGAMENTO VIA MCP (OBRIGATÓRIO):** As skills do projecto estão em `.shitenno/docs/skills/` e são acedidas **EXCLUSIVAMENTE** via MCP shitenno. Para carregar uma skill, use `shitenno_getSkills(name="<nome>")` ou `shitenno_getSkills(task="<tipo>")` para resolver skills obrigatórias por contexto. O tool `skill` do opencode **NÃO** reconhece estas skills — usá-lo resulta em erro. **VIOLAÇÃO = sessão inválida.**
 
 ---
 

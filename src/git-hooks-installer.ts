@@ -35,6 +35,7 @@ export function installReactiveHooks(
   for (const hookName of ["post-commit", "post-merge"] as const) {
     const hookPath = join(targetDir, hookName);
     const shitennoLine = `${shugoBinPath} detect --auto 2>/dev/null &`;
+    const largeCommitLine = `${shugoBinPath} internal large-commit-check 2>/dev/null &`;
 
     if (existsSync(hookPath)) {
       const existing = readFileSync(hookPath, "utf-8");
@@ -42,9 +43,9 @@ export function installReactiveHooks(
         skipped.push(`${hookName} (já instalado)`);
         continue;
       }
-      writeFileSync(hookPath, `${existing}\n${HOOK_MARKER}\n${shitennoLine}\n`);
+      writeFileSync(hookPath, `${existing}\n${HOOK_MARKER}\n${shitennoLine}\n${largeCommitLine}\n`);
     } else {
-      writeFileSync(hookPath, `#!/bin/sh\n${HOOK_MARKER}\n${shitennoLine}\n`);
+      writeFileSync(hookPath, `#!/bin/sh\n${HOOK_MARKER}\n${shitennoLine}\n${largeCommitLine}\n`);
     }
     chmodSync(hookPath, 0o755);
     installed.push(hookName);

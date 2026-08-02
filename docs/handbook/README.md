@@ -22,7 +22,7 @@ Comece aqui se você é novo no Shugo.
 
 | Arquivo | Conteúdo |
 |---|---|
-| [O que é Shugo](01-fundamentals/what-is-shitenno.md) | Definição, problema que resolve, para quem serve |
+| [What Is Shugo](01-fundamentals/what-is-shugo.md) | Definition, problem it solves, who it's for |
 | [Instalação](01-fundamentals/installation.md) | Pré-requisitos, métodos de instalação, verificação |
 | [Primeiros Passos](01-fundamentals/quick-start.md) | Init, status, detect, briefing, feedback |
 | [Conceitos](01-fundamentals/concepts.md) | Maturity, capabilities, governance, knowledge debt |

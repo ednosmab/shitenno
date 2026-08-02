@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # 📋 REGISTRY.md — Rule → Capability Mapping
 
 > Auto-generated registry for dynamic rule loading.

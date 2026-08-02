@@ -1,3 +1,8 @@
+---
+category: implementation
+lifecycle: Active
+---
+
 # 22 — README REFACTOR
 
 > Plan to rewrite the README with the new architecture.

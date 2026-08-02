@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Draft
+---
+
 ## Done
 
 | Item | Severidade | Resolucao |

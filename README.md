@@ -1,10 +1,26 @@
 # Shitenno
 
-> A CLI tool for preserving engineering context across AI-assisted work sessions — scoring, pattern detection, health auditing.
+> Engineering knowledge governance — the context bridge between you, your team, and the AI agents that work on your project.
 
-Shugo analyzes your project's complexity, detects patterns in engineering history, and audits governance health, so you (and the AI agents you work with) don't lose context between sessions. It adapts suggestions to a declared experience level (Junior / Pleno / Senior).
+## What it is
 
-**Status:** built and validated for solo use. Team usage (2+ people on the same project) has not been tested with real users yet — see [Known Limitations](docs/KNOWN_LIMITATIONS.md) before relying on it in a shared repository.
+**Shitenno** is an engineering knowledge governance system. It observes your project, maintains a persistent and verifiable model of what is already known about it — decisions, risks, test coverage, patterns, knowledge gaps — and serves that state as trustworthy context to both humans and AI agents working in the repository. Every intervention produces an outcome, and that outcome feeds back into future recommendations.
+
+It exists to solve a specific problem: work sessions (human or AI) that start from zero, with no memory of what was already decided, tested, or broken before. Shitenno calls this **Knowledge Debt** — knowledge that exists but is disconnected, unverified, or never reaches whoever (or whatever) needs it at the moment of acting.
+
+**The three components:**
+
+| Component | What it is |
+|---|---|
+| **Shugo** | The binary/CLI — single entry point (`shugo init`, `audit`, `briefing`, `plan`, `daemon`, `mcp`, among ~39 commands) |
+| **`.shitenno/`** | Artifact generated per project when running `shugo init` — where state, cache, history, and that repository's daemon live |
+| **Daemon** | Background process, one per project, started by the CLI (automatically or via `shugo daemon start`). Once started it runs isolated — watches files, listens to the event bus, triggers checks — but the CLI never depends on it: there's always a disk-based fallback path |
+
+**The AI bridge:** the MCP server (`shugo mcp`) exposes the project's state as tools an LLM agent can query before and during work — `getBriefing`, `getRiskMap`, `getRules`, `getEngineeringState`, `getBacklog`, `getADRs`, `getSkills` — and receives the outcome back via `submitFeedback`, closing the loop between recommendation and reality.
+
+**What it is not:** not a linter/formatter (it recommends, it doesn't apply code changes on its own); not a framework you import into your application code; not an AI wrapper (it doesn't call any LLM — it's the context layer an external LLM queries); not hosted or multi-tenant — every instance is local and isolated per project.
+
+**Status:** built and validated for solo use. Team usage (2+ people on the same project) has not been tested with real users yet — see [Known Limitations](docs/KNOWN_LIMITATIONS.md) before relying on it in a shared repository. Part of the architecture described above (advanced autonomy phases, third-party extensibility) is design direction documented in [`docs/evolution/`](docs/evolution/), not current state.
 
 ---
 
@@ -80,7 +96,7 @@ That's it. Your project now has governed context for you and your AI agents.
 
 ---
 
-## All Commands (38)
+## All Commands (41)
 
 ### Core Commands
 
@@ -101,6 +117,9 @@ That's it. Your project now has governed context for you and your AI agents.
 | `shugo evolve` | Adaptive recommendations | Get next-step suggestions |
 | `shugo assess` | Re-evaluate maturity profile | After major changes |
 | `shugo doctor` | System diagnostics | When something feels off |
+| `shugo pipeline` | Run phase-based validation pipeline | Validate specific phases or full pipeline |
+| `shugo scheduled-check` | Check uncommitted drift | Detect stale uncommitted changes |
+| `shugo large-commit-check` | Check recent commit size | Trigger audit for large commits (internal) |
 
 ### Governance Commands
 
@@ -121,6 +140,8 @@ That's it. Your project now has governed context for you and your AI agents.
 | `shugo digest` | Generate digest summaries | Quick status overviews |
 | `shugo feedback` | Submit session feedback | Record session outcomes |
 | `shugo history` | View engineering state history | Review past snapshots |
+| `shugo handbook` | Reference handbook for Shugo | Quick reference lookup |
+| `shugo backlog` | Manage backlog items with states and priorities | Track work items and tasks |
 
 ### Utility Commands
 
@@ -135,9 +156,12 @@ That's it. Your project now has governed context for you and your AI agents.
 | `shugo profile` | View maturity profile | Detailed maturity analysis |
 | `shugo reminders` | Track pending tasks and follow-ups | Never forget action items |
 | `shugo mcp` | MCP server for AI integration | Connect AI agents |
+| `shugo skill` | Manage AI agent skills | Configure agent capabilities |
 | `shugo update` | Update Shugo system | Keep governance current |
 | `shugo shell-init` | Shell integration setup | Configure shell completions |
 | `shugo docs-audit` | Audit documentation sync | Validate docs match code |
+| `shugo events` | Show rule engine execution trace | Debug rule engine behaviour |
+| `shugo hooks` | Manage Git hooks for auto-detection | Setup post-commit/merge hooks |
 
 ---
 
@@ -192,7 +216,7 @@ shitenno-cli/
 │   │   ├── init.ts
 │   │   ├── status.ts
 │   │   ├── audit.ts
-│   │   ├── ... (32 commands)
+ │   │   ├── ... (33 commands)
 │   │   └── mcp.ts
 │   ├── audit/                # Audit detectors
 │   │   ├── engineering-detectors.ts
@@ -211,9 +235,9 @@ shitenno-cli/
 
 | Metric | Count |
 |--------|-------|
-| CLI Commands | 40 |
+| CLI Commands | 41 |
 | Source Files | 269 |
-| Test Files | 130 |
+| Test Files | 176 |
 | Audit Detectors | 100+ |
 | Engine Modules | 12 |
 
@@ -328,6 +352,13 @@ npm run bench         # Run benchmarks
 - **Test job** — Build + test across Node 18/20/22
 - **Coverage job** — Code coverage report
 - **Release job** — Version verification + npm publish + GitHub release
+
+---
+
+## Documentation
+
+- [Known Limitations](docs/KNOWN_LIMITATIONS.md) — Known issues and workarounds
+- [ROI Analysis](docs/ROI.md) — Return on investment analysis and metrics
 
 ---
 

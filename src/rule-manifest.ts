@@ -3,25 +3,22 @@
  *
  * PRINCIPLE: Explicit field matching, no inference.
  * Same input -> same rule set, always (deterministic).
+ *
+ * This module is a thin wrapper around manifest-resolver.ts with
+ * unconditionalMandatory: true (mandatory rules always apply, ignoring `when`).
  */
 
 import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
+import {
+  resolveEntries,
+  partitionEntries,
+  type ManifestEntry,
+  type TaskMetadata,
+} from "./manifest-resolver.js";
 
-export interface RuleManifestEntry {
-  id: string;
-  path: string;
-  mandatory?: boolean;
-  priority: number;
-  when?: Record<string, string>;
-}
-
-export interface TaskMetadata {
-  task?: string;
-  language?: string;
-  framework?: string;
-  [key: string]: string | undefined;
-}
+export type { TaskMetadata };
+export type RuleManifestEntry = ManifestEntry;
 
 export function loadManifest(manifestPath: string): RuleManifestEntry[] {
   const raw = readFileSync(manifestPath, "utf-8");
@@ -37,15 +34,7 @@ export function resolveRules(
   manifest: RuleManifestEntry[],
   taskMeta: TaskMetadata
 ): RuleManifestEntry[] {
-  const selected = manifest.filter((rule) => {
-    if (rule.mandatory) return true;
-    if (!rule.when) return false;
-    return Object.entries(rule.when).every(
-      ([key, value]) => taskMeta[key] === value
-    );
-  });
-
-  return selected.sort((a, b) => a.priority - b.priority);
+  return resolveEntries(manifest, taskMeta, { unconditionalMandatory: true });
 }
 
 /**
@@ -56,9 +45,5 @@ export function partitionRules(
   manifest: RuleManifestEntry[],
   taskMeta: TaskMetadata
 ): { mandatory: RuleManifestEntry[]; contextual: RuleManifestEntry[] } {
-  const resolved = resolveRules(manifest, taskMeta);
-  return {
-    mandatory: resolved.filter((r) => r.mandatory),
-    contextual: resolved.filter((r) => !r.mandatory),
-  };
+  return partitionEntries(manifest, taskMeta, { unconditionalMandatory: true });
 }

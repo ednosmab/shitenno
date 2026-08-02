@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 17 — FEEDBACK LOOPS
 
 > Recommendations → acceptance → learning.

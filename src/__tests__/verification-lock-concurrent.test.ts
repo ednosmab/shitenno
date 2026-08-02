@@ -142,14 +142,19 @@ function sendToChild(child: ChildProcess, msg: Record<string, string>): void {
   child.stdin!.write(JSON.stringify(msg) + "\n");
 }
 
-function killChild(child: ChildProcess): Promise<void> {
+function killChild(child: ChildProcess, realPid?: number): Promise<void> {
   return new Promise((resolve) => {
-    if (!child.pid || child.killed) {
+    const pidToKill = realPid ?? child.pid;
+    if (!pidToKill || child.killed) {
       resolve();
       return;
     }
     child.on("exit", () => resolve());
-    child.kill("SIGKILL");
+    // tsx faz fork interno: child.pid é o wrapper, não o processo que
+    // de fato grava o lock. Matar pelo PID real reportado no "result".
+    try {
+      process.kill(pidToKill, "SIGKILL");
+    } catch { /* already dead */ }
     setTimeout(resolve, 1000);
   });
 }
@@ -255,7 +260,7 @@ describe("verification-lock: concurrent cross-process", () => {
     expect(lockContent.pid).toBe(childResult.pid);
 
     // Step 2: Kill the child with SIGKILL (simulates crash)
-    await killChild(holder.child);
+    await killChild(holder.child, childResult.pid);
     await new Promise((r) => setTimeout(r, 300));
 
     // Step 3: Parent tries to acquire — should reclaim the stale lock

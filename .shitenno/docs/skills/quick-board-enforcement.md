@@ -5,6 +5,8 @@ description: >
   do AGENTS.md (BLOQUEADOR DE SESSÃO). Sem esta skill ativa, nenhuma resposta operacional
   pode ser enviada ao utilizador. A skill garante que o Quick Board é exibido antes de
   QUALQUER mensagem, incluindo saudações triviais como "oi" ou "olá".
+category: engineering
+lifecycle: Active
 ---
 
 # 🚫 QUICK BOARD ENFORCEMENT — BLOQUEADOR DE SESSÃO
@@ -19,27 +21,14 @@ Ao receber QUALQUER mensagem do utilizador (incluindo "oi", "olá", "bom dia", e
 
 ### PASSO 1: Carregar Dados
 ```
-1. Ler governance/context/context_buffer.yaml
+1. Chamar a tool MCP: shitenno_getBriefing({"format":"markdown","depth":"minimal"})
+2. A resposta já contém a secção "## QUICK BOARD — Estado do Projecto" pronta,
+   formatada em Markdown. NÃO reformatar. NÃO ler context_buffer.yaml directamente.
 ```
 
 ### PASSO 2: Exibir Quick Board
-Formato OBRIGATÓRIO (copiar exactamente):
-```
-┌─────────────────────────────────────────────────────────────┐
-│ QUICK BOARD — <data actual>                                 │
-│ Tarefa: <tarefa em curso ou "Nenhuma">                      │
-│ Próximo P0: <próximo P0 ou "Definir">                       │
-│ Dívidas P1: <lista ou "Nenhuma">                            │
-│ Impedimentos: <lista ou "Nenhum">                           │
-│ Estado última sessão: <estado>                               │
-│ 📚 Handbook: <template detectado? "Sim — X campos pendentes" ou "Nenhum template"> │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Nota sobre Handbook:** Se existir `docs/handbook/*.template.md`, mostrar:
-- `Sim — X campos semânticos por preencher`
-- Se RULE-HB-001 está activa, adicionar: `Reminder: Revisar partes filosóficas`
-- Se não existir template: `Nenhum template detectado`
+Copiar a secção "## QUICK BOARD — Estado do Projecto" da resposta da tool
+`getBriefing` directamente na mensagem ao utilizador, sem alterações.
 
 ### PASSO 3: Validar Exibição
 APÓS exibir o Quick Board, confirmar internamente:
@@ -48,10 +37,7 @@ APÓS exibir o Quick Board, confirmar internamente:
 - [ ] A data está correcta
 
 ### PASSO 3.5: Verificar Reminders Activos
-Se `governance/context/context_buffer.yaml` contém `reminders` não vazios:
-1. Listar cada reminder com: prioridade, categoria, mensagem resumida
-2. Perguntar ao utilizador: "Existem X reminders activos. Quer resolver algum agora?"
-3. NÃO ignorar reminders de prioridade `high` — estes são obrigatórios de apresentar
+Se a resposta de `getBriefing` contém a secção `## Reminder`, listar cada reminder com prioridade e mensagem. Perguntar ao utilizador: "Existem X reminders activos. Quer resolver algum agora?"
 
 ### PASSO 4: Processar Mensagem
 SÓ APÓS validação do Passo 3 e Passo 3.5, processar a mensagem do utilizador.
@@ -63,7 +49,7 @@ SÓ APÓS validação do Passo 3 e Passo 3.5, processar a mensagem do utilizador
 | Utilizador diz "oi" | EXIBIR Quick Board PRIMEIRO, depois processar "oi" |
 | Utilizador pede tarefa | EXIBIR Quick Board PRIMEIRO, depois processar tarefa |
 | Sessão já tem contexto | EXIBIR Quick Board PRIMEIRO, depois continuar |
-| Quick Board não disponível | Ler `governance/context/context_buffer.yaml` directamente |
+| Quick Board não disponível | Reportar erro — `getBriefing` MCP indisponível |
 
 ## 🚨 Violação = Sessão Inválida
 
@@ -86,5 +72,4 @@ Antes de enviar qualquer resposta, o agente DEVE verificar:
 ## 🔗 Referências
 - `docs/AGENTS.md` — Regra #13 (BLOQUEADOR DE SESSÃO)
 - `docs/opencode-context.md` — Formato do Quick Board
-- `governance/context/context_buffer.yaml` — Fonte de dados
-- `governance/context/context_buffer.yaml` — fonte primária de contexto (Quick Board)
+- MCP tool `shitenno_getBriefing` — fonte única de dados do Quick Board

@@ -12,12 +12,15 @@ const __dirname = dirname(__filename);
 export const ROOT = resolve(__dirname, "..", "..", "..");
 export const SHUGO = resolve(ROOT, ".shitenno");
 export const DOCS = resolve(SHUGO, "docs");
+export const TEMPLATE_DOCS = resolve(ROOT, "src", "templates", "base", "docs");
+export const ROOT_DOCS = resolve(ROOT, "docs");
 export const SRC = resolve(ROOT, "src", "commands");
 export const SRC_TS = resolve(ROOT, "src");
 export const README = resolve(ROOT, "README.md");
 export const CHANGELOG = resolve(ROOT, "CHANGELOG.md");
 export const PACKAGE_JSON = resolve(ROOT, "package.json");
 export const SYSTEM_MAP = resolve(SHUGO, "governance", "SYSTEM_MAP.md");
+export const SYSTEM_MAP_TREE = resolve(SHUGO, "governance", "SYSTEM_MAP_TREE.md");
 
 export interface Discrepancy {
   type: string;
@@ -66,14 +69,19 @@ export function dryLog(ctx: ValidatorContext, message: string) {
   if (ctx.DRY_RUN) console.log(`  🔸 Would fix: ${message}`);
 }
 
+const RUNTIME_DIRS = new Set(["executions", "records", "telemetry", "daemon", "checkpoints"]);
+
 export function walkDir(dir: string, prefix = ""): string[] {
   const entries: string[] = [];
   if (!existsSync(dir)) return entries;
 
-  for (const item of readdirSync(dir, { withFileTypes: true })) {
+  const items = readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
+
+  for (const item of items) {
     if (item.name.startsWith(".") || item.name === "node_modules") continue;
     const relPath = prefix ? `${prefix}/${item.name}` : item.name;
     if (item.isDirectory()) {
+      if (RUNTIME_DIRS.has(item.name)) continue;
       entries.push(`${relPath}/`);
       entries.push(...walkDir(join(dir, item.name), relPath));
     } else {

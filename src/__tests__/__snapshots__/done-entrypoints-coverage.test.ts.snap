@@ -1,0 +1,22 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`cobertura das duas portas de entrada para done > snapshot dos conjuntos de gate — mudança exige atualizar o comentário cruzado 1`] = `
+[
+  "tests",
+  "lint",
+  "documentation",
+  "backlog",
+  "plan_status",
+]
+`;
+
+exports[`cobertura das duas portas de entrada para done > snapshot dos conjuntos de gate — mudança exige atualizar o comentário cruzado 2`] = `
+[
+  "FORMAT",
+  "BUILD",
+  "TESTS",
+  "LINT",
+  "GATE_SELF_TEST",
+  "DOCS",
+]
+`;

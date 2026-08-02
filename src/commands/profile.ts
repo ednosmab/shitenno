@@ -50,8 +50,10 @@ function displayProfile(profile: UserProfile): void {
   output(`     % No-code:     ${chalk.cyan(String(profile.codeFreePercent))}%`);
   output(`     Áreas foco:    ${chalk.cyan(profile.focusAreas.join(", ") || "nenhuma")}`);
   outputBlank();
+  displayCalibration(profile);
+}
 
-  // Calibration preview
+function displayCalibration(profile: UserProfile): void {
   const toneLabel = profile.tone === "mentor" ? "Mentor (suportivo, didático)"
     : profile.tone === "peer" ? "Peer (direto, entre pares)"
     : "Relatório (técnico, impessoal)";
@@ -64,7 +66,188 @@ function displayProfile(profile: UserProfile): void {
   outputBlank();
 }
 
+function outputProfile(isJson: boolean, profile: UserProfile): void {
+  if (isJson) {
+    outputJson({ type: "profile", ...profile });
+  } else {
+    displayProfile(profile);
+  }
+}
+
+function validateAndAssign(profile: UserProfile, { key, value, valid, errorKey, errorMsg, isJson }: { key: keyof UserProfile; value: string; valid: string[]; errorKey: string; errorMsg: string; isJson: boolean }): boolean {
+  if (!valid.includes(value)) {
+    if (isJson) {
+      outputJson({ error: errorKey, message: errorMsg });
+    } else {
+      outputError(`  ✘ ${errorMsg}`);
+    }
+    return false;
+  }
+  (profile as unknown as Record<string, unknown>)[key] = value;
+  return true;
+}
+
+async function runInteractiveSetup(profile: UserProfile): Promise<boolean> {
+  output("");
+  outputSection("shugo profile — Setup Interactivo");
+  outputBlank();
+  output(chalk.gray("  Pressiona Enter para manter o valor actual."));
+  outputBlank();
+
+  const readline = await import("node:readline");
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const ask = (question: string, current: string): Promise<string> => {
+    return new Promise((resolve) => {
+      rl.question(`  ${question} (${chalk.gray(current)}): `, (answer) => {
+        resolve(answer.trim() || current);
+      });
+    });
+  };
+
+  profile.name = await ask("Nome", profile.name);
+  profile.role = await ask("Cargo", profile.role);
+  profile.architecture = await ask("Arquitectura (junior/pleno/senior)", profile.architecture) as SkillLevel;
+  profile.coding = await ask("Código (junior/pleno/senior)", profile.coding) as SkillLevel;
+  profile.leadership = await ask("Leadership (junior/pleno/senior)", profile.leadership) as SkillLevel;
+  profile.tone = await ask("Tom (mentor/peer/relatorio)", profile.tone) as FeedbackTone;
+  profile.language = await ask("Idioma (pt/en)", profile.language) as "pt" | "en";
+  profile.codeFreePercent = parseInt(await ask("% No-code (0-100)", String(profile.codeFreePercent)), 10);
+  profile.focusAreas = (await ask("Áreas foco (vírgula-separado)", profile.focusAreas.join(", ")))
+    .split(",")
+    .map((a: string) => a.trim())
+    .filter(Boolean);
+
+  rl.close();
+  return true;
+}
+
 // ── Command ────────────────────────────────────────────────────────────────
+
+function applySkillLevel(profile: UserProfile, options: Record<string, unknown>, key: "architecture" | "coding" | "leadership", isJson: boolean): boolean | null {
+  const raw = options[key];
+  if (raw === undefined) return null;
+  const val = String(raw) as SkillLevel;
+  return validateAndAssign(profile, { key, value: val, valid: ["junior", "pleno", "senior"], errorKey: "invalid_level", errorMsg: "Level must be junior, pleno, or senior", isJson });
+}
+
+function applyTone(profile: UserProfile, options: Record<string, unknown>, isJson: boolean): boolean | null {
+  const raw = options.tone;
+  if (raw === undefined) return null;
+  const val = String(raw) as FeedbackTone;
+  return validateAndAssign(profile, { key: "tone", value: val, valid: ["mentor", "peer", "relatorio"], errorKey: "invalid_tone", errorMsg: "Tone must be mentor, peer, or relatorio", isJson });
+}
+
+function applyLanguage(profile: UserProfile, options: Record<string, unknown>, isJson: boolean): boolean | null {
+  const raw = options.language;
+  if (raw === undefined) return null;
+  const val = String(raw) as "pt" | "en";
+  return validateAndAssign(profile, { key: "language", value: val, valid: ["pt", "en"], errorKey: "invalid_language", errorMsg: "Language must be pt or en", isJson });
+}
+
+function applyCodeFree(profile: UserProfile, options: Record<string, unknown>, isJson: boolean): boolean | null {
+  const raw = options["code-free"];
+  if (raw === undefined) return null;
+  const val = parseInt(String(raw), 10);
+  if (isNaN(val) || val < 0 || val > 100) {
+    if (isJson) {
+      outputJson({ error: "invalid_percent", message: "Code-free must be 0-100" });
+    } else {
+      outputError("  ✘ Code-free must be 0-100");
+    }
+    return false;
+  }
+  profile.codeFreePercent = val;
+  return true;
+}
+
+function applyFocus(profile: UserProfile, options: Record<string, unknown>): boolean | null {
+  const raw = options.focus;
+  if (raw === undefined) return null;
+  profile.focusAreas = String(raw)
+    .split(",")
+    .map((a: string) => a.trim())
+    .filter(Boolean);
+  return true;
+}
+
+function applyAllFlags(profile: UserProfile, options: Record<string, unknown>, isJson: boolean): { applied: boolean; error: boolean } {
+  let applied = false;
+
+  if (options.name !== undefined) { profile.name = String(options.name); applied = true; }
+  if (options.role !== undefined) { profile.role = String(options.role); applied = true; }
+
+  for (const key of ["architecture", "coding", "leadership"] as const) {
+    const result = applySkillLevel(profile, options, key, isJson);
+    if (result === false) return { applied: false, error: true };
+    if (result === true) applied = true;
+  }
+
+  const tone = applyTone(profile, options, isJson);
+  if (tone === false) return { applied: false, error: true };
+  if (tone === true) applied = true;
+
+  const lang = applyLanguage(profile, options, isJson);
+  if (lang === false) return { applied: false, error: true };
+  if (lang === true) applied = true;
+
+  const cf = applyCodeFree(profile, options, isJson);
+  if (cf === false) return { applied: false, error: true };
+  if (cf === true) applied = true;
+
+  const focus = applyFocus(profile, options);
+  if (focus === true) applied = true;
+
+  return { applied, error: false };
+}
+
+async function profileAction(this: Command, options: Record<string, unknown>): Promise<void> {
+  const isJson = options.json === true;
+
+  const ctx = guardNotInitialized(options, isJson);
+  if (!ctx) return;
+
+  if (!checkLifecycleGate("profile", ctx.projectRoot, ctx.shitennoDir, isJson)) return;
+
+  const profile = loadUserProfile(ctx.shitennoDir);
+  let updated = false;
+
+  if (options.set) {
+    if (isJson) {
+      outputJson({
+        error: "interactive_not_supported",
+        message: "Interactive setup not supported with --json. Use individual flags.",
+      });
+      return;
+    }
+    await runInteractiveSetup(profile);
+    updated = true;
+  }
+
+  const flags = applyAllFlags(profile, options, isJson);
+  if (flags.error) return;
+  if (flags.applied) updated = true;
+
+  if (updated) {
+    saveUserProfile(ctx.shitennoDir, profile);
+    if (isJson) {
+      outputJson({ type: "profile_updated", ...profile });
+    } else {
+      outputSuccess("  ✔ Perfil actualizado com sucesso.");
+      displayProfile(profile);
+    }
+    getEventBus().publish("analysis.complete", {
+      type: "profile_updated",
+      profile: { name: profile.name, role: profile.role },
+    });
+    return;
+  }
+
+  outputProfile(isJson, profile);
+}
 
 export function profileCommand(): Command {
   const cmd = new Command("profile")
@@ -81,186 +264,7 @@ export function profileCommand(): Command {
     .option("--code-free <percent>", "Set code-free percentage (0-100)")
     .option("--focus <areas>", "Set focus areas (comma-separated)")
     .option("--json", "Output as JSON")
-    .action(async function (this: Command, options: Record<string, unknown>) {
-      const isJson = options.json === true;
-
-      const ctx = guardNotInitialized(options, isJson);
-      if (!ctx) return;
-
-      if (!checkLifecycleGate("profile", ctx.projectRoot, ctx.shitennoDir, isJson)) {
-        return;
-      }
-
-      const profile = loadUserProfile(ctx.shitennoDir);
-      let updated = false;
-
-      // ── Interactive setup ────────────────────────────────────────
-      if (options.set) {
-        if (isJson) {
-          outputJson({
-            error: "interactive_not_supported",
-            message: "Interactive setup not supported with --json. Use individual flags.",
-          });
-          return;
-        }
-
-        output("");
-        outputSection("shugo profile — Setup Interactivo");
-        outputBlank();
-        output(chalk.gray("  Pressiona Enter para manter o valor actual."));
-        outputBlank();
-
-        const readline = await import("node:readline");
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout,
-        });
-
-        const ask = (question: string, current: string): Promise<string> => {
-          return new Promise((resolve) => {
-            rl.question(`  ${question} (${chalk.gray(current)}): `, (answer) => {
-              resolve(answer.trim() || current);
-            });
-          });
-        };
-
-        profile.name = await ask("Nome", profile.name);
-        profile.role = await ask("Cargo", profile.role);
-        profile.architecture = await ask("Arquitectura (junior/pleno/senior)", profile.architecture) as SkillLevel;
-        profile.coding = await ask("Código (junior/pleno/senior)", profile.coding) as SkillLevel;
-        profile.leadership = await ask("Leadership (junior/pleno/senior)", profile.leadership) as SkillLevel;
-        profile.tone = await ask("Tom (mentor/peer/relatorio)", profile.tone) as FeedbackTone;
-        profile.language = await ask("Idioma (pt/en)", profile.language) as "pt" | "en";
-        profile.codeFreePercent = parseInt(await ask("% No-code (0-100)", String(profile.codeFreePercent)), 10);
-        profile.focusAreas = (await ask("Áreas foco (vírgula-separado)", profile.focusAreas.join(", ")))
-          .split(",")
-          .map((a: string) => a.trim())
-          .filter(Boolean);
-
-        rl.close();
-        updated = true;
-      }
-
-      // ── Individual flags ─────────────────────────────────────────
-      if (options.name) {
-        profile.name = String(options.name);
-        updated = true;
-      }
-      if (options.role) {
-        profile.role = String(options.role);
-        updated = true;
-      }
-      if (options.architecture) {
-        const val = String(options.architecture) as SkillLevel;
-        if (!["junior", "pleno", "senior"].includes(val)) {
-          if (isJson) {
-            outputJson({ error: "invalid_level", message: "Level must be junior, pleno, or senior" });
-          } else {
-            outputError("  ✘ Level must be junior, pleno, or senior");
-          }
-          return;
-        }
-        profile.architecture = val;
-        updated = true;
-      }
-      if (options.coding) {
-        const val = String(options.coding) as SkillLevel;
-        if (!["junior", "pleno", "senior"].includes(val)) {
-          if (isJson) {
-            outputJson({ error: "invalid_level", message: "Level must be junior, pleno, or senior" });
-          } else {
-            outputError("  ✘ Level must be junior, pleno, or senior");
-          }
-          return;
-        }
-        profile.coding = val;
-        updated = true;
-      }
-      if (options.leadership) {
-        const val = String(options.leadership) as SkillLevel;
-        if (!["junior", "pleno", "senior"].includes(val)) {
-          if (isJson) {
-            outputJson({ error: "invalid_level", message: "Level must be junior, pleno, or senior" });
-          } else {
-            outputError("  ✘ Level must be junior, pleno, or senior");
-          }
-          return;
-        }
-        profile.leadership = val;
-        updated = true;
-      }
-      if (options.tone) {
-        const val = String(options.tone) as FeedbackTone;
-        if (!["mentor", "peer", "relatorio"].includes(val)) {
-          if (isJson) {
-            outputJson({ error: "invalid_tone", message: "Tone must be mentor, peer, or relatorio" });
-          } else {
-            outputError("  ✘ Tone must be mentor, peer, or relatorio");
-          }
-          return;
-        }
-        profile.tone = val;
-        updated = true;
-      }
-      if (options.language) {
-        const val = String(options.language) as "pt" | "en";
-        if (!["pt", "en"].includes(val)) {
-          if (isJson) {
-            outputJson({ error: "invalid_language", message: "Language must be pt or en" });
-          } else {
-            outputError("  ✘ Language must be pt or en");
-          }
-          return;
-        }
-        profile.language = val;
-        updated = true;
-      }
-      if (options["code-free"]) {
-        const val = parseInt(String(options["code-free"]), 10);
-        if (isNaN(val) || val < 0 || val > 100) {
-          if (isJson) {
-            outputJson({ error: "invalid_percent", message: "Code-free must be 0-100" });
-          } else {
-            outputError("  ✘ Code-free must be 0-100");
-          }
-          return;
-        }
-        profile.codeFreePercent = val;
-        updated = true;
-      }
-      if (options.focus) {
-        profile.focusAreas = String(options.focus)
-          .split(",")
-          .map((a: string) => a.trim())
-          .filter(Boolean);
-        updated = true;
-      }
-
-      // ── Save if updated ──────────────────────────────────────────
-      if (updated) {
-        saveUserProfile(ctx.shitennoDir, profile);
-
-        if (isJson) {
-          outputJson({ type: "profile_updated", ...profile });
-        } else {
-          outputSuccess("  ✔ Perfil actualizado com sucesso.");
-          displayProfile(profile);
-        }
-
-        getEventBus().publish("analysis.complete", {
-          type: "profile_updated",
-          profile: { name: profile.name, role: profile.role },
-        });
-        return;
-      }
-
-      // ── Display current profile ──────────────────────────────────
-      if (isJson) {
-        outputJson({ type: "profile", ...profile });
-      } else {
-        displayProfile(profile);
-      }
-    });
+    .action(profileAction);
 
   return cmd;
 }

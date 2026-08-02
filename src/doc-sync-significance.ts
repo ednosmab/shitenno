@@ -95,28 +95,40 @@ const DIRECTORY_SCORES: Record<string, number> = {
 
 // ── Detect Artifact Type ─────────────────────────────────────────────────────
 
+const ARTIFACT_PREFIX_MAP: Array<[string, ArtifactType]> = [
+  ["docs/generated/", "generated"],
+  ["docs/skills/", "skill"],
+  ["docs/adrs/", "adr"],
+  ["governance/WORKFLOW", "workflow"],
+  ["governance/rules/", "rule"],
+  ["governance/agents/", "config"],
+  ["governance/", "doc"],
+  ["docs/", "doc"],
+  ["scripts/", "script"],
+  ["telemetry/", "telemetry"],
+  ["reports/", "report"],
+  ["feedback/", "feedback"],
+  ["session-feedback/", "feedback"],
+  ["core/", "config"],
+  ["cognition/", "doc"],
+];
+
+const ARTIFACT_EXTENSION_MAP: Array<[RegExp, ArtifactType]> = [
+  [/\.json$|\.yaml$/, "config"],
+  [/\.md$/, "doc"],
+  [/\.(ts|tsx|js|jsx|vue|svelte)$/, "script"],
+];
+
 export function detectArtifactType(filePath: string, shitennoDir: string): ArtifactType {
   const relative = filePath.slice(shitennoDir.length + 1);
 
-  if (relative.startsWith("docs/generated/")) return "generated";
-  if (relative.startsWith("docs/skills/")) return "skill";
-  if (relative.startsWith("docs/adrs/")) return "adr";
-  if (relative.startsWith("governance/WORKFLOW")) return "workflow";
-  if (relative.startsWith("governance/rules/")) return "rule";
-  if (relative.startsWith("governance/agents/")) return "config";
-  if (relative.startsWith("governance/")) return "doc";
-  if (relative.startsWith("docs/")) return "doc";
-  if (relative.startsWith("scripts/")) return "script";
-  if (relative.startsWith("telemetry/")) return "telemetry";
-  if (relative.startsWith("reports/")) return "report";
-  if (relative.startsWith("feedback/")) return "feedback";
-  if (relative.startsWith("session-feedback/")) return "feedback";
-  if (relative.startsWith("core/")) return "config";
-  if (relative.startsWith("cognition/")) return "doc";
+  for (const [prefix, type] of ARTIFACT_PREFIX_MAP) {
+    if (relative.startsWith(prefix)) return type;
+  }
 
-  if (relative.endsWith(".json") || relative.endsWith(".yaml")) return "config";
-  if (relative.endsWith(".md")) return "doc";
-  if (/\.(ts|tsx|js|jsx|vue|svelte)$/.test(relative)) return "script";
+  for (const [pattern, type] of ARTIFACT_EXTENSION_MAP) {
+    if (pattern.test(relative)) return type;
+  }
 
   return "unknown";
 }
@@ -184,23 +196,35 @@ export function calculateSizeScore(
 
 // ── Calculate Significance ───────────────────────────────────────────────────
 
-export function calculateSignificance(
-  filePath: string,
-  shitennoDir: string,
-  oldContent: string | null,
-  newContent: string,
-  frequency: ChangeFrequency
-): SignificanceResult {
+export interface SignificanceInput {
+  filePath: string;
+  shitennoDir: string;
+  oldContent: string | null;
+  newContent: string;
+  frequency: ChangeFrequency;
+}
+
+function determineSignificanceLevel(score: number): {
+  level: SignificanceLevel;
+  outputLevel: "silent" | "minimal" | "verbose";
+  shouldSync: boolean;
+} {
+  if (score < 0.3) return { level: "ignore", outputLevel: "silent", shouldSync: false };
+  if (score < 0.6) return { level: "low", outputLevel: "silent", shouldSync: true };
+  if (score < 0.8) return { level: "medium", outputLevel: "minimal", shouldSync: true };
+  return { level: "high", outputLevel: "verbose", shouldSync: true };
+}
+
+function buildSignificanceReasons(input: SignificanceInput): { reasons: string[]; score: number } {
+  const { filePath, shitennoDir, oldContent, newContent, frequency } = input;
   const reasons: string[] = [];
 
-  // 1. Artifact type score
   const artifactType = detectArtifactType(filePath, shitennoDir);
   const artifactScore = ARTIFACT_SCORES[artifactType];
   if (artifactScore >= 0.7) {
     reasons.push(`artifact:${artifactType}(${artifactScore})`);
   }
 
-  // 2. Directory score
   const directoryScore = detectDirectoryScore(filePath, shitennoDir);
   if (directoryScore >= 0.6) {
     const relative = filePath.slice(shitennoDir.length + 1);
@@ -210,55 +234,30 @@ export function calculateSignificance(
     reasons.push(`directory:${matchedDir}(${directoryScore})`);
   }
 
-  // 3. Frequency score
   const frequencyScore = calculateFrequencyScore(frequency);
   if (frequencyScore >= 0.5) {
     reasons.push(`frequency:${frequency.count}changes(${frequencyScore})`);
   }
 
-  // 4. Size score
   const sizeScore = calculateSizeScore(oldContent, newContent);
   if (sizeScore >= 0.5) {
     reasons.push(`size:(${sizeScore})`);
   }
 
-  // Weighted sum
   const score =
     artifactScore * ARTIFACT_WEIGHT +
     directoryScore * DIRECTORY_WEIGHT +
     frequencyScore * FREQUENCY_WEIGHT +
     sizeScore * SIZE_WEIGHT;
 
-  // Determine level and output
-  let level: SignificanceLevel;
-  let outputLevel: "silent" | "minimal" | "verbose";
-  let shouldSync: boolean;
+  return { reasons, score };
+}
 
-  if (score < 0.3) {
-    level = "ignore";
-    outputLevel = "silent";
-    shouldSync = false;
-  } else if (score < 0.6) {
-    level = "low";
-    outputLevel = "silent";
-    shouldSync = true;
-  } else if (score < 0.8) {
-    level = "medium";
-    outputLevel = "minimal";
-    shouldSync = true;
-  } else {
-    level = "high";
-    outputLevel = "verbose";
-    shouldSync = true;
-  }
+export function calculateSignificance(input: SignificanceInput): SignificanceResult {
+  const { reasons, score } = buildSignificanceReasons(input);
+  const { level, outputLevel, shouldSync } = determineSignificanceLevel(score);
 
-  return {
-    score,
-    level,
-    reasons,
-    shouldSync,
-    outputLevel,
-  };
+  return { score, level, reasons, shouldSync, outputLevel };
 }
 
 // ── Change History Tracker ───────────────────────────────────────────────────

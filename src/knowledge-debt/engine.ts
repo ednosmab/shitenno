@@ -14,22 +14,23 @@ import {
 } from "./detection.js";
 import { calculateDebtHealth, generateRecommendations } from "./scoring.js";
 
-export function detectKnowledgeDebt(
-  _projectRoot: string,
-  shitennoDir: string
-): KnowledgeDebtReport {
-  const gaps: KnowledgeGap[] = [];
-  const now = new Date().toISOString();
+function collectGaps(shitennoDir: string, now: string): KnowledgeGap[] {
+  return [
+    ...detectMissingAdrs(shitennoDir, now),
+    ...detectMissingRunbooks(shitennoDir, now),
+    ...detectMissingSkills(shitennoDir, now),
+    ...detectMissingDocs(shitennoDir, now),
+    ...detectMissingAutomation(shitennoDir, now),
+    ...detectMissingContracts(shitennoDir, now),
+    ...detectMissingWorkflows(shitennoDir, now),
+    ...detectStaleAdrs(shitennoDir, now),
+  ];
+}
 
-  gaps.push(...detectMissingAdrs(shitennoDir, now));
-  gaps.push(...detectMissingRunbooks(shitennoDir, now));
-  gaps.push(...detectMissingSkills(shitennoDir, now));
-  gaps.push(...detectMissingDocs(shitennoDir, now));
-  gaps.push(...detectMissingAutomation(shitennoDir, now));
-  gaps.push(...detectMissingContracts(shitennoDir, now));
-  gaps.push(...detectMissingWorkflows(shitennoDir, now));
-  gaps.push(...detectStaleAdrs(shitennoDir, now));
-
+function countGaps(gaps: KnowledgeGap[]): {
+  gapsBySeverity: Record<DebtSeverity, number>;
+  gapsByType: Record<DebtType, number>;
+} {
   const gapsBySeverity: Record<DebtSeverity, number> = {
     critical: 0,
     high: 0,
@@ -37,23 +38,25 @@ export function detectKnowledgeDebt(
     low: 0,
   };
   const gapsByType: Record<DebtType, number> = {} as Record<DebtType, number>;
-
   for (const gap of gaps) {
     gapsBySeverity[gap.severity]++;
     gapsByType[gap.type] = (gapsByType[gap.type] || 0) + 1;
   }
+  return { gapsBySeverity, gapsByType };
+}
 
-  const healthScore = calculateDebtHealth(gaps);
-  const recommendations = generateRecommendations(gaps);
-
-  const critical = gapsBySeverity.critical;
-  const high = gapsBySeverity.high;
+function buildSummary(gaps: KnowledgeGap[], healthScore: number): string {
+  const critical = gaps.filter((g) => g.severity === "critical").length;
+  const high = gaps.filter((g) => g.severity === "high").length;
   const parts: string[] = [];
   parts.push(`${gaps.length} knowledge gap(s) detected.`);
   if (critical > 0) parts.push(`${critical} critical.`);
   if (high > 0) parts.push(`${high} high.`);
   parts.push(`Debt Health: ${healthScore}/100.`);
+  return parts.join(" ");
+}
 
+function publishDebtEvents(gaps: KnowledgeGap[]): void {
   for (const gap of gaps) {
     getEventBus().publish("debt.detected", {
       debtType: "knowledge",
@@ -63,12 +66,24 @@ export function detectKnowledgeDebt(
       timestamp: new Date().toISOString(),
     });
   }
-
   getEventBus().publish("knowledge_debt.detected", {
     gapCount: gaps.length,
     gaps: gaps.map((g) => ({ source: g.location || "unknown", gap: g.description, severity: g.severity })),
     timestamp: new Date().toISOString(),
   });
+}
+
+export function detectKnowledgeDebt(
+  _projectRoot: string,
+  shitennoDir: string
+): KnowledgeDebtReport {
+  const now = new Date().toISOString();
+  const gaps = collectGaps(shitennoDir, now);
+  const { gapsBySeverity, gapsByType } = countGaps(gaps);
+  const healthScore = calculateDebtHealth(gaps);
+  const recommendations = generateRecommendations(gaps);
+
+  publishDebtEvents(gaps);
 
   return {
     generatedAt: now,
@@ -77,7 +92,7 @@ export function detectKnowledgeDebt(
     gapsByType,
     gaps,
     healthScore,
-    summary: parts.join(" "),
+    summary: buildSummary(gaps, healthScore),
     recommendations,
   };
 }

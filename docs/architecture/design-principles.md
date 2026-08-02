@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 03 — DESIGN PRINCIPLES
 
 > These principles are immutable. They govern every decision in the Shitenno.

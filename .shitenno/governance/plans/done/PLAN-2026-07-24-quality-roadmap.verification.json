@@ -1,0 +1,1 @@
+{"planId":"PLAN-2026-07-24-quality-roadmap","commitHash":"HEAD","checks":["atomic-writes","async-exec","daemon-hardening","code-hygiene"],"passed":true,"timestamp":"2026-07-24T12:00:00.000Z"}

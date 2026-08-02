@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Watch
 
 Real-time event log for governance monitoring.
@@ -32,7 +37,7 @@ shugo watch [--events <types>] [--dir <path>]
 | Category | Color | Events |
 |----------|-------|--------|
 | Plan | Cyan | `plan.created`, `plan.file_changed`, `plan.status_changed`, `plan.archived` |
-| Pipeline | Magenta | `pipeline.started`, `pipeline.stage_completed` |
+| Pipeline | Magenta | `pipeline.stage.start`, `pipeline.stage.complete` |
 | Session | Yellow | `session.started`, `session.ended` |
 | Asset | Green | `asset.created`, `asset.updated`, `asset.archived` |
 | Docs | Blue | `docs.sync.triggered`, `doc.lifecycle.audited` |

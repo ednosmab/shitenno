@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Configuration Reference
 
 > How Shugo CLI reads and writes configuration.
@@ -19,7 +24,15 @@ The AI agent configuration file, created by `shugo init` at the project root.
   },
   "instructions": [ ... ],
   "skills": { ... },
-  "mcp": { ... }
+  "mcp": { ... },
+  "permission": {
+    "*": "allow",
+    "edit": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny"
+    }
+  }
 }
 ```
 
@@ -34,6 +47,7 @@ The AI agent configuration file, created by `shugo init` at the project root.
 | `instructions` | string[] | Yes | File paths loaded as system context |
 | `skills` | object | No | Skills directory configuration |
 | `mcp` | object | No | MCP server configurations |
+| `permission` | object | No | Global permission rules for all agents |
 
 ### Agent Definitions
 
@@ -68,20 +82,6 @@ Each agent under `agent` supports:
 {
   "skills": {
     "paths": ["shitenno/docs/skills"]
-  }
-}
-```
-
-### MCP Server Configuration
-
-```json
-{
-  "mcp": {
-    "local-filesystem": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "."],
-      "enabled": true
-    }
   }
 }
 ```

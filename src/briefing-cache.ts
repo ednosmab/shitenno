@@ -17,6 +17,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync, renameS
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import type { Briefing } from "./briefing.js";
+import { isBriefingCache } from "./schema-validators.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -49,6 +50,22 @@ export function computeInputHash(inputs: {
   contextRuleCount: number;
   dynamicRuleCount: number;
   maturityScore: number | null;
+}): string {
+  const payload = JSON.stringify(inputs);
+  return createHash("sha256").update(payload).digest("hex").slice(0, 16);
+}
+
+/**
+ * Compute a request hash from handler input parameters.
+ * Used to check cache validity BEFORE computing the briefing.
+ * Changes when request parameters change → triggers cache miss.
+ */
+export function computeRequestHash(inputs: {
+  projectRoot: string;
+  shitennoDir: string;
+  format: string;
+  depth: string;
+  task?: string;
 }): string {
   const payload = JSON.stringify(inputs);
   return createHash("sha256").update(payload).digest("hex").slice(0, 16);
@@ -97,9 +114,9 @@ export function readCache(shitennoDir: string): BriefingCache | null {
 
   try {
     const content = readFileSync(cachePath, "utf-8");
-    const parsed = JSON.parse(content) as BriefingCache;
-    if (parsed.version !== 1) return null;
-    return parsed;
+    const parsed = JSON.parse(content);
+    if (!isBriefingCache(parsed)) return null;
+    return parsed as unknown as BriefingCache;
   } catch {
     return null;
   }
@@ -132,6 +149,26 @@ export function getCachedBriefing(
 
   // Check hash validity + optional TTL expiration (3.27)
   if (isCacheValid(cache.entry, currentHash) && !isCacheExpired(cache.entry)) {
+    return { briefing: cache.entry.briefing, cacheHit: true };
+  }
+
+  return null;
+}
+
+/**
+ * Get a cached briefing by request hash (computed from input parameters).
+ * Used to check cache BEFORE computing the briefing.
+ * Returns null on cache miss (hash mismatch or expiration).
+ */
+export function getCachedBriefingByRequest(
+  shitennoDir: string,
+  requestHash: string
+): { briefing: Briefing; cacheHit: boolean } | null {
+  const cache = readCache(shitennoDir);
+  if (!cache?.entry) return null;
+
+  // Check request hash validity + optional TTL expiration
+  if (isCacheValid(cache.entry, requestHash) && !isCacheExpired(cache.entry)) {
     return { briefing: cache.entry.briefing, cacheHit: true };
   }
 

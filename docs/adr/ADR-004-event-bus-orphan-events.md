@@ -1,3 +1,8 @@
+---
+category: adr
+lifecycle: Active
+---
+
 # ADR-004: Event Bus Orphaned Events Triage
 
 > ⚠️ **Retroactive ADR** — documented 2026-07-05, decision made

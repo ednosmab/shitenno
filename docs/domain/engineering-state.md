@@ -1,3 +1,8 @@
+---
+category: domain
+lifecycle: Active
+---
+
 # Engineering State
 
 > How to measure and govern the health of an engineering project.

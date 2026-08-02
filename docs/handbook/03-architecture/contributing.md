@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # Contributing
 
 Guia para contribuidores do Shugo.

@@ -20,5 +20,5 @@
     "jsxImportSource": "react"
   },
   "include": ["bin/**/*", "src/**/*"],
-  "exclude": ["node_modules", "dist", "src/templates"]
+  "exclude": ["node_modules", "dist", "src/templates", "src/audit/__fixtures__"]
 }

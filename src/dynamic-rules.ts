@@ -22,62 +22,58 @@ export type { RuleSeverity, DynamicRule } from "./domain/entities/engineering-st
 
 // ── Git Incident Detection ─────────────────────────────────────────────────
 
+function runGitCountQuery(command: string, projectRoot: string): number {
+  const output = execSync(command, { encoding: "utf-8", cwd: projectRoot, timeout: 10000 });
+  return parseInt(output.trim(), 10);
+}
+
+interface GitIncidentRuleInput {
+  id: string;
+  count: number;
+  label: string;
+  advice: string;
+  severity: RuleSeverity;
+}
+
+function buildGitIncidentRule(input: GitIncidentRuleInput): DynamicRule {
+  const { id, count, label, advice, severity } = input;
+  return {
+    id,
+    rule: `This project has ${count} ${label} in the last 180 days. ${advice}`,
+    source: "git-incident",
+    severity,
+    evidence: `${count} ${label} detected in git log`,
+    generatedAt: new Date().toISOString(),
+    incidentCount: count,
+  };
+}
+
 function detectGitIncidents(projectRoot: string): DynamicRule[] {
   const rules: DynamicRule[] = [];
 
   try {
-    // Check for force pushes
-    const forcePushOutput = execSync(
+    const forcePushCount = runGitCountQuery(
       'git log --oneline --all --grep="force push" --grep="forced push" --grep="\\+\\+" --since="180 days ago" 2>/dev/null | wc -l',
-      { encoding: "utf-8", cwd: projectRoot, timeout: 10000 }
+      projectRoot
     );
-    const forcePushCount = parseInt(forcePushOutput.trim(), 10);
     if (forcePushCount > 0) {
-      rules.push({
-        id: "git-force-push",
-        rule: `This project has ${forcePushCount} force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.`,
-        source: "git-incident",
-        severity: "high",
-        evidence: `${forcePushCount} force push(es) detected in git log`,
-        generatedAt: new Date().toISOString(),
-        incidentCount: forcePushCount,
-      });
+      rules.push(buildGitIncidentRule({ id: "git-force-push", count: forcePushCount, label: "force push(es)", advice: 'Avoid "git push --force" — use --force-with-lease instead.', severity: "high" }));
     }
 
-    // Check for reverts
-    const revertOutput = execSync(
+    const revertCount = runGitCountQuery(
       'git log --oneline --all --grep="revert" --since="180 days ago" 2>/dev/null | wc -l',
-      { encoding: "utf-8", cwd: projectRoot, timeout: 10000 }
+      projectRoot
     );
-    const revertCount = parseInt(revertOutput.trim(), 10);
     if (revertCount > 2) {
-      rules.push({
-        id: "git-reverts",
-        rule: `This project has ${revertCount} reverts in the last 180 days. Ensure thorough testing before merging.`,
-        source: "git-incident",
-        severity: "medium",
-        evidence: `${revertCount} revert(s) detected in git log`,
-        generatedAt: new Date().toISOString(),
-        incidentCount: revertCount,
-      });
+      rules.push(buildGitIncidentRule({ id: "git-reverts", count: revertCount, label: "revert(s)", advice: "Ensure thorough testing before merging.", severity: "medium" }));
     }
 
-    // Check for hotfixes
-    const hotfixOutput = execSync(
+    const hotfixCount = runGitCountQuery(
       'git log --oneline --all --grep="hotfix" --grep="hot-fix" --grep="urgent" --grep="critical" --since="180 days ago" 2>/dev/null | wc -l',
-      { encoding: "utf-8", cwd: projectRoot, timeout: 10000 }
+      projectRoot
     );
-    const hotfixCount = parseInt(hotfixOutput.trim(), 10);
     if (hotfixCount > 3) {
-      rules.push({
-        id: "git-hotfixes",
-        rule: `This project has ${hotfixCount} hotfix(es) in the last 180 days. Consider adding more pre-merge validation.`,
-        source: "git-incident",
-        severity: "medium",
-        evidence: `${hotfixCount} hotfix(es) detected in git log`,
-        generatedAt: new Date().toISOString(),
-        incidentCount: hotfixCount,
-      });
+      rules.push(buildGitIncidentRule({ id: "git-hotfixes", count: hotfixCount, label: "hotfix(es)", advice: "Consider adding more pre-merge validation.", severity: "medium" }));
     }
   } catch (error) {
     logger.debug("dynamic-rules", "Suppressed error", { error });
@@ -88,6 +84,19 @@ function detectGitIncidents(projectRoot: string): DynamicRule[] {
 
 // ── History Analysis ───────────────────────────────────────────────────────
 
+const INCIDENT_KEYWORDS = ["erro", "bug", "falhou", "rollback", "incidente", "problema", "broken", "regression"];
+
+function extractIncidentAreas(content: string): string[] {
+  const areas: string[] = [];
+  for (const keyword of INCIDENT_KEYWORDS) {
+    if (content.includes(keyword)) {
+      const areaMatches = content.match(/(src|packages|apps|lib)\/[\w/-]+/g) || [];
+      areas.push(...areaMatches);
+    }
+  }
+  return areas;
+}
+
 function detectHistoryIncidents(_projectRoot: string, shitennoDir: string): DynamicRule[] {
   const rules: DynamicRule[] = [];
   const historyDir = join(shitennoDir, "docs", "history");
@@ -96,26 +105,16 @@ function detectHistoryIncidents(_projectRoot: string, shitennoDir: string): Dyna
 
   try {
     const files = readdirSync(historyDir).filter((f: string) => f.endsWith(".md"));
-
-    const incidentKeywords = ["erro", "bug", "falhou", "rollback", "incidente", "problema", "broken", "regression"];
     const areaIncidents: Record<string, number> = {};
 
     for (const file of files) {
       const content = readFileSync(join(historyDir, file), "utf-8").toLowerCase();
-
-      // Detect incidents by keyword
-      for (const keyword of incidentKeywords) {
-        if (content.includes(keyword)) {
-          // Extract area from content (look for src/, packages/, apps/)
-          const areaMatches = content.match(/(src|packages|apps|lib)\/[\w/-]+/g) || [];
-          for (const area of areaMatches) {
-            areaIncidents[area] = (areaIncidents[area] || 0) + 1;
-          }
-        }
+      const areas = extractIncidentAreas(content);
+      for (const area of areas) {
+        areaIncidents[area] = (areaIncidents[area] || 0) + 1;
       }
     }
 
-    // Generate rules for areas with multiple incidents
     for (const [area, count] of Object.entries(areaIncidents)) {
       if (count >= 3) {
         rules.push({

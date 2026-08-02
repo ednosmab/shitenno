@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # Rule Engine
 
 O motor de regras permite definir comportamentos reativos baseados em triggers e condições.

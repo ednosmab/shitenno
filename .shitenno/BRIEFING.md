@@ -1,5 +1,5 @@
 # Pre-Session Briefing
-*Generated: 2026-07-20T03:00:36.251Z*
+*Generated: 2026-08-02T16:52:01.583Z*
 
 ---
 
@@ -18,20 +18,9 @@
 
 ---
 
-## Actividade Recente (24h)
-
-| Evento | Detalhe | Hora |
-|--------|---------|------|
-| backlog.updated | retroactive_scan: 1 passos | 02:37 |
-| plan.format_warning | Formato inválido: PLAN-2026-07-19-BLOCO-L-reforco-gate | 02:37 |
-| backlog.updated | retroactive_scan: 2 passos | 02:07 |
-| plan.format_warning | Formato inválido: PLAN-2026-07-19-BLOCO-L-reforco-gate | 02:07 |
-
-**Resumo:** 2 sincronizações, 2 erros
-
 ## Project Identity
 - **Domain:** monorepo
-- **Scale:** medium
+- **Scale:** large
 - **Stack:** typescript, node, react
 - **Maturity:** 73/100
 
@@ -44,15 +33,19 @@
 - **Areas Without Tests:** 5
 
 ## Context Rules (Top)
-- Area "src" has 6 file(s) without tests. Prioritize test coverage here.
 - Area "src" contains sensitive keywords (auth, payment, security). Apply extra security review.
 - Area "apps" has 8 file(s) without tests. Prioritize test coverage here.
 - Area "apps" contains sensitive keywords (auth, payment, security). Apply extra security review.
 - This is a monorepo. When modifying shared packages, ensure backward compatibility.
+- Large codebase: Always run tests before committing. Consider impact on other modules.
 
 ## Dynamic Rules (From History)
-- [high] This project has 128 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
-- [medium] This project has 6 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
+- [high] This project has 154 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
+- [medium] This project has 7 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
+
+
+## Daemon Status
+- **Running:** No
 
 ## Recommended Next Steps
 1. Address critical risk areas: src, apps
@@ -63,3 +56,15 @@
 - **Context rules:** 7
 - **Dynamic rules:** 2
 - **Cache hit:** No
+
+## Semantic Analysis
+### Patterns (1)
+- **30 alterações vs 0 melhorias de qualidade**
+  - Domain: governance | Type: tech_debt_accumulation | Confidence: 85%
+  - → Dedicar tempo a testes e documentação
+  - → Rever dívida técnica acumulada
+### Insights (1)
+- **Dívida técnica a acumular — padrões de degradação detectados** (medium)
+  - Domains: testing, documentation
+  - → Dedicar sprint de qualidade
+  - → Rever e actualizar documentação

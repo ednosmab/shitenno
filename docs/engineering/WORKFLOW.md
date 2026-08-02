@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Workflow
 
 > Development workflow for Shugo CLI contributors.

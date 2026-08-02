@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Lazy Loading — Diretriz de Leitura Preguiçosa
 
 > **Gatilho:** Início de sessão, nova tarefa iniciada

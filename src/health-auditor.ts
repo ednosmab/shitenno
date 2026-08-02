@@ -54,53 +54,10 @@ export async function auditHealth(
     ? allSourceFiles.filter((f) => changedFiles.includes(f.relPath))
     : allSourceFiles;
 
-  const detectorMap = buildDetectorMap(projectRoot, shitennoDir, sourceFiles, rules, history);
+  const detectorMap = buildDetectorMap({ projectRoot, shitennoDir, sourceFiles, rules, history });
 
-  const issues: HealthIssue[] = [];
-  const detectorErrors: Array<{ name: string; error: string }> = [];
-
-  // Heuristic: check if we're auditing Shitenno itself (more robust than path check)
-  const isAuditingShitennoItself = projectRoot.includes("shitenno-go");
-
-  // Collect detector results (some may be async)
-  const detectorResults: Array<HealthIssue[] | Promise<HealthIssue[]>> = [];
-  const activeDetectorNames: string[] = [];
-
-  for (const [name, fn] of Object.entries(detectorMap)) {
-    if (!activeDetectors.has(name)) continue;
-    // Skip cross-file detectors in --changed mode (they need full project)
-    if (changedFiles && changedFiles.length > 0 && CROSS_FILE_ONLY_DETECTORS.has(name)) continue;
-    // Skip shitenno-self-only detectors when not auditing Shitenno itself
-    const scope = FRONTEND_DETECTOR_SCOPE[name];
-    if (scope === "shitenno-self-only" && !isAuditingShitennoItself) continue;
-
-    activeDetectorNames.push(name);
-    try {
-      detectorResults.push(fn());
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : String(err);
-      detectorErrors.push({ name, error: errorMsg });
-      logger.warn("health-auditor", `Detector "${name}" failed: ${errorMsg}`);
-    }
-  }
-
-  // Await all results (handles both sync and async detectors)
-  const resolvedResults = await Promise.all(detectorResults);
-  for (const result of resolvedResults) {
-    issues.push(...result);
-  }
-
-  // Convert detector failures into low-severity issues so they're visible in the report
-  for (const { name, error } of detectorErrors) {
-    issues.push({
-      type: "detector_failure",
-      severity: 2,
-      description: `Detector "${name}" failed to run: ${error}`,
-      location: `src/audit/ (detector: ${name})`,
-      recommendation: `Investigate and fix detector "${name}" — results for this category may be incomplete in this run`,
-      confidence: 1.0,
-    });
-  }
+  const isAuditingShitennoItself = existsSync(join(projectRoot, ".shitenno-self"));
+  const { issues, detectorErrors } = await executeDetectors(detectorMap, activeDetectors, changedFiles, isAuditingShitennoItself);
 
   const deduped = deduplicateIssues(issues);
   const suppressions = loadSuppressions(shitennoDir);
@@ -109,20 +66,7 @@ export async function auditHealth(
   const dimensionScores = calculateDimensionScores(visible, sourceFiles.length);
   const optimizations = proposeOptimizations(visible);
 
-  const critical = visible.filter((i) => i.severity === 3).length;
-  const warnings = visible.filter((i) => i.severity === 2).length;
-  const info = visible.filter((i) => i.severity === 1).length;
-
-  const parts: string[] = [];
-  parts.push(`Score de saúde: ${healthScore}/100`);
-  parts.push(`Nível: ${level} (${activeDetectors.size} detectors).`);
-  parts.push(`${rules.length} regras, ${history.length} sessões analisadas.`);
-  if (critical > 0) parts.push(`${critical} crítico(s).`);
-  if (warnings > 0) parts.push(`${warnings} aviso(s).`);
-  if (info > 0) parts.push(`${info} info.`);
-  if (suppressed.length > 0) parts.push(`${suppressed.length} suprimido(s).`);
-  if (optimizations.length > 0) parts.push(`${optimizations.length} optimização(ões) proposta(s).`);
-
+  const summary = buildAuditSummary({ healthScore, level, activeDetectorCount: activeDetectors.size, rules, history, visible, suppressed, optimizations });
   const durationMs = Date.now() - startTime;
 
   return {
@@ -135,7 +79,7 @@ export async function auditHealth(
     optimizations,
     healthScore,
     dimensionScores,
-    summary: parts.join(" "),
+    summary,
     level,
     durationMs,
     filesScanned: sourceFiles.length,
@@ -159,4 +103,77 @@ export function writeHealthReport(shitennoDir: string, report: HealthAuditReport
   } catch {
     return null;
   }
+}
+
+async function executeDetectors(
+  detectorMap: Record<string, () => HealthIssue[] | Promise<HealthIssue[]>>,
+  activeDetectors: Set<string>,
+  changedFiles: string[] | undefined,
+  isAuditingShitennoItself: boolean,
+): Promise<{ issues: HealthIssue[]; detectorErrors: Array<{ name: string; error: string }> }> {
+  const issues: HealthIssue[] = [];
+  const detectorErrors: Array<{ name: string; error: string }> = [];
+  const detectorResults: Array<HealthIssue[] | Promise<HealthIssue[]>> = [];
+
+  for (const [name, fn] of Object.entries(detectorMap)) {
+    if (!activeDetectors.has(name)) continue;
+    if (changedFiles && changedFiles.length > 0 && CROSS_FILE_ONLY_DETECTORS.has(name)) continue;
+    const scope = FRONTEND_DETECTOR_SCOPE[name];
+    if (scope === "shitenno-self-only" && !isAuditingShitennoItself) continue;
+
+    try {
+      detectorResults.push(fn());
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      detectorErrors.push({ name, error: errorMsg });
+      logger.warn("health-auditor", `Detector "${name}" failed: ${errorMsg}`);
+    }
+  }
+
+  const resolvedResults = await Promise.all(detectorResults);
+  for (const result of resolvedResults) {
+    issues.push(...result);
+  }
+
+  for (const { name, error } of detectorErrors) {
+    issues.push({
+      type: "detector_failure",
+      severity: 2,
+      description: `Detector "${name}" failed to run: ${error}`,
+      location: `src/audit/ (detector: ${name})`,
+      recommendation: `Investigate and fix detector "${name}" — results for this category may be incomplete in this run`,
+      confidence: 1.0,
+    });
+  }
+
+  return { issues, detectorErrors };
+}
+
+interface AuditSummaryInput {
+  healthScore: number;
+  level: AuditLevel;
+  activeDetectorCount: number;
+  rules: ReturnType<typeof readRules>;
+  history: ReturnType<typeof readHistory>;
+  visible: HealthIssue[];
+  suppressed: HealthIssue[];
+  optimizations: ReturnType<typeof proposeOptimizations>;
+}
+
+function buildAuditSummary(input: AuditSummaryInput): string {
+  const critical = input.visible.filter((i) => i.severity === 3).length;
+  const warnings = input.visible.filter((i) => i.severity === 2).length;
+  const info = input.visible.filter((i) => i.severity === 1).length;
+
+  const parts: string[] = [];
+  parts.push(`Score de saúde: ${input.healthScore}/100`);
+  parts.push(`Nível: ${input.level} (${input.activeDetectorCount} detectors).`);
+  parts.push(`${input.rules.length} regras, ${input.history.length} sessões analisadas.`);
+  if (critical > 0) parts.push(`${critical} crítico(s).`);
+  if (warnings > 0) parts.push(`${warnings} aviso(s).`);
+  if (info > 0) parts.push(`${info} info.`);
+  if (input.suppressed.length > 0) parts.push(`${input.suppressed.length} suprimido(s).`);
+  if (input.optimizations.length > 0) parts.push(`${input.optimizations.length} optimização(ões) proposta(s).`);
+
+  return parts.join(" ");
 }

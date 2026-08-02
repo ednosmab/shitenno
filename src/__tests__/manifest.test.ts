@@ -200,7 +200,7 @@ describe("createManifest", () => {
 describe("updateManifest", () => {
   it("creates new manifest when no current exists", () => {
     mockReaddirSync.mockReturnValue([]);
-    const manifest = updateManifest(null, "2.0.0", "/shugo", ["core"], 70);
+    const manifest = updateManifest(null, { cliVersion: "2.0.0", shitennoDir: "/shugo", capabilities: ["core"], maturityScore: 70 });
     expect(manifest.cliVersion).toBe("2.0.0");
   });
 
@@ -218,7 +218,7 @@ describe("updateManifest", () => {
     ]);
     mockReadFileSync.mockReturnValue("new content");
 
-    const updated = updateManifest(current, "2.0.0", "/shugo", ["core", "ai"], 75);
+    const updated = updateManifest(current, { cliVersion: "2.0.0", shitennoDir: "/shugo", capabilities: ["core", "ai"], maturityScore: 75 });
 
     expect(updated.cliVersion).toBe("2.0.0");
     expect(updated.templateHashes).toHaveProperty("old.txt", "hash1");

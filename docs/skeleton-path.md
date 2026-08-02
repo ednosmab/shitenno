@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Documentation Structure
 
 > Current directory layout of the Shitenno documentation.

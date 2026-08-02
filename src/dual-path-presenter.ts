@@ -52,22 +52,8 @@ export interface DualPathJson {
 
 // ── Formatting Functions ────────────────────────────────────────────────────
 
-/** Format dual path for human-readable terminal output. */
-export function formatDualPath(
-  comfortable: EvolutionRecommendation,
-  challenging: EvolutionRecommendation,
-  profile: GrowthProfile
-): string {
+function formatComfortablePath(comfortable: EvolutionRecommendation): string[] {
   const lines: string[] = [];
-
-  // Header
-  lines.push("");
-  lines.push(chalk.bold.cyan("  ╔══════════════════════════════════════════════════╗"));
-  lines.push(chalk.bold.cyan("  ║           DUAL PATH — Choose Your Way           ║"));
-  lines.push(chalk.bold.cyan("  ╚══════════════════════════════════════════════════╝"));
-  lines.push("");
-
-  // Comfortable path
   lines.push(chalk.green("  ┌─ PATH A: COMFORTABLE ─────────────────────────────┐"));
   lines.push(chalk.green("  │") + ` Within your current thinking`);
   lines.push(chalk.green("  │"));
@@ -80,8 +66,11 @@ export function formatDualPath(
   lines.push(chalk.green("  │") + ` ${chalk.gray(comfortable.action)}`);
   lines.push(chalk.green("  └──────────────────────────────────────────────────┘"));
   lines.push("");
+  return lines;
+}
 
-  // Challenging path
+function formatChallengingPath(challenging: EvolutionRecommendation): string[] {
+  const lines: string[] = [];
   lines.push(chalk.yellow("  ┌─ PATH B: CHALLENGING ────────────────────────────┐"));
   lines.push(chalk.yellow("  │") + ` Beyond your current thinking`);
   lines.push(chalk.yellow("  │"));
@@ -92,7 +81,6 @@ export function formatDualPath(
   lines.push(chalk.yellow("  │") + ` Confidence: ${formatConfidence(challenging.confidence)}`);
   lines.push(chalk.yellow("  │"));
 
-  // Show paradigm shift if available
   const paradigmShift = challenging.evidence.find((e) => e.startsWith("Paradigm shift:"));
   if (paradigmShift) {
     lines.push(chalk.yellow("  │"));
@@ -100,7 +88,6 @@ export function formatDualPath(
     lines.push(chalk.yellow("  │") + `   ${chalk.gray(paradigmShift.replace("Paradigm shift: ", ""))}`);
   }
 
-  // Show knowledge gap if available
   const knowledgeGap = challenging.evidence.find((e) => e.startsWith("Knowledge gap:"));
   if (knowledgeGap) {
     lines.push(chalk.yellow("  │"));
@@ -112,12 +99,27 @@ export function formatDualPath(
   lines.push(chalk.yellow("  │") + ` ${chalk.gray(challenging.action)}`);
   lines.push(chalk.yellow("  └──────────────────────────────────────────────────┘"));
   lines.push("");
+  return lines;
+}
 
-  // Growth progress
-  lines.push(formatGrowthProgress(profile));
+export function formatDualPath(
+  comfortable: EvolutionRecommendation,
+  challenging: EvolutionRecommendation,
+  profile: GrowthProfile
+): string {
+  const lines: string[] = [];
+
+  lines.push("");
+  lines.push(chalk.bold.cyan("  ╔══════════════════════════════════════════════════╗"));
+  lines.push(chalk.bold.cyan("  ║           DUAL PATH — Choose Your Way           ║"));
+  lines.push(chalk.bold.cyan("  ╚══════════════════════════════════════════════════╝"));
   lines.push("");
 
-  // Choice hint
+  lines.push(...formatComfortablePath(comfortable));
+  lines.push(...formatChallengingPath(challenging));
+
+  lines.push(formatGrowthProgress(profile));
+  lines.push("");
   lines.push(chalk.gray("  Choose: --comfortable or --challenging"));
   lines.push("");
 

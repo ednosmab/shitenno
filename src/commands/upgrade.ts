@@ -48,10 +48,87 @@ export const upgradeCommand = new Command("upgrade")
     if (isDryRun) return handleDryRun(ctx.shitennoDir, installed, isJson);
     if (options.list) return handleList(ctx.projectRoot, installed, isJson);
     if (options.acceptRecommended) return handleAcceptRecommended(ctx, targetDir, installed, isJson);
-    return handleInstallCapability(ctx, targetDir, options.capability, installed, isJson);
+    return handleInstallCapability({ ctx, targetDir, targetCapability: options.capability, installed, isJson });
   });
 
 // ── Handlers ───────────────────────────────────────────────────────────────
+
+interface InstallCapabilityOpts {
+  ctx: { shitennoDir: string; projectRoot: string };
+  targetDir: string;
+  targetCapability: string | undefined;
+  installed: string[];
+  isJson: boolean;
+}
+
+async function resolveCliVersion(): Promise<string> {
+  const { readFileSync: readFS } = await import("node:fs");
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  try {
+    const pkg = JSON.parse(readFS(join(__dirname, "..", "..", "package.json"), "utf-8"));
+    return pkg.version || "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+async function publishInstalledEvents(shitennoDir: string, caps: string[], cliVersion: string, installed: string[]) {
+  for (const cap of caps) {
+    const capInfo = CAPABILITIES.find((c) => c.id === cap);
+    getEventBus().publish("capability.installed", { capabilityId: cap, capabilityName: capInfo?.name ?? cap, version: cliVersion });
+    recordFeedback(shitennoDir, { recommendationId: `cap-${cap}`, action: "accepted", context: { maturityScore: 0, installedCapabilities: installed, knowledgeDebt: 0 } });
+  }
+}
+
+async function promptCapabilitySelection(available: { id: string; name: string; description: string }[]): Promise<string> {
+  const { select } = await import("inquirer").then((mod) => mod.default.prompt([{ type: "list", name: "select", message: "Select capability to add:", choices: available.map((cap) => ({ name: `${cap.name} — ${cap.description}`, value: cap.id })) }]));
+  return select;
+}
+
+interface FinalizeInstallOpts {
+  shitennoDir: string;
+  targetDir: string;
+  capId: string;
+  capName: string;
+  installed: string[];
+  cliVersion: string;
+}
+
+async function finalizeCapabilityInstall(opts: FinalizeInstallOpts) {
+  const { shitennoDir, targetDir, capId, capName, installed, cliVersion } = opts;
+  const allInstalled = [...installed, capId] as Capability[];
+  updateAgentsMdWithCapabilities(targetDir, allInstalled);
+  updateSystemMapStatus(targetDir, allInstalled);
+  const currentManifest = readManifest(shitennoDir);
+  const updatedManifest = updateManifest(currentManifest, { cliVersion, shitennoDir, capabilities: allInstalled, maturityScore: 0 });
+  writeManifest(shitennoDir, updatedManifest);
+  invalidateCache({ projectRoot: targetDir });
+  getEventBus().publish("capability.installed", { capabilityId: capId, capabilityName: capName, version: cliVersion });
+  recordFeedback(shitennoDir, { recommendationId: `cap-${capId}`, action: "accepted", context: { maturityScore: 0, installedCapabilities: installed, knowledgeDebt: 0 } });
+}
+
+async function generatePostInstallArtifacts(shitennoDir: string, targetDir: string, isJson: boolean) {
+  try {
+    const { generateProjectFingerprint, loadFingerprint } = await import("../project-fingerprint.js");
+    const { generateRiskMap } = await import("../risk-map.js");
+    const { generateContextRules } = await import("../context-rules.js");
+    const analysis = (await import("../analyser.js")).analyseProject(targetDir);
+    let fingerprint = loadFingerprint(shitennoDir);
+    if (!fingerprint) {
+      const { saveFingerprint } = await import("../project-fingerprint.js");
+      fingerprint = generateProjectFingerprint(targetDir, analysis);
+      saveFingerprint(shitennoDir, fingerprint);
+    }
+    const riskMap = generateRiskMap(targetDir, shitennoDir);
+    const contextRules = generateContextRules(fingerprint, riskMap);
+    if (contextRules.length > 0 && !isJson) {
+      outputSection("Context-Aware Rules Generated:");
+      for (const rule of contextRules.slice(0, 3)) output(chalk.gray(`    • ${rule.rule}`));
+      outputBlank();
+    }
+  } catch { /* non-critical */ }
+}
 
 async function handleDryRun(shitennoDir: string, installed: string[], isJson: boolean) {
   const profile = loadMaturityProfile(shitennoDir);
@@ -113,27 +190,22 @@ async function handleAcceptRecommended(ctx: { shitennoDir: string; projectRoot: 
   updateAgentsMdWithCapabilities(targetDir, allInstalled);
   updateSystemMapStatus(targetDir, allInstalled);
 
+  const cliVersion = await resolveCliVersion();
   const currentManifest = readManifest(ctx.shitennoDir);
-  const { readFileSync: readFS } = await import("node:fs");
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  let cliVersion = "unknown";
-  try { const pkg = JSON.parse(readFS(join(__dirname, "..", "..", "package.json"), "utf-8")); cliVersion = pkg.version || "unknown"; } catch { /* fallback */ }
-  const updatedManifest = updateManifest(currentManifest, cliVersion, ctx.shitennoDir, [...installed, ...toInstall] as Capability[], profile?.overallScore ?? 0);
+  const updatedManifest = updateManifest(currentManifest, { cliVersion, shitennoDir: ctx.shitennoDir, capabilities: allInstalled, maturityScore: profile?.overallScore ?? 0 });
   writeManifest(ctx.shitennoDir, updatedManifest);
-  invalidateCache(targetDir);
+  invalidateCache({ projectRoot: targetDir });
 
-  for (const cap of toInstall) {
-    const capInfo = CAPABILITIES.find((c) => c.id === cap);
-    getEventBus().publish("capability.installed", { capabilityId: cap, capabilityName: capInfo?.name ?? cap, version: cliVersion });
-    recordFeedback(ctx.shitennoDir, { recommendationId: `cap-${cap}`, action: "accepted", context: { maturityScore: 0, installedCapabilities: installed, knowledgeDebt: 0 } });
-  }
+  await publishInstalledEvents(ctx.shitennoDir, toInstall, cliVersion, installed);
 
   if (isJson) outputJson({ installed: toInstall, filesInstalled: result.filesInstalled, directoriesCreated: result.directoriesCreated });
   else { outputBlank(); outputSuccess("  ✔ Capabilities installed!"); outputBlank(); for (const cap of toInstall) { const info = CAPABILITIES.find((c) => c.id === cap); output(chalk.cyan(`    ✓ ${info?.name || cap}`)); } outputBlank(); }
 }
 
-async function handleInstallCapability(ctx: { shitennoDir: string; projectRoot: string }, targetDir: string, targetCapability: string | undefined, installed: string[], isJson: boolean) {
+async function handleInstallCapability(opts: InstallCapabilityOpts) {
+  const { ctx, targetDir, installed, isJson } = opts;
+  let { targetCapability } = opts;
+
   if (!targetCapability) {
     const available = CAPABILITIES.filter((cap) => !cap.alwaysInstalled && !installed.includes(cap.id));
     if (available.length === 0) {
@@ -141,8 +213,7 @@ async function handleInstallCapability(ctx: { shitennoDir: string; projectRoot: 
       else { outputSuccess("  ✔ All capabilities are already installed!"); outputBlank(); }
       return;
     }
-    const { select } = await import("inquirer").then((mod) => mod.default.prompt([{ type: "list", name: "select", message: "Select capability to add:", choices: available.map((cap) => ({ name: `${cap.name} — ${cap.description}`, value: cap.id })) }]));
-    targetCapability = select;
+    targetCapability = await promptCapabilitySelection(available);
   }
 
   const capInfo = CAPABILITIES.find((c) => c.id === targetCapability);
@@ -171,36 +242,13 @@ async function handleInstallCapability(ctx: { shitennoDir: string; projectRoot: 
     const result = installCapabilities(targetDir, [targetCapability as Capability]);
     spinner.succeed(`Installed ${capInfo.name}`);
 
-    updateAgentsMdWithCapabilities(targetDir, [...installed, targetCapability] as Capability[]);
-    updateSystemMapStatus(targetDir, [...installed, targetCapability] as Capability[]);
-
-    const currentManifest = readManifest(ctx.shitennoDir);
-    const { readFileSync: readFS } = await import("node:fs");
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
-    let cliVersion = "unknown";
-    try { const pkg = JSON.parse(readFS(join(__dirname, "..", "..", "package.json"), "utf-8")); cliVersion = pkg.version || "unknown"; } catch { /* fallback */ }
-    const updatedManifest = updateManifest(currentManifest, cliVersion, ctx.shitennoDir, [...installed, targetCapability as Capability], 0);
-    writeManifest(ctx.shitennoDir, updatedManifest);
-    invalidateCache(targetDir);
-
-    getEventBus().publish("capability.installed", { capabilityId: targetCapability, capabilityName: capInfo.name, version: cliVersion });
-    recordFeedback(ctx.shitennoDir, { recommendationId: `cap-${targetCapability}`, action: "accepted", context: { maturityScore: 0, installedCapabilities: installed, knowledgeDebt: 0 } });
+    const cliVersion = await resolveCliVersion();
+    await finalizeCapabilityInstall({ shitennoDir: ctx.shitennoDir, targetDir, capId: targetCapability, capName: capInfo.name, installed, cliVersion });
 
     if (isJson) outputJson({ capability: targetCapability, filesInstalled: result.filesInstalled, directoriesCreated: result.directoriesCreated });
     else { outputBlank(); outputSuccess("  ✔ Capability installed!"); outputBlank(); outputSection("Changes:"); output(chalk.gray(`    Directories created: ${result.directoriesCreated}`)); output(chalk.gray(`    Files installed: ${result.filesInstalled}`)); outputBlank(); }
 
-    try {
-      const { generateProjectFingerprint, loadFingerprint } = await import("../project-fingerprint.js");
-      const { generateRiskMap } = await import("../risk-map.js");
-      const { generateContextRules } = await import("../context-rules.js");
-      const analysis = (await import("../analyser.js")).analyseProject(targetDir);
-      let fingerprint = loadFingerprint(ctx.shitennoDir);
-      if (!fingerprint) { const { saveFingerprint } = await import("../project-fingerprint.js"); fingerprint = generateProjectFingerprint(targetDir, analysis); saveFingerprint(ctx.shitennoDir, fingerprint); }
-      const riskMap = generateRiskMap(targetDir, ctx.shitennoDir);
-      const contextRules = generateContextRules(fingerprint, riskMap);
-      if (contextRules.length > 0 && !isJson) { outputSection("Context-Aware Rules Generated:"); for (const rule of contextRules.slice(0, 3)) output(chalk.gray(`    • ${rule.rule}`)); outputBlank(); }
-    } catch { /* non-critical */ }
+    await generatePostInstallArtifacts(ctx.shitennoDir, targetDir, isJson);
   } catch (error) {
     if (isJson) outputJson({ error: "install_failed", message: String(error) });
     else { spinner.fail("Installation failed"); logger.error("upgrade", `Error: ${error}`); }

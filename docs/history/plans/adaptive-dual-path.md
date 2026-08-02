@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Plano: Sistema Adaptativo de Dualidade de Caminhos
 
 ## Visão

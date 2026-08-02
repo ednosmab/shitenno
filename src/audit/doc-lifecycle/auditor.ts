@@ -7,103 +7,48 @@ import { getEventBus } from "../../event-bus.js";
 import type {
   DocLifecycleStatus,
   DocumentClassification,
-  DetectionSignals,
+  DocumentInfo,
   GitCorrelation,
   StalenessSignals,
-  SupersessionSignals,
-  ProposedMove,
   DocLifecycleReport,
   MoveResult,
 } from "./types.js";
 import { detectStatusMarkers, detectCrossReferences, detectSupersession } from "./detectors.js";
 import { classifyDocument, discoverDocuments, hasRecentCommits, getLastModified } from "./classifier.js";
 
+function classifyDocumentWithSignals(doc: DocumentInfo, allDocPaths: string[], docs: DocumentInfo[], adrs: DocumentInfo[]): DocumentClassification {
+  const statusMarkers = detectStatusMarkers(doc.content);
+  const crossReferences = detectCrossReferences(doc.content, allDocPaths);
+  const lastModified = getLastModified(doc.path);
+  const ageInDays = Math.floor((Date.now() - new Date(lastModified).getTime()) / (24 * 60 * 60 * 1000));
+  const gitCorrelation: GitCorrelation = { lastModified, referencedFilesExist: crossReferences.some((r) => r.exists), recentCommits: hasRecentCommits(doc.path, 30) };
+  const staleness: StalenessSignals = { ageInDays, referencedByOtherDocs: docs.some((d) => d.path !== doc.path && d.content.includes(basename(doc.path))), recentCommits: gitCorrelation.recentCommits };
+  const supersessionSignals = doc.docType === "adr" ? detectSupersession(doc, adrs) : undefined;
+  return classifyDocument(doc, { statusMarkers, crossReferences, gitCorrelation, staleness, supersessionSignals });
+}
+
+function buildStatusCounts(classifications: DocumentClassification[]): Record<DocLifecycleStatus, number> {
+  const statusCounts: Record<DocLifecycleStatus, number> = { planned: 0, in_progress: 0, completed: 0, superseded: 0, stale: 0 };
+  for (const c of classifications) statusCounts[c.status]++;
+  return statusCounts;
+}
+
 export function auditDocLifecycle(projectRoot: string, shitennoDir: string): DocLifecycleReport {
   const docs = discoverDocuments(projectRoot, shitennoDir);
   const allDocPaths = docs.map((d) => d.path);
-
   const plans = docs.filter((d) => d.docType === "plan");
   const adrs = docs.filter((d) => d.docType === "adr");
-
-  const classifications: DocumentClassification[] = [];
-
-  for (const doc of docs) {
-    const statusMarkers = detectStatusMarkers(doc.content);
-    const crossReferences = detectCrossReferences(doc.content, allDocPaths);
-
-    const lastModified = getLastModified(doc.path);
-    const ageInDays = Math.floor(
-      (Date.now() - new Date(lastModified).getTime()) / (24 * 60 * 60 * 1000)
-    );
-
-    const gitCorrelation: GitCorrelation = {
-      lastModified,
-      referencedFilesExist: crossReferences.some((r) => r.exists),
-      recentCommits: hasRecentCommits(doc.path, 30),
-    };
-
-    const staleness: StalenessSignals = {
-      ageInDays,
-      referencedByOtherDocs: docs.some(
-        (d) => d.path !== doc.path && d.content.includes(basename(doc.path))
-      ),
-      recentCommits: gitCorrelation.recentCommits,
-    };
-
-    let supersessionSignals: SupersessionSignals | undefined;
-    if (doc.docType === "adr") {
-      supersessionSignals = detectSupersession(doc, adrs);
-    }
-
-    const signals: DetectionSignals = {
-      statusMarkers,
-      crossReferences,
-      gitCorrelation,
-      staleness,
-      supersessionSignals,
-    };
-
-    const classification = classifyDocument(doc, signals);
-    classifications.push(classification);
-  }
-
-  const proposedMoves: ProposedMove[] = classifications
-    .filter((c) => c.confidence >= 0.5)
-    .map((c) => ({
-      source: c.relativePath,
-      destination: join(SHITENNO_DIR_NAME, "docs", c.suggestedDestination, basename(c.path)),
-      docType: c.docType,
-      status: c.status,
-      reason: c.evidence.join("; "),
-    }));
-
-  const statusCounts: Record<DocLifecycleStatus, number> = {
-    planned: 0,
-    in_progress: 0,
-    completed: 0,
-    superseded: 0,
-    stale: 0,
-  };
-  for (const c of classifications) {
-    statusCounts[c.status]++;
-  }
-
-  const summary = [
-    `Analysed ${plans.length} plan(s) and ${adrs.length} ADR(s).`,
+  const classifications = docs.map((doc) => classifyDocumentWithSignals(doc, allDocPaths, docs, adrs));
+  const proposedMoves = classifications.filter((c) => c.confidence >= 0.5).map((c) => ({
+    source: c.relativePath, destination: join(SHITENNO_DIR_NAME, "docs", c.suggestedDestination, basename(c.path)),
+    docType: c.docType, status: c.status, reason: c.evidence.join("; "),
+  }));
+  const statusCounts = buildStatusCounts(classifications);
+  const summary = [`Analysed ${plans.length} plan(s) and ${adrs.length} ADR(s).`,
     `Found: ${statusCounts.planned} planned, ${statusCounts.in_progress} in progress,`,
     `${statusCounts.completed} completed, ${statusCounts.superseded} superseded,`,
-    `${statusCounts.stale} stale.`,
-    `${proposedMoves.length} move(s) proposed.`,
-  ].join(" ");
-
-  return {
-    auditedAt: new Date().toISOString(),
-    totalPlans: plans.length,
-    totalAdrs: adrs.length,
-    classifications,
-    proposedMoves,
-    summary,
-  };
+    `${statusCounts.stale} stale.`, `${proposedMoves.length} move(s) proposed.`].join(" ");
+  return { auditedAt: new Date().toISOString(), totalPlans: plans.length, totalAdrs: adrs.length, classifications, proposedMoves, summary };
 }
 
 export function applyMoves(report: DocLifecycleReport, shitennoDir: string, dryRun: boolean): MoveResult {

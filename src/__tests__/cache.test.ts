@@ -55,69 +55,69 @@ describe("setCache and getCached", () => {
     const checksums = computeKeyChecksums(tempDir, shitennoDir);
     const data = { score: 85, level: "pleno" };
 
-    setCache(tempDir, shitennoDir, "complexity", data, checksums);
-    const result = getCached<typeof data>(tempDir, shitennoDir, "complexity", () =>
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data, checksums });
+    const result = getCached<typeof data>({ projectRoot: tempDir, key: "complexity", computeChecksumsFn: () =>
       computeKeyChecksums(tempDir, shitennoDir)
-    );
+    });
 
     expect(result).toEqual(data);
   });
 
   it("returns null on cache miss (no cache file)", () => {
-    const result = getCached(tempDir, shitennoDir, "complexity", () =>
+    const result = getCached({ projectRoot: tempDir, key: "complexity", computeChecksumsFn: () =>
       computeKeyChecksums(tempDir, shitennoDir)
-    );
+    });
     expect(result).toBeNull();
   });
 
   it("returns null when checksums changed", () => {
     const checksums = computeKeyChecksums(tempDir, shitennoDir);
-    setCache(tempDir, shitennoDir, "complexity", { score: 85 }, checksums);
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data: { score: 85 }, checksums });
 
     // Change the shitenno/ content
     writeFileSync(join(shitennoDir, "changed.md"), "changed");
 
-    const result = getCached(tempDir, shitennoDir, "complexity", () =>
+    const result = getCached({ projectRoot: tempDir, key: "complexity", computeChecksumsFn: () =>
       computeKeyChecksums(tempDir, shitennoDir)
-    );
+    });
     expect(result).toBeNull();
   });
 
   it("returns null for different cache key", () => {
     const checksums = computeKeyChecksums(tempDir, shitennoDir);
-    setCache(tempDir, shitennoDir, "complexity", { score: 85 }, checksums);
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data: { score: 85 }, checksums });
 
-    const result = getCached(tempDir, shitennoDir, "health", () =>
+    const result = getCached({ projectRoot: tempDir, key: "health", computeChecksumsFn: () =>
       computeKeyChecksums(tempDir, shitennoDir)
-    );
+    });
     expect(result).toBeNull();
   });
 
   it("overwrites existing entry for same key", () => {
     const checksums = computeKeyChecksums(tempDir, shitennoDir);
-    setCache(tempDir, shitennoDir, "complexity", { score: 50 }, checksums);
-    setCache(tempDir, shitennoDir, "complexity", { score: 90 }, checksums);
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data: { score: 50 }, checksums });
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data: { score: 90 }, checksums });
 
-    const result = getCached(tempDir, shitennoDir, "complexity", () =>
+    const result = getCached({ projectRoot: tempDir, key: "complexity", computeChecksumsFn: () =>
       computeKeyChecksums(tempDir, shitennoDir)
-    );
+    });
     expect(result).toEqual({ score: 90 });
   });
 
   it("stores multiple keys independently", () => {
     const checksums = computeKeyChecksums(tempDir, shitennoDir);
-    setCache(tempDir, shitennoDir, "complexity", { score: 85 }, checksums);
-    setCache(tempDir, shitennoDir, "patterns", { patterns: [] }, checksums);
-    setCache(tempDir, shitennoDir, "health", { healthScore: 90 }, checksums);
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data: { score: 85 }, checksums });
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "patterns", data: { patterns: [] }, checksums });
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "health", data: { healthScore: 90 }, checksums });
 
-    expect(getCached(tempDir, shitennoDir, "complexity", () => computeKeyChecksums(tempDir, shitennoDir))).toEqual({ score: 85 });
-    expect(getCached(tempDir, shitennoDir, "patterns", () => computeKeyChecksums(tempDir, shitennoDir))).toEqual({ patterns: [] });
-    expect(getCached(tempDir, shitennoDir, "health", () => computeKeyChecksums(tempDir, shitennoDir))).toEqual({ healthScore: 90 });
+    expect(getCached({ projectRoot: tempDir, key: "complexity", computeChecksumsFn: () => computeKeyChecksums(tempDir, shitennoDir) })).toEqual({ score: 85 });
+    expect(getCached({ projectRoot: tempDir, key: "patterns", computeChecksumsFn: () => computeKeyChecksums(tempDir, shitennoDir) })).toEqual({ patterns: [] });
+    expect(getCached({ projectRoot: tempDir, key: "health", computeChecksumsFn: () => computeKeyChecksums(tempDir, shitennoDir) })).toEqual({ healthScore: 90 });
   });
 
   it("writes a valid cache file to disk", () => {
     const checksums = computeKeyChecksums(tempDir, shitennoDir);
-    setCache(tempDir, shitennoDir, "complexity", { score: 85 }, checksums);
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data: { score: 85 }, checksums });
 
     const cachePath = join(tempDir, ".shitenno-cache.json");
     expect(existsSync(cachePath)).toBe(true);
@@ -133,39 +133,39 @@ describe("setCache and getCached", () => {
 describe("invalidateCache", () => {
   it("removes entire cache file when no key specified", () => {
     const checksums = computeKeyChecksums(tempDir, shitennoDir);
-    setCache(tempDir, shitennoDir, "complexity", { score: 85 }, checksums);
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data: { score: 85 }, checksums });
     expect(existsSync(join(tempDir, ".shitenno-cache.json"))).toBe(true);
 
-    invalidateCache(tempDir);
+    invalidateCache({ projectRoot: tempDir });
     expect(existsSync(join(tempDir, ".shitenno-cache.json"))).toBe(false);
   });
 
   it("removes only the specified key", () => {
     const checksums = computeKeyChecksums(tempDir, shitennoDir);
-    setCache(tempDir, shitennoDir, "complexity", { score: 85 }, checksums);
-    setCache(tempDir, shitennoDir, "health", { score: 90 }, checksums);
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data: { score: 85 }, checksums });
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "health", data: { score: 90 }, checksums });
 
-    invalidateCache(tempDir, "complexity");
+    invalidateCache({ projectRoot: tempDir, key: "complexity" });
 
-    expect(getCached(tempDir, shitennoDir, "complexity", () => computeKeyChecksums(tempDir, shitennoDir))).toBeNull();
-    expect(getCached(tempDir, shitennoDir, "health", () => computeKeyChecksums(tempDir, shitennoDir))).toEqual({ score: 90 });
+    expect(getCached({ projectRoot: tempDir, key: "complexity", computeChecksumsFn: () => computeKeyChecksums(tempDir, shitennoDir) })).toBeNull();
+    expect(getCached({ projectRoot: tempDir, key: "health", computeChecksumsFn: () => computeKeyChecksums(tempDir, shitennoDir) })).toEqual({ score: 90 });
   });
 
   it("does nothing when no cache exists", () => {
     // Should not throw
-    invalidateCache(tempDir);
+    invalidateCache({ projectRoot: tempDir });
     expect(existsSync(join(tempDir, ".shitenno-cache.json"))).toBe(false);
   });
 
   it("does nothing when key does not exist in cache", () => {
     const checksums = computeKeyChecksums(tempDir, shitennoDir);
-    setCache(tempDir, shitennoDir, "complexity", { score: 85 }, checksums);
+    setCache({ projectRoot: tempDir, shitennoDir: shitennoDir, key: "complexity", data: { score: 85 }, checksums });
 
     // Invalidate a key that was never set
-    invalidateCache(tempDir, "health");
+    invalidateCache({ projectRoot: tempDir, key: "health" });
 
     // Complexity should still be there
-    expect(getCached(tempDir, shitennoDir, "complexity", () => computeKeyChecksums(tempDir, shitennoDir))).toEqual({ score: 85 });
+    expect(getCached({ projectRoot: tempDir, key: "complexity", computeChecksumsFn: () => computeKeyChecksums(tempDir, shitennoDir) })).toEqual({ score: 85 });
   });
 });
 
@@ -174,9 +174,9 @@ describe("invalidateCache", () => {
 describe("corrupted cache handling", () => {
   it("returns null for corrupted JSON", () => {
     writeFileSync(join(tempDir, ".shitenno-cache.json"), "not valid json {{{");
-    const result = getCached(tempDir, shitennoDir, "complexity", () =>
+    const result = getCached({ projectRoot: tempDir, key: "complexity", computeChecksumsFn: () =>
       computeKeyChecksums(tempDir, shitennoDir)
-    );
+    });
     expect(result).toBeNull();
   });
 
@@ -185,9 +185,9 @@ describe("corrupted cache handling", () => {
       join(tempDir, ".shitenno-cache.json"),
       JSON.stringify({ version: 99, projectRoot: tempDir })
     );
-    const result = getCached(tempDir, shitennoDir, "complexity", () =>
+    const result = getCached({ projectRoot: tempDir, key: "complexity", computeChecksumsFn: () =>
       computeKeyChecksums(tempDir, shitennoDir)
-    );
+    });
     expect(result).toBeNull();
   });
 });

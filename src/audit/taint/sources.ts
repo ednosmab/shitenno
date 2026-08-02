@@ -15,6 +15,7 @@ export const HTTP_SOURCES: TaintSourceDef[] = [
   { pattern: /^req\.headers$/, kind: "property", description: "req.headers — HTTP request headers" },
   { pattern: /^req\.cookies$/, kind: "property", description: "req.cookies — HTTP cookies" },
   { pattern: /^req\.files$/, kind: "property", description: "req.files — Uploaded files" },
+  { pattern: /^req\.file$/, kind: "property", description: "req.file — Single uploaded file" },
 ];
 
 /** Node.js process and global sources */
@@ -56,6 +57,25 @@ export const CLI_SOURCES: TaintSourceDef[] = [
   { pattern: /^options$/, kind: "parameter", description: "options — Commander.js parsed CLI options" },
 ];
 
+/** GraphQL resolver sources (args, context, info) */
+export const GRAPHQL_SOURCES: TaintSourceDef[] = [
+  { pattern: /^args$/, kind: "parameter", description: "args — GraphQL resolver arguments (user-controlled input)" },
+  { pattern: /^args\.\w+$/, kind: "parameter", description: "args.X — GraphQL resolver argument property" },
+  { pattern: /^context$/, kind: "parameter", description: "context — GraphQL resolver context (may contain user data)" },
+  { pattern: /^info$/, kind: "parameter", description: "info — GraphQL resolver info object" },
+  { pattern: /^parent$/, kind: "parameter", description: "parent — GraphQL resolver parent object (contains DB data)" },
+  { pattern: /^root$/, kind: "parameter", description: "root — GraphQL resolver root value" },
+];
+
+/** File upload sources (multer, formidable, busboy, etc.) */
+export const UPLOAD_SOURCES: TaintSourceDef[] = [
+  { pattern: /^file\.originalname$/, kind: "property", description: "file.originalname — Uploaded file original name" },
+  { pattern: /^file\.filename$/, kind: "property", description: "file.filename — Uploaded file stored filename" },
+  { pattern: /^file\.path$/, kind: "property", description: "file.path — Uploaded file path on disk" },
+  { pattern: /^file\.mimetype$/, kind: "property", description: "file.mimetype — Uploaded file MIME type" },
+  { pattern: /^uploadedFile$/, kind: "property", description: "uploadedFile — Upload object (generic)" },
+];
+
 /** All sources combined */
 export const ALL_SOURCES: TaintSourceDef[] = [
   ...HTTP_SOURCES,
@@ -65,6 +85,8 @@ export const ALL_SOURCES: TaintSourceDef[] = [
   ...DB_SOURCES,
   ...FS_SOURCES,
   ...CLI_SOURCES,
+  ...GRAPHQL_SOURCES,
+  ...UPLOAD_SOURCES,
 ];
 
 /** Check if a variable/expression matches any taint source */

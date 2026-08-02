@@ -1,3 +1,8 @@
+---
+category: implementation
+lifecycle: Active
+---
+
 # 24 — CORE EVOLUTION
 
 > Core evolution roadmap.

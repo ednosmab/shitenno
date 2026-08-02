@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # FORBIDDEN_OPERATIONS — Regras Vinculantes
 
 > **Versão:** 1.1

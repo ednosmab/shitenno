@@ -186,35 +186,73 @@ export function detectDrift(
   const keywords = extractKeywords(doc.content);
   const missing: string[] = [];
   let confidence = 0;
-  for (const dep of keywords.dependencies) {
-    if (isFalsePositive(dep)) continue;
-    if (!fuzzyMatch(dep, facts.dependencies, 2)) {
-      missing.push(dep);
-      confidence += CONFIDENCE_RULES.dependency_missing;
-    }
-  }
-  for (const cmd of keywords.commands) {
-    if (isFalsePositive(cmd)) continue;
-    const cmdName = cmd.split(/\s+/).pop() ?? cmd;
-    if (!fuzzyMatch(cmdName, facts.cliCommands, 2)) {
-      missing.push(cmd);
-      confidence += CONFIDENCE_RULES.command_missing;
-    }
-  }
-  for (const key of keywords.configRefs) {
-    if (isFalsePositive(key)) continue;
-    if (!fuzzyMatch(key, facts.configKeys, 1)) {
-      missing.push(key);
-      confidence += CONFIDENCE_RULES.config_missing;
-    }
-  }
-  if (doc.type === "runbook") confidence += CONFIDENCE_RULES.runbook_boost;
-  if (doc.type === "adr" && doc.age && doc.age > 365) confidence += CONFIDENCE_RULES.adr_historical_penalty;
+
+  confidence += collectMissingDependencies(keywords.dependencies, facts.dependencies, missing);
+  confidence += collectMissingCommands(keywords.commands, facts.cliCommands, missing);
+  confidence += collectMissingConfigRefs(keywords.configRefs, facts.configKeys, missing);
+  confidence += applyDocTypeAdjustments(doc);
   confidence = Math.min(1, Math.max(0, confidence));
+
   const reason = missing.length > 0
     ? `Missing in codebase: ${missing.slice(0, 3).join(", ")}${missing.length > 3 ? ` (+${missing.length - 3})` : ""}`
     : "No significant drift detected";
   return { document: docPath ?? "unknown", confidence, missingKeywords: missing, reason };
+}
+
+function collectMissingDependencies(
+  deps: string[],
+  factsDeps: string[],
+  missing: string[]
+): number {
+  let score = 0;
+  for (const dep of deps) {
+    if (isFalsePositive(dep)) continue;
+    if (!fuzzyMatch(dep, factsDeps, 2)) {
+      missing.push(dep);
+      score += CONFIDENCE_RULES.dependency_missing;
+    }
+  }
+  return score;
+}
+
+function collectMissingCommands(
+  cmds: string[],
+  factsCmds: string[],
+  missing: string[]
+): number {
+  let score = 0;
+  for (const cmd of cmds) {
+    if (isFalsePositive(cmd)) continue;
+    const cmdName = cmd.split(/\s+/).pop() ?? cmd;
+    if (!fuzzyMatch(cmdName, factsCmds, 2)) {
+      missing.push(cmd);
+      score += CONFIDENCE_RULES.command_missing;
+    }
+  }
+  return score;
+}
+
+function collectMissingConfigRefs(
+  refs: string[],
+  factsKeys: string[],
+  missing: string[]
+): number {
+  let score = 0;
+  for (const key of refs) {
+    if (isFalsePositive(key)) continue;
+    if (!fuzzyMatch(key, factsKeys, 1)) {
+      missing.push(key);
+      score += CONFIDENCE_RULES.config_missing;
+    }
+  }
+  return score;
+}
+
+function applyDocTypeAdjustments(doc: { type: string; age?: number }): number {
+  let adj = 0;
+  if (doc.type === "runbook") adj += CONFIDENCE_RULES.runbook_boost;
+  if (doc.type === "adr" && doc.age && doc.age > 365) adj += CONFIDENCE_RULES.adr_historical_penalty;
+  return adj;
 }
 
 export function detectDriftBatch(

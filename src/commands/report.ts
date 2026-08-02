@@ -46,31 +46,23 @@ export function formatInsight(insight: Insight): string {
   return `   ${icon} ${text}`;
 }
 
-export function formatReport(report: PerformanceReport): void {
-  output("");
-  output(`${chalk.bold.cyan("╔══╗")}  ${chalk.bold("REPORT")}`);
-  output(`${chalk.bold.cyan("╚══╝")}  Relatório de Desempenho — Últimos ${report.period.days} dias`);
-  output(`   ${chalk.gray(`${report.period.from} → ${report.period.to}`)}`);
-  outputBlank();
-
-  // Profile
+function displayProfileAndDimensions(report: PerformanceReport): void {
   outputSection("📊 Perfil");
   output(`   Padrão: ${chalk.cyan(report.profile.growthPattern)} (${report.profile.challengeLevel > 0.5 ? "desafiador" : "conforto"})`);
   output(`   Capacidade: ${chalk.cyan(Math.round(report.profile.growthCapacity * 100) + "%")}`);
   output(`   Nível de desafio: ${chalk.cyan(Math.round(report.profile.challengeLevel * 100) + "%")}`);
   outputBlank();
 
-  // Dimensions
   outputSection("📐 Dimensões");
   const dims = Object.entries(report.dimensions) as [PerformanceMetric, DimensionReport][];
-  // Sort by score descending
   dims.sort((a, b) => b[1].score - a[1].score);
   for (const [dim, data] of dims) {
     output(formatDimensionBar(METRIC_LABELS[dim], data));
   }
   outputBlank();
+}
 
-  // Trends
+function displayTrendsAndFeedback(report: PerformanceReport): void {
   outputSection("📈 Tendências");
   const debtColor = report.debtTrend.delta < 0 ? chalk.green : report.debtTrend.delta > 0 ? chalk.red : chalk.gray;
   const matColor = report.maturityTrend.delta > 0 ? chalk.green : report.maturityTrend.delta < 0 ? chalk.red : chalk.gray;
@@ -78,7 +70,6 @@ export function formatReport(report: PerformanceReport): void {
   output(`   Knowledge Debt:  ${report.debtTrend.current} → ${report.debtTrend.current + report.debtTrend.delta}  (${debtColor((report.debtTrend.delta > 0 ? "+" : "") + report.debtTrend.delta)})`);
   outputBlank();
 
-  // Feedback
   outputSection("💬 Feedback");
   output(`   ${report.feedback.totalInteractions} interações | ${report.feedback.acceptanceRate}% aceitação | ${report.feedback.challengingRatio}% desafio`);
   if (report.feedback.patterns.length > 0) {
@@ -87,8 +78,9 @@ export function formatReport(report: PerformanceReport): void {
     }
   }
   outputBlank();
+}
 
-  // Sessions
+function displaySessions(report: PerformanceReport): void {
   if (report.sessions.total > 0) {
     outputSection("🕐 Sessões");
     output(`   Total: ${report.sessions.total} | Média: ${report.sessions.avgDuration}min`);
@@ -100,27 +92,78 @@ export function formatReport(report: PerformanceReport): void {
     }
     outputBlank();
   }
+}
 
-  // Insights
+function displayInsightsAndSteps(report: PerformanceReport): void {
   outputSection("💡 Insights");
   for (const insight of report.insights) {
     output(formatInsight(insight));
   }
   outputBlank();
 
-  // Next Steps
   outputSection("📌 Próximos Passos");
   for (let i = 0; i < report.nextSteps.length; i++) {
     output(`   ${i + 1}. ${report.nextSteps[i]}`);
   }
   outputBlank();
+}
 
-  // Summary
+export function formatReport(report: PerformanceReport): void {
+  output("");
+  output(`${chalk.bold.cyan("╔══╗")}  ${chalk.bold("REPORT")}`);
+  output(`${chalk.bold.cyan("╚══╝")}  Relatório de Desempenho — Últimos ${report.period.days} dias`);
+  output(`   ${chalk.gray(`${report.period.from} → ${report.period.to}`)}`);
+  outputBlank();
+  displayProfileAndDimensions(report);
+  displayTrendsAndFeedback(report);
+  displaySessions(report);
+  displayInsightsAndSteps(report);
   output(chalk.gray(report.summary));
   outputBlank();
 }
 
 // ── Command ──────────────────────────────────────────────────────────────────
+
+function printReportBanner(): void {
+  output("");
+  output(`${chalk.bold.cyan("╔══╗")}  ${chalk.bold("REPORT")}`);
+  output(`${chalk.bold.cyan("╚══╝")}  Relatório de Desempenho`);
+  outputBlank();
+}
+
+function handleReportSuccess(
+  shitennoDir: string,
+  report: PerformanceReport,
+  args: { isJson: boolean; days: number; save: boolean }
+): void {
+  if (args.isJson) {
+    outputJson(report as unknown as Record<string, unknown>);
+  } else {
+    formatReport(report);
+  }
+
+  if (args.save) {
+    const filename = writePerformanceReport(shitennoDir, report);
+    if (filename && !args.isJson) {
+      output(chalk.gray(`  Relatório salvo em: reports/${filename}`));
+    }
+  }
+
+  getEventBus().publish("analysis.complete", {
+    type: "performance_report",
+    days: args.days,
+    dimensions: Object.keys(report.dimensions).length,
+    insights: report.insights.length,
+  });
+}
+
+function handleReportError(error: unknown, isJson: boolean): void {
+  if (isJson) {
+    outputJson({ error: "report_failed", message: String(error) });
+  } else {
+    logger.error("report", `Erro: ${error}`);
+  }
+}
 
 export function reportCommand(): Command {
   const cmd = new Command("report")
@@ -133,12 +176,7 @@ export function reportCommand(): Command {
       const isJson = options.json === true;
       const days = Number(options.period) || 30;
 
-      if (!isJson) {
-        output("");
-        output(`${chalk.bold.cyan("╔══╗")}  ${chalk.bold("REPORT")}`);
-        output(`${chalk.bold.cyan("╚══╝")}  Relatório de Desempenho`);
-        outputBlank();
-      }
+      if (!isJson) printReportBanner();
 
       const ctx = guardNotInitialized(options, isJson);
       if (!ctx) return;
@@ -153,38 +191,11 @@ export function reportCommand(): Command {
 
       try {
         const report = generatePerformanceReport(ctx.projectRoot, ctx.shitennoDir, { days });
-
         spinner.stop();
-
-        if (isJson) {
-          outputJson(report as unknown as Record<string, unknown>);
-        } else {
-          formatReport(report);
-        }
-
-        // Save if requested
-        if (options.save) {
-          const filename = writePerformanceReport(ctx.shitennoDir, report);
-          if (filename && !isJson) {
-            output(chalk.gray(`  Relatório salvo em: reports/${filename}`));
-          }
-        }
-
-        // Publish event
-        getEventBus().publish("analysis.complete", {
-          type: "performance_report",
-          days,
-          dimensions: Object.keys(report.dimensions).length,
-          insights: report.insights.length,
-        });
-
+        handleReportSuccess(ctx.shitennoDir, report, { isJson, days, save: !!options.save });
       } catch (error) {
         spinner.fail("Erro ao gerar relatório");
-        if (isJson) {
-          outputJson({ error: "report_failed", message: String(error) });
-        } else {
-          logger.error("report", `Erro: ${error}`);
-        }
+        handleReportError(error, isJson);
       }
     });
 

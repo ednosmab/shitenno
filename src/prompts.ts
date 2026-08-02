@@ -38,44 +38,25 @@ export interface UserAnswers {
   };
 }
 
-/**
- * Questionário de descoberta de maturidade.
- * Cada pergunta contribui para uma dimensão do perfil.
- */
-export async function askQuestions(
-  analysis: ProjectAnalysis
-): Promise<UserAnswers> {
+function renderBlockHeader(icon: string, title: string): void {
   outputBlank();
-
-  // ── Bloco 1: Configuração IA ──
   output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   🤖  Configuração IA               │"));
+  output(chalk.bold.cyan(`  │   ${icon}  ${title.padEnd(30)}│`));
   output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
   outputBlank();
+}
 
-  const aiConfig = await inquirer.prompt([
-    {
-      type: "input",
-      name: "principalModel",
-      message: "Modelo de IA principal (para planning/review):",
-      default: "opencode/mimo-v2.5-free",
-    },
-    {
-      type: "input",
-      name: "executorModel",
-      message: "Modelo de IA para build/executor:",
-      default: "opencode/deepseek-v4-flash-free",
-    },
+async function promptAIConfig() {
+  renderBlockHeader("🤖", "Configuração IA");
+  return inquirer.prompt([
+    { type: "input", name: "principalModel", message: "Modelo de IA principal (para planning/review):", default: "opencode/mimo-v2.5-free" },
+    { type: "input", name: "executorModel", message: "Modelo de IA para build/executor:", default: "opencode/deepseek-v4-flash-free" },
   ]);
+}
 
-  // ── Bloco 2: Stack Tecnológica ──
-  outputBlank();
-  output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   📦  Stack Tecnológica              │"));
-  output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
-  outputBlank();
-
-  const stackConfig = await inquirer.prompt([
+async function promptStackConfig(analysis: ProjectAnalysis) {
+  renderBlockHeader("📦", "Stack Tecnológica");
+  return inquirer.prompt([
     {
       type: "checkbox",
       name: "stack",
@@ -95,54 +76,24 @@ export async function askQuestions(
         { name: "Outro", value: "other" },
       ],
     },
-    {
-      type: "list",
-      name: "database",
-      message: "SGBD / banco de dados:",
-      choices: ["PostgreSQL", "MySQL", "SQLite", "MongoDB", "Supabase", "Firebase", "Nenhum", "Outro"],
-    },
-    {
-      type: "list",
-      name: "styling",
-      message: "Framework de estilização:",
-      choices: ["Tailwind CSS", "CSS Modules", "Styled Components", "Emotion", "Tamagui", "NativeWind", "Nenhum (CSS puro)", "Outro"],
-    },
+    { type: "list", name: "database", message: "SGBD / banco de dados:", choices: ["PostgreSQL", "MySQL", "SQLite", "MongoDB", "Supabase", "Firebase", "Nenhum", "Outro"] },
+    { type: "list", name: "styling", message: "Framework de estilização:", choices: ["Tailwind CSS", "CSS Modules", "Styled Components", "Emotion", "Tamagui", "NativeWind", "Nenhum (CSS puro)", "Outro"] },
   ]);
+}
 
-  // ── Bloco 3: Experiência ──
-  outputBlank();
-  output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   👤  Experiência                    │"));
-  output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
-  outputBlank();
-
-  const experience = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "usedShitennoBefore",
-      message: "Já utilizou o Shugo anteriormente?",
-      default: false,
-    },
-    {
-      type: "confirm",
-      name: "isFirstProject",
-      message: "É seu primeiro projeto utilizando o Shugo?",
-      default: false,
-    },
+async function promptExperience() {
+  renderBlockHeader("👤", "Experiência");
+  return inquirer.prompt([
+    { type: "confirm", name: "usedShitennoBefore", message: "Já utilizou o Shugo anteriormente?", default: false },
+    { type: "confirm", name: "isFirstProject", message: "É seu primeiro projeto utilizando o Shugo?", default: false },
   ]);
+}
 
-  // ── Bloco 4: Projeto ──
-  outputBlank();
-  output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   📁  Projeto                        │"));
-  output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
-  outputBlank();
-
-  const projectInfo = await inquirer.prompt([
+async function promptProjectInfo() {
+  renderBlockHeader("📁", "Projeto");
+  return inquirer.prompt([
     {
-      type: "list",
-      name: "projectAge",
-      message: "Idade do projeto:",
+      type: "list", name: "projectAge", message: "Idade do projeto:",
       choices: [
         { name: "Novo (menos de 1 mês)", value: "new" },
         { name: "Poucos meses (1-6 meses)", value: "few_months" },
@@ -151,9 +102,7 @@ export async function askQuestions(
       ],
     },
     {
-      type: "list",
-      name: "teamSize",
-      message: "Tamanho da equipa:",
+      type: "list", name: "teamSize", message: "Tamanho da equipa:",
       choices: [
         { name: "Solo (só eu)", value: "solo" },
         { name: "Pequena (2-3 pessoas)", value: "small" },
@@ -161,242 +110,127 @@ export async function askQuestions(
         { name: "Grande (9+ pessoas)", value: "large" },
       ],
     },
-    {
-      type: "confirm",
-      name: "hasDedicatedTeam",
-      message: "Existe equipe dedicada ao projeto?",
-      default: false,
-    },
+    { type: "confirm", name: "hasDedicatedTeam", message: "Existe equipe dedicada ao projeto?", default: false },
   ]);
+}
 
-  // ── Bloco 5: Arquitetura ──
-  outputBlank();
-  output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   🏗️   Arquitetura                   │"));
-  output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
-  outputBlank();
-
-  const architecture = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "hasArchitectureDocs",
-      message: "Existe documentação arquitetural?",
-      default: false,
-    },
-    {
-      type: "confirm",
-      name: "hasADRs",
-      message: "Existem Architecture Decision Records (ADRs)?",
-      default: false,
-    },
-    {
-      type: "confirm",
-      name: "hasTechnicalReviews",
-      message: "Há revisão técnica regular?",
-      default: false,
-    },
+async function promptArchitecture() {
+  renderBlockHeader("🏗️", "Arquitetura");
+  return inquirer.prompt([
+    { type: "confirm", name: "hasArchitectureDocs", message: "Existe documentação arquitetural?", default: false },
+    { type: "confirm", name: "hasADRs", message: "Existem Architecture Decision Records (ADRs)?", default: false },
+    { type: "confirm", name: "hasTechnicalReviews", message: "Há revisão técnica regular?", default: false },
   ]);
+}
 
-  // ── Bloco 6: Qualidade ──
-  outputBlank();
-  output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   ✅  Qualidade                      │"));
-  output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
-  outputBlank();
-
-  // Auto-detect CI/CD from analysis
-  const quality = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "hasCICD",
-      message: "Existe CI/CD configurado?",
-      default: analysis.hasCI,
-    },
-    {
-      type: "confirm",
-      name: "hasAutomatedTests",
-      message: "Existem testes automatizados?",
-      default: analysis.hasTests,
-    },
-    {
-      type: "confirm",
-      name: "hasValidationPipeline",
-      message: "Existe pipeline de validação?",
-      default: false,
-    },
+async function promptQuality(analysis: ProjectAnalysis) {
+  renderBlockHeader("✅", "Qualidade");
+  return inquirer.prompt([
+    { type: "confirm", name: "hasCICD", message: "Existe CI/CD configurado?", default: analysis.hasCI },
+    { type: "confirm", name: "hasAutomatedTests", message: "Existem testes automatizados?", default: analysis.hasTests },
+    { type: "confirm", name: "hasValidationPipeline", message: "Existe pipeline de validação?", default: false },
   ]);
+}
 
-  // ── Bloco 7: IA ──
-  outputBlank();
-  output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   🧠  Inteligência Artificial         │"));
-  output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
-  outputBlank();
-
-  const aiUsage = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "intendsToUseAI",
-      message: "Pretende utilizar IA durante o desenvolvimento?",
-      default: true,
-    },
-    {
-      type: "confirm",
-      name: "aiWillImplement",
-      message: "A IA participará da implementação?",
-      default: true,
-    },
-    {
-      type: "confirm",
-      name: "requiresHumanReview",
-      message: "Haverá revisão humana obrigatória?",
-      default: true,
-    },
+async function promptAIUsage() {
+  renderBlockHeader("🧠", "Inteligência Artificial");
+  return inquirer.prompt([
+    { type: "confirm", name: "intendsToUseAI", message: "Pretende utilizar IA durante o desenvolvimento?", default: true },
+    { type: "confirm", name: "aiWillImplement", message: "A IA participará da implementação?", default: true },
+    { type: "confirm", name: "requiresHumanReview", message: "Haverá revisão humana obrigatória?", default: true },
   ]);
+}
 
-  // ── Bloco 8: Governança ──
-  outputBlank();
-  output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   📋  Governança                     │"));
-  output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
-  outputBlank();
-
-  const governance = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "hasDefinedPatterns",
-      message: "Existem padrões definidos?",
-      default: false,
-    },
-    {
-      type: "confirm",
-      name: "hasReviewProcess",
-      message: "Existe processo de revisão?",
-      default: false,
-    },
-    {
-      type: "confirm",
-      name: "hasDecisionControl",
-      message: "Existe controle de decisões?",
-      default: false,
-    },
+async function promptGovernance() {
+  renderBlockHeader("📋", "Governança");
+  return inquirer.prompt([
+    { type: "confirm", name: "hasDefinedPatterns", message: "Existem padrões definidos?", default: false },
+    { type: "confirm", name: "hasReviewProcess", message: "Existe processo de revisão?", default: false },
+    { type: "confirm", name: "hasDecisionControl", message: "Existe controle de decisões?", default: false },
   ]);
+}
 
-  // ── Bloco 9: Perfil do Usuário ──
-  outputBlank();
-  output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   👤  Perfil do Usuário              │"));
-  output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
-  outputBlank();
+const ROLE_CHOICES = [
+  { name: "Tech Lead em Formação", value: "Tech Lead em Formação" },
+  { name: "Senior Developer", value: "Senior Developer" },
+  { name: "Junior Developer", value: "Junior Developer" },
+  { name: "Pleno Developer", value: "Pleno Developer" },
+  { name: "Architect", value: "Architect" },
+  { name: "Engineering Manager", value: "Engineering Manager" },
+  { name: "Outro", value: "Outro" },
+];
+
+const LEVEL_CHOICES = [
+  { name: "Júnior — ainda a aprender padrões", value: "junior" },
+  { name: "Pleno — conhece bem os fundamentos", value: "pleno" },
+  { name: "Sênior — domina system design", value: "senior" },
+];
+
+const CODING_CHOICES = [
+  { name: "Júnior — ainda a aprender", value: "junior" },
+  { name: "Pleno — escreve bem", value: "pleno" },
+  { name: "Sênior — domina padrões e optimização", value: "senior" },
+];
+
+const LEADERSHIP_CHOICES = [
+  { name: "Júnior — foco em execução", value: "junior" },
+  { name: "Pleno — começa a guiar", value: "pleno" },
+  { name: "Sênior — guia o time", value: "senior" },
+];
+
+const TONE_CHOICES = [
+  { name: "Mentor — suportivo, didático, encorajador", value: "mentor" },
+  { name: "Peer — directo, entre pares", value: "peer" },
+  { name: "Relatório — técnico, impessoal", value: "relatorio" },
+];
+
+function validateCodeFreePercent(value: string): string | true {
+  const num = parseInt(value, 10);
+  if (isNaN(num) || num < 0 || num > 100) return "Deve ser um número entre 0 e 100";
+  return true;
+}
+
+async function promptUserProfile() {
+  renderBlockHeader("👤", "Perfil do Usuário");
   output(chalk.gray("  Para feedback personalizado. Pode configurar depois com 'shugo profile'."));
   outputBlank();
-
-  const userProfile = await inquirer.prompt([
-    {
-      type: "input",
-      name: "name",
-      message: "O teu nome:",
-      default: "Developer",
-    },
-    {
-      type: "list",
-      name: "role",
-      message: "O teu cargo/role:",
-      choices: [
-        { name: "Tech Lead em Formação", value: "Tech Lead em Formação" },
-        { name: "Senior Developer", value: "Senior Developer" },
-        { name: "Junior Developer", value: "Junior Developer" },
-        { name: "Pleno Developer", value: "Pleno Developer" },
-        { name: "Architect", value: "Architect" },
-        { name: "Engineering Manager", value: "Engineering Manager" },
-        { name: "Outro", value: "Outro" },
-      ],
-    },
-    {
-      type: "list",
-      name: "architecture",
-      message: "Nível de Arquitectura:",
-      choices: [
-        { name: "Júnior — ainda a aprender padrões", value: "junior" },
-        { name: "Pleno — conhece bem os fundamentos", value: "pleno" },
-        { name: "Sênior — domina system design", value: "senior" },
-      ],
-    },
-    {
-      type: "list",
-      name: "coding",
-      message: "Nível de Código:",
-      choices: [
-        { name: "Júnior — ainda a aprender", value: "junior" },
-        { name: "Pleno — escreve bem", value: "pleno" },
-        { name: "Sênior — domina padrões e optimização", value: "senior" },
-      ],
-    },
-    {
-      type: "list",
-      name: "leadership",
-      message: "Nível de Leadership:",
-      choices: [
-        { name: "Júnior — foco em execução", value: "junior" },
-        { name: "Pleno — começa a guiar", value: "pleno" },
-        { name: "Sênior — guia o time", value: "senior" },
-      ],
-    },
-    {
-      type: "list",
-      name: "tone",
-      message: "Tom de feedback preferido:",
-      choices: [
-        { name: "Mentor — suportivo, didático, encorajador", value: "mentor" },
-        { name: "Peer — directo, entre pares", value: "peer" },
-        { name: "Relatório — técnico, impessoal", value: "relatorio" },
-      ],
-    },
-    {
-      type: "list",
-      name: "language",
-      message: "Idioma do feedback:",
-      choices: [
-        { name: "Português", value: "pt" },
-        { name: "English", value: "en" },
-      ],
-    },
-    {
-      type: "input",
-      name: "codeFreePercent",
-      message: "Percentagem de feedback no-code (0-100):",
-      default: "50",
-      validate: (value: string) => {
-        const num = parseInt(value, 10);
-        if (isNaN(num) || num < 0 || num > 100) return "Deve ser um número entre 0 e 100";
-        return true;
-      },
-    },
-    {
-      type: "input",
-      name: "focusAreas",
-      message: "Áreas de foco (vírgula-separado, ex: visão,leadership):",
-      default: "",
-    },
+  return inquirer.prompt([
+    { type: "input", name: "name", message: "O teu nome:", default: "Developer" },
+    { type: "list", name: "role", message: "O teu cargo/role:", choices: ROLE_CHOICES },
+    { type: "list", name: "architecture", message: "Nível de Arquitectura:", choices: LEVEL_CHOICES },
+    { type: "list", name: "coding", message: "Nível de Código:", choices: CODING_CHOICES },
+    { type: "list", name: "leadership", message: "Nível de Leadership:", choices: LEADERSHIP_CHOICES },
+    { type: "list", name: "tone", message: "Tom de feedback preferido:", choices: TONE_CHOICES },
+    { type: "list", name: "language", message: "Idioma do feedback:", choices: [{ name: "Português", value: "pt" }, { name: "English", value: "en" }] },
+    { type: "input", name: "codeFreePercent", message: "Percentagem de feedback no-code (0-100):", default: "50", validate: validateCodeFreePercent },
+    { type: "input", name: "focusAreas", message: "Áreas de foco (vírgula-separado, ex: visão,leadership):", default: "" },
   ]);
+}
 
-  // ── Bloco 10: MCP Server ──
-  outputBlank();
-  output(chalk.bold.cyan("  ╭──────────────────────────────────────╮"));
-  output(chalk.bold.cyan("  │   🔌  MCP Server                     │"));
-  output(chalk.bold.cyan("  ╰──────────────────────────────────────╯"));
-  outputBlank();
+async function promptMcpConfig() {
+  renderBlockHeader("🔌", "MCP Server");
   output(chalk.gray("  Regista o shitenno-mcp em .mcp.json para AI agents (Claude Code, Cursor, etc.)."));
   outputBlank();
-
-  const mcpConfig = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "enableMcpRegistration",
-      message: "Registar servidor MCP (.mcp.json)?",
-      default: true,
-    },
+  return inquirer.prompt([
+    { type: "confirm", name: "enableMcpRegistration", message: "Registar servidor MCP (.mcp.json)?", default: true },
   ]);
+}
+
+export async function askQuestions(
+  analysis: ProjectAnalysis
+): Promise<UserAnswers> {
+  outputBlank();
+
+  const aiConfig = await promptAIConfig();
+  const stackConfig = await promptStackConfig(analysis);
+  const experience = await promptExperience();
+  const projectInfo = await promptProjectInfo();
+  const architecture = await promptArchitecture();
+  const quality = await promptQuality(analysis);
+  const aiUsage = await promptAIUsage();
+  const governance = await promptGovernance();
+  const userProfile = await promptUserProfile();
+  const mcpConfig = await promptMcpConfig();
 
   return {
     principalModel: aiConfig.principalModel,

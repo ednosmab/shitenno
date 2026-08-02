@@ -41,7 +41,7 @@ export interface CapabilityMetrics {
 export interface CapabilityEngineResult {
   evaluatedAt: string;
   capabilities: CapabilityEntity[];
-  byMaturity: Record<CapabilityMaturity, Capability[]>;
+  byMaturity: Record<CapabilityMaturity, CapabilityEntity[]>;
   overallScore: number;
   recommendations: CapabilityRecommendation[];
   summary: string;

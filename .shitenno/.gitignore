@@ -1,0 +1,20 @@
+# Shitenno private files
+*.log
+*.pid
+*.sock
+daemon-state.json
+circuit-breaker.json
+notifications.jsonl
+proactive-digest.md
+engineering-state.json
+capability-engine.json
+fingerprint.json
+audit-suppressions.json
+audit-suppressions.jsonl
+answers.json
+feedback/records/*.json
+feedback/summary.json
+governance/executions/*.json
+governance/change-journal.jsonl
+governance/context/checkpoints/*.yaml
+reports/*.json

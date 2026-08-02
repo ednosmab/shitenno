@@ -1,8 +1,15 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # DESDO — Diretrizes de Engenharia
 
-> **Versão:** 1.0
-> **Data:** 2026-07-09
+> **Versão:** 1.1
+> **Data:** 2026-07-28
 > **Aplicável a:** Todos os agentes IA e developers
+
+> Regras detalhadas (SOLID, TDD, limites, segurança): `docs/engineering-standards.md`
 
 ---
 
@@ -12,74 +19,21 @@
 
 ---
 
-## 1.1 Limites de Tamanho
+## 1. Referências
 
-| Limite | Valor | Regra ESLint | Excepções |
-|--------|-------|--------------|-----------|
-| Ficheiro | 300 linhas | max-lines-per-file | `__tests__/`, `src/templates/` |
-| Função | 50 linhas | max-lines-per-function | — |
-| Profundidade | 4 níveis | max-depth | — |
-| Parâmetros | 4 por função | max-params | — |
-| Complexidade | 15 | complexity | — |
-
-> **Referência:** ADR-007 (docs/adrs/ADR-007-file-size-limits.md)
-
-## 2. Princípios SOLID
-
-- **S** — Single Responsibility: cada função/classe com um motivo para mudar
-- **O** — Open/Closed: aberto para extensão, fechado para modificação
-- **L** — Liskov Substitution: subclasses substituíveis sem quebrar
-- **I** — Interface Segregation: interfaces pequenas e específicas
-- **D** — Dependency Inversion: depender de abstrações, não implementações
-
-## 3. TDD — Test-Driven Development
-
-### Ciclo Red-Green-Refactor
-1. **RED** — Escrever teste que falha
-2. **GREEN** — Implementar mínimo para passar
-3. **REFACTOR** — Limpar sem mudar comportamento
-
-### Pirâmide de Testes
-- **Unitários** — Muitos, rápidos, lógica de negócio
-- **Integração** — Médios, fluxos entre serviços
-- **E2E** — Poucos, lentos, críticos
-
-## 4. Segurança
-
-1. Sanitizar todo input dinâmico
-2. Usar componentes seguros (nunca `dangerouslySetInnerHTML` sem sanitização)
-3. Validar todos os dados na entrada (Zod, Yup, etc.)
-4. RLS em todas as tabelas
-5. Sanitizar output (prevenir XSS)
-
-## 5. Documentação
-
-- **JSDoc** obrigatório em todas as funções exportadas
-- **ADRs** para decisões arquitecturais (`docs/adrs/`)
-- **SDRs** para decisões de solução (`docs/sdr/` — futuro)
-
-## 6. Performance
-
-- Não optimizar prematuramente
-- Medir primeiro com ferramentas de profiling
-- Definir métricas antes de optimizar
-
-## 7. Git e Branches
-
-### Conventional Commits
-```
-feat: add new feature
-fix: correct bug
-docs: update documentation
-refactor: code restructuring
-test: adding missing tests
-chore: maintenance tasks
-```
-
----
-
-## Referências
-
+- `docs/engineering-standards.md` — Padrões de código (SOLID, TDD, limites, segurança)
 - `docs/AGENTS.md` — Regras do time
 - `docs/FORBIDDEN_OPERATIONS.md` — Regras vinculantes
 - `docs/skills/senior-engineer.md` — Postura operacional
+
+## 2. Mitigações Operacionais
+
+- Antes de criar nova tabela: verificar se RLS está configurado
+- Antes de commit: rodar `pnpm run lint` e `pnpm run test`
+- Decisões arquiteturais: documentar em `docs/adrs/`
+
+## 3. Governança
+
+- ADRs para decisões de alto impacto (`docs/adrs/`)
+- SDRs para decisões de solução (`docs/sdr/` — futuro)
+- Loading profiles para optimização de tokens (ver `docs/AGENTS.md` §Loading Profiles)

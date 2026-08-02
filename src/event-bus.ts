@@ -36,7 +36,6 @@ export type ShitennoEventType =
   | "task.completed"
   | "pipeline.stage.start"
   | "pipeline.stage.complete"
-  | "pipeline.started"
   | "pipeline.complete"
   | "lifecycle.state_changed"
   | "knowledge.analyzed"
@@ -66,12 +65,34 @@ export type ShitennoEventType =
   | "state.mutated"
   | "workdir.large_uncommitted_drift"
   | "context.p4_loaded"
-  | "context.tier_mismatch"
   | "watcher.error"
   | "daemon.ready"
-  | "action.pre_sensitive";
+  | "briefing.generated"
+  | "proactive.digest_ready"
+  | "action.pre_sensitive"
+  | "audit.standard"
+  | "source.changed"
+  | "source.file_added"
+  | "source.file_deleted"
+  | "git.branch_changed"
+  | "git.commit_detected"
+  | "git.large_commit_detected"
+  | "git.ref_updated"
+  | "semantic.pattern_detected"
+  | "semantic.insight_detected"
+  | "notification.sent"
+  | "notification.throttled"
+  | "user.notification";
 
 export type EventHandler<T = unknown> = (payload: T) => void | Promise<void>;
+
+/** Optional semantic annotation added by the Signal Classifier. */
+export interface SemanticAnnotation {
+  domain: string;
+  subdomain: string;
+  confidence: number;
+  evidence: string[];
+}
 
 /** Envelope wrapping a typed payload with metadata. */
 export interface EventEnvelope<T = unknown> {
@@ -80,6 +101,7 @@ export interface EventEnvelope<T = unknown> {
   timestamp: string;
   traceId: TraceId;
   correlationId?: CorrelationId;
+  semantic?: SemanticAnnotation;
 }
 
 export interface EventBus {

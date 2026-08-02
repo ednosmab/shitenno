@@ -21,10 +21,7 @@ export function registerMdLifecycle(cmd: import("commander").Command) {
 
       const { runLifecycleReview } = await import("../../plan-lifecycle.js");
       try {
-        const result = await runLifecycleReview(ctx.projectRoot, {
-          auto: opts.auto === true,
-          dry: opts.dry === true,
-        });
+        const result = await runLifecycleReview(ctx.shitennoDir, ctx.projectRoot);
         if (isJson) outputJson(result as unknown as Record<string, unknown>);
       } catch (error) {
         if (isJson) outputJson({ error: error instanceof Error ? error.message : String(error) });

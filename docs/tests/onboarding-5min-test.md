@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Manual Test: 5-Minute Onboarding
 
 > **Objective:** Validate that a person with zero Shugo context can run `shugo init` and understand the output within 5 minutes, without asking anyone for help.

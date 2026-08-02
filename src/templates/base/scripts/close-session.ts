@@ -87,16 +87,19 @@ function checkBuffer() {
 
 // ── 4. Backlog updated? ───────────────────────────────────────────────────
 function checkBacklog() {
-  const backlogPath = resolve(ROOT, '.shitenno', 'docs', 'BACKLOG.md');
+  const modularPath = resolve(ROOT, '.shitenno', 'docs', 'backlog', 'ACTIVE.md');
+  const legacyPath = resolve(ROOT, '.shitenno', 'docs', 'BACKLOG.md');
+  const backlogPath = existsSync(modularPath) ? modularPath : legacyPath;
+
   if (!existsSync(backlogPath)) {
-    warn('BACKLOG', 'BACKLOG.md not found');
+    warn('BACKLOG', 'Backlog not found');
     return;
   }
   const content = readFileSync(backlogPath, 'utf-8');
   if (content.includes('Concluído') || content.includes('Done') || content.includes('In Progress')) {
-    pass('BACKLOG', 'BACKLOG.md has tracked items');
+    pass('BACKLOG', 'Backlog has tracked items');
   } else {
-    warn('BACKLOG', 'BACKLOG.md may need updating');
+    warn('BACKLOG', 'Backlog may need updating');
   }
 }
 
@@ -216,6 +219,67 @@ async function checkPlanLifecycle() {
   }
 }
 
+// ── 8. E2E suite — best-effort, never blocks session close ─────────────────
+// A suíte pesada (cli-integration, dashboard, heavy-bootstrap-scoping, bench)
+// não roda no gate de plan done (usa test:unit — ver BLOCO P). Roda aqui
+// pelo menos uma vez por sessão como best-effort: se falhar, gera um reminder
+// P1 em context_buffer.yaml visível no próximo briefing, mas NÃO bloqueia
+// o fechamento da sessão.
+function runE2eBestEffort() {
+  try {
+    const pkgPath = resolve(ROOT, 'package.json');
+    if (!existsSync(pkgPath)) {
+      warn('E2E_SUITE', 'No package.json found — skipping');
+      return;
+    }
+    let e2eScript = '';
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      e2eScript = pkg.scripts?.['test:e2e'] ?? '';
+    } catch { /* no-op */ }
+
+    if (!e2eScript) {
+      warn('E2E_SUITE', 'No test:e2e script — skipped (non-blocking)');
+      return;
+    }
+
+    console.log('🧪 [E2E_SUITE] Running test:e2e (best-effort, non-blocking)...');
+    execSync('npm run test:e2e 2>&1 | tail -20', {
+      encoding: 'utf-8',
+      cwd: ROOT,
+      timeout: 600000, // 10min — suíte pesada é lenta mas NÃO é bloqueante
+    });
+    pass('E2E_SUITE', 'test:e2e passed');
+  } catch (err) {
+    // NÃO define exitCode — best-effort, sessão fecha normalmente
+    const detail = err instanceof Error ? err.message : String(err);
+    warn('E2E_SUITE', `test:e2e failed (non-blocking): ${String(detail).slice(0, 200)}`);
+
+    // Registar reminder P1 em context_buffer.yaml para visibilidade no próximo briefing
+    try {
+      const shitennoDir = resolve(ROOT, '.shitenno');
+      const bufferPath = resolve(shitennoDir, 'governance', 'context', 'context_buffer.yaml');
+      if (existsSync(bufferPath)) {
+        const bufContent = readFileSync(bufferPath, 'utf-8');
+        const nagMsg = 'e2e-suite: test:e2e falhou na última sessão — investigar antes do próximo release';
+        const escapedMsg = nagMsg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (!new RegExp(`^\\s*- message: "${escapedMsg}"`, 'm').test(bufContent)) {
+          const priority = 'P1';
+          const createdAt = new Date().toISOString();
+          const entry = `  - message: "${nagMsg}"\n    priority: "${priority}"\n    category: "quality"\n    createdAt: "${createdAt}"\n`;
+          let updated = bufContent;
+          if (/^reminders:/m.test(updated)) {
+            updated = updated.replace(/^(reminders:)\s*\n/m, `$1\n${entry}`);
+          } else {
+            updated = updated.trimEnd() + '\n\nreminders:\n' + entry;
+          }
+          writeFileSync(bufferPath, updated, 'utf-8');
+        }
+      }
+    } catch { /* best effort */ }
+  }
+}
+
 // ── Execute ───────────────────────────────────────────────────────────────
 console.log('\n🔒 CLOSE SESSION — Closing session checklist\n');
 
@@ -226,6 +290,7 @@ checkBacklog();
 checkCommit();
 checkBuildLocal();
 await checkPlanLifecycle();
+runE2eBestEffort();
 
 console.log(`\n${exitCode === 0 ? '✅ Session ready to close' : '❌ Session has issues to resolve'}`);
 if (warnings.length > 0) {

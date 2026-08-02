@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Shitenno — Relatório de Execução E2E + Correções
 
 > Gerado após instalar, buildar, testar e executar o pacote `shitenno`

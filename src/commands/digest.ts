@@ -48,6 +48,56 @@ export interface DigestData {
 
 // ── Digest Generation ──────────────────────────────────────────────────────
 
+function readMaturityScore(shitennoDir: string): number | null {
+  const profilePath = join(shitennoDir, "maturity-profile.json");
+  if (!existsSync(profilePath)) return null;
+  try {
+    const profile = JSON.parse(readFileSync(profilePath, "utf-8"));
+    return profile.overallScore ?? null;
+  } catch (error) {
+    logger.debug("digest", "Suppressed error", { error });
+    return null;
+  }
+}
+
+function readKnowledgeDebt(shitennoDir: string): number {
+  const debtPath = join(shitennoDir, "knowledge-debt.json");
+  if (!existsSync(debtPath)) return 0;
+  try {
+    const debt = JSON.parse(readFileSync(debtPath, "utf-8"));
+    return debt.total ?? 0;
+  } catch (error) {
+    logger.debug("digest", "Suppressed error", { error });
+    return 0;
+  }
+}
+
+function determineHealth(knowledgeDebt: number, filesModified: number): { overall: string; issues: string[] } {
+  const issues: string[] = [];
+  if (knowledgeDebt > 50) issues.push("High knowledge debt");
+  if (filesModified > 20) issues.push("Many files changed today");
+
+  let overall: string;
+  if (issues.length === 0) {
+    overall = "good";
+  } else if (issues.length === 1) {
+    overall = "fair";
+  } else {
+    overall = "needs attention";
+  }
+
+  return { overall, issues };
+}
+
+function generateRecommendations(knowledgeDebt: number, filesModified: number, maturityScore: number | null): string[] {
+  const recommendations: string[] = [];
+  if (knowledgeDebt > 30) recommendations.push("Run `shugo audit` to reduce knowledge debt");
+  if (filesModified === 0) recommendations.push("No changes detected today — consider running `shugo assess`");
+  if (maturityScore !== null && maturityScore < 50) recommendations.push("Project is in early maturity — focus on foundation practices");
+  if (recommendations.length === 0) recommendations.push("Project is healthy — continue current practices");
+  return recommendations;
+}
+
 function getMaturityLevel(score: number | null): string {
   if (score === null) return "Unknown";
   if (score < 25) return "Starting";
@@ -100,45 +150,11 @@ function analyzeRecentChanges(projectRoot: string): DigestData["recentChanges"] 
 }
 
 export function generateDigest(projectRoot: string, shitennoDir: string): DigestData {
-  // Read maturity profile
-  let maturityScore: number | null = null;
-  const profilePath = join(shitennoDir, "maturity-profile.json");
-  if (existsSync(profilePath)) {
-    try {
-      const profile = JSON.parse(readFileSync(profilePath, "utf-8"));
-      maturityScore = profile.overallScore ?? null;
-    } catch (error) {
-      logger.debug("digest", "Suppressed error", { error });
-    }
-  }
-
-  // Read knowledge debt
-  let knowledgeDebt = 0;
-  const debtPath = join(shitennoDir, "knowledge-debt.json");
-  if (existsSync(debtPath)) {
-    try {
-      const debt = JSON.parse(readFileSync(debtPath, "utf-8"));
-      knowledgeDebt = debt.total ?? 0;
-    } catch (error) {
-      logger.debug("digest", "Suppressed error", { error });
-    }
-  }
-
-  // Analyze recent changes
+  const maturityScore = readMaturityScore(shitennoDir);
+  const knowledgeDebt = readKnowledgeDebt(shitennoDir);
   const recentChanges = analyzeRecentChanges(projectRoot);
-
-  // Determine health
-  const issues: string[] = [];
-  if (knowledgeDebt > 50) issues.push("High knowledge debt");
-  if (recentChanges.filesModified > 20) issues.push("Many files changed today");
-  const healthOverall = issues.length === 0 ? "good" : issues.length === 1 ? "fair" : "needs attention";
-
-  // Generate recommendations
-  const recommendations: string[] = [];
-  if (knowledgeDebt > 30) recommendations.push("Run `shugo audit` to reduce knowledge debt");
-  if (recentChanges.filesModified === 0) recommendations.push("No changes detected today — consider running `shugo assess`");
-  if (maturityScore !== null && maturityScore < 50) recommendations.push("Project is in early maturity — focus on foundation practices");
-  if (recommendations.length === 0) recommendations.push("Project is healthy — continue current practices");
+  const health = determineHealth(knowledgeDebt, recentChanges.filesModified);
+  const recommendations = generateRecommendations(knowledgeDebt, recentChanges.filesModified, maturityScore);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -147,10 +163,7 @@ export function generateDigest(projectRoot: string, shitennoDir: string): Digest
       maturityScore,
       maturityLevel: getMaturityLevel(maturityScore),
     },
-    health: {
-      overall: healthOverall,
-      issues,
-    },
+    health,
     recentChanges,
     knowledgeDebt: {
       current: knowledgeDebt,

@@ -6,7 +6,9 @@
  */
 
 import * as ts from "typescript";
-import { statSync } from "node:fs";
+import { statSync, existsSync } from "node:fs";
+import { join } from "node:path";
+import { logger } from "../logger.js";
 import { createHash } from "node:crypto";
 
 const programCache = new Map<string, ts.Program>();
@@ -14,6 +16,15 @@ const programCache = new Map<string, ts.Program>();
 /** Clear the program cache (useful between test runs to avoid OOM). */
 export function clearProgramCache(): void {
   programCache.clear();
+}
+
+/** Detect likely source directory by checking common conventions. */
+function findLikelySourceDir(projectRoot: string): string | null {
+  const candidates = ["src", "app", "lib", "source"];
+  for (const c of candidates) {
+    if (existsSync(join(projectRoot, c))) return join(projectRoot, c);
+  }
+  return null;
 }
 
 /** Collect all .ts source files in a directory, excluding tests and node_modules. */
@@ -38,7 +49,7 @@ function buildCacheKey(configPath: string | undefined, fileNames: string[]): str
       const stat = statSync(configPath);
       hash.update(String(stat.mtimeMs));
     } catch {
-      // ignore
+      logger.debug("ts-program-cache", "Config file stat failed — cache key incomplete");
     }
   }
   for (const f of fileNames) {
@@ -46,7 +57,7 @@ function buildCacheKey(configPath: string | undefined, fileNames: string[]): str
       const stat = statSync(f);
       hash.update(f + ":" + stat.mtimeMs);
     } catch {
-      // ignore
+      logger.debug("ts-program-cache", `Source file stat failed: ${f}`);
     }
   }
   return hash.digest("hex");
@@ -55,6 +66,7 @@ function buildCacheKey(configPath: string | undefined, fileNames: string[]): str
 /**
  * Get or create a ts.Program for the given project root.
  * Reuses cached programs when tsconfig and source files haven't changed.
+ * Auto-detects source directory (src/app/lib/source) instead of hardcoding "/src".
  */
 export function getOrCreateProgram(projectRoot: string): ts.Program {
   const configPath = ts.findConfigFile(projectRoot, ts.sys.fileExists, "tsconfig.json");
@@ -81,7 +93,7 @@ export function getOrCreateProgram(projectRoot: string): ts.Program {
     }
   }
 
-  const srcDir = projectRoot + "/src";
+  const srcDir = findLikelySourceDir(projectRoot) ?? projectRoot + "/src";
   const fileNames = collectSourceFiles(srcDir);
   const cacheKey = buildCacheKey(configPath, fileNames);
 

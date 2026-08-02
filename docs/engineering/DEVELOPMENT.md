@@ -1,3 +1,8 @@
+---
+category: engineering
+lifecycle: Active
+---
+
 # Development Guide
 
 > Setting up and working on the Shugo CLI development environment.

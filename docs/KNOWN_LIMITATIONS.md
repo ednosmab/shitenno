@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # Known Limitations — Shitenno
 
 > Documented limitations and known workarounds for the Shugo CLI.

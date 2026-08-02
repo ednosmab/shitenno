@@ -1,3 +1,8 @@
+---
+category: adr
+lifecycle: Active
+---
+
 # ADR-002: Event-Driven Architecture with Centralized Engineering State
 
 > ⚠️ **Retroactive ADR** — documented 2026-07-05, decision made

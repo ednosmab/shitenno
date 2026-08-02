@@ -1,36 +1,73 @@
-reminders:
-  - message: "Revisar handbook — AI preencheu dados semânticos. Editar partes filosóficas."
-    priority: "medium"
-    category: "docs"
-    createdAt: "2026-07-16T04:58:10.072Z"
-  - message: "Health status is CRITICAL — immediate action required"
-    priority: "medium"
-    category: "feature"
-    createdAt: "2026-07-15T04:32:10.092Z"
-  - message: "High knowledge debt detected — create ADRs and skills"
-    priority: "medium"
-    category: "feature"
-    createdAt: "2026-07-15T04:32:04.732Z"
+contextVersion: 2
+skills_resolved:
+  - skillId: "mcp-interaction"
+    taskMeta: "task=implementation,language=typescript"
+    reason: "mandatory"
+    resolvedAt: "2026-07-29T06:37:04.874Z"
+  - skillId: "tdd-agent"
+    taskMeta: "task=implementation,language=typescript"
+    reason: "mandatory"
+    resolvedAt: "2026-07-29T04:47:30.182Z"
+  - skillId: "clean_code_standards"
+    taskMeta: "task=implementation,language=typescript"
+    reason: "mandatory"
+    resolvedAt: "2026-07-29T04:47:30.182Z"
+  - skillId: "senior-engineer"
+    taskMeta: "task=implementation,language=typescript"
+    reason: "mandatory"
+    resolvedAt: "2026-07-29T04:47:30.182Z"
+  - skillId: "tdd_workflow"
+    taskMeta: "task=implementation,language=typescript"
+    reason: "mandatory"
+    resolvedAt: "2026-07-29T04:47:30.182Z"
+  - skillId: "mcp-interaction"
+    taskMeta: "task=governance"
+    reason: "mandatory"
+    resolvedAt: "2026-07-27T01:45:15.746Z"
+  - skillId: "mcp-interaction"
+    taskMeta: "task=refactor"
+    reason: "mandatory"
+    resolvedAt: "2026-07-27T01:45:10.185Z"
+  - skillId: "mcp-interaction"
+    taskMeta: "task=implementation"
+    reason: "mandatory"
+    resolvedAt: "2026-07-27T01:45:04.626Z"
+  - skillId: "tdd-agent"
+    taskMeta: "task=implementation"
+    reason: "mandatory"
+    resolvedAt: "2026-07-26T03:02:22.348Z"
+  - skillId: "clean_code_standards"
+    taskMeta: "task=implementation"
+    reason: "mandatory"
+    resolvedAt: "2026-07-26T03:02:22.348Z"
+  - skillId: "senior-engineer"
+    taskMeta: "task=implementation"
+    reason: "mandatory"
+    resolvedAt: "2026-07-26T03:02:22.348Z"
+  - skillId: "tdd_workflow"
+    taskMeta: "task=implementation"
+    reason: "mandatory"
+    resolvedAt: "2026-07-26T03:02:22.347Z"
 
+reminders:
+[]
 session:
   id: session-2026-07-16-audit
   status: active
 
 current_task:
-  id: governance-plans-execution
-  description: "Execute 3 governance plans: Resilience, Log Rotation, Full Integration"
+  id: plano-unico-consolidado-final
+  description: "PLANO-UNICO-CONSOLIDADO final — Fases B/C/D: dead code removal, 8 observability handlers, regression tests"
   status: "completed"
-  started_at: "2026-07-17T00:00:00.000Z"
-  completed_at: "2026-07-17T05:55:00.000Z"
+  started_at: "2026-08-01T02:25:00.000Z"
+  completed_at: "2026-08-01T02:35:00.000Z"
 
-next_p0: "Dogfooding real (item 1 do handoff) — rodar shugo init no próprio repo"
+next_p0: "SA7 — God modules refactoring (rule-engine 1307L, scorer 947L, engineering-state 908L, feedback-engine 756L). No P0 items exist; SA7 is highest-impact P1."
 
 documents_loaded:
   - docs/BACKLOG.md
   - governance/WORKFLOW.md
   - governance/context/context_buffer.yaml
-
-impediments: []
 
 technical_debt:
   - id: NEW-001
@@ -54,6 +91,16 @@ completed_tasks:
   - PLAN-SYSTEM-RESILIENCE (Fases 0-4: event publishers, daemon module split, status daemon-aware, async startup)
   - PLAN-LOG-ROTATION (byte counter, rotation config, rotateLogIfNeeded)
   - PLAN-DAEMON-FULL-INTEGRATION (Fases 6-9: watch removal, daemon logs, command.completed loop, daemon-aware banner)
+  - PLAN-QUALITY-ROADMAP (Phases 1-3: atomic writes, daemon hardening, code hygiene)
+  - PLAN-FILE-REFACTOR Phase 1 (17 foundation files: audit types/constants/detector-map, commands briefing/init/validate, markdown-plan-engine, briefing, context-collector, context-buffer-writer, backlog-writer, prioritization recommend/evaluators, rule-engine policy, file-watcher, event-payloads, action-engine)
+  - PLAN-FILE-REFACTOR Phase 3 (10 command files >300L: detect, evolve, daemon, sync, doctor, assess, reminders, feedback, goal, update)
+  - PLAN-FILE-REFACTOR Phase 6 (8 files >300L: plan-backlog-sync, pattern-detector, pipeline, challenge-responder, daemon-client, inference-engine, handbook-nav, audit-display)
+  - EFFICIENCY-IMPROVEMENTS Phase 1: Notification deduplication and empty message fix
+  - EFFICIENCY-IMPROVEMENTS Phase 2: Session bootstrapper for token optimization
+  - EFFICIENCY-IMPROVEMENTS Phase 3: MCP response caching
+  - EFFICIENCY-IMPROVEMENTS Phase 4: Inference engine caching
+  - PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4 (Items 0-8: fixtures corpus, findTaintSink suffix, WeakCrypto fix, XSS sinks, req.file, deserialize separation, CORS+secrets, srcDir auto-detect, SCA skip signal, regex multiline fix, taint 2-pass, self-mutation script)
+  - PLANO-UNICO-CONSOLIDADO-FINAL: pipeline.started removal, 8 observability handlers, 15 regression tests
 
 impediments:
   - description: "Retroactive sync failed for TEST-FILE-WATCHER-001: 2 errors"

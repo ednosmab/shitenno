@@ -532,17 +532,17 @@
     "status": "active"
   },
   {
-    "id": "doc-BACKLOG",
+    "id": "doc-BACKLOG-ACTIVE",
     "type": "doc",
-    "name": "BACKLOG",
-    "path": "docs/BACKLOG.md",
-    "description": "Documentation: BACKLOG.md",
+    "name": "BACKLOG ACTIVE",
+    "path": "docs/backlog/ACTIVE.md",
+    "description": "Documentation: ACTIVE.md (active backlog items)",
     "tags": [
       "doc",
       "documentation"
     ],
     "createdAt": "2026-07-15T04:34:04.119Z",
-    "updatedAt": "2026-07-15T04:34:04.119Z",
+    "updatedAt": "2026-07-29T12:00:00.000Z",
     "status": "active"
   },
   {

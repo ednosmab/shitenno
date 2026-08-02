@@ -20,9 +20,6 @@ const PROMOTION_THRESHOLD = 3;
 /** Event type to monitor for on-demand P4 loads. */
 const P4_LOADED_EVENT = "context.p4_loaded";
 
-/** Event type for tier mismatches. */
-const TIER_MISMATCH_EVENT = "context.tier_mismatch";
-
 // ── Shared Helper ──────────────────────────────────────────────────────────
 
 /**
@@ -97,44 +94,4 @@ export function detectMisclassifiedTier(shitennoDir: string): HealthIssue[] {
   return issues;
 }
 
-/**
- * Detect tier mismatches between declared tier and actual usage.
- *
- * Compares the tier declared in context metadata with the tier
- * used in actual on-demand loads.
- *
- * @param shitennoDir - Path to shitenno/ directory
- * @returns Array of HealthIssue with tier mismatches
- */
-export function detectTierMismatches(shitennoDir: string): HealthIssue[] {
-  const issues: HealthIssue[] = [];
 
-  try {
-    const events = getRecentEvents(shitennoDir, 7);
-    const mismatchEvents = events.filter((e) => e.type === TIER_MISMATCH_EVENT);
-
-    for (const event of mismatchEvents) {
-      const payload = event.payload as {
-        docPath?: string;
-        declaredTier?: string;
-        actualTier?: string;
-        reason?: string;
-      };
-
-      if (payload.docPath && payload.declaredTier && payload.actualTier) {
-        issues.push({
-          type: "tier_promotion_candidate",
-          severity: 2,
-          description: `Tier mismatch para "${payload.docPath}": declarado como ${payload.declaredTier}, mas comportamento indica ${payload.actualTier}.`,
-          location: `governance/context/${payload.docPath}`,
-          recommendation: `Actualizar tier declarado de ${payload.declaredTier} para ${payload.actualTier}.`,
-          confidence: 0.8,
-        });
-      }
-    }
-  } catch (err) {
-    logger.debug("context-tier-detectors", "Failed to detect tier mismatches:", err instanceof Error ? err.message : err);
-  }
-
-  return issues;
-}

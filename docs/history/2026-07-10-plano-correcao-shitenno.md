@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Plano de Correção Shugo — Execução e Validação
 
 > **Data:** 2026-07-10

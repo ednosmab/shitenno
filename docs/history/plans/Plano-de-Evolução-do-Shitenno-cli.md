@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 Plano de Evolução do Shugo CLI - Instalação Orientada por Maturidade
 
 Contexto

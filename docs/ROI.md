@@ -1,3 +1,8 @@
+---
+category: product
+lifecycle: Active
+---
+
 # 📊 ROI — Return on Investment do Shitenno
 
 ## Resumo Executivo

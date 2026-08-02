@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 10 — AI READINESS
 
 > What does it mean for a project to be "ready for AI"?

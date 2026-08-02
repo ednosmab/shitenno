@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Daemon
 
 Background automation service for Shugo governance.

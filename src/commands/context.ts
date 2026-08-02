@@ -12,9 +12,10 @@ import { generateForecast } from "../trend-engine.js";
 import { logger } from "../logger.js";
 import { join } from "node:path";
 import { SHITENNO_DIR_NAME } from "../constants.js";
+import chalk from "chalk";
 import { output, outputBlank } from "../output.js";
 import { Command } from "commander";
-import { queryDaemon, isDaemonRunning } from "../daemon-client.js";
+
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -66,33 +67,12 @@ export interface ContextOutput {
 /**
  * Generate context output for AI agents.
  */
-export async function generateContext(shitennoDir: string): Promise<ContextOutput | null> {
-  const projectRoot = process.cwd();
-
-  // Daemon-first: try to get engineering state from daemon cache
-  if (isDaemonRunning(shitennoDir)) {
-    const result = await queryDaemon<{ type: string; data: ContextOutput }>(shitennoDir, {
-      type: "query_briefing",
-    });
-    if (result?.data) {
-      return result.data as ContextOutput;
-    }
-  }
-
-  // Fallback: compute from disk
-  let state;
-  try {
-    state = getEngineeringState(projectRoot, shitennoDir);
-  } catch {
-    logger.debug("context", "No engineering state found");
-    return null;
-  }
-
-  const trend = generateForecast(loadHistoricalStates(shitennoDir));
-  const challenges = loadChallenges(state);
-
-  const trendDirection = trend?.trends.find((t) => t.metric === "health")?.direction ?? "unknown";
-
+function buildContextOutput(
+  state: ReturnType<typeof getEngineeringState>,
+  trend: ReturnType<typeof generateForecast>,
+  trendDirection: string,
+  challenges: ContextOutput["challenges"]
+): ContextOutput {
   return {
     version: "1.0.0",
     timestamp: new Date().toISOString(),
@@ -107,9 +87,9 @@ export async function generateContext(shitennoDir: string): Promise<ContextOutpu
       healthScores: state.healthScores,
       entropy: state.entropy,
       maturity: state.maturity ? {
-      score: state.maturity.overallScore,
-      level: "defined",
-    } : null,
+        score: state.maturity.overallScore,
+        level: "defined",
+      } : null,
       capabilities: state.capabilities,
       assets: state.assets.map((a) => ({
         type: a.type,
@@ -125,6 +105,24 @@ export async function generateContext(shitennoDir: string): Promise<ContextOutpu
     } : null,
     challenges,
   };
+}
+
+export async function generateContext(shitennoDir: string): Promise<ContextOutput | null> {
+  const projectRoot = process.cwd();
+
+  let state;
+  try {
+    state = getEngineeringState(projectRoot, shitennoDir);
+  } catch {
+    logger.debug("context", "No engineering state found");
+    return null;
+  }
+
+  const trend = generateForecast(loadHistoricalStates(shitennoDir));
+  const challenges = loadChallenges(state);
+  const trendDirection = trend?.trends.find((t) => t.metric === "health")?.direction ?? "unknown";
+
+  return buildContextOutput(state, trend, trendDirection, challenges);
 }
 
 /**
@@ -193,48 +191,68 @@ export async function executeContextCommand(options: { json?: boolean; forAgent?
   }
 
   if (options.json) {
-    output(JSON.stringify(context, null, 2));
+    // Use force:true to bypass global JSON mode gate
+    output(JSON.stringify(context, null, 2), { force: true });
   } else {
     printContext(context);
   }
 }
 
-function printContext(context: ContextOutput): void {
+function printProjectHeader(context: ContextOutput): void {
   output("📋 Project Context");
   output("==================");
   output(`Project: ${context.project.name}`);
   output(`Stack: ${context.project.stack.join(", ")}`);
   output(`Root: ${context.project.root}`);
   outputBlank();
+}
 
+function printEngineeringState(es: ContextOutput["engineeringState"]): boolean {
+  if (!es) {
+    output(chalk.yellow("⚠️  Engineering state not available"));
+    return false;
+  }
+
+  const hs = es.healthScores;
+  const kv = (val: unknown, fallback = "N/A") => val ?? fallback;
   output("📊 Engineering State");
   output("====================");
-  output(`Lifecycle: ${context.engineeringState.lifecycle}`);
-  output(`Health: ${context.engineeringState.healthScores.overall}/100`);
-  output(`Knowledge Debt: ${context.engineeringState.healthScores.knowledgeDebt}/100`);
-  output(`Knowledge Graph: ${context.engineeringState.healthScores.knowledgeGraph}/100`);
-  output(`Entropy: ${context.engineeringState.entropy.score}/100`);
-  output(`Capabilities: ${context.engineeringState.capabilities.join(", ")}`);
-  output(`Assets: ${context.engineeringState.assets.length}`);
-  output(`Rules: ${context.engineeringState.rules}`);
-  output(`Policies: ${context.engineeringState.policies}`);
+  output(`Lifecycle: ${kv(es.lifecycle)}`);
+  output(`Health: ${kv(hs?.overall)}/100`);
+  output(`Knowledge Debt: ${kv(hs?.knowledgeDebt)}/100`);
+  output(`Knowledge Graph: ${kv(hs?.knowledgeGraph)}/100`);
+  output(`Entropy: ${kv(es.entropy?.score)}/100`);
+  output(`Capabilities: ${kv(es.capabilities?.join(", "))}`);
+  output(`Assets: ${es.assets?.length ?? 0}`);
+  output(`Rules: ${kv(es.rules)}`);
+  output(`Policies: ${kv(es.policies)}`);
   outputBlank();
+  return true;
+}
 
-  if (context.trend) {
-    output("📈 Trend");
-    output("========");
-    output(`Direction: ${context.trend.direction}`);
-    output(`Confidence: ${(context.trend.confidence * 100).toFixed(0)}%`);
-    outputBlank();
-  }
+function printTrend(trend: ContextOutput["trend"]): void {
+  if (!trend) return;
+  output("📈 Trend");
+  output("========");
+  output(`Direction: ${trend.direction}`);
+  output(`Confidence: ${(trend.confidence * 100).toFixed(0)}%`);
+  outputBlank();
+}
 
-  if (context.challenges.length > 0) {
-    output("⚠️  Challenges");
-    output("==============");
-    for (const challenge of context.challenges) {
-      output(`  [${challenge.severity}] ${challenge.description}`);
-    }
+function printChallenges(challenges: ContextOutput["challenges"]): void {
+  if (challenges.length === 0) return;
+  output("⚠️  Challenges");
+  output("==============");
+  for (const challenge of challenges) {
+    output(`  [${challenge.severity}] ${challenge.description}`);
   }
+}
+
+function printContext(context: ContextOutput): void {
+  printProjectHeader(context);
+  if (!printEngineeringState(context.engineeringState)) return;
+  printTrend(context.trend);
+  printChallenges(context.challenges);
 }
 
 // ── Agent Filtering ────────────────────────────────────────────────────────

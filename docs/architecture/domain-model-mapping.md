@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # Domain Model Mapping
 
 > Mapping of each source module to the Meta Model concept it represents.

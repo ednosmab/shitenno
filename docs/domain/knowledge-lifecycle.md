@@ -1,3 +1,8 @@
+---
+category: domain
+lifecycle: Active
+---
+
 # Knowledge Lifecycle
 
 > Knowledge flows through 9 stages of formalization.

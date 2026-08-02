@@ -1,0 +1,13 @@
+{
+  "principalModel": "openai/gpt-4o",
+  "executorModel": "openai/gpt-4o-mini",
+  "stack": ["typescript"],
+  "database": "none",
+  "styling": "none",
+  "maturity": {
+    "level": "level_2",
+    "testsExist": true,
+    "docsExist": false,
+    "ciExists": false
+  }
+}

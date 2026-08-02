@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Active
+---
+
 # Events Reference
 
 > Complete catalog of all events in the Shitenno.

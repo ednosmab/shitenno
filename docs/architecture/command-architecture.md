@@ -1,3 +1,8 @@
+---
+category: architecture
+lifecycle: Active
+---
+
 # 21 — COMMAND ARCHITECTURE
 
 > Command patterns, shared infrastructure.

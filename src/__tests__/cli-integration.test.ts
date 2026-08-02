@@ -213,7 +213,7 @@ describe("CLI Integration Tests", () => {
       expect(stdout).toContain("Health Check");
       expect(stdout).toContain("Project root");
       expect(stdout).toContain("Governance Health");
-      expect(stdout).toContain("Complexity Analysis");
+      expect(stdout).toContain("Complexity Report");
     });
 
     it("should show complexity score and area breakdown", async () => {
@@ -221,8 +221,8 @@ describe("CLI Integration Tests", () => {
       dirs.push(dir);
 
       const { stdout } = await runShugo("status", dir);
-      expect(stdout).toContain("Score Breakdown");
-      expect(stdout).toContain("Total score");
+      expect(stdout).toContain("Complexity Report");
+      expect(stdout).toContain("Score:");
     });
 
     it("should generate a report file when reports/ exists (senior)", async () => {
@@ -503,6 +503,47 @@ describe("CLI Integration Tests", () => {
       expect(json).toHaveProperty("issues");
       expect(json).toHaveProperty("optimizations");
       expect(typeof json.healthScore).toBe("number");
+    });
+
+    it("should include semantic layer data in audit --json", async () => {
+      const { dir } = scaffoldTestProject("json-audit-semantic", "junior");
+      dirs.push(dir);
+
+      const { stdout, exitCode } = await runShugo("audit --json", dir);
+      expect(exitCode).toBe(0);
+      const json = JSON.parse(stdout);
+      expect(json).toHaveProperty("semantic");
+      const semantic = json.semantic as Record<string, unknown>;
+      expect(semantic).toHaveProperty("patterns");
+      expect(semantic).toHaveProperty("insights");
+      expect(semantic).toHaveProperty("correlations");
+      expect(semantic).toHaveProperty("growthProfile");
+      expect(Array.isArray(semantic.patterns)).toBe(true);
+      expect(Array.isArray(semantic.insights)).toBe(true);
+      expect(Array.isArray(semantic.correlations)).toBe(true);
+      const gp = semantic.growthProfile as Record<string, unknown>;
+      expect(gp).toHaveProperty("growthCapacity");
+      expect(gp).toHaveProperty("challengeLevel");
+      expect(gp).toHaveProperty("domainChallengeLevels");
+      expect(typeof gp.growthCapacity).toBe("number");
+      expect(typeof gp.challengeLevel).toBe("number");
+    });
+
+    it("should include semantic layer data in detect --json", async () => {
+      const { dir } = scaffoldTestProject("json-detect-semantic", "junior");
+      dirs.push(dir);
+
+      const { stdout, exitCode } = await runShugo("detect --json", dir);
+      expect(exitCode).toBe(0);
+      const json = JSON.parse(stdout);
+      expect(json).toHaveProperty("semantic");
+      const semantic = json.semantic as Record<string, unknown>;
+      expect(semantic).toHaveProperty("patterns");
+      expect(semantic).toHaveProperty("insights");
+      expect(semantic).toHaveProperty("correlations");
+      expect(Array.isArray(semantic.patterns)).toBe(true);
+      expect(Array.isArray(semantic.insights)).toBe(true);
+      expect(Array.isArray(semantic.correlations)).toBe(true);
     });
 
     it("should output valid JSON on validate --json", async () => {

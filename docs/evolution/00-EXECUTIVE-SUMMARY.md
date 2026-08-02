@@ -1,3 +1,8 @@
+---
+category: evolution
+lifecycle: Active
+---
+
 # Executive Summary
 
 > High-level priorities for the Shitenno evolution.

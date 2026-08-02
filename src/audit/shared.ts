@@ -101,6 +101,19 @@ export function deduplicateIssues(issues: HealthIssue[]): HealthIssue[] {
 }
 
 /**
+ * Remove line (//) and block (/* *​/) comments from source code.
+ * Preserves newlines so line numbers stay aligned.
+ * Not a full parser — just enough to stop regex detectors from matching prose.
+ */
+export function stripComments(content: string): string {
+  return content
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ""))
+    .split("\n")
+    .map((line) => line.replace(/\/\/.*$/, ""))
+    .join("\n");
+}
+
+/**
  * Hash estável do issue, usado para supressão e tracking histórico.
  */
 export function issueFingerprint(issue: HealthIssue): string {

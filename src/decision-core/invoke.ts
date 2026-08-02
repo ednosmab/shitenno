@@ -18,7 +18,8 @@ import type { ActionType, RuleAction, RuleContext } from "../domain/rules/rule.j
 import { PolicyEngine, FilePolicyRepository } from "../rule-engine/index.js";
 import { computeExecutionHash, type ExecutionRecord } from "../action-engine.js";
 import { checkPolicyGate } from "./policy-gate.js";
-import { checkPrecedence, type InvokeMode } from "./precedence.js";
+import { checkPrecedence, getResourceId, type InvokeMode } from "./precedence.js";
+import { claimResource, releaseResource } from "../resource-claims.js";
 import type { ActionExecutor } from "./executors/types.js";
 import {
   RunScriptExecutor,
@@ -38,6 +39,15 @@ export interface InvokeActionParams {
   ruleAutonomousFlag?: boolean;
   sessionId?: string;
   resourceClaimed?: (id: string) => boolean;
+  /** Optional repository for idempotency checks. When provided, invokeAction
+   *  will check for existing completed executions before running. */
+  executionRepo?: {
+    findByHash(hash: string): ExecutionRecord | undefined;
+    findByActionId(actionId: string): ExecutionRecord | undefined;
+  };
+  /** Optional external executor. When provided, bypasses the built-in registry.
+   *  Used by ActionEngine to delegate execution while keeping its own executors. */
+  externalExecutor?: ActionExecutor;
 }
 
 export interface InvokeResult {
@@ -46,6 +56,8 @@ export interface InvokeResult {
   deferred?: boolean;
   message: string;
   executionId?: string;
+  /** Output data from the executor (when execution succeeds). */
+  output?: Record<string, unknown>;
 }
 
 // ── Executor Registry ──────────────────────────────────────────────────────
@@ -91,21 +103,12 @@ function getExecLogDir(shitennoDir: string): string {
   return dir;
 }
 
-// ── Core Invoke Function ───────────────────────────────────────────────────
+// ── Gate Helpers ─────────────────────────────────────────────────────────────
 
-/**
- * Unified action dispatcher — the single entry point for all action execution.
- *
- * Gate order:
- *   1. Policy gate (ADR-009) — enforce violations veto the action
- *   2. Precedence gate (ADR-008) — tier-based in autonomous mode
- *   3. Execution + audit trail
- */
-export async function invokeAction(params: InvokeActionParams): Promise<InvokeResult> {
-  const { action, context, mode } = params;
-  const executor = getExecutor(action.type);
-
-  // 1. Policy gate — runs FIRST (ADR-009)
+export function runPolicyGate(
+  action: RuleAction,
+  context: RuleContext,
+): InvokeResult | null {
   const policyEngine = getPolicyEngine(context.shitennoDir);
   const policyResult = checkPolicyGate(action, context, policyEngine);
   if (!policyResult.allowed) {
@@ -115,8 +118,11 @@ export async function invokeAction(params: InvokeActionParams): Promise<InvokeRe
       message: `Blocked by policy: ${policyResult.reason}`,
     };
   }
+  return null;
+}
 
-  // 2. Precedence gate — only relevant in autonomous mode (ADR-008)
+function runPrecedenceGate(params: InvokeActionParams): InvokeResult | null {
+  const { action, mode } = params;
   const precedence = checkPrecedence(action.type, mode, {
     ruleAutonomousFlag: params.ruleAutonomousFlag,
     resourceClaimed: params.resourceClaimed ?? params.context.isResourceClaimed,
@@ -129,10 +135,45 @@ export async function invokeAction(params: InvokeActionParams): Promise<InvokeRe
       message: precedence.reason ?? "Deferred by precedence rules",
     };
   }
+  return null;
+}
 
-  // 3. Execution + audit trail
+function buildSuccessResult(actionType: ActionType, output: Record<string, unknown>, executionId: string): InvokeResult {
+  const actionSuccess = output.success === true;
+  return {
+    success: actionSuccess,
+    message: actionSuccess ? `Executed ${actionType}` : (output.message as string ?? `Failed: ${actionType}`),
+    executionId,
+    output,
+  };
+}
+
+function buildFailureResult(error: unknown, executionId: string): InvokeResult {
+  return {
+    success: false,
+    message: `Failed: ${error instanceof Error ? error.message : String(error)}`,
+    executionId,
+  };
+}
+
+function writeExecRecord(execPath: string, record: ExecutionRecord): void {
+  writeFileSync(execPath, JSON.stringify(record, null, 2), "utf-8");
+}
+
+function resourceIdToClaimType(resourceId: string): "plan" | "task" {
+  return resourceId.startsWith("plan:") ? "plan" : "task";
+}
+
+async function executeWithAudit(
+  params: InvokeActionParams,
+  executor: ActionExecutor,
+): Promise<InvokeResult> {
+  const { action, context } = params;
   const executionId = `EXE-${randomUUID().slice(0, 8).toUpperCase()}`;
   const executionHash = computeExecutionHash(action.type, action.params as Record<string, unknown>);
+
+  const resourceId = getResourceId(action.type, action.params as Record<string, unknown>);
+  const claimSessionId = resourceId ? claimResource(resourceId, resourceIdToClaimType(resourceId)) : undefined;
 
   const record: ExecutionRecord = {
     executionId,
@@ -146,9 +187,8 @@ export async function invokeAction(params: InvokeActionParams): Promise<InvokeRe
     startedAt: new Date().toISOString(),
   };
 
-  const execDir = getExecLogDir(context.shitennoDir);
-  const execPath = join(execDir, `${executionId}.json`);
-  writeFileSync(execPath, JSON.stringify(record, null, 2), "utf-8");
+  const execPath = join(getExecLogDir(context.shitennoDir), `${executionId}.json`);
+  writeExecRecord(execPath, record);
 
   try {
     const startTime = Date.now();
@@ -156,35 +196,63 @@ export async function invokeAction(params: InvokeActionParams): Promise<InvokeRe
       action.params as Record<string, unknown>,
       { projectRoot: context.projectRoot, shitennoDir: context.shitennoDir }
     );
-    const duration = Date.now() - startTime;
 
     record.status = "completed";
     record.result = "success";
     record.output = output;
     record.completedAt = new Date().toISOString();
-    record.duration = duration;
+    record.duration = Date.now() - startTime;
+    writeExecRecord(execPath, record);
 
-    writeFileSync(execPath, JSON.stringify(record, null, 2), "utf-8");
-
-    const actionSuccess = output.success !== false;
-    return {
-      success: actionSuccess,
-      message: actionSuccess ? `Executed ${action.type}` : (output.message as string ?? `Failed: ${action.type}`),
-      executionId,
-    };
+    return buildSuccessResult(action.type, output, executionId);
   } catch (error) {
     record.status = "failed";
     record.result = "failure";
     record.error = error instanceof Error ? error.message : String(error);
     record.completedAt = new Date().toISOString();
     record.duration = Date.now() - new Date(record.startedAt).getTime();
+    writeExecRecord(execPath, record);
 
-    writeFileSync(execPath, JSON.stringify(record, null, 2), "utf-8");
-
-    return {
-      success: false,
-      message: `Failed: ${error instanceof Error ? error.message : String(error)}`,
-      executionId,
-    };
+    return buildFailureResult(error, executionId);
+  } finally {
+    if (resourceId && claimSessionId) {
+      releaseResource(resourceId, claimSessionId);
+    }
   }
+}
+
+// ── Core Invoke Function ───────────────────────────────────────────────────
+
+/**
+ * Unified action dispatcher — the single entry point for all action execution.
+ *
+ * Gate order:
+ *   1. Policy gate (ADR-009) — enforce violations veto the action
+ *   2. Precedence gate (ADR-008) — tier-based in autonomous mode
+ *   3. Execution + audit trail
+ */
+export async function invokeAction(params: InvokeActionParams): Promise<InvokeResult> {
+  const { action, context } = params;
+
+  // Idempotency check — skip if same action already completed
+  if (params.executionRepo) {
+    const executionHash = computeExecutionHash(action.type, action.params as Record<string, unknown>);
+    const existing = params.executionRepo.findByHash(executionHash);
+    if (existing?.status === "completed") {
+      return { success: true, message: `Already executed (idempotent): ${action.type}`, executionId: existing.executionId };
+    }
+    const actionMatch = params.executionRepo.findByActionId(params.sessionId ?? "");
+    if (actionMatch?.status === "completed") {
+      return { success: true, message: `Already executed (idempotent): ${action.type}`, executionId: actionMatch.executionId };
+    }
+  }
+
+  const policyBlock = runPolicyGate(action, context);
+  if (policyBlock) return policyBlock;
+
+  const precedenceBlock = runPrecedenceGate(params);
+  if (precedenceBlock) return precedenceBlock;
+
+  const executor = params.externalExecutor ?? getExecutor(action.type);
+  return executeWithAudit(params, executor);
 }

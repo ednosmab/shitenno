@@ -1,3 +1,8 @@
+---
+category: reference
+lifecycle: Historical
+---
+
 # Plano de Integração — Transformar CLI em Sistema
 
 ## Contexto
