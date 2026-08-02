@@ -67,6 +67,9 @@ vi.mock("../session-feedback.js", () => ({
 vi.mock("../context-buffer-writer.js", () => ({
   recordSkillResolution: vi.fn(),
 }));
+vi.mock("../usage-tracker.js", () => ({
+  recordToolCall: vi.fn(),
+}));
 
 // ── Imports (after mocks) ──────────────────────────────────────────────────
 
