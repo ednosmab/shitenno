@@ -1,5 +1,5 @@
 # Pre-Session Briefing
-*Generated: 2026-07-31T14:24:44.902Z*
+*Generated: 2026-08-02T16:52:01.583Z*
 
 ---
 
@@ -10,18 +10,13 @@
 
 | Campo | Estado |
 |---|---|
-| **Tarefa em curso** | LIVING-007 LIVING-007 Sistema de Pipelines de Validação (In Progress) |
-| **Próximo P0** | SA7 — God modules refactoring (rule-engine 1307L, scorer 947L, engineering-state 908L, feedback-engine 756L). No P0 items exist; SA7 is highest-impact P1. |
+| **Tarefa em curso** | Nenhuma |
+| **Próximo P0** | Definir novo P0 no BACKLOG.md |
 | **Dívidas P1** | Nenhuma |
-| **Impedimentos** | Retroactive sync failed for TEST-FILE-WATCHER-001: 2 errors |
-| **Estado última sessão** | Em curso |
+| **Impedimentos** | Nenhum |
+| **Estado última sessão** | Desconhecido |
 
 ---
-
-## Active Reminders
-
-- 🔴 **HIGH** — Path .shitenno: MCP local-filesystem filtra dot-prefs. Usar MCP shitenno para governance/plans. [mcp]
-- 🟡 **MEDIUM** — Revisar handbook — AI preencheu dados semânticos. Editar partes filosóficas. [docs]
 
 ## Project Identity
 - **Domain:** monorepo
@@ -45,7 +40,7 @@
 - Large codebase: Always run tests before committing. Consider impact on other modules.
 
 ## Dynamic Rules (From History)
-- [high] This project has 153 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
+- [high] This project has 154 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
 - [medium] This project has 7 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
 
 
