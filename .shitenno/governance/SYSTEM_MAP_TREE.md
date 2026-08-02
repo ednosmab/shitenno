@@ -38,6 +38,7 @@
 │   docs/adrs/ADR-008-human-over-autonomous-precedence.md
 │   docs/adrs/ADR-009-unified-execution-core.md
 │   docs/adrs/ADR-010-docs-check-auto-fix.md
+│   docs/adrs/ADR-011-mcp-background-consolidation.md
 │   docs/adrs/ADR-TEMPLATE.md
 │   docs/AGENTS.md
 │   docs/audits/
@@ -388,6 +389,8 @@
 │   governance/plans/done/PLANO-MCP-DAEMON-2026-07-30.verification.json
 │   governance/plans/done/plano-melhoria-mecanismo-contexto.md
 │   governance/plans/done/plano-melhoria-mecanismo-contexto.verification.json
+│   governance/plans/done/PLANO-MESTRE-UNICO-v2-2026-08-01.md
+│   governance/plans/done/PLANO-MESTRE-UNICO-v2-2026-08-01.verification.json
 │   governance/plans/done/PLANO-QUALIDADE-EFICIENCIA-2026-08-01.md
 │   governance/plans/done/PLANO-QUALIDADE-EFICIENCIA-2026-08-01.verification.json
 │   governance/plans/done/PLANO-UNICO-CONSOLIDADO-2026-08-01-v2.md
@@ -513,6 +516,15 @@
 │   reports/complexity-shitenno-2026-08-01-session2.json
 │   reports/complexity-shitenno-2026-08-01-session3.json
 │   reports/complexity-shitenno-2026-08-02-session1.json
+│   reports/complexity-shitenno-2026-08-02-session10.json
+│   reports/complexity-shitenno-2026-08-02-session2.json
+│   reports/complexity-shitenno-2026-08-02-session3.json
+│   reports/complexity-shitenno-2026-08-02-session4.json
+│   reports/complexity-shitenno-2026-08-02-session5.json
+│   reports/complexity-shitenno-2026-08-02-session6.json
+│   reports/complexity-shitenno-2026-08-02-session7.json
+│   reports/complexity-shitenno-2026-08-02-session8.json
+│   reports/complexity-shitenno-2026-08-02-session9.json
 │   reports/complexity-shitenno-cli-2026-07-12-session1.json
 │   reports/complexity-shitenno-cli-2026-07-13-session1.json
 │   reports/complexity-shitenno-cli-2026-07-14-session1.json

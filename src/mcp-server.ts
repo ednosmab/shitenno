@@ -264,7 +264,7 @@ export async function dispatchTool(
   }
 }
 
-export function createMcpServer(projectRoot: string, shitennoDir?: string): Server {
+export function createMcpServer(projectRoot: string, shitennoDir?: string, readyPromise?: Promise<void>): Server {
   const resolvedShitennoDir = shitennoDir ?? `${projectRoot}/shitenno`;
 
   const server = new Server(
@@ -279,6 +279,7 @@ export function createMcpServer(projectRoot: string, shitennoDir?: string): Serv
     const { name, arguments: args } = request.params;
     const toolArgs = (args ?? {}) as Record<string, unknown>;
     try {
+      if (readyPromise) await readyPromise;
       return await dispatchTool(name, projectRoot, resolvedShitennoDir, toolArgs) as unknown as Record<string, unknown>;
     } catch (error) {
       return {
@@ -291,8 +292,8 @@ export function createMcpServer(projectRoot: string, shitennoDir?: string): Serv
   return server;
 }
 
-export async function startMcpServer(projectRoot: string, shitennoDir?: string): Promise<void> {
-  const server = createMcpServer(projectRoot, shitennoDir);
+export async function startMcpServer(projectRoot: string, shitennoDir?: string, readyPromise?: Promise<void>): Promise<void> {
+  const server = createMcpServer(projectRoot, shitennoDir, readyPromise);
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }

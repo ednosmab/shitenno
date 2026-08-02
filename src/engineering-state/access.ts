@@ -16,6 +16,14 @@ import { consolidateEngineeringState, saveEngineeringState, loadEngineeringState
 let cachedState: EngineeringState | null = null;
 
 /**
+ * Lightweight check: is the project initialized (has a `.shitenno` dir)?
+ * Cheap alternative to full consolidation — safe to call from commands.
+ */
+export function isInitialized(shitennoDir: string): boolean {
+  return existsSync(shitennoDir);
+}
+
+/**
  * Check if the governance directory has been modified since the given timestamp.
  * This is a lightweight freshness check — much cheaper than full consolidation.
  */

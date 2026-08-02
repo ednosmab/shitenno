@@ -24,7 +24,7 @@ export {
 } from "../engineering-state.js";
 
 // Re-export from sub-modules
-export { getEngineeringState, clearEngineeringStateCache } from "./access.js";
+export { getEngineeringState, clearEngineeringStateCache, isInitialized } from "./access.js";
 export {
   type CapabilityLifecycleState,
   type StateEvent,

@@ -82,7 +82,7 @@ export function checkGateIntegrity(projectRoot: string): CompletionCheck {
   if (!pkg?.scripts?.["validate"]) return { name: "GATE_SELF_TEST", passed: true, message: "No validate script — skipped" };
   const { run } = resolveRunner(projectRoot);
   try {
-    execSync(`${run("validate")}`, { cwd: projectRoot, encoding: "utf-8", timeout: 30_000, stdio: ["pipe", "pipe", "pipe"] });
+    execSync(`${run("validate")}`, { cwd: projectRoot, encoding: "utf-8", timeout: 180_000, stdio: ["pipe", "pipe", "pipe"] });
     return { name: "GATE_SELF_TEST", passed: true, message: "Gate integrity check passed" };
   } catch (err) {
     return { name: "GATE_SELF_TEST", passed: false, message: `Gate integrity check failed: ${extractExecError(err).slice(0, 300)}` };

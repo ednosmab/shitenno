@@ -69,10 +69,12 @@ if (isInitialized) {
 // (rule-engine, knowledge-graph, capability-engine, task-pipeline,
 // engineering-state, proactive-engine, model-config, doc-sync, plan-backlog-sync).
 // All other commands are "light" and skip the heavy bootstrap entirely.
+// NOTE: "mcp" is intentionally excluded — the MCP server must respond to the
+// stdio handshake immediately; heavy consolidation runs in a detached child
+// (src/mcp-consolidation.ts) so it never blocks startup.
 const HEAVY_COMMANDS = new Set([
   "audit",
   "status",
-  "mcp",
   "history",
   "doctor",
   "context",

@@ -220,6 +220,35 @@ describe("dispatchTool", () => {
     expect(result).toEqual(MOCK_RESPONSE);
   });
 
+  it("waits for the ready gate before dispatching tool calls", async () => {
+    const { createMcpServer } = await import("../mcp-server.js");
+    const { InMemoryTransport } = await import("@modelcontextprotocol/sdk/inMemory.js");
+    const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
+
+    let releaseReady!: () => void;
+    const readyGate = new Promise<void>((resolve) => {
+      releaseReady = resolve;
+    });
+
+    const server = createMcpServer(PROJECT_ROOT, SHITENNO_DIR, readyGate);
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+    const serverReady = server.connect(serverTransport).catch(() => {});
+
+    const client = new Client({ name: "test-client", version: "0.0.1" }, { capabilities: {} });
+    await client.connect(clientTransport);
+
+    const callPromise = client.callTool({ name: "getBriefing", arguments: {} });
+    await new Promise((r) => setTimeout(r, 25));
+    expect(mockHandleGetBriefing).not.toHaveBeenCalled();
+
+    releaseReady();
+    await callPromise;
+    expect(mockHandleGetBriefing).toHaveBeenCalledWith(PROJECT_ROOT, SHITENNO_DIR, EMPTY_ARGS);
+
+    await client.close();
+    await serverReady;
+  });
+
   it("returns isError for another unknown tool", async () => {
     const result = await dispatchTool("xyz123", PROJECT_ROOT, SHITENNO_DIR, {});
     expect(result.isError).toBe(true);

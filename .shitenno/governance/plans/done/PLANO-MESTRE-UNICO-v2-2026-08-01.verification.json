@@ -1,0 +1,38 @@
+{
+  "planId": "PLANO-MESTRE-UNICO-v2-2026-08-01",
+  "checks": [
+    {
+      "name": "FORMAT",
+      "passed": true,
+      "message": "Passed with 3 warning(s)"
+    },
+    {
+      "name": "BUILD",
+      "passed": true,
+      "message": "TypeScript compilation succeeded"
+    },
+    {
+      "name": "TESTS",
+      "passed": true,
+      "message": "test:unit passed"
+    },
+    {
+      "name": "LINT",
+      "passed": true,
+      "message": "Lint passed"
+    },
+    {
+      "name": "GATE_SELF_TEST",
+      "passed": true,
+      "message": "Gate integrity check passed"
+    },
+    {
+      "name": "DOCS",
+      "passed": true,
+      "message": "Documentation in sync"
+    }
+  ],
+  "passed": true,
+  "verifiedAt": "2026-08-02T19:11:22.889Z",
+  "diffHash": "9e25c26f9945367cb11ff6e3737b1389bffc35bde7a2494644f423506c102814"
+}
