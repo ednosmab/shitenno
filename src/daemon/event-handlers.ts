@@ -230,7 +230,6 @@ export function subscribeTier2Events(ctx: DaemonContext): void {
     const p = payload as { planId?: string; message?: string } | undefined;
     daemonLog(ctx.logPath, "WARN", `Plan inconsistency detected: ${p?.planId ?? "unknown"} — ${p?.message ?? ""}`);
   });
-
 }
 
 // ── Generic Log Events ──────────────────────────────────────────────────────
