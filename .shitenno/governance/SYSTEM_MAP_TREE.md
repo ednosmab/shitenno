@@ -580,6 +580,7 @@
 │   reports/patterns-2026-07-30.json
 │   reports/patterns-2026-07-31.json
 │   reports/patterns-2026-08-01.json
+│   reports/patterns-2026-08-02.json
 │   scripts/
 │   scripts/add-frontmatter.ts
 │   scripts/backlog.ts
