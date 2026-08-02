@@ -1,7 +1,7 @@
 # Plano Mestre Único v2 (2026-08-01) — com código verificado contra o repositório real
 
-**Status:** checked
-**Updated_at:** 2026-08-02T02:53:52.951Z
+**Status:** Done
+**Updated_at:** 2026-08-02T19:12:02.908Z
 **Date:** 2026-08-01
 
 > Esta versão adiciona diffs concretos aos itens que consegui investigar a fundo no código deste turno (Fase 0, Fase 1 completa, e o item 12 da Fase 3). Os itens 8-11, 13-14 (Fases 2-4) continuam como estavam no documento anterior — não investiguei os módulos deles ainda (corpus de vulnerabilidades, matriz de nível, eventos órfãos). Aviso onde a investigação mudou uma conclusão do plano original.

@@ -727,3 +727,18 @@ lifecycle: Active
 | **Modulos** | governance/plans/ |
 | **Descricao** | Auditoria Shitenno — Blocos S/T/U/V (2026-07-29) |
 | **Correcao** | Verificar checklist no plano `governance/plans/RELATORIO-AUDITORIA-S-T-U-V-2026-07-29.md` |
+
+
+### BACKLOG-PLANO_MESTRE_UNICO_V2_2026_08_01 — Plano Mestre Único v2 (2026-08-01) — com código verificado contra o repositório real
+
+| Campo | Valor |
+|---|---|
+| **Status** | planeado |
+| **Severidade** | Medio |
+| **Prioridade** | P1 |
+| **Owner** | executor |
+| **Data** | 2026-08-02 |
+| **Fonte** | shugo plan md prepare |
+| **Modulos** | governance/plans/ |
+| **Descricao** | Plano Mestre Único v2 (2026-08-01) — com código verificado contra o repositório real |
+| **Correcao** | Verificar checklist no plano `governance/plans/PLANO-MESTRE-UNICO-v2-2026-08-01.md` |
