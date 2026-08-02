@@ -236,8 +236,8 @@ shitenno-cli/
 | Metric | Count |
 |--------|-------|
 | CLI Commands | 41 |
-| Source Files | 269 |
-| Test Files | 176 |
+| Source Files | 270 |
+| Test Files | 177 |
 | Audit Detectors | 100+ |
 | Engine Modules | 12 |
 
