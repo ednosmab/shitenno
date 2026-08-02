@@ -1,8 +1,7 @@
 import chalk from "chalk";
 import fse from "fs-extra";
 import { existsSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { type ManifestDiff } from "../../manifest.js";
 import { SHITENNO_DIR_NAME } from "../../constants.js";
 import { outputJson } from "../../formatting.js";
@@ -10,11 +9,7 @@ import { output, outputBlank, outputSection, outputSuccess, outputError, outputW
 
 const { copySync, ensureDirSync, removeSync } = fse;
 
-export function getTemplatesDir(): string {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  return join(__dirname, "..", "..", "templates", "base");
-}
+import { getTemplatesDir } from "../../paths.js";
 
 export function displayDiff(diff: ManifestDiff, isJson: boolean): void {
   if (isJson) {
@@ -73,7 +68,7 @@ export function applyUpdates(
     const backupDir = join(shitennoDir, "backups", new Date().toISOString().replace(/[:.]/g, "-"));
     ensureDirSync(backupDir);
 
-    for (const file of [...diff.changed, ...diff.removed]) {
+    for (const file of [...diff.changed, ...diff.removed, ...(diff.conflict ?? [])]) {
       const srcPath = join(shitennoDir, file);
       if (existsSync(srcPath)) {
         const destPath = join(backupDir, file);
@@ -87,6 +82,7 @@ export function applyUpdates(
 
   let filesUpdated = 0;
 
+  // Skip conflict files — they are not applied automatically
   for (const file of [...diff.added, ...diff.changed]) {
     const srcPath = join(templatesDir, file);
     const destPath = join(shitennoDir, file);

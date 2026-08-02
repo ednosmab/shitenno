@@ -8,6 +8,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
+import { getTemplatesDir } from "./paths.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -18,6 +19,8 @@ export interface Manifest {
   installedAt: string;
   /** SHA-256 hashes of each template file relative to shitenno/ */
   templateHashes: Record<string, string>;
+  /** SHA-256 hashes of installed files (optional, for backward compatibility) */
+  installedHashes?: Record<string, string>;
   /** Capabilities installed */
   capabilities: string[];
   /** Maturity profile score at install time */
@@ -33,6 +36,8 @@ export interface ManifestDiff {
   changed: string[];
   /** Files unchanged */
   unchanged: string[];
+  /** Files with conflict (template changed + locally customized) */
+  conflict?: string[];
 }
 
 export interface UpdateManifestOptions {
@@ -130,10 +135,12 @@ export function createManifest(
   capabilities: string[],
   maturityScore: number
 ): Manifest {
+  const templatesDir = getTemplatesDir();
   return {
     cliVersion,
     installedAt: new Date().toISOString(),
-    templateHashes: scanTemplateHashes(shitennoDir),
+    templateHashes: scanTemplateHashes(templatesDir),
+    installedHashes: scanTemplateHashes(shitennoDir),
     capabilities,
     maturityScore,
   };
@@ -176,6 +183,53 @@ export function diffManifests(
 }
 
 /**
+ * Compare two manifests and return the diff with conflict detection.
+ * Conflict: template changed + locally customized.
+ */
+export function diffManifestsV2(
+  oldManifest: Manifest,
+  newManifest: Manifest
+): ManifestDiff {
+  const oldFiles = new Set(Object.keys(oldManifest.templateHashes));
+  const newFiles = new Set(Object.keys(newManifest.templateHashes));
+
+  const added: string[] = [];
+  const removed: string[] = [];
+  const changed: string[] = [];
+  const unchanged: string[] = [];
+  const conflict: string[] = [];
+
+  for (const file of newFiles) {
+    if (!oldFiles.has(file)) {
+      added.push(file);
+    } else if (
+      oldManifest.templateHashes[file] !== newManifest.templateHashes[file]
+    ) {
+      // Template changed. Check if locally customized.
+      // Compare current installed hash (from newManifest) against original template hash.
+      // If they differ, the user has modified the file since installation.
+      const currentInstalledHash = newManifest.installedHashes?.[file];
+      const isCustomized = currentInstalledHash !== undefined && currentInstalledHash !== oldManifest.templateHashes[file];
+      if (isCustomized) {
+        conflict.push(file);
+      } else {
+        changed.push(file);
+      }
+    } else {
+      unchanged.push(file);
+    }
+  }
+
+  for (const file of oldFiles) {
+    if (!newFiles.has(file)) {
+      removed.push(file);
+    }
+  }
+
+  return { added, removed, changed, unchanged, conflict };
+}
+
+/**
  * Update manifest after an upgrade.
  * Preserves existing hashes for unchanged files, updates changed/new ones.
  */
@@ -183,13 +237,16 @@ export function updateManifest(
   currentManifest: Manifest | null,
   options: UpdateManifestOptions
 ): Manifest {
-  const newHashes = scanTemplateHashes(options.shitennoDir);
+  const templatesDir = getTemplatesDir();
+  const templateHashes = scanTemplateHashes(templatesDir);
+  const installedHashes = scanTemplateHashes(options.shitennoDir);
 
   if (currentManifest) {
     return {
       cliVersion: options.cliVersion,
       installedAt: new Date().toISOString(),
-      templateHashes: { ...currentManifest.templateHashes, ...newHashes },
+      templateHashes,
+      installedHashes,
       capabilities: options.capabilities,
       maturityScore: options.maturityScore,
     };

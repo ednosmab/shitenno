@@ -2,19 +2,14 @@
  * Shared helpers for upgrade sub-commands.
  */
 
-import { join, dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join, resolve } from "node:path";
 import { existsSync } from "node:fs";
 import fse from "fs-extra";
 import { getCapabilityFiles } from "../../capability-mapping.js";
 
 const { copySync, ensureDirSync } = fse;
 
-export function getTemplatesDir(): string {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  return join(__dirname, "..", "..", "..", "templates", "base");
-}
+import { getTemplatesDir } from "../../paths.js";
 
 export function installCapabilities(
   targetDir: string,

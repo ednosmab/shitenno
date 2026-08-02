@@ -119,6 +119,7 @@
 │   docs/history/2026-08-01-rule-plan_archived.md
 │   docs/history/2026-08-01-rule-session_close.md
 │   docs/history/2026-08-01-rule-session_end_plans.md
+│   docs/history/2026-08-02-rule-plan_archived.md
 │   docs/history/2026-08-02-rule-session_close.md
 │   docs/history/2026-08-02-rule-session_end_plans.md
 │   docs/INDEX.md
@@ -269,6 +270,8 @@
 │   governance/plans/done/handoff-agente.verification.json
 │   governance/plans/done/migracao-yaml-frontmatter.md
 │   governance/plans/done/migracao-yaml-frontmatter.verification.json
+│   governance/plans/done/NARRATIVA-BRANCH-TESTE-2026-08-02.md
+│   governance/plans/done/NARRATIVA-BRANCH-TESTE-2026-08-02.verification.json
 │   governance/plans/done/PLAN_identity_documentation_v2.md
 │   governance/plans/done/PLAN_identity_documentation_v2.verification.json
 │   governance/plans/done/PLAN_quality_gates_tooling.md
@@ -412,7 +415,6 @@
 │   governance/plans/pipeline/living-fase1-cache.md
 │   governance/plans/pipeline/living-fase2-hooks.md
 │   governance/plans/pipeline/living-fase3-daemon.md
-│   governance/plans/PLANO-MESTRE-UNICO-v2-2026-08-01.md
 │   governance/plans/README.md
 │   governance/plans/reference/
 │   governance/plans/reference/ENTERPRISE_AUDIT_PLAN.md
@@ -452,6 +454,7 @@
 │   history/
 │   history/snapshots/
 │   history/snapshots/README.md
+│   manifest.json
 │   maturity-profile.json
 │   package.json
 │   plugins/

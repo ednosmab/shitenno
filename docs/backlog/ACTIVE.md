@@ -1,5 +1,0 @@
----
-category: product
-lifecycle: Draft
----
-

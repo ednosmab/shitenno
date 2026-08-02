@@ -204,7 +204,7 @@ describe("updateManifest", () => {
     expect(manifest.cliVersion).toBe("2.0.0");
   });
 
-  it("merges hashes from current manifest", () => {
+  it("recomputes templateHashes from templates dir and installedHashes from shitennoDir", () => {
     const current: Manifest = {
       cliVersion: "1.0.0",
       installedAt: "2026-07-08T00:00:00Z",
@@ -221,8 +221,10 @@ describe("updateManifest", () => {
     const updated = updateManifest(current, { cliVersion: "2.0.0", shitennoDir: "/shugo", capabilities: ["core", "ai"], maturityScore: 75 });
 
     expect(updated.cliVersion).toBe("2.0.0");
-    expect(updated.templateHashes).toHaveProperty("old.txt", "hash1");
+    // templateHashes now comes from templates dir (not merged with old)
     expect(updated.templateHashes).toHaveProperty("new.txt");
+    // installedHashes comes from shitennoDir scan
+    expect(updated.installedHashes).toHaveProperty("new.txt");
     expect(updated.capabilities).toEqual(["core", "ai"]);
   });
 });
