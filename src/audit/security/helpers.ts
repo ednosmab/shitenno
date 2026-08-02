@@ -4,7 +4,7 @@
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { SECURITY_DETECTOR_SELF_PATHS } from "../constants.js";
+import { DETECTOR_PATTERN_FILES } from "../constants.js";
 
 const NODE_BUILTINS = new Set([
   "fs", "path", "os", "child_process", "util", "events", "stream", "http", "https",
@@ -13,8 +13,22 @@ const NODE_BUILTINS = new Set([
 ]);
 for (const b of [...NODE_BUILTINS]) NODE_BUILTINS.add("node:" + b);
 
-export function isDetectorDefinitionFile(relPath: string): boolean {
-  return SECURITY_DETECTOR_SELF_PATHS.some((p) => relPath.startsWith(p));
+/**
+ * True only when the LINE is a pattern definition inside one of the closed
+ * set of definition files. Never excludes an entire file, and never excludes
+ * files outside DETECTOR_PATTERN_FILES — a real secret in detector code must
+ * be detected.
+ */
+export function isDetectorPatternLine(relPath: string, lineContent: string): boolean {
+  if (!DETECTOR_PATTERN_FILES.has(relPath)) return false;
+  const line = lineContent.trim();
+  // Comment/JSDoc lines inside a definition file describe patterns — never real usage.
+  if (line.startsWith("//") || line.startsWith("/*") || line.startsWith("*")) return true;
+  // Object-format pattern entries: { name: "...", pattern: /.../, regex: /.../ }
+  if (/(?:name|pattern|regex)\s*:\s*["'`/]/.test(line)) return true;
+  // Regex-literal pattern array elements: /.../flags,  or  /.../flags)
+  if (/^\s*\/.*\/[a-z]*\s*,?\s*$/.test(line)) return true;
+  return false;
 }
 
 export function isLocalHttpUrl(url: string): boolean {

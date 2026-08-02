@@ -5,12 +5,12 @@
  */
 
 import type { HealthIssue, SourceFileInfo } from "../types.js";
-import { isDetectorDefinitionFile } from "./helpers.js";
+import { isDetectorPatternLine } from "./helpers.js";
 
 /**
  * Detect weak cryptographic algorithms (MD5, SHA1, createCipher).
  * Matches both `.createHash("md5")` (property access) and `createHash("md5")` (destructured import).
- * Excludes detector definition files to avoid self-reporting.
+ * Skips only pattern-definition lines, never whole files.
  */
 export function detectWeakCrypto(_projectRoot: string, files: SourceFileInfo[]): HealthIssue[] {
   const issues: HealthIssue[] = [];
@@ -22,10 +22,10 @@ export function detectWeakCrypto(_projectRoot: string, files: SourceFileInfo[]):
   ];
 
   for (const file of files) {
-    if (isDetectorDefinitionFile(file.relPath)) continue;
     const lines = file.content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       if (weakPatterns.some((p) => p.test(line))) {
         issues.push({
           type: "weak_crypto",
@@ -50,10 +50,10 @@ export function detectWeakRandomness(_projectRoot: string, files: SourceFileInfo
 
   for (const file of files) {
     if (file.relPath.includes("__tests__")) continue;
-    if (isDetectorDefinitionFile(file.relPath)) continue;
     const lines = file.content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       if (line.trim().startsWith("//") || line.trim().startsWith("*")) continue;
       if (assignmentPattern.test(line)) {
         issues.push({

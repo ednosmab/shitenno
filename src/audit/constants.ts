@@ -28,22 +28,20 @@ export { VIOLATION_KEYWORDS } from "../constants.js";
 
 export const BLOCKED_LICENSES = ["GPL-3.0", "AGPL-3.0", "SSPL-1.0", "EUPL-1.1"];
 
-// ── Security Detector Self-Paths ─────────────────────────────────────────────
+// ── Security Detector Pattern Files ─────────────────────────────────────────
+// Only the files that literally DEFINE detection patterns (name/regex lists).
+// No directory exclusions: a real secret in src/audit/security/ must be detected.
 
-export const SECURITY_DETECTOR_SELF_PATHS = [
-  "src/health-auditor.ts",
-  "src/audit/taint/analyzer.ts",
-  "src/audit/taint/ast-visitor.ts",
+export const DETECTOR_PATTERN_FILES = new Set([
   "src/audit/taint/sinks.ts",
   "src/audit/taint/sources.ts",
   "src/audit/taint/sanitizers.ts",
-  "src/audit/taint/issue-builder.ts",
-  "src/audit/security/",
-  "src/audit/engineering-detectors.ts",
-  "src/audit/engineering-detectors-security.ts",
-  "src/audit/engineering-detectors-quality.ts",
-  "src/audit/engineering-detectors-supply.ts",
-];
+  "src/audit/security/secrets.ts",
+  "src/audit/security/crypto.ts",
+  "src/audit/security/cors.ts",
+  "src/audit/security/path-traversal.ts",
+  "src/audit/security/injection.ts",
+]);
 
 // ── Complexity Thresholds ────────────────────────────────────────────────────
 

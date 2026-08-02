@@ -45,6 +45,8 @@
     "mcp": "node scripts/mcp-client.mjs",
     "mcp:list": "node scripts/mcp-client.mjs --list",
     "test:wiring": "vitest run src/__tests__/detector-orphan-sweep.test.ts src/__tests__/detector-level-composition.test.ts src/__tests__/security-self-exclusion.test.ts",
+    "verify:detector-composition": "tsx scripts/verify/detector-composition.ts",
+    "verify:self-exclusion": "tsx scripts/verify/self-exclusion.ts",
     "test:matrix": "vitest run src/__tests__/audit-level-matrix.test.ts src/__tests__/security-benchmark.test.ts",
     "lint:sink-definitions": "npx tsx scripts/security/lint-sink-definitions.ts",
     "baseline:diff": "npx tsx scripts/security/baseline-diff.ts",

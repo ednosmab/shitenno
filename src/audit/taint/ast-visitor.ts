@@ -71,12 +71,26 @@ export function findTaintedArgument(
   return undefined;
 }
 
+/**
+ * Extract the receiver expression of a call (e.g. `db.collection("users")` in
+ * `db.collection("users").find(...)`, or `arr` in `arr.find(...)`).
+ * Returns undefined for bare calls like `find(...)`.
+ */
+function getReceiverExpression(node: ts.CallExpression): ts.Expression | undefined {
+  const expr = node.expression;
+  if (ts.isPropertyAccessExpression(expr)) return expr.expression;
+  if (ts.isElementAccessExpression(expr)) return expr.expression;
+  return undefined;
+}
+
 export function visitSink(
   node: ts.CallExpression,
   ctx: Pick<AstVisitorContext, "graph" | "variableTaint" | "checker" | "nextNodeId">
 ): void {
   const funcName = getCallName(node);
-  const sinkDef = findTaintSink(funcName);
+  const receiverExpr = getReceiverExpression(node);
+  const receiverType = receiverExpr ? ctx.checker.getTypeAtLocation(receiverExpr) : undefined;
+  const sinkDef = findTaintSink(funcName, receiverType, ctx.checker);
   if (!sinkDef) return;
 
   const sourceVar = findTaintedArgument(node, ctx.variableTaint, ctx.checker);

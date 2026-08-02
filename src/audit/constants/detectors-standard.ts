@@ -1,12 +1,9 @@
+import { QUICK_DETECTORS } from "./detectors-quick.js";
+
 /** Standard-level detectors — includes all quick-level plus structural and security checks. */
 export const STANDARD_DETECTORS: string[] = [
   // Quick-level detectors
-  "detectMissingDocs",
-  "detectDatePlaceholders",
-  "detectMissingGitignore",
-  "detectMissingPackageJson",
-  "detectStaleBuffer",
-  "detectMaturityInconsistency",
+  ...QUICK_DETECTORS,
   // Structural detectors
   "detectBrokenRefs",
   "detectBrokenDirRefs",

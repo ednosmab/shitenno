@@ -5,7 +5,7 @@
  */
 
 import type { HealthIssue, SourceFileInfo } from "../types.js";
-import { isDetectorDefinitionFile } from "./helpers.js";
+import { isDetectorPatternLine } from "./helpers.js";
 import { stripComments } from "../shared.js";
 
 /**
@@ -21,11 +21,11 @@ export function detectSQLInjection(_projectRoot: string, files: SourceFileInfo[]
   ];
 
   for (const file of files) {
-    if (isDetectorDefinitionFile(file.relPath)) continue;
     const codeOnly = stripComments(file.content);
     const lines = codeOnly.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       if (sqlPatterns.some((p) => p.test(line))) {
         issues.push({
           type: "sql_injection",
@@ -53,11 +53,11 @@ export function detectXSS(_projectRoot: string, files: SourceFileInfo[]): Health
 
   for (const file of files) {
     if (file.relPath.includes("__tests__")) continue;
-    if (isDetectorDefinitionFile(file.relPath)) continue;
     const codeOnly = stripComments(file.content);
     const lines = codeOnly.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       if (xssPatterns.some((p) => p.test(line))) {
         issues.push({
           type: "xss_risk",
@@ -86,11 +86,11 @@ export function detectUnsafeEval(_projectRoot: string, files: SourceFileInfo[]):
 
   for (const file of files) {
     if (file.relPath.includes("__tests__")) continue;
-    if (isDetectorDefinitionFile(file.relPath)) continue;
     const codeOnly = stripComments(file.content);
     const lines = codeOnly.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       if (evalPatterns.some((p) => p.test(line))) {
         issues.push({
           type: "unsafe_eval",
@@ -128,11 +128,11 @@ export function detectUnsafeDeserialization(_projectRoot: string, files: SourceF
   ];
 
   for (const file of files) {
-    if (isDetectorDefinitionFile(file.relPath)) continue;
     const codeOnly = stripComments(file.content);
     const lines = codeOnly.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       if (realDeserializationSinks.some((p) => p.test(line))) {
         issues.push({
           type: "unsafe_deserialize",

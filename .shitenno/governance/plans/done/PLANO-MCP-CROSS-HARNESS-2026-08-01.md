@@ -1,6 +1,8 @@
 # Plano — AGENTS.md na Raiz + MCP como Fonte Única Cross-Harness
 
-**Status:** In Progress
+**Status:** Done
+**Updated_at:** 2026-08-01T13:56:29.486Z
+**Date:** 2026-08-01
 **Complementa:** `PLANO-FONTE-UNICA-MCP-2026-07-31.md` (Item D + Achado da triplicação de AGENTS.md, que ainda não foram executados)
 **Escopo:** portabilidade entre opencode, Claude Code, Cursor, Antigravity e Claw/Freebuff — sem depender de sintaxe proprietária de nenhum harness para as *regras*.
 **Prioridade:** Alta. Zero regressão no `opencode.json` atual (ele continua funcionando durante toda a transição).

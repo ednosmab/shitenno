@@ -1,6 +1,8 @@
 # Plano — Fonte Única de Verdade via MCP + Correção de Achados
 
-**Status:** checked
+**Status:** Done
+**Updated_at:** 2026-08-01T13:54:22.781Z
+**Date:** 2026-07-31
 **Data:** 2026-07-31 | **Base:** zip `shitenno-feat-refactor` (validado linha a linha contra o código real)
 **Prioridade:** Máxima — este é o mecanismo de continuidade entre sessões. Zero regressão tolerada.
 

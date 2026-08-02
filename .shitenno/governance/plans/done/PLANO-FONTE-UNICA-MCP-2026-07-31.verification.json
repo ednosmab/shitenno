@@ -1,0 +1,38 @@
+{
+  "planId": "PLANO-FONTE-UNICA-MCP-2026-07-31",
+  "checks": [
+    {
+      "name": "FORMAT",
+      "passed": true,
+      "message": "Auto-fixed: Campo **Date:** em falta no header do plano"
+    },
+    {
+      "name": "BUILD",
+      "passed": true,
+      "message": "TypeScript compilation succeeded"
+    },
+    {
+      "name": "TESTS",
+      "passed": true,
+      "message": "test:unit passed"
+    },
+    {
+      "name": "LINT",
+      "passed": true,
+      "message": "Lint passed"
+    },
+    {
+      "name": "GATE_SELF_TEST",
+      "passed": true,
+      "message": "Gate integrity check passed"
+    },
+    {
+      "name": "DOCS",
+      "passed": true,
+      "message": "Documentation in sync"
+    }
+  ],
+  "passed": true,
+  "verifiedAt": "2026-08-02T02:55:48.001Z",
+  "diffHash": "ea18e270c74dd5c99dbb461f2906e25b4189bb051504b57af4fc20be5722d3f6"
+}

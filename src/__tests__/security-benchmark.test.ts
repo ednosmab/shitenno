@@ -111,12 +111,24 @@ describe("Security Benchmark — Detection Corpus (manifest-driven)", () => {
   });
 
   describe("Self-detection exclusion", () => {
-    it("detectWeakCrypto does not flag detector definition files", () => {
+    it("detectWeakCrypto now FLAGS real weak crypto in src/audit/security/crypto.ts (whole-file exclusion removed)", () => {
       const detectorFile: SourceFileInfo = {
         fullPath: "/tmp/src/audit/security/crypto.ts",
         relPath: "src/audit/security/crypto.ts",
         basename: "crypto.ts",
         content: 'const hash = crypto.createHash("md5");',
+        lineCount: 1,
+      };
+      const issues = detectWeakCrypto("/tmp", [detectorFile]);
+      expect(issues.length).toBe(1);
+    });
+
+    it("detectWeakCrypto does not flag pattern-definition lines in sinks.ts", () => {
+      const detectorFile: SourceFileInfo = {
+        fullPath: "/tmp/src/audit/taint/sinks.ts",
+        relPath: "src/audit/taint/sinks.ts",
+        basename: "sinks.ts",
+        content: '{ name: "createHash", kind: "call", severity: 3 }',
         lineCount: 1,
       };
       const issues = detectWeakCrypto("/tmp", [detectorFile]);

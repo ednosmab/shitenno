@@ -118,6 +118,8 @@
 │   docs/history/2026-08-01-rule-plan_archived.md
 │   docs/history/2026-08-01-rule-session_close.md
 │   docs/history/2026-08-01-rule-session_end_plans.md
+│   docs/history/2026-08-02-rule-session_close.md
+│   docs/history/2026-08-02-rule-session_end_plans.md
 │   docs/INDEX.md
 │   docs/KNOWLEDGE_LIFECYCLE.md
 │   docs/opencode-context.md
@@ -378,6 +380,10 @@
 │   governance/plans/done/PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4.verification.json
 │   governance/plans/done/PLANO-FINAL-CONSOLIDADO-2026-07-29.md
 │   governance/plans/done/PLANO-FINAL-CONSOLIDADO-2026-07-29.verification.json
+│   governance/plans/done/PLANO-FONTE-UNICA-MCP-2026-07-31.md
+│   governance/plans/done/PLANO-FONTE-UNICA-MCP-2026-07-31.verification.json
+│   governance/plans/done/PLANO-MCP-CROSS-HARNESS-2026-08-01.md
+│   governance/plans/done/PLANO-MCP-CROSS-HARNESS-2026-08-01.verification.json
 │   governance/plans/done/PLANO-MCP-DAEMON-2026-07-30.md
 │   governance/plans/done/PLANO-MCP-DAEMON-2026-07-30.verification.json
 │   governance/plans/done/plano-melhoria-mecanismo-contexto.md
@@ -403,8 +409,7 @@
 │   governance/plans/pipeline/living-fase1-cache.md
 │   governance/plans/pipeline/living-fase2-hooks.md
 │   governance/plans/pipeline/living-fase3-daemon.md
-│   governance/plans/PLANO-FONTE-UNICA-MCP-2026-07-31.md
-│   governance/plans/PLANO-MCP-CROSS-HARNESS-2026-08-01.md
+│   governance/plans/PLANO-MESTRE-UNICO-v2-2026-08-01.md
 │   governance/plans/README.md
 │   governance/plans/reference/
 │   governance/plans/reference/ENTERPRISE_AUDIT_PLAN.md
@@ -543,6 +548,7 @@
 │   reports/doc-sync-2026-07-30.json
 │   reports/doc-sync-2026-07-31.json
 │   reports/doc-sync-2026-08-01.json
+│   reports/doc-sync-2026-08-02.json
 │   reports/evolution-2026-07-18.json
 │   reports/evolution-2026-07-25.json
 │   reports/health-2026-07-16.json
@@ -573,6 +579,7 @@
 │   reports/patterns-2026-07-29.json
 │   reports/patterns-2026-07-30.json
 │   reports/patterns-2026-07-31.json
+│   reports/patterns-2026-08-01.json
 │   scripts/
 │   scripts/add-frontmatter.ts
 │   scripts/backlog.ts

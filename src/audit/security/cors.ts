@@ -5,7 +5,7 @@
  */
 
 import type { HealthIssue, SourceFileInfo } from "../types.js";
-import { isDetectorDefinitionFile, isSkippableFile, collectMissingFlags } from "./helpers.js";
+import { isDetectorPatternLine, isSkippableFile, collectMissingFlags } from "./helpers.js";
 
 /**
  * Detect insecure CORS wildcard configuration.
@@ -21,12 +21,12 @@ export function detectInsecureCORS(_projectRoot: string, files: SourceFileInfo[]
 
   for (const file of files) {
     if (file.relPath.includes("__tests__")) continue;
-    if (isDetectorDefinitionFile(file.relPath)) continue;
 
     // Line-by-line patterns (existing)
     const lines = file.content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       if (corsPatterns.some((p) => p.test(line))) {
         issues.push({
           type: "insecure_cors",
@@ -43,6 +43,10 @@ export function detectInsecureCORS(_projectRoot: string, files: SourceFileInfo[]
     const corsCallRegex = /\bcors\s*\(\s*\{([\s\S]{0,300}?)\}\s*\)/g;
     let match: RegExpExecArray | null;
     while ((match = corsCallRegex.exec(file.content)) !== null) {
+      const lineStart = file.content.lastIndexOf("\n", match.index) + 1;
+      const lineEnd = file.content.indexOf("\n", match.index);
+      const matchLine = file.content.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
+      if (isDetectorPatternLine(file.relPath, matchLine)) continue;
       const body = match[1]!;
       const hasWildcardOrigin = /origin\s*:\s*["']\*["']/.test(body);
       const hasCredentials = /credentials\s*:\s*true/.test(body);
@@ -131,10 +135,10 @@ export function detectInsecureCookies(_projectRoot: string, files: SourceFileInf
 
   for (const file of files) {
     if (isSkippableFile(file.relPath, skipFiles)) continue;
-    if (isDetectorDefinitionFile(file.relPath)) continue;
     const lines = file.content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       const issue = detectResCookieIssue(line, lines, i, file.relPath)
         ?? detectSetCookieHeaderIssue(line, i, file.relPath);
       if (issue) issues.push(issue);

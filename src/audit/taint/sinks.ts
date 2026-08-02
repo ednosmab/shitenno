@@ -6,6 +6,7 @@
  */
 
 import type { TaintSinkDef, TaintIssueType } from "./types.js";
+import type * as ts from "typescript";
 
 /** Code execution sinks */
 export const CODE_EXECUTION_SINKS: TaintSinkDef[] = [
@@ -154,9 +155,35 @@ export const ALL_SINKS: TaintSinkDef[] = [
 ];
 
 /** Check if a function/property name matches any taint sink.
- *  Matches by exact name OR by dotted suffix (e.g. "pool.query" matches "query"). */
-export function findTaintSink(name: string): TaintSinkDef | undefined {
-  return ALL_SINKS.find((s) => s.name === name || name.endsWith("." + s.name));
+ *  Matches by exact name OR by dotted suffix (e.g. "pool.query" matches "query").
+ *  When a receiver type and checker are provided, incompatible candidates are
+ *  discarded (e.g. Array.prototype.find() is never a NoSQL injection sink). */
+export function findTaintSink(
+  name: string,
+  receiverType?: ts.Type,
+  checker?: ts.TypeChecker
+): TaintSinkDef | undefined {
+  const candidates = ALL_SINKS.filter((s) => s.name === name || name.endsWith("." + s.name));
+  if (candidates.length === 0) return undefined;
+  if (!receiverType || !checker) return candidates[0];
+  const compatible = candidates.filter((s) => isReceiverTypeCompatible(receiverType, s, checker));
+  return compatible[0] ?? undefined;
+}
+
+/**
+ * Heuristic: if a receiver type is known, only accept candidates the receiver
+ * could plausibly belong to. Currently only NoSQL sinks are type-sensitive —
+ * Array/ReadonlyArray receivers (arr.find, list.findOne) are never NoSQL sinks.
+ */
+function isReceiverTypeCompatible(
+  receiverType: ts.Type,
+  sink: TaintSinkDef,
+  checker: ts.TypeChecker
+): boolean {
+  if (sink.issueType !== "nosql_injection") return true;
+  if (checker.isArrayType(receiverType) || checker.isTupleType(receiverType)) return false;
+  const typeName = checker.typeToString(receiverType);
+  return !/^(Array|ReadonlyArray)</.test(typeName) && !/\[\]$/.test(typeName);
 }
 
 /** Check if a property access name matches any property-kind taint sink.

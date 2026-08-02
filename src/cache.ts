@@ -1,13 +1,13 @@
 /**
  * cache.ts — Disk cache for shugo scoring results
  *
- * Strategy: SHA256 checksum per key file with mtime-based fast-path.
+ * Strategy: SHA256 checksum per key file (content-based, no stat fast-paths).
  * Cache stored at project root as .shitenno-cache.json.
  * Invalidated when any tracked file changes.
  */
 
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync, renameSync, chmodSync, statSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync, renameSync, chmodSync } from "node:fs";
 import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { SHITENNO_DIR_NAME } from "./constants.js";
@@ -37,40 +37,18 @@ export interface ShitennoCache {
   health?: CacheEntry<unknown>;
 }
 
-// ── Mtime Cache ────────────────────────────────────────────────────────────
-
-interface MtimeEntry {
-  mtimeMs: number;
-  size: number;
-  hash: string;
-}
-
-const mtimeCache = new Map<string, MtimeEntry>();
-
-/** Clear the in-memory mtime cache (for testing). */
-export function clearMtimeCache(): void {
-  mtimeCache.clear();
-}
-
 // ── Checksum Helpers ────────────────────────────────────────────────────────
+//
+// Note: no stat-based fast paths here. On filesystems with coarse timestamp
+// granularity (e.g. 1s rounding), mtime/ctime/size can all stay unchanged when
+// a file is added or modified within the same tick, which would return stale
+// checksums. Content is always re-read to guarantee cache invalidation.
 
-const dirStructureCache = new Map<string, { mtimeMs: number; checksum: string }>();
-
-/** Compute SHA256 of a file's content, using mtime+size as fast-path. */
+/** Compute SHA256 of a file's content. */
 function fileChecksum(filePath: string): string | null {
   try {
-    const s = statSync(filePath);
-
-    const cacheKey = filePath;
-    const cached = mtimeCache.get(cacheKey);
-    if (cached && cached.mtimeMs === s.mtimeMs && cached.size === s.size) {
-      return cached.hash;
-    }
-
     const content = readFileSync(filePath);
-    const hash = createHash("sha256").update(content).digest("hex");
-    mtimeCache.set(cacheKey, { mtimeMs: s.mtimeMs, size: s.size, hash });
-    return hash;
+    return createHash("sha256").update(content).digest("hex");
   } catch {
     return null;
   }
@@ -79,10 +57,6 @@ function fileChecksum(filePath: string): string | null {
 /** Compute a directory's aggregate checksum (all files recursively, capped at depth 3). */
 function dirChecksum(dirPath: string, maxDepth = 3): string {
   if (!existsSync(dirPath)) return "missing";
-
-  const dirStat = statSync(dirPath);
-  const cached = dirStructureCache.get(dirPath);
-  if (cached && cached.mtimeMs === dirStat.mtimeMs) return cached.checksum;
 
   const hashes: string[] = [];
 
@@ -108,9 +82,7 @@ function dirChecksum(dirPath: string, maxDepth = 3): string {
 
   walk(dirPath, 0);
   hashes.sort(); // deterministic order
-  const checksum = createHash("sha256").update(hashes.join("\n")).digest("hex");
-  dirStructureCache.set(dirPath, { mtimeMs: dirStat.mtimeMs, checksum });
-  return checksum;
+  return createHash("sha256").update(hashes.join("\n")).digest("hex");
 }
 
 // ── Checksum Collection ─────────────────────────────────────────────────────

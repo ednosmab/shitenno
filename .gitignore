@@ -43,7 +43,6 @@ coverage/
 .shitenno/feedback/records/
 .shitenno/reports/
 .shitenno/docs/generated/
-.shitenno/docs/backlog/
 .shitenno/governance/executions/
 .shitenno/governance/context/checkpoints/
 .shitenno/governance/context/context_buffer.yaml

@@ -3,13 +3,13 @@
  *
  * Runs in CI, warns without blocking. Catches:
  * 1. Bare sinks without suffix-match justification (class of bug like item 18)
- * 2. Directory-level exclusions in SECURITY_DETECTOR_SELF_PATHS (class of regression 2)
+ * 2. Directory-level exclusions in DETECTOR_PATTERN_FILES (class of regression 2)
  *
  * See: PLANO-UNICO-CONSOLIDADO-2026-08-01-v2.md — Phase D.20
  */
 
 import { ALL_SINKS } from "../../src/audit/taint/sinks.js";
-import { SECURITY_DETECTOR_SELF_PATHS } from "../../src/audit/constants.js";
+import { DETECTOR_PATTERN_FILES } from "../../src/audit/constants.js";
 
 /**
  * Bare sink names that intentionally rely on suffix matching.
@@ -50,10 +50,16 @@ for (const sink of ALL_SINKS) {
   }
 }
 
-for (const path of SECURITY_DETECTOR_SELF_PATHS) {
+for (const path of DETECTOR_PATTERN_FILES) {
   if (path.endsWith("/")) {
     console.warn(
-      `⚠️  "${path}" excludes an ENTIRE DIRECTORY — confirm no production code lives there. (same class as Regression 2)`,
+      `⚠️  "${path}" excludes an ENTIRE DIRECTORY — pattern exclusions must be file-scoped. (same class as Regression 2)`,
+    );
+    warnings++;
+  }
+  if (!path.startsWith("src/audit/taint/") && !path.startsWith("src/audit/security/")) {
+    console.warn(
+      `⚠️  "${path}" is outside src/audit/{taint,security}/ — only files that literally define detection patterns belong here.`,
     );
     warnings++;
   }

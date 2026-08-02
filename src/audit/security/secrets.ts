@@ -7,7 +7,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import type { HealthIssue, SourceFileInfo } from "../types.js";
-import { isDetectorDefinitionFile, shannonEntropy, extractPackageName, isUndeclaredDependency } from "./helpers.js";
+import { isDetectorPatternLine, shannonEntropy, extractPackageName, isUndeclaredDependency } from "./helpers.js";
 
 /**
  * Detect hardcoded secrets, API keys, and credentials in source code.
@@ -28,10 +28,10 @@ export function detectHardcodedSecrets(_projectRoot: string, files: SourceFileIn
 
   for (const file of files) {
     if (skipPatterns.some((p) => p.test(file.relPath))) continue;
-    if (isDetectorDefinitionFile(file.relPath)) continue;
     const lines = file.content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       if (line.trim().startsWith("//") || line.trim().startsWith("*")) continue;
       for (const { regex, name } of secretPatterns) {
         const m = line.match(regex);
@@ -65,10 +65,10 @@ export function detectConsoleSecrets(_projectRoot: string, files: SourceFileInfo
 
   for (const file of files) {
     if (file.relPath.includes("__tests__")) continue;
-    if (isDetectorDefinitionFile(file.relPath)) continue;
     const lines = file.content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
+      if (isDetectorPatternLine(file.relPath, line)) continue;
       if (sensitivePatterns.some((p) => p.test(line)) && !falsePositiveContext.test(line)) {
         issues.push({
           type: "console_secret",
