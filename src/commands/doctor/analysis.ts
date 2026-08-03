@@ -1,6 +1,6 @@
 import { type EngineeringState, consolidateEngineeringState } from "../../engineering-state.js";
 import { detectKnowledgeDebt, type KnowledgeDebtReport } from "../../knowledge-debt.js";
-import { calculateHealthPenalty } from "../../formatting.js";
+import { getEngineeringRiskScore } from "../../health-score-registry.js";
 import { logger } from "../../logger.js";
 
 export interface DoctorFinding {
@@ -192,13 +192,8 @@ export function runDoctorAnalysis(
 
   const allFindings = [...riskFindings, ...improvementFindings, ...teachingFindings];
 
-  let healthScore = 100;
-  for (const f of allFindings) {
-    if (f.category === "risk") {
-      healthScore -= calculateHealthPenalty(f.severity);
-    }
-  }
-  healthScore = Math.max(0, Math.min(100, healthScore));
+  const riskOnlyFindings = allFindings.filter((f) => f.category === "risk");
+  const healthScore = getEngineeringRiskScore(riskOnlyFindings, state.project.sourceFileCount).score;
 
   let overallHealth: DoctorReport["overallHealth"] = "healthy";
   if (healthScore < 50) overallHealth = "critical";

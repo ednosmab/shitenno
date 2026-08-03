@@ -37,7 +37,7 @@ describe("health-score-registry", () => {
 
   describe("getEngineeringRiskScore", () => {
     it("returns 100 for no findings", () => {
-      const result = getEngineeringRiskScore([]);
+      const result = getEngineeringRiskScore([], 100);
       expect(result.score).toBe(100);
       expect(result.label).toBe("Engineering Risk");
       expect(result.type).toBe("engineering_risk");
@@ -47,15 +47,25 @@ describe("health-score-registry", () => {
       const fewFindings = [{ severity: "low" }];
       const manyFindings = [{ severity: "critical" }, { severity: "critical" }];
 
-      const fewResult = getEngineeringRiskScore(fewFindings);
-      const manyResult = getEngineeringRiskScore(manyFindings);
+      const fewResult = getEngineeringRiskScore(fewFindings, 100);
+      const manyResult = getEngineeringRiskScore(manyFindings, 100);
 
       expect(fewResult.score).toBeGreaterThan(manyResult.score);
     });
 
-    it("penalizes critical findings heavily", () => {
-      const result = getEngineeringRiskScore([{ severity: "critical" }]);
-      expect(result.score).toBe(75);
+    it("penalizes critical findings but does not zero on small finding sets (sample = project scope)", () => {
+      const result = getEngineeringRiskScore([{ severity: "critical" }], 100);
+      expect(result.score).toBe(61);
+    });
+
+    it("uses project scope as sample — a critical finding in a large project keeps a healthy score", () => {
+      const result = getEngineeringRiskScore([{ severity: "critical" }], 300);
+      expect(result.score).toBe(85);
+    });
+
+    it("does not zero with a single low-severity finding", () => {
+      const result = getEngineeringRiskScore([{ severity: "low" }], 100);
+      expect(result.score).toBeGreaterThan(90);
     });
   });
 
@@ -85,7 +95,7 @@ describe("health-score-registry", () => {
   describe("getOverallHealth", () => {
     it("combines three scores with weights", () => {
       const code = getCodeSecurityScore([], 100);
-      const risk = getEngineeringRiskScore([]);
+      const risk = getEngineeringRiskScore([], 100);
       const knowledge = getKnowledgeHealthScore(100, 100, 0);
 
       const overall = getOverallHealth(code, risk, knowledge);
@@ -95,7 +105,7 @@ describe("health-score-registry", () => {
 
     it("returns lower score when one dimension is poor", () => {
       const code = getCodeSecurityScore([], 100);
-      const risk = getEngineeringRiskScore([{ severity: "critical" }, { severity: "critical" }]);
+      const risk = getEngineeringRiskScore([{ severity: "critical" }, { severity: "critical" }], 100);
       const knowledge = getKnowledgeHealthScore(100, 100, 0);
 
       const overall = getOverallHealth(code, risk, knowledge);

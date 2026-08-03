@@ -34,6 +34,11 @@ const STALE_THRESHOLDS_DAYS: Record<AssetType, number> = {
 
 const ORPHAN_EXEMPT_TYPES = new Set<AssetType>(["report", "doc", "adr", "policy"]);
 
+// Minimum sample before ratios are trustworthy — a single orphaned asset in a
+// freshly-started project is noise, not degradation (calibrated; revisit against
+// real maturity-profile data if available).
+const MIN_ASSET_SAMPLE = 8;
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function orphanWeightFor(lifecycle: ShitennoLifecycleState): number {
@@ -73,7 +78,8 @@ export function calculateEntropy(
     a.dependencies.some((dep) => !assetIds.has(dep))
   ).length;
 
-  const totalAssets = assets.length || 1;
+  const rawTotal = assets.length || 1;
+  const totalAssets = Math.max(rawTotal, MIN_ASSET_SAMPLE);
   const orphanWeight = orphanWeightFor(lifecycle);
   const staleWeight = 100 - orphanWeight - 30;
 

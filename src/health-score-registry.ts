@@ -2,12 +2,17 @@
  * health-score-registry.ts — Unified Health Score System
  *
  * Provides three distinct health scores with clear labels:
- * - Code Security: Exponential decay based on audit issues
- * - Engineering Risk: Penalty-based (100 - penalties)
+ * - Code Security: Dampened exponential decay based on audit issues
+ * - Engineering Risk: Dampened exponential decay based on doctor findings
  * - Knowledge Health: Weighted average of knowledge debt, graph, and entropy
  *
  * PRINCIPLE: Each score measures a different dimension. Labels prevent confusion.
+ * Small samples share the dampened bounded formula (sqrt damping + sample floor)
+ * so a cluster of findings in a small project does not zero the score by noise.
  */
+
+import { calculateBoundedHealthScore, type SeverityBucket } from "./shared/bounded-health-score.js";
+import { HEALTH_SCORE_DEDUCTIONS } from "./formatting.js";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -24,8 +29,8 @@ export interface HealthScoreResult {
 // ── Code Security Score ────────────────────────────────────────────────────
 
 /**
- * Calculate Code Security score using exponential decay.
- * Based on the actual health-auditor formula.
+ * Calculate Code Security score using the dampened bounded formula.
+ * Sample floor of 10 files prevents small projects from zeroing by noise.
  */
 export function getCodeSecurityScore(
   issues: { severity: string }[],
@@ -41,59 +46,51 @@ export function getCodeSecurityScore(
     };
   }
 
-  const criticalCount = issues.filter((i) => i.severity === "critical").length;
-  const highCount = issues.filter((i) => i.severity === "high").length;
-  const mediumCount = issues.filter((i) => i.severity === "medium").length;
-
-  const penaltyPerFile =
-    (criticalCount * 10 + highCount * 5 + mediumCount * 2) / totalFiles;
-  const score = Math.round(100 * Math.exp(-penaltyPerFile));
+  const bySeverity: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
+  for (const i of issues) bySeverity[i.severity] = (bySeverity[i.severity] ?? 0) + 1;
+  const buckets: SeverityBucket[] = Object.entries(HEALTH_SCORE_DEDUCTIONS).map(([key, weight]) => ({
+    key,
+    weight,
+    count: bySeverity[key] ?? 0,
+  }));
+  const score = calculateBoundedHealthScore({ buckets, sampleSize: totalFiles, minSampleSize: 10 });
 
   return {
     type: "code_security",
     label: "Code Health",
-    score: Math.max(0, Math.min(100, score)),
+    score,
     maxScore: 100,
-    formula: `100 * exp(-penalty_per_file), penalty = (critical*10 + high*5 + medium*2) / files`,
+    formula: "dampened: sqrt(count) per severity, sample floor = 10 files",
   };
 }
 
 // ── Engineering Risk Score ─────────────────────────────────────────────────
 
 /**
- * Calculate Engineering Risk score using penalty-based approach.
- * Based on the actual doctor formula: 100 - penalties.
+ * Calculate Engineering Risk score using the dampened bounded formula.
+ * sampleSize is the project scope (e.g. source file count) — NOT the finding
+ * count, which would zero the score on small samples. Sample floor of 5
+ * prevents degenerate zero-scope projects from reporting noise.
  */
 export function getEngineeringRiskScore(
-  findings: { severity: string }[]
+  findings: { severity: string }[],
+  sampleSize: number
 ): HealthScoreResult {
-  let penalties = 0;
-
-  for (const finding of findings) {
-    switch (finding.severity) {
-      case "critical":
-        penalties += 25;
-        break;
-      case "high":
-        penalties += 15;
-        break;
-      case "medium":
-        penalties += 8;
-        break;
-      case "low":
-        penalties += 3;
-        break;
-    }
-  }
-
-  const score = Math.max(0, 100 - penalties);
+  const bySeverity: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
+  for (const f of findings) bySeverity[f.severity] = (bySeverity[f.severity] ?? 0) + 1;
+  const buckets: SeverityBucket[] = Object.entries(HEALTH_SCORE_DEDUCTIONS).map(([key, weight]) => ({
+    key,
+    weight,
+    count: bySeverity[key] ?? 0,
+  }));
+  const score = calculateBoundedHealthScore({ buckets, sampleSize, minSampleSize: 5 });
 
   return {
     type: "engineering_risk",
     label: "Engineering Risk",
     score,
     maxScore: 100,
-    formula: "100 - (critical*25 + high*15 + medium*8 + low*3)",
+    formula: "dampened: sqrt(count) per severity, sample = project scope (files), floor = 5",
   };
 }
 

@@ -136,4 +136,23 @@ describe("calculateEntropy", () => {
     const result = calculateEntropy(assets, [], "assessed");
     expect(result.score).toBeLessThan(50);
   });
+
+  it("does not flag a single orphaned asset as heavy entropy (small-sample noise floor)", () => {
+    // 1 asset, 1 orphan in a freshly-started project: score must stay low —
+    // statistical noise of a tiny sample, not real degradation (MIN_ASSET_SAMPLE).
+    const asset = makeAsset({ type: "runbook" }); // orphan, not exempt
+    const result = calculateEntropy([asset], [], "governed");
+    expect(result.score).toBeLessThanOrEqual(40);
+    expect(result.score).toBeGreaterThan(0);
+  });
+
+  it("reports correct ratios for very small asset sets after the sample floor", () => {
+    // 1 orphan among 2 assets: with the floor of 8, ratio = 1/8 → bounded score,
+    // while raw counts stay accurate.
+    const a = makeAsset({ type: "runbook" });
+    const b = makeAsset({ id: "b1", type: "doc" });
+    const result = calculateEntropy([a, b], [], "governed");
+    expect(result.orphanedAssets).toBe(1);
+    expect(result.score).toBeLessThan(40);
+  });
 });

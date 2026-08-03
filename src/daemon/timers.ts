@@ -42,17 +42,30 @@ function getChangedFiles(projectRoot: string): string[] | undefined {
   }
 }
 
-export async function runPeriodicAudit(ctx: DaemonContext): Promise<void> {
+export async function runPeriodicAudit(ctx: DaemonContext, forceFull = false): Promise<void> {
   try {
     const level = getAuditLevel(ctx);
-    const changedFiles = getChangedFiles(ctx.projectRoot);
+    const changedFiles = forceFull ? undefined : getChangedFiles(ctx.projectRoot);
     const report = await auditHealth(ctx.projectRoot, ctx.shitennoDir, level, changedFiles);
 
-    ctx.state.health = {
-      score: report.healthScore,
-      previousScore: ctx.state.health?.score ?? null,
-      checkedAt: report.auditedAt,
-    };
+    // "Overall health" only makes sense from a full sweep (large enough
+    // denominator to dilute findings). An incremental audit measures something
+    // else — issues introduced by the recent changeset — and must not
+    // overwrite the same field, or a small delta with clustered severe findings
+    // would mathematically zero the health score (PLANO-FINAL-UNICO-HEALTH-SCORES).
+    if (!changedFiles || changedFiles.length === 0) {
+      ctx.state.health = {
+        score: report.healthScore,
+        previousScore: ctx.state.health?.score ?? null,
+        checkedAt: report.auditedAt,
+      };
+    } else {
+      ctx.state.lastDeltaAudit = {
+        changedFilesCount: changedFiles.length,
+        newIssueCount: report.issues.length,
+        checkedAt: report.auditedAt,
+      };
+    }
 
     recordEvent(ctx.state, "health.checked");
     getEventBus().publish("audit.standard", {
@@ -82,29 +95,46 @@ function setupConsolidationTimer(ctx: DaemonContext): NodeJS.Timeout {
 
 // ── Audit Timer ─────────────────────────────────────────────────────────────
 
-function setupAuditTimer(ctx: DaemonContext, runPeriodicAuditFn: () => Promise<void>): { timer: NodeJS.Timeout; cleanup: () => void } {
-  let timer = setInterval(runPeriodicAuditFn, getAuditIntervalMs(ctx));
+/**
+ * The interval timer runs FULL sweeps (forceFull) so ctx.state.health always
+ * reflects overall health. Event-driven audits (runPeriodicAuditFn without
+ * forceFull) remain incremental and populate lastDeltaAudit only.
+ */
+function setupAuditTimer(ctx: DaemonContext): { timer: NodeJS.Timeout; cleanup: () => void } {
+  let timer = setInterval(() => runPeriodicAudit(ctx, true), getAuditIntervalMs(ctx));
   const sub = getEventBus().subscribe("health.checked", () => {
     const newInterval = getAuditIntervalMs(ctx);
     clearInterval(timer);
-    timer = setInterval(runPeriodicAuditFn, newInterval);
+    timer = setInterval(() => runPeriodicAudit(ctx, true), newInterval);
     daemonLog(ctx.logPath, "DEBUG", `Audit interval recalculated: ${newInterval / 1000}s (score=${ctx.state.health?.score ?? "unknown"})`);
   });
   return { timer, cleanup: () => sub() };
+}
+
+// ── Initial Full Sweep ──────────────────────────────────────────────────────
+
+/**
+ * Ensure ctx.state.health is seeded shortly after daemon start — otherwise the
+ * first full sweep only fires after getAuditIntervalMs (4-6h), leaving the
+ * health score null/stale during an active working session.
+ */
+export function scheduleInitialFullAudit(ctx: DaemonContext): NodeJS.Timeout {
+  return setTimeout(() => {
+    runPeriodicAudit(ctx, true);
+  }, 15_000);
 }
 
 // ── Periodic Timers ─────────────────────────────────────────────────────────
 
 export function setupPeriodicTimers(
   ctx: DaemonContext,
-  runPeriodicAuditFn: () => Promise<void>,
 ): { persistTimer: NodeJS.Timeout; auditTimer: NodeJS.Timeout; consolidationTimer: NodeJS.Timeout; cleanupAudit: () => void } {
   const persistTimer = setInterval(() => {
     persistState(ctx.state, ctx.statePath);
   }, 30_000);
 
   const consolidationTimer = setupConsolidationTimer(ctx);
-  const { timer: auditTimer, cleanup: cleanupAudit } = setupAuditTimer(ctx, runPeriodicAuditFn);
+  const { timer: auditTimer, cleanup: cleanupAudit } = setupAuditTimer(ctx);
 
   return { persistTimer, auditTimer, consolidationTimer, cleanupAudit };
 }

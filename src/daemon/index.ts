@@ -25,7 +25,7 @@ import {
   type DaemonContext,
 } from "./pid-manager.js";
 import { subscribeAllEvents } from "./event-handlers.js";
-import { setupPeriodicTimers, scheduleCheckNag, runPeriodicAudit } from "./timers.js";
+import { setupPeriodicTimers, scheduleCheckNag, runPeriodicAudit, scheduleInitialFullAudit } from "./timers.js";
 import { createVerifyAllPendingPlans } from "./verification.js";
 import { initializeDaemonEngines } from "./engine-init.js";
 import { setupShutdown, type ShutdownTimers } from "./shutdown.js";
@@ -220,7 +220,8 @@ export async function runDaemon(shitennoDir: string, projectRoot?: string): Prom
 
   const runPeriodicAuditFn = () => runPeriodicAudit(ctx);
   const logEvents = subscribeAllEvents(ctx, verifyAllPendingPlans, runPeriodicAuditFn);
-  const timers = setupPeriodicTimers(ctx, runPeriodicAuditFn);
+  const timers = setupPeriodicTimers(ctx);
+  const initialFullAuditTimer = scheduleInitialFullAudit(ctx);
 
   // Import circuit breaker dynamically to avoid circular deps
   const { DaemonCircuitBreaker } = await import("../daemon-circuit-breaker.js");
@@ -232,7 +233,7 @@ export async function runDaemon(shitennoDir: string, projectRoot?: string): Prom
 
   const checkNagTimer = scheduleCheckNag(ctx);
 
-  const shutdownTimers: ShutdownTimers = { stableTimer, checkNagTimer, ...timers };
+  const shutdownTimers: ShutdownTimers = { stableTimer, checkNagTimer, initialFullAuditTimer, ...timers };
   setupShutdown(ctx, shutdownTimers);
 
   daemonLog(ctx.logPath, "INFO", `Daemon ready — consuming ${logEvents.length + 8} event types`);

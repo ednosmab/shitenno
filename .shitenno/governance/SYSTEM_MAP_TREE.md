@@ -122,6 +122,8 @@
 │   docs/history/2026-08-02-rule-plan_archived.md
 │   docs/history/2026-08-02-rule-session_close.md
 │   docs/history/2026-08-02-rule-session_end_plans.md
+│   docs/history/2026-08-03-rule-session_close.md
+│   docs/history/2026-08-03-rule-session_end_plans.md
 │   docs/INDEX.md
 │   docs/KNOWLEDGE_LIFECYCLE.md
 │   docs/opencode-context.md
@@ -415,6 +417,7 @@
 │   governance/plans/pipeline/living-fase1-cache.md
 │   governance/plans/pipeline/living-fase2-hooks.md
 │   governance/plans/pipeline/living-fase3-daemon.md
+│   governance/plans/PLANO-FINAL-UNICO-HEALTH-SCORES-2026-08-02.md
 │   governance/plans/README.md
 │   governance/plans/reference/
 │   governance/plans/reference/ENTERPRISE_AUDIT_PLAN.md
@@ -565,6 +568,7 @@
 │   reports/doc-sync-2026-07-31.json
 │   reports/doc-sync-2026-08-01.json
 │   reports/doc-sync-2026-08-02.json
+│   reports/doc-sync-2026-08-03.json
 │   reports/evolution-2026-07-18.json
 │   reports/evolution-2026-07-25.json
 │   reports/health-2026-07-16.json

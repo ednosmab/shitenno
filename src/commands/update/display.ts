@@ -11,6 +11,19 @@ const { copySync, ensureDirSync, removeSync } = fse;
 
 import { getTemplatesDir } from "../../paths.js";
 
+function hasChanges(diff: ManifestDiff): boolean {
+  return diff.added.length > 0 || diff.removed.length > 0 || diff.changed.length > 0 || (diff.conflict?.length ?? 0) > 0;
+}
+
+function printList(items: string[], icon: string, color: (text: string) => string): void {
+  for (const f of items.slice(0, 10)) {
+    output(color(`      ${icon} ${f}`));
+  }
+  if (items.length > 10) {
+    output(chalk.gray(`      ... and ${items.length - 10} more`));
+  }
+}
+
 export function displayDiff(diff: ManifestDiff, isJson: boolean): void {
   if (isJson) {
     outputJson(diff as unknown as Record<string, unknown>);
@@ -21,35 +34,26 @@ export function displayDiff(diff: ManifestDiff, isJson: boolean): void {
 
   if (diff.added.length > 0) {
     outputSuccess(`    + ${diff.added.length} file(s) added`);
-    for (const f of diff.added.slice(0, 10)) {
-      output(chalk.green(`      + ${f}`));
-    }
-    if (diff.added.length > 10) {
-      output(chalk.gray(`      ... and ${diff.added.length - 10} more`));
-    }
+    printList(diff.added, "+", chalk.green);
   }
 
   if (diff.removed.length > 0) {
     outputError(`    - ${diff.removed.length} file(s) removed`);
-    for (const f of diff.removed.slice(0, 10)) {
-      output(chalk.red(`      - ${f}`));
-    }
-    if (diff.removed.length > 10) {
-      output(chalk.gray(`      ... and ${diff.removed.length - 10} more`));
-    }
+    printList(diff.removed, "-", chalk.red);
   }
 
   if (diff.changed.length > 0) {
     outputWarning(`    ~ ${diff.changed.length} file(s) changed`);
-    for (const f of diff.changed.slice(0, 10)) {
-      output(chalk.yellow(`      ~ ${f}`));
-    }
-    if (diff.changed.length > 10) {
-      output(chalk.gray(`      ... and ${diff.changed.length - 10} more`));
-    }
+    printList(diff.changed, "~", chalk.yellow);
   }
 
-  if (diff.added.length === 0 && diff.removed.length === 0 && diff.changed.length === 0) {
+  if ((diff.conflict?.length ?? 0) > 0) {
+    outputWarning(`    ⚠ ${diff.conflict!.length} file(s) in conflict — customized locally AND changed in template`);
+    printList(diff.conflict!, "⚠", chalk.magenta);
+    output(chalk.gray("      Not applied automatically — review manually."));
+  }
+
+  if (!hasChanges(diff)) {
     outputSuccess("    No changes detected. Everything is up to date.");
   }
 

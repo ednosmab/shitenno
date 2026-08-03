@@ -24,6 +24,13 @@ export interface HealthInfo {
   checkedAt: string;
 }
 
+/** Incremental (per-commit delta) audit result — kept separate from HealthInfo. */
+export interface DeltaAuditInfo {
+  changedFilesCount: number;
+  newIssueCount: number;
+  checkedAt: string;
+}
+
 export interface ChallengeInfo {
   type: string;
   severity: string;
@@ -60,6 +67,8 @@ export interface DaemonState {
   drift: DriftInfo | null;
   sessions: SessionInfo[];
   health: HealthInfo | null;
+  /** Latest incremental (delta) audit — issues introduced by the current changeset. */
+  lastDeltaAudit: DeltaAuditInfo | null;
   challenges: ChallengeInfo[];
   debt: DebtInfo | null;
   events: EventEntry[];
@@ -99,6 +108,7 @@ export function createDaemonState(): DaemonState {
     drift: null,
     sessions: [],
     health: null,
+    lastDeltaAudit: null,
     challenges: [],
     debt: null,
     events: [],

@@ -17,6 +17,7 @@ import type { DaemonContext } from "./pid-manager.js";
 export type ShutdownTimers = {
   stableTimer: NodeJS.Timeout;
   checkNagTimer: NodeJS.Timeout;
+  initialFullAuditTimer?: NodeJS.Timeout;
   persistTimer: NodeJS.Timeout;
   auditTimer: NodeJS.Timeout;
   consolidationTimer: NodeJS.Timeout;
@@ -26,6 +27,7 @@ export type ShutdownTimers = {
 export function clearAllTimers(timers: ShutdownTimers): void {
   clearTimeout(timers.stableTimer);
   clearTimeout(timers.checkNagTimer);
+  if (timers.initialFullAuditTimer) clearTimeout(timers.initialFullAuditTimer);
   clearInterval(timers.persistTimer);
   clearInterval(timers.auditTimer);
   clearInterval(timers.consolidationTimer);

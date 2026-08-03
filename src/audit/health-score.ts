@@ -4,6 +4,7 @@
 
 import type { HealthIssue } from "./types.js";
 import { dimensionOf, type AuditDimension } from "./dimensions.js";
+import { calculateBoundedHealthScore, type SeverityBucket } from "../shared/bounded-health-score.js";
 
 /**
  * Calculate health score from issues and total files.
@@ -18,16 +19,13 @@ export function calculateHealthScore(issues: HealthIssue[], totalFiles: number):
     bySeverity[issue.severity] = (bySeverity[issue.severity] ?? 0) + 1;
     confidenceBySeverity[issue.severity] = (confidenceBySeverity[issue.severity] ?? 0) + (issue.confidence ?? 1.0);
   }
-  const rawPenalty = Object.entries(bySeverity).reduce(
-    (sum, [sev, count]) => {
-      const conf = count > 0 ? (confidenceBySeverity[Number(sev)] ?? count) / count : 1.0;
-      return sum + (weights[Number(sev)] ?? 0) * Math.sqrt(count) * conf;
-    }, 0
-  );
-  const normalizer = Math.max(totalFiles, 10);
-  const density = rawPenalty / normalizer;
-  const score = 100 * Math.exp(-density * 2);
-  return Math.max(0, Math.min(100, Math.round(score)));
+  const buckets: SeverityBucket[] = [3, 2, 1].map((sev) => ({
+    key: String(sev),
+    weight: weights[sev]!,
+    count: bySeverity[sev]!,
+    avgConfidence: bySeverity[sev]! > 0 ? confidenceBySeverity[sev]! / bySeverity[sev]! : 1.0,
+  }));
+  return calculateBoundedHealthScore({ buckets, sampleSize: totalFiles, minSampleSize: 10 });
 }
 
 /**

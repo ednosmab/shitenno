@@ -128,6 +128,7 @@ function handleQueryHealth(opts: HandleMessageOptions): void {
     type: "health",
     score: state.health?.score ?? null,
     checkedAt: state.health?.checkedAt ?? null,
+    deltaAudit: state.lastDeltaAudit ?? null,
     trend,
     uptimeSeconds,
     pid: process.pid,

@@ -13,8 +13,7 @@ import ora from "ora";
 import {
   readManifest,
   writeManifest,
-  scanTemplateHashes,
-  diffManifests,
+  diffManifestsV2,
   updateManifest,
   type Manifest,
   type ManifestDiff,
@@ -60,17 +59,18 @@ function processUpdate(ctx: { shitennoDir: string }, currentManifest: Manifest):
   }
 
   const spinner = ora("Scanning templates for changes...").start();
-  const newHashes = scanTemplateHashes(ctx.shitennoDir);
+  const newManifest = updateManifest(currentManifest, {
+    cliVersion: currentCliVersion,
+    shitennoDir: ctx.shitennoDir,
+    capabilities: currentManifest.capabilities,
+    maturityScore: currentManifest.maturityScore,
+  });
   spinner.succeed("Scan complete");
 
-  const newManifest: Manifest = {
-    ...currentManifest,
-    templateHashes: newHashes,
-  };
-
-  const diff = diffManifests(currentManifest, newManifest);
+  const diff = diffManifestsV2(currentManifest, newManifest);
   const hasChanges =
-    diff.added.length > 0 || diff.removed.length > 0 || diff.changed.length > 0;
+    diff.added.length > 0 || diff.removed.length > 0 || diff.changed.length > 0 ||
+    (diff.conflict?.length ?? 0) > 0;
   const versionMismatch = currentManifest.cliVersion !== currentCliVersion;
 
   return { currentManifest, currentCliVersion, diff, hasChanges, versionMismatch };
