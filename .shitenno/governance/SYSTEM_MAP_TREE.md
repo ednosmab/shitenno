@@ -124,6 +124,9 @@
 │   docs/history/2026-08-02-rule-session_end_plans.md
 │   docs/history/2026-08-03-rule-session_close.md
 │   docs/history/2026-08-03-rule-session_end_plans.md
+│   docs/history/2026-08-04-rule-plan_archived.md
+│   docs/history/2026-08-04-rule-session_close.md
+│   docs/history/2026-08-04-rule-session_end_plans.md
 │   docs/INDEX.md
 │   docs/KNOWLEDGE_LIFECYCLE.md
 │   docs/opencode-context.md
@@ -386,6 +389,10 @@
 │   governance/plans/done/PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4.verification.json
 │   governance/plans/done/PLANO-FINAL-CONSOLIDADO-2026-07-29.md
 │   governance/plans/done/PLANO-FINAL-CONSOLIDADO-2026-07-29.verification.json
+│   governance/plans/done/PLANO-FINAL-UNICO-HEALTH-SCORES-2026-08-02.md
+│   governance/plans/done/PLANO-FINAL-UNICO-HEALTH-SCORES-2026-08-02.verification.json
+│   governance/plans/done/PLANO-FLUXO-INSTALACAO-TERCEIROS-2026-08-03.md
+│   governance/plans/done/PLANO-FLUXO-INSTALACAO-TERCEIROS-2026-08-03.verification.json
 │   governance/plans/done/PLANO-FONTE-UNICA-MCP-2026-07-31.md
 │   governance/plans/done/PLANO-FONTE-UNICA-MCP-2026-07-31.verification.json
 │   governance/plans/done/PLANO-MCP-CROSS-HARNESS-2026-08-01.md
@@ -417,7 +424,6 @@
 │   governance/plans/pipeline/living-fase1-cache.md
 │   governance/plans/pipeline/living-fase2-hooks.md
 │   governance/plans/pipeline/living-fase3-daemon.md
-│   governance/plans/PLANO-FINAL-UNICO-HEALTH-SCORES-2026-08-02.md
 │   governance/plans/README.md
 │   governance/plans/reference/
 │   governance/plans/reference/ENTERPRISE_AUDIT_PLAN.md
@@ -531,6 +537,10 @@
 │   reports/complexity-shitenno-2026-08-02-session7.json
 │   reports/complexity-shitenno-2026-08-02-session8.json
 │   reports/complexity-shitenno-2026-08-02-session9.json
+│   reports/complexity-shitenno-2026-08-04-session1.json
+│   reports/complexity-shitenno-2026-08-04-session2.json
+│   reports/complexity-shitenno-2026-08-04-session3.json
+│   reports/complexity-shitenno-2026-08-04-session4.json
 │   reports/complexity-shitenno-cli-2026-07-12-session1.json
 │   reports/complexity-shitenno-cli-2026-07-13-session1.json
 │   reports/complexity-shitenno-cli-2026-07-14-session1.json
@@ -569,6 +579,7 @@
 │   reports/doc-sync-2026-08-01.json
 │   reports/doc-sync-2026-08-02.json
 │   reports/doc-sync-2026-08-03.json
+│   reports/doc-sync-2026-08-04.json
 │   reports/evolution-2026-07-18.json
 │   reports/evolution-2026-07-25.json
 │   reports/health-2026-07-16.json
@@ -579,6 +590,7 @@
 │   reports/health-2026-07-25.json
 │   reports/health-2026-07-29.json
 │   reports/health-2026-08-01.json
+│   reports/health-2026-08-04.json
 │   reports/patterns-2026-07-12.json
 │   reports/patterns-2026-07-13.json
 │   reports/patterns-2026-07-14.json
@@ -601,6 +613,7 @@
 │   reports/patterns-2026-07-31.json
 │   reports/patterns-2026-08-01.json
 │   reports/patterns-2026-08-02.json
+│   reports/patterns-2026-08-03.json
 │   scripts/
 │   scripts/add-frontmatter.ts
 │   scripts/backlog.ts

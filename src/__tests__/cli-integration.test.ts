@@ -758,11 +758,16 @@ describe("CLI Integration Tests", () => {
       );
       writeFileSync(join(dir, "index.js"), "console.log('hello');\n");
 
+      // Phase 0 prerequisite: init requires a git repository (isolation via
+      // git worktree). A real third-party project is already versioned.
+      execSync("git init -q", { cwd: dir });
+
       // Create an answers file for non-interactive init (senior level ensures all capabilities installed)
       const personaPath = join(dir, "persona.json");
       writeFileSync(
         personaPath,
         JSON.stringify({
+          projectType: "new",
           principalModel: "opencode/mimo-v2.5-free",
           executorModel: "opencode/deepseek-v4-flash-free",
           stack: ["javascript"],

@@ -17,6 +17,7 @@ export {
   detectBrokenRefs,
   detectBrokenDirRefs,
   detectNonBacktickFileRefs,
+  detectBrokenManifestRefs,
 } from "./docs/refs.js";
 
 export {

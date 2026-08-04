@@ -9,6 +9,17 @@ import { join, dirname } from "node:path";
 import { logger } from "../../logger.js";
 import type { HealthIssue } from "../types.js";
 import { collectBacktickRefs, isTemplateRef, refExists } from "./helpers.js";
+import { EXTERNAL_INDEX_REL_PATH } from "../../constants.js";
+
+interface ExternalManifestEntry {
+  type: string;
+  path: string;
+}
+
+interface ExternalManifest {
+  version?: number;
+  refs?: ExternalManifestEntry[];
+}
 
 const DOCS_WITH_FILE_REFS = [
   "docs/AGENTS.md",
@@ -118,6 +129,47 @@ export function detectBrokenDirRefs(shitennoDir: string): HealthIssue[] {
       }
     } catch (err) {
       logger.debug("docs/refs", `Error scanning dir refs in ${doc}:`, err);
+    }
+  }
+
+  return issues;
+}
+
+/**
+ * Detect broken references in the external-index manifest.
+ *
+ * The manifest (`docs/external-index.json`) references knowledge artifacts
+ * (ADRs, plans, …) at their real project locations. A reference without a
+ * verification is just a list that silently rots — this detector flags
+ * entries whose target file no longer exists (moved or deleted).
+ */
+export function detectBrokenManifestRefs(shitennoDir: string): HealthIssue[] {
+  const issues: HealthIssue[] = [];
+  const manifestPath = join(shitennoDir, EXTERNAL_INDEX_REL_PATH);
+  if (!existsSync(manifestPath)) return issues;
+
+  let manifest: ExternalManifest;
+  try {
+    manifest = JSON.parse(readFileSync(manifestPath, "utf-8")) as ExternalManifest;
+  } catch (err) {
+    logger.debug("docs/refs", "Failed to parse external-index.json:", err);
+    return issues;
+  }
+
+  const refs = Array.isArray(manifest.refs) ? manifest.refs : [];
+  const projectRoot = join(shitennoDir, "..");
+
+  for (const entry of refs) {
+    const refPath = join(projectRoot, entry.path);
+    if (!existsSync(refPath)) {
+      issues.push({
+        type: "broken_manifest_ref",
+        severity: 2,
+        description: `external-index.json entry "${entry.type}" points to "${entry.path}", which no longer exists.`,
+        location: `shitenno/${EXTERNAL_INDEX_REL_PATH}`,
+        recommendation: `Fix the reference "${entry.path}" in ${EXTERNAL_INDEX_REL_PATH} or restore the artifact.`,
+        confidence: 0.9,
+      });
     }
   }
 

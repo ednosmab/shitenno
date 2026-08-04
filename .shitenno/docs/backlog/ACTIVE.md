@@ -742,3 +742,39 @@ lifecycle: Active
 | **Modulos** | governance/plans/ |
 | **Descricao** | Plano Mestre Único v2 (2026-08-01) — com código verificado contra o repositório real |
 | **Correcao** | Verificar checklist no plano `governance/plans/PLANO-MESTRE-UNICO-v2-2026-08-01.md` |
+
+| **Status** | em validação |
+
+| Campo | Valor |
+|---|---|
+| **Status** | em implementação |
+| **Severidade** | Medio |
+| **Prioridade** | P1 |
+| **Owner** | openai/assistente |
+| **Data** | 2026-08-04 |
+| **Fonte** | mcp |
+| **Descricao** | Fase 5 concluída em build: módulo commands/init/manifest-refs.ts (collectExternalReferences/writeExternalIndex), detector detectBrokenManifestRefs em audit/docs/refs.ts, tipo broken_manifest_ref em HealthIssueType, registros em STANDARD_DETECTORS, governance detector map e DIMENSION_BY_TYPE, wiring em applyByLevel (só escreve se houver ADRs/plans, sem copiar artefatos). 14 testes novos verdes (init-manifest-refs.test.ts + init-apply.test.ts), typecheck + eslint limpos. |
+
+| **Status** | em validação |
+
+| Campo | Valor |
+|---|---|
+| **Status** | em implementação |
+| **Severidade** | Medio |
+| **Prioridade** | P1 |
+| **Owner** | assistente |
+| **Data** | 2026-08-04 |
+| **Fonte** | mcp |
+| **Descricao** | Módulo commands/init/restore.ts (restoreFromBackup + runUndo), flag --undo no shugo init. Testes: init-restore.test.ts (5). Correção de design: backupLevel2 agora copia do projeto real (backupSourceDir) — antes, no worktree isolado, arquivos untracked do usuário não existiam no checkout e o backup capturava nada. |
+
+| **Status** | em validação |
+
+| Campo | Valor |
+|---|---|
+| **Status** | em implementação |
+| **Severidade** | Medio |
+| **Prioridade** | P1 |
+| **Owner** | assistente |
+| **Data** | 2026-08-04 |
+| **Fonte** | mcp |
+| **Descricao** | Módulo commands/init/upgrade.ts (runUpgradeFlow/approveUpgrade/performUpgrade), integrado no init.ts antes do handleAlreadyInitialized. Lê o último registro de .git/shitenno/consent.json; N1 → oferece upgrade (confirm interativo ou consentLevel:2 em answers-file); apply N2 em worktree + novo registro de consentimento. Testes: init-upgrade.test.ts (5). |

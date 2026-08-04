@@ -1,6 +1,8 @@
 # Plano Final Único — Health Scores, `shugo update`, Limpeza da Raiz
 
-**Status:** In Progress
+**Status:** Done
+**Updated_at:** 2026-08-04T12:54:18.924Z
+**Date:** 2026-08-02
 **Data:** 2026-08-02 | **Prioridade:** Máxima — cobre os dois achados de "score degradado a zero" (validados por execução real, causas raiz distintas e complementares) + o que já estava pendente da branch de MCP.
 **Regra de ouro pro agente:** cada bloco tem TDD obrigatório (teste vermelho antes do fix, verde depois) e um passo de validação por execução real — não considerar nenhum item concluído só porque compilou.
 

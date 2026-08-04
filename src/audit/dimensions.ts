@@ -119,6 +119,7 @@ export const DIMENSION_BY_TYPE: Partial<Record<string, AuditDimension>> = {
   phantom_rule_ref: "governance",
   violation_hotspot: "governance",
   orphan_dir: "governance",
+  broken_manifest_ref: "governance",
   stale_buffer: "governance",
   session_not_closed: "governance",
   buffer_not_pruned: "governance",

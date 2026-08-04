@@ -1,4 +1,5 @@
 {
+  "projectType": "new",
   "principalModel": "openai/gpt-4o",
   "executorModel": "openai/gpt-4o-mini",
   "stack": ["typescript"],

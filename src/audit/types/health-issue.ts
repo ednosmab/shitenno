@@ -218,7 +218,9 @@ export type HealthIssueType =
   | "orphan_skill"
   | "broken_skill_manifest_entry"
   // Governance Integrity (J.1)
-  | "governance_integrity";
+  | "governance_integrity"
+  // External knowledge-artifact manifest (Fase 5)
+  | "broken_manifest_ref";
 
 /** Problema de saúde detectado no sistema. */
 export interface HealthIssue {

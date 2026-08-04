@@ -1,5 +1,5 @@
 {
-  "consolidatedAt": "2026-08-02T19:01:00.978Z",
+  "consolidatedAt": "2026-08-04T12:28:25.468Z",
   "lifecycle": "evolved",
   "project": {
     "name": "shitenno",
@@ -14,7 +14,7 @@
     "hasTests": true,
     "hasTypeScript": true,
     "packageCount": 0,
-    "sourceFileCount": 911,
+    "sourceFileCount": 934,
     "monorepo": true
   },
   "maturity": {
@@ -61,11 +61,11 @@
   "knowledgeDebt": {
     "totalGaps": 0,
     "healthScore": 100,
-    "detectedAt": "2026-08-02T19:01:00.968Z"
+    "detectedAt": "2026-08-04T12:28:25.462Z"
   },
   "knowledgeGraph": {
     "totalArtifacts": 56,
-    "totalRelations": 204,
+    "totalRelations": 205,
     "healthScore": 100
   },
   "assets": [
@@ -81,8 +81,8 @@
         "architecture"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture",
         "documentation"
@@ -101,8 +101,8 @@
         "architecture"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture",
         "documentation"
@@ -121,8 +121,8 @@
         "architecture"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture",
         "documentation"
@@ -141,8 +141,8 @@
         "architecture"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture",
         "documentation"
@@ -161,8 +161,8 @@
         "architecture"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture",
         "documentation"
@@ -181,8 +181,8 @@
         "architecture"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture",
         "documentation"
@@ -201,8 +201,8 @@
         "architecture"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture",
         "documentation"
@@ -221,8 +221,8 @@
         "architecture"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture",
         "documentation"
@@ -241,8 +241,28 @@
         "architecture"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "architecture",
+        "documentation"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "adr-ADR-011-mcp-background-consolidation",
+      "type": "adr",
+      "name": "ADR-011: MCP Background Consolidation for Fast Handshake",
+      "path": "docs/adrs/ADR-011-mcp-background-consolidation.md",
+      "description": "Architecture Decision Record: ADR-011-mcp-background-consolidation.md",
+      "tags": [
+        "adr",
+        "decision",
+        "architecture"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture",
         "documentation"
@@ -260,8 +280,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -279,8 +299,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -298,8 +318,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -317,8 +337,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -336,8 +356,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -355,8 +375,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -374,8 +394,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -393,8 +413,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -412,8 +432,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -431,8 +451,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -450,8 +470,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -469,8 +489,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -488,8 +508,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -507,8 +527,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -526,8 +546,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -545,8 +565,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -564,8 +584,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -583,8 +603,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -602,8 +622,8 @@
         "engineering"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation",
         "quality"
@@ -622,8 +642,8 @@
         "ai"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "ai",
         "governance"
@@ -642,8 +662,8 @@
         "ai"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "ai",
         "governance"
@@ -662,8 +682,8 @@
         "ai"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "ai",
         "governance"
@@ -682,8 +702,8 @@
         "ai"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "ai",
         "governance"
@@ -702,8 +722,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -721,8 +741,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -740,8 +760,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -759,8 +779,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -778,8 +798,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -797,8 +817,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -816,8 +836,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -835,8 +855,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -854,8 +874,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -873,8 +893,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -892,8 +912,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -911,8 +931,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -930,8 +950,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -949,8 +969,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -967,29 +987,11 @@
         "operations"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "operations",
         "quality"
-      ],
-      "dependencies": []
-    },
-    {
-      "id": "plan-PLANO-MESTRE-UNICO-v2-2026-08-01",
-      "type": "plan",
-      "name": "PLANO MESTRE UNICO v2 2026 08 01",
-      "path": "governance/plans/PLANO-MESTRE-UNICO-v2-2026-08-01.md",
-      "description": "Execution plan: PLANO-MESTRE-UNICO-v2-2026-08-01.md",
-      "tags": [
-        "plan",
-        "execution"
-      ],
-      "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
-      "contributesTo": [
-        "architecture"
       ],
       "dependencies": []
     },
@@ -1004,8 +1006,8 @@
         "execution"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "architecture"
       ],
@@ -1022,8 +1024,8 @@
         "automation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "automation"
       ],
@@ -1040,8 +1042,8 @@
         "automation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "automation"
       ],
@@ -1058,8 +1060,8 @@
         "automation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "automation"
       ],
@@ -1076,8 +1078,8 @@
         "automation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "automation"
       ],
@@ -1094,8 +1096,8 @@
         "automation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "automation"
       ],
@@ -1112,8 +1114,8 @@
         "automation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "automation"
       ],
@@ -1130,8 +1132,8 @@
         "automation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "automation"
       ],
@@ -1149,8 +1151,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance",
         "documentation"
@@ -1169,8 +1171,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance",
         "documentation"
@@ -1189,8 +1191,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance",
         "documentation"
@@ -1208,8 +1210,8 @@
         "documentation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation"
       ],
@@ -1227,8 +1229,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance",
         "documentation"
@@ -1246,8 +1248,8 @@
         "documentation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation"
       ],
@@ -1265,8 +1267,8 @@
         "governance"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance",
         "documentation"
@@ -1284,8 +1286,8 @@
         "documentation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation"
       ],
@@ -1302,8 +1304,8 @@
         "documentation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation"
       ],
@@ -1320,8 +1322,8 @@
         "documentation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation"
       ],
@@ -1338,8 +1340,8 @@
         "documentation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation"
       ],
@@ -1356,8 +1358,8 @@
         "documentation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation"
       ],
@@ -1374,8 +1376,8 @@
         "documentation"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "documentation"
       ],
@@ -1392,8 +1394,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1410,8 +1412,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1428,8 +1430,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1446,8 +1448,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1464,8 +1466,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1482,8 +1484,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1500,8 +1502,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1518,8 +1520,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1536,8 +1538,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1554,8 +1556,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1572,8 +1574,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1590,8 +1592,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1608,8 +1610,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1626,8 +1628,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1644,8 +1646,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1662,8 +1664,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1680,8 +1682,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1698,8 +1700,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1716,8 +1718,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1734,8 +1736,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1752,8 +1754,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1770,8 +1772,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1788,8 +1790,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1806,8 +1808,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1824,8 +1826,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1842,8 +1844,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1860,8 +1862,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1878,8 +1880,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1896,8 +1898,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1914,8 +1916,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1932,8 +1934,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1950,8 +1952,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1968,8 +1970,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -1986,8 +1988,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2004,8 +2006,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2022,8 +2024,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2040,8 +2042,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2058,8 +2060,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2076,8 +2078,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2094,8 +2096,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2112,8 +2114,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2130,8 +2132,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2148,8 +2150,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2166,8 +2168,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2184,8 +2186,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2202,8 +2204,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2220,8 +2222,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2238,8 +2240,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2256,8 +2258,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2274,8 +2276,26 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-complexity-shitenno-2026-08-02-session10",
+      "type": "report",
+      "name": "complexity shitenno 2026 08 02 session10",
+      "path": "reports/complexity-shitenno-2026-08-02-session10.json",
+      "description": "Report: complexity-shitenno-2026-08-02-session10.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2292,8 +2312,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2310,8 +2330,152 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-complexity-shitenno-2026-08-02-session4",
+      "type": "report",
+      "name": "complexity shitenno 2026 08 02 session4",
+      "path": "reports/complexity-shitenno-2026-08-02-session4.json",
+      "description": "Report: complexity-shitenno-2026-08-02-session4.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-complexity-shitenno-2026-08-02-session5",
+      "type": "report",
+      "name": "complexity shitenno 2026 08 02 session5",
+      "path": "reports/complexity-shitenno-2026-08-02-session5.json",
+      "description": "Report: complexity-shitenno-2026-08-02-session5.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-complexity-shitenno-2026-08-02-session6",
+      "type": "report",
+      "name": "complexity shitenno 2026 08 02 session6",
+      "path": "reports/complexity-shitenno-2026-08-02-session6.json",
+      "description": "Report: complexity-shitenno-2026-08-02-session6.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-complexity-shitenno-2026-08-02-session7",
+      "type": "report",
+      "name": "complexity shitenno 2026 08 02 session7",
+      "path": "reports/complexity-shitenno-2026-08-02-session7.json",
+      "description": "Report: complexity-shitenno-2026-08-02-session7.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-complexity-shitenno-2026-08-02-session8",
+      "type": "report",
+      "name": "complexity shitenno 2026 08 02 session8",
+      "path": "reports/complexity-shitenno-2026-08-02-session8.json",
+      "description": "Report: complexity-shitenno-2026-08-02-session8.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-complexity-shitenno-2026-08-02-session9",
+      "type": "report",
+      "name": "complexity shitenno 2026 08 02 session9",
+      "path": "reports/complexity-shitenno-2026-08-02-session9.json",
+      "description": "Report: complexity-shitenno-2026-08-02-session9.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-complexity-shitenno-2026-08-04-session1",
+      "type": "report",
+      "name": "complexity shitenno 2026 08 04 session1",
+      "path": "reports/complexity-shitenno-2026-08-04-session1.json",
+      "description": "Report: complexity-shitenno-2026-08-04-session1.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-complexity-shitenno-2026-08-04-session2",
+      "type": "report",
+      "name": "complexity shitenno 2026 08 04 session2",
+      "path": "reports/complexity-shitenno-2026-08-04-session2.json",
+      "description": "Report: complexity-shitenno-2026-08-04-session2.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2328,8 +2492,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2346,8 +2510,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2364,8 +2528,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2382,8 +2546,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2400,8 +2564,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2418,8 +2582,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2436,8 +2600,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2454,8 +2618,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2472,8 +2636,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2490,8 +2654,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2508,8 +2672,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2526,8 +2690,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2544,8 +2708,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2562,8 +2726,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2580,8 +2744,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2598,8 +2762,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2616,8 +2780,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2634,8 +2798,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2652,8 +2816,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2670,8 +2834,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2688,8 +2852,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2706,8 +2870,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2724,8 +2888,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2742,8 +2906,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2760,8 +2924,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2778,8 +2942,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2796,8 +2960,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2814,8 +2978,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2832,8 +2996,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2850,8 +3014,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2868,8 +3032,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2886,8 +3050,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2904,8 +3068,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2922,8 +3086,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2940,8 +3104,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2958,8 +3122,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2976,8 +3140,44 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-doc-sync-2026-08-03",
+      "type": "report",
+      "name": "doc sync 2026 08 03",
+      "path": "reports/doc-sync-2026-08-03.json",
+      "description": "Report: doc-sync-2026-08-03.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-doc-sync-2026-08-04",
+      "type": "report",
+      "name": "doc sync 2026 08 04",
+      "path": "reports/doc-sync-2026-08-04.json",
+      "description": "Report: doc-sync-2026-08-04.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -2994,8 +3194,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3012,8 +3212,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3030,8 +3230,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3048,8 +3248,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3066,8 +3266,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3084,8 +3284,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3102,8 +3302,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3120,8 +3320,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3138,8 +3338,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3156,8 +3356,26 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-health-2026-08-04",
+      "type": "report",
+      "name": "health 2026 08 04",
+      "path": "reports/health-2026-08-04.json",
+      "description": "Report: health-2026-08-04.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3174,8 +3392,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3192,8 +3410,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3210,8 +3428,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3228,8 +3446,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3246,8 +3464,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3264,8 +3482,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3282,8 +3500,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3300,8 +3518,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3318,8 +3536,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3336,8 +3554,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3354,8 +3572,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3372,8 +3590,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3390,8 +3608,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3408,8 +3626,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3426,8 +3644,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3444,8 +3662,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3462,8 +3680,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3480,8 +3698,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3498,8 +3716,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3516,8 +3734,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3534,8 +3752,8 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3552,8 +3770,26 @@
         "metrics"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
+      "contributesTo": [
+        "observability"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "report-patterns-2026-08-03",
+      "type": "report",
+      "name": "patterns 2026 08 03",
+      "path": "reports/patterns-2026-08-03.json",
+      "description": "Report: patterns-2026-08-03.json",
+      "tags": [
+        "report",
+        "metrics"
+      ],
+      "status": "active",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "observability"
       ],
@@ -3571,8 +3807,8 @@
         "state"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "governance"
       ],
@@ -3590,8 +3826,8 @@
         "executor"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "ai"
       ],
@@ -3609,8 +3845,8 @@
         "planner"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "ai"
       ],
@@ -3628,8 +3864,8 @@
         "reviewer"
       ],
       "status": "active",
-      "createdAt": "2026-08-02T19:01:00.952Z",
-      "updatedAt": "2026-08-02T19:01:00.952Z",
+      "createdAt": "2026-08-04T12:28:25.456Z",
+      "updatedAt": "2026-08-04T12:28:25.456Z",
       "contributesTo": [
         "ai"
       ],
@@ -3637,16 +3873,16 @@
     }
   ],
   "assetsByType": {
-    "adr": 9,
+    "adr": 10,
     "skill": 19,
     "contract": 4,
     "policy": 13,
     "workflow": 1,
     "runbook": 1,
-    "plan": 2,
+    "plan": 1,
     "script": 7,
     "doc": 13,
-    "report": 121,
+    "report": 134,
     "context": 1,
     "prompt": 3
   },
@@ -3655,13 +3891,13 @@
   "healthScores": {
     "knowledgeDebt": 100,
     "knowledgeGraph": 100,
-    "overall": 99
+    "overall": 100
   },
   "entropy": {
-    "orphanedAssets": 7,
+    "orphanedAssets": 6,
     "staleAssets": 0,
     "missingDependencies": 0,
-    "score": 2
+    "score": 1
   },
-  "summary": "194 assets. 9 capabilities. Health: 99/100. 7 orphaned. Lifecycle: evolved."
+  "summary": "207 assets. 9 capabilities. Health: 100/100. 6 orphaned. Lifecycle: evolved."
 }

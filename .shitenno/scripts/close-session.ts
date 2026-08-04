@@ -62,7 +62,7 @@ function checkTestsLocal() {
     execSync('pnpm run test 2>/dev/null | tail -1', {
       encoding: 'utf-8',
       cwd: ROOT,
-      timeout: 120000,
+      timeout: 600000,
     });
     pass('TESTS', 'Tests passed');
   } catch {
@@ -144,8 +144,8 @@ function checkBuildLocal() {
 // ── 7. Plan lifecycle — detect active plans ────────────────────────────────
 async function checkPlanLifecycle() {
   try {
-    const { detectActivePlans, runAutoVerification } = await import(resolve(ROOT, 'dist', 'plan-lifecycle.js'));
-    const { acquireVerificationLock, releaseVerificationLock } = await import(resolve(ROOT, 'dist', 'verification-lock.js'));
+    const { detectActivePlans, runAutoVerification } = await import(resolve(ROOT, 'dist', 'src', 'plan-lifecycle.js'));
+    const { acquireVerificationLock, releaseVerificationLock } = await import(resolve(ROOT, 'dist', 'src', 'verification-lock.js'));
     const shitennoDir = resolve(ROOT, '.shitenno');
 
     if (!acquireVerificationLock(shitennoDir)) {

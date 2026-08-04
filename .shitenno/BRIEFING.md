@@ -1,5 +1,5 @@
 # Pre-Session Briefing
-*Generated: 2026-08-02T16:52:01.583Z*
+*Generated: 2026-08-04T03:55:08.527Z*
 
 ---
 
@@ -40,8 +40,8 @@
 - Large codebase: Always run tests before committing. Consider impact on other modules.
 
 ## Dynamic Rules (From History)
-- [high] This project has 154 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
-- [medium] This project has 7 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
+- [high] This project has 159 force push(es) in the last 180 days. Avoid "git push --force" — use --force-with-lease instead.
+- [medium] This project has 8 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.
 
 
 ## Daemon Status

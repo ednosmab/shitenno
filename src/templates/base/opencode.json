@@ -53,8 +53,7 @@
     "shitenno": {
       "type": "local",
       "command": [
-        "node",
-        "./dist/bin/shugo.js",
+        "shugo",
         "mcp"
       ],
       "enabled": true

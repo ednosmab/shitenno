@@ -49,5 +49,14 @@ export const GIT_TIMEOUT = 5000;
 /** Timeout for rule scripts (ms). */
 export const RULE_SCRIPT_TIMEOUT = 30000;
 
+/** Knowledge-artifact reference manifest inside .shitenno/docs. */
+export const EXTERNAL_INDEX_REL_PATH = "docs/external-index.json";
+
+/** npm package name (used for node_modules/shitenno resolution). */
+export const NPM_PACKAGE_NAME = "shitenno";
+
+/** Metadata subfolder name used inside the git common dir (consent records). */
+export const GIT_METADATA_DIR_NAME = "shitenno";
+
 /** Valid action types for rule engine — single source of truth in rule-engine.ts. */
 export { VALID_ACTION_TYPES } from "./rule-engine.js";

@@ -42,6 +42,7 @@ import {
   detectOrphanSkills,
   detectOrphanSkillFiles,
   detectBrokenSkillManifestEntries,
+  detectBrokenManifestRefs,
 } from "../governance-detectors.js";
 
 export function buildGovernanceDetectors(ctx: DetectorContext): Record<string, () => HealthIssue[]> {
@@ -82,5 +83,6 @@ export function buildGovernanceDetectors(ctx: DetectorContext): Record<string, (
     detectOrphanSkills: () => detectOrphanSkills(ctx.shitennoDir),
     detectOrphanSkillFiles: () => detectOrphanSkillFiles(ctx.shitennoDir),
     detectBrokenSkillManifestEntries: () => detectBrokenSkillManifestEntries(ctx.shitennoDir),
+    detectBrokenManifestRefs: () => detectBrokenManifestRefs(ctx.shitennoDir),
   };
 }

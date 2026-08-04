@@ -52,3 +52,5 @@ export {
   detectOrphanSkillFiles,
   detectBrokenSkillManifestEntries,
 } from "./skill-manifest-detectors.js";
+
+export { detectBrokenManifestRefs } from "./docs/refs.js";

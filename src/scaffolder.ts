@@ -32,6 +32,15 @@ export interface ScaffoldResult {
   level: string;
 }
 
+export interface ScaffoldOptions {
+  /**
+   * Write root-level config files (opencode.json, .gitignore).
+   * Defaults to true (full integration). Set to false for Level 1
+   * (observation) where only `.shitenno/` may be created.
+   */
+  rootConfig?: boolean;
+}
+
 // ── Re-exports from split modules ───────────────────────────────────────────
 
 export { selectSkills, copySkills } from "./scaffold/skills.js";
@@ -67,7 +76,8 @@ import { updateGitignore } from "./scaffold/gitignore.js";
 export function scaffoldShitenno(
   targetDir: string,
   answers: UserAnswers,
-  capabilities: Capability[]
+  capabilities: Capability[],
+  options?: ScaffoldOptions,
 ): ScaffoldResult {
   const result: ScaffoldResult = {
     filesCreated: [],
@@ -75,16 +85,21 @@ export function scaffoldShitenno(
     capabilities,
     level: "custom",
   };
+  const withRootConfig = options?.rootConfig !== false;
 
   const baseDir = join(TEMPLATES_DIR, "base");
   const { allDirs, allFiles } = collectCapabilityAssets(capabilities);
 
   createDirectories(targetDir, allDirs, result);
   copyAndCustomizeFiles({ targetDir, baseDir, allFiles, answers, capabilities, result });
-  generateOpencodeJson(targetDir, baseDir, answers, result);
+  if (withRootConfig) {
+    generateOpencodeJson(targetDir, baseDir, answers, result);
+  }
   generateProfile(targetDir, baseDir, result);
   removeTemplateFile(targetDir, SHITENNO_DIR_NAME);
-  updateGitignore(targetDir);
+  if (withRootConfig) {
+    updateGitignore(targetDir);
+  }
   copySkills({ targetDir, baseDir, capabilities, allDirs, result });
 
   return result;

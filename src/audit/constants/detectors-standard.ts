@@ -47,4 +47,5 @@ export const STANDARD_DETECTORS: string[] = [
   "detectAccessibilityGaps",
   "detectOrphanSkillFiles",
   "detectBrokenSkillManifestEntries",
+  "detectBrokenManifestRefs",
 ];
