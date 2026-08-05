@@ -10,6 +10,7 @@
 │   answers.json
 │   audit-suppressions.json
 │   audit-suppressions.jsonl
+│   briefing-cache.json
 │   BRIEFING.md
 │   capability-engine.json
 │   cognition/

@@ -1,0 +1,572 @@
+{
+  "version": 1,
+  "entry": {
+    "inputHash": "8fbdb7160acd7a39",
+    "computedAt": "2026-08-05T05:08:51.692Z",
+    "briefing": {
+      "generatedAt": "2026-08-05T05:02:36.041Z",
+      "project": {
+        "domain": "monorepo",
+        "scale": "large",
+        "stack": [
+          "typescript",
+          "node",
+          "react"
+        ],
+        "maturityScore": 73
+      },
+      "risks": {
+        "overall": "critical",
+        "criticalAreas": [
+          "src",
+          "apps"
+        ],
+        "highAreas": []
+      },
+      "tests": {
+        "hasTests": true,
+        "areasWithoutTests": [
+          "No test file for apps/shitenno-dashboard/dist/assets/ADRs-BmYcx2q9.js",
+          "No test file for apps/shitenno-dashboard/dist/assets/API-DpSktkPq.js",
+          "No test file for apps/shitenno-dashboard/dist/assets/ArchitectureConcept-CITJ3ipH.js",
+          "No test file for apps/shitenno-dashboard/dist/assets/BestPractices-BXVhFero.js",
+          "No test file for apps/shitenno-dashboard/dist/assets/Capabilities-BNHFcoDx.js"
+        ]
+      },
+      "patterns": {
+        "recurringErrors": [],
+        "hotAreas": [],
+        "detected": [
+          {
+            "type": "hot_area",
+            "description": "Area \"src/__tests__\" com score elevado consistente (media 8.8 em 10 relatorios)",
+            "occurrences": 10,
+            "affectedArea": "src/__tests__",
+            "severity": 4
+          },
+          {
+            "type": "hot_area",
+            "description": "Area \"src/commands\" com score elevado consistente (media 6.8 em 10 relatorios)",
+            "occurrences": 10,
+            "affectedArea": "src/commands",
+            "severity": 3
+          },
+          {
+            "type": "hot_area",
+            "description": "Area \"src/templates\" com score elevado consistente (media 6.8 em 10 relatorios)",
+            "occurrences": 10,
+            "affectedArea": "src/templates",
+            "severity": 3
+          }
+        ]
+      },
+      "contextRules": [
+        {
+          "id": "risk-sensitive-src",
+          "rule": "Area \"src\" contains sensitive keywords (auth, payment, security). Apply extra security review.",
+          "rationale": "Sensitive areas require stricter review and testing.",
+          "priority": 1,
+          "area": "src",
+          "basedOn": "risk-map"
+        },
+        {
+          "id": "risk-notest-apps",
+          "rule": "Area \"apps\" has 8 file(s) without tests. Prioritize test coverage here.",
+          "rationale": "8 files lack test coverage. This increases regression risk.",
+          "priority": 1,
+          "area": "apps",
+          "basedOn": "risk-map"
+        },
+        {
+          "id": "risk-sensitive-apps",
+          "rule": "Area \"apps\" contains sensitive keywords (auth, payment, security). Apply extra security review.",
+          "rationale": "Sensitive areas require stricter review and testing.",
+          "priority": 1,
+          "area": "apps",
+          "basedOn": "risk-map"
+        },
+        {
+          "id": "fp-monorepo-packages",
+          "rule": "This is a monorepo. When modifying shared packages, ensure backward compatibility.",
+          "rationale": "Monorepo changes can affect multiple downstream packages.",
+          "priority": 2,
+          "area": "packages/",
+          "basedOn": "fingerprint"
+        },
+        {
+          "id": "fp-scale-review",
+          "rule": "Large codebase: Always run tests before committing. Consider impact on other modules.",
+          "rationale": "Large projects have higher risk of unintended side effects.",
+          "priority": 2,
+          "area": "project-wide",
+          "basedOn": "fingerprint"
+        }
+      ],
+      "dynamicRules": [
+        {
+          "id": "git-force-push",
+          "rule": "This project has 159 force push(es) in the last 180 days. Avoid \"git push --force\" — use --force-with-lease instead.",
+          "source": "git-incident",
+          "severity": "high",
+          "evidence": "159 force push(es) detected in git log",
+          "generatedAt": "2026-08-05T05:02:35.949Z",
+          "incidentCount": 159
+        },
+        {
+          "id": "git-hotfixes",
+          "rule": "This project has 8 hotfix(es) in the last 180 days. Consider adding more pre-merge validation.",
+          "source": "git-incident",
+          "severity": "medium",
+          "evidence": "8 hotfix(es) detected in git log",
+          "generatedAt": "2026-08-05T05:02:35.983Z",
+          "incidentCount": 8
+        }
+      ],
+      "recommendations": [
+        "Address critical risk areas: src, apps",
+        "Improve test coverage in 5 area(s)"
+      ],
+      "tokenEconomy": {
+        "estimatedTokensSaved": 11600,
+        "cacheHit": false,
+        "contextRuleCount": 7,
+        "dynamicRuleCount": 2
+      },
+      "quickBoard": {
+        "currentTask": "Nenhuma",
+        "nextP0": "Definir novo P0 no BACKLOG.md",
+        "p1Debts": "Nenhuma",
+        "impediments": "Nenhum",
+        "lastSessionStatus": "Desconhecido"
+      },
+      "reminders": [],
+      "daemonHeartbeat": {
+        "running": false,
+        "uptime": "N/A",
+        "lastAudit": "N/A",
+        "auditCount": 0,
+        "notificationsSent": 0
+      },
+      "semantic": {
+        "patterns": [
+          {
+            "id": "tech_debt_accumulation-multi-1785906156009",
+            "type": "tech_debt_accumulation",
+            "domain": "governance",
+            "domains": [
+              "testing",
+              "documentation"
+            ],
+            "confidence": 0.85,
+            "description": "30 alterações vs 0 melhorias de qualidade",
+            "signals": [
+              "source.changed",
+              "knowledge_debt.detected"
+            ],
+            "suggestedActions": [
+              "Dedicar tempo a testes e documentação",
+              "Rever dívida técnica acumulada",
+              "Considerar sprint de qualidade"
+            ],
+            "detectedAt": "2026-08-05T05:02:36.009Z",
+            "windowSessions": 5,
+            "evidence": [
+              {
+                "id": "86334cc1-2e0b-4684-8d73-d710af69814e",
+                "timestamp": "2026-08-05T04:48:42.160Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: source.changed"
+                  ],
+                  "signals": [
+                    "source.changed"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "source.changed"
+                ]
+              },
+              {
+                "id": "f632ba47-bdb3-4d27-96bf-4e34dc6c7f24",
+                "timestamp": "2026-08-05T04:48:42.160Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: source.changed"
+                  ],
+                  "signals": [
+                    "source.changed"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "source.changed"
+                ]
+              },
+              {
+                "id": "04422f1e-771b-477d-a0c1-cf435cc7b171",
+                "timestamp": "2026-08-05T04:48:42.157Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: knowledge_debt.detected"
+                  ],
+                  "signals": [
+                    "knowledge_debt.detected"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "knowledge_debt.detected"
+                ]
+              },
+              {
+                "id": "89b590fe-1bdf-4ccc-a551-4e4fa0a9dbe8",
+                "timestamp": "2026-08-05T04:33:42.220Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: source.changed"
+                  ],
+                  "signals": [
+                    "source.changed"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "source.changed"
+                ]
+              },
+              {
+                "id": "fa922422-2838-4fe8-a90f-56a0e0dca340",
+                "timestamp": "2026-08-05T04:33:42.220Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: source.changed"
+                  ],
+                  "signals": [
+                    "source.changed"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "source.changed"
+                ]
+              },
+              {
+                "id": "ecae20f9-eab2-4106-9172-ea6015cccce9",
+                "timestamp": "2026-08-05T04:33:42.212Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: knowledge_debt.detected"
+                  ],
+                  "signals": [
+                    "knowledge_debt.detected"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "knowledge_debt.detected"
+                ]
+              },
+              {
+                "id": "d1a68ed3-3ab9-4f68-ba2d-8be1523d0446",
+                "timestamp": "2026-08-05T04:18:42.135Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: source.changed"
+                  ],
+                  "signals": [
+                    "source.changed"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "source.changed"
+                ]
+              },
+              {
+                "id": "b41f5bf8-e2db-4e5a-bfdd-e33e10741859",
+                "timestamp": "2026-08-05T04:18:42.135Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: source.changed"
+                  ],
+                  "signals": [
+                    "source.changed"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "source.changed"
+                ]
+              },
+              {
+                "id": "b42f7c0d-3eb0-4b86-827c-89498c1c7eba",
+                "timestamp": "2026-08-05T04:18:42.133Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: knowledge_debt.detected"
+                  ],
+                  "signals": [
+                    "knowledge_debt.detected"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "knowledge_debt.detected"
+                ]
+              },
+              {
+                "id": "8d3bf143-8e94-4ef3-a238-97b9a309b45b",
+                "timestamp": "2026-08-05T04:03:43.316Z",
+                "sessionId": "2026-08-04T03:29:42.748Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: source.changed"
+                  ],
+                  "signals": [
+                    "source.changed"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "source.changed"
+                ]
+              }
+            ]
+          }
+        ],
+        "insights": [
+          {
+            "id": "da-1785906156025",
+            "type": "debt_accumulation",
+            "domains": [
+              "testing",
+              "documentation"
+            ],
+            "description": "Dívida técnica a acumular — padrões de degradação detectados",
+            "confidence": 0.85,
+            "evidence": [
+              {
+                "source": "pattern",
+                "description": "Pattern: tech_debt_accumulation in governance",
+                "data": {
+                  "patternType": "tech_debt_accumulation",
+                  "domain": "governance",
+                  "confidence": 0.85
+                }
+              },
+              {
+                "source": "journal",
+                "description": "20 entries across 1 domains",
+                "data": {
+                  "entryCount": 20,
+                  "domains": {
+                    "governance": 20
+                  }
+                }
+              }
+            ],
+            "suggestedActions": [
+              "Dedicar sprint de qualidade",
+              "Rever e actualizar documentação",
+              "Adicionar testes para código não testado"
+            ],
+            "priority": "medium",
+            "detectedAt": "2026-08-05T05:02:36.025Z",
+            "sourcePatterns": [
+              "tech_debt_accumulation-multi-1785814418592"
+            ]
+          }
+        ],
+        "correlations": [],
+        "growthProfile": {
+          "growthCapacity": 0.3,
+          "challengeLevel": 0.36,
+          "domainChallengeLevels": {},
+          "totalChoices": 0
+        }
+      },
+      "governanceKnowledge": {
+        "adrs": [
+          {
+            "id": "ADR-001",
+            "title": "Single Agent Architecture",
+            "status": "Accepted"
+          },
+          {
+            "id": "ADR-002",
+            "title": "Event-Driven Architecture with Centralized Engineering State",
+            "status": "Accepted"
+          },
+          {
+            "id": "ADR-003",
+            "title": "Knowledge Graph as Foundation for Documentation",
+            "status": "Accepted"
+          },
+          {
+            "id": "ADR-005",
+            "title": "Automated Task Completion Pipeline",
+            "status": "Accepted"
+          },
+          {
+            "id": "ADR-006",
+            "title": "Restrict Filesystem Access in CLI Commands",
+            "status": "Accepted"
+          },
+          {
+            "id": "ADR-007",
+            "title": "File Size and Complexity Limits",
+            "status": "Accepted"
+          },
+          {
+            "id": "ADR-008",
+            "title": "Precedência Humana sobre Execução Autônoma (CLI vs Daemon)",
+            "status": "Proposed"
+          },
+          {
+            "id": "ADR-009",
+            "title": "Núcleo Único de Execução para Engines com Autoridade de Efeito Colateral",
+            "status": "Proposed"
+          },
+          {
+            "id": "ADR-010",
+            "title": "DOCS Check Auto-Fix Side Effect",
+            "status": "Accepted"
+          },
+          {
+            "id": "ADR-011",
+            "title": "MCP Background Consolidation for Fast Handshake",
+            "status": "Accepted"
+          }
+        ],
+        "skills": [
+          {
+            "name": "architectural-integrity",
+            "description": ""
+          },
+          {
+            "name": "ci_cd_pipeline",
+            "description": ""
+          },
+          {
+            "name": "clean-code-standards",
+            "description": ""
+          },
+          {
+            "name": "codebase_hygiene_git",
+            "description": ""
+          },
+          {
+            "name": "design-patterns",
+            "description": ""
+          },
+          {
+            "name": "domain-driven-design",
+            "description": ""
+          },
+          {
+            "name": "error_handling_observability",
+            "description": ""
+          },
+          {
+            "name": "handbook-fill",
+            "description": ""
+          },
+          {
+            "name": "mcp-interaction",
+            "description": ""
+          },
+          {
+            "name": "operacao_no_shitenno",
+            "description": ""
+          },
+          {
+            "name": "optimistic_ui",
+            "description": ""
+          },
+          {
+            "name": "pnpm-management",
+            "description": ""
+          },
+          {
+            "name": "quick-board-enforcement",
+            "description": ""
+          },
+          {
+            "name": "security_xss_prevention",
+            "description": ""
+          },
+          {
+            "name": "senior-engineer",
+            "description": ""
+          },
+          {
+            "name": "solid-principles",
+            "description": ""
+          },
+          {
+            "name": "system-first",
+            "description": ""
+          },
+          {
+            "name": "tdd-agent",
+            "description": ""
+          },
+          {
+            "name": "tdd_workflow",
+            "description": ""
+          }
+        ]
+      }
+    }
+  }
+}
