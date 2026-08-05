@@ -27,26 +27,6 @@ lifecycle: Active
 | **Owner** | unassigned |
 | **Descricao** | Relacao baixa entre artifacts (24 relacoes para 26 artifacts). Sugestao: adicionar mais conexoes. |
 
-| **Status** | em implementação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | Backlog [REVISIT: 2026-07-13 — piorou: zero separação de camadas] |
-| **Severidade** | Alto |
-| **Prioridade** | P1 |
-| **Owner** | unassigned |
-| **Descricao** | 99 arquivos flat em src/, sem separacao de camadas. Domain logic misturado com infrastructure. Commands importam implementacoes concretas. Zero pattern DI (except context-collector.ts). |
-
-| **Status** | em implementação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | Backlog [REVISIT: 2026-07-13 — piorou: 10 ficheiros >500 linhas] |
-| **Severidade** | Alto |
-| **Prioridade** | P1 |
-| **Owner** | unassigned |
-| **Descricao** | God modules: rule-engine.ts (1307 linhas), scorer.ts (947), engineering-state.ts (908), feedback-engine.ts (756). 10 ficheiros >500 linhas. Sem dependency injection (except context-collector.ts). Interface Segregation violada (ShitennoState com 60+ campos). |
-
 ### LIVING-005 LIVING-005 Pipeline de validação por fases
 
 | Campo | Valor |
@@ -178,46 +158,6 @@ lifecycle: Active
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
 | **Descricao** | O capability-engine recomenda instalacoes mas nao aprende com falhas. |
-
-| **Status** | em implementação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | Backlog |
-| **Severidade** | Medio |
-| **Prioridade** | P2 |
-| **Owner** | unassigned |
-| **Descricao** | `context-collector.ts` importa `pattern-detector.ts` e `session-feedback.ts`, aumentando o acoplamento. |
-
-| **Status** | em implementação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | Backlog |
-| **Severidade** | Baixo |
-| **Prioridade** | P2 |
-| **Owner** | unassigned |
-| **Descricao** | `BriefingDepth` e definido em `token-optimizer.ts` mas re-exportado. briefing.ts usa `string` no display. |
-
-| **Status** | em implementação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | Backlog |
-| **Severidade** | Baixo |
-| **Prioridade** | P2 |
-| **Owner** | unassigned |
-| **Descricao** | `differentialBriefing()` e mais compacto que `generateDiff()`. O `--diff` usa `generateDiff()` verboso. |
-
-| **Status** | em implementação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | Backlog |
-| **Severidade** | Medio |
-| **Prioridade** | P2 |
-| **Owner** | unassigned |
-| **Descricao** | Records lidos de JSONL nao tem validacao de schema. |
 
 ### 2.9 2.9 Extrair modulo shared de display
 
@@ -498,86 +438,6 @@ lifecycle: Active
 - [ ] `shugo daemon status` mostra circuit breaker, proactive engine, último audit
 - [ ] Pipeline proativo tem teste e2e cobrindo file→event→challenge→notification
 - [ ] Documentação `docs/DAEMON.md` existe e é precisa
-- [ ] `shugo briefing` mostra proactive alerts pendentes
-- [ ] Challenge de severity `high` dispara notificação desktop em <5s
-- [ ] Notificações funcionam em Linux e macOS (Windows via fallback log)
-- [ ] `shugo init` em projeto terceiro gera `.gitignore` completo
-- [ ] `shugo daemon status` mostra circuit breaker, proactive engine, último audit
-- [ ] Pipeline proativo tem teste e2e cobrindo file→event→challenge→notification
-- [ ] Documentação `docs/DAEMON.md` existe e é precisa
-
-
-| **Status** | em validação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | em implementação |
-| **Severidade** | Medio |
-| **Prioridade** | P1 |
-| **Owner** | executor |
-| **Data** | 2026-07-24 |
-| **Fonte** | shugo plan md prepare |
-| **Modulos** | governance/plans/ |
-| **Descricao** | Camada Semântica — Classificação, Raciocínio e Dual Path |
-| **Correcao** | Verificar checklist no plano `governance/plans/PLAN-2026-07-23-semantic-layer.md` |
-
-#### Passos do Plano
-- [ ] Classifica dependências em package.json (pg → persistence, helmet → security)
-- [ ] Classifica arquivos criados (migrations/ → persistence, src/auth/ → authentication)
-- [ ] Classifica config changes (DATABASE_URL → persistence, JWT_SECRET → security)
-- [ ] Confiança calculada corretamente (0-1)
-- [ ] Evidências rastreadas (quais sinais geraram a classificação)
-- [ ] Todos os testes passam
-- [ ] Change Journal grava classificações em JSONL
-- [ ] Journal filtra por domínio e janela temporal
-- [ ] Pattern Matcher detecta architectural_shift (3+ sinais em 5 sessões)
-- [ ] Pattern Matcher detecta scope_drift (2+ domínios novos)
-- [ ] Padrões publicam evento `semantic.pattern_detected`
-- [ ] Daemon integra journal + matcher
-- [ ] Todos os testes passam
-- [ ] Growth Profile persiste por projecto
-- [ ] Dual Path mostra Path A (confortável) e Path B (desafiador)
-- [ ] Escolha é registada no Growth Profile
-- [ ] Sistema adapta nível de desafio baseado no histórico
-- [ ] Comandos evolve/audit/status/detect mostram dual path
-- [ ] Briefing inclui padrões semânticos detectados
-- [ ] Todos os testes passam
-- [ ] README.md actualizado com seção Semantic Layer
-- [ ] docs/semantic/ criado com 8 arquivos
-- [ ] Referências CLI actualizadas
-- [ ] Eventos documentados
-- [ ] Templates actualizados (AGENTS.md, WORKFLOW.md)
-- [ ] Conceptual model actualizado
-- [ ] Nenhuma referência quebrada
-- [ ] Linguagem acessível e clara
-- [ ] Classifica dependências em package.json (pg → persistence, helmet → security)
-- [ ] Classifica arquivos criados (migrations/ → persistence, src/auth/ → authentication)
-- [ ] Classifica config changes (DATABASE_URL → persistence, JWT_SECRET → security)
-- [ ] Confiança calculada corretamente (0-1)
-- [ ] Evidências rastreadas (quais sinais geraram a classificação)
-- [ ] Todos os testes passam
-- [ ] Change Journal grava classificações em JSONL
-- [ ] Journal filtra por domínio e janela temporal
-- [ ] Pattern Matcher detecta architectural_shift (3+ sinais em 5 sessões)
-- [ ] Pattern Matcher detecta scope_drift (2+ domínios novos)
-- [ ] Padrões publicam evento `semantic.pattern_detected`
-- [ ] Daemon integra journal + matcher
-- [ ] Todos os testes passam
-- [ ] Growth Profile persiste por projecto
-- [ ] Dual Path mostra Path A (confortável) e Path B (desafiador)
-- [ ] Escolha é registada no Growth Profile
-- [ ] Sistema adapta nível de desafio baseado no histórico
-- [ ] Comandos evolve/audit/status/detect mostram dual path
-- [ ] Briefing inclui padrões semânticos detectados
-- [ ] Todos os testes passam
-- [ ] README.md actualizado com seção Semantic Layer
-- [ ] docs/semantic/ criado com 8 arquivos
-- [ ] Referências CLI actualizadas
-- [ ] Eventos documentados
-- [ ] Templates actualizados (AGENTS.md, WORKFLOW.md)
-- [ ] Conceptual model actualizado
-- [ ] Nenhuma referência quebrada
-- [ ] Linguagem acessível e clara
 
 
 ### BACKLOG-PLAN_2026_07_24_QUALITY_ROADMAP — PLAN-2026-07-24-quality-roadmap — Roadmap de Qualidade Pós-Auditoria
@@ -598,30 +458,6 @@ lifecycle: Active
 - [ ] Passo 1.1 — Atomic writes para session-tracker
 - [ ] Passo 2.1 — File watcher debounce cleanup
 - [ ] Passo 3.1 — Empty catch blocks em paths críticos
-
-| **Status** | em investigação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | planeado |
-| **Severidade** | Medio |
-| **Prioridade** | P1 |
-| **Owner** | executor |
-| **Data** | 2026-07-25 |
-| **Fonte** | manual |
-| **Descricao** | Transformar o MCP de dashboard de leitura para assistente adaptativo: suggestedActions no briefing, nova tool getContext, contextVersion para detectar mudanças, getBacklog adaptativo, e padrões de uso para refinar sugestões. 4 fases, ~12h estimadas. |
-
-| **Status** | em implementação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | planeado |
-| **Severidade** | Alto |
-| **Prioridade** | P1 |
-| **Owner** | engine |
-| **Data** | 2026-07-28 |
-| **Fonte** | shitenno-plano-mestre-sequencial Phase B |
-| **Descricao** | buffer-io.ts uses regex string replacement (replaceSectionField) to write context_buffer.yaml, which caused corruption ([] stray, duplicate impediments key). Replace with proper YAML.stringify() to prevent future corruption. 31 files depend on this file. |
 
 
 ### BACKLOG-ADENDO_VERIFICACAO_BUGS_VS_DESIGN_2026_07_29 — Adendo de Verificação — Bugs vs. Design (2026-07-29)
@@ -667,21 +503,6 @@ lifecycle: Active
 | **Modulos** | governance/plans/ |
 | **Descricao** | Plano de Correção — Achados em Aberto (2026-07-30) |
 | **Correcao** | Verificar checklist no plano `governance/plans/PLANO-CORRECAO-ACHADOS-ABERTOS-2026-07-30.md` |
-
-
-| **Status** | em validação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | em implementação |
-| **Severidade** | Medio |
-| **Prioridade** | P1 |
-| **Owner** | executor |
-| **Data** | 2026-07-31 |
-| **Fonte** | shugo plan md prepare |
-| **Modulos** | governance/plans/ |
-| **Descricao** | Plano de Evolução do Audit de Segurança — v4 (consolidado, com código, testado ao vivo) |
-| **Correcao** | Verificar checklist no plano `governance/plans/PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4.md` |
 
 
 ### BACKLOG-PLANO_FINAL_CONSOLIDADO_2026_07_29 — Plano Final Consolidado (2026-07-29) — respostas às duas perguntas
@@ -743,38 +564,3 @@ lifecycle: Active
 | **Descricao** | Plano Mestre Único v2 (2026-08-01) — com código verificado contra o repositório real |
 | **Correcao** | Verificar checklist no plano `governance/plans/PLANO-MESTRE-UNICO-v2-2026-08-01.md` |
 
-| **Status** | em validação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | em implementação |
-| **Severidade** | Medio |
-| **Prioridade** | P1 |
-| **Owner** | openai/assistente |
-| **Data** | 2026-08-04 |
-| **Fonte** | mcp |
-| **Descricao** | Fase 5 concluída em build: módulo commands/init/manifest-refs.ts (collectExternalReferences/writeExternalIndex), detector detectBrokenManifestRefs em audit/docs/refs.ts, tipo broken_manifest_ref em HealthIssueType, registros em STANDARD_DETECTORS, governance detector map e DIMENSION_BY_TYPE, wiring em applyByLevel (só escreve se houver ADRs/plans, sem copiar artefatos). 14 testes novos verdes (init-manifest-refs.test.ts + init-apply.test.ts), typecheck + eslint limpos. |
-
-| **Status** | em validação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | em implementação |
-| **Severidade** | Medio |
-| **Prioridade** | P1 |
-| **Owner** | assistente |
-| **Data** | 2026-08-04 |
-| **Fonte** | mcp |
-| **Descricao** | Módulo commands/init/restore.ts (restoreFromBackup + runUndo), flag --undo no shugo init. Testes: init-restore.test.ts (5). Correção de design: backupLevel2 agora copia do projeto real (backupSourceDir) — antes, no worktree isolado, arquivos untracked do usuário não existiam no checkout e o backup capturava nada. |
-
-| **Status** | em validação |
-
-| Campo | Valor |
-|---|---|
-| **Status** | em implementação |
-| **Severidade** | Medio |
-| **Prioridade** | P1 |
-| **Owner** | assistente |
-| **Data** | 2026-08-04 |
-| **Fonte** | mcp |
-| **Descricao** | Módulo commands/init/upgrade.ts (runUpgradeFlow/approveUpgrade/performUpgrade), integrado no init.ts antes do handleAlreadyInitialized. Lê o último registro de .git/shitenno/consent.json; N1 → oferece upgrade (confirm interativo ou consentLevel:2 em answers-file); apply N2 em worktree + novo registro de consentimento. Testes: init-upgrade.test.ts (5). |
