@@ -39,8 +39,10 @@ vi.mock("../cache-metrics.js", () => ({
 
 import { collectContext } from "../context-collector.js";
 import { handleGetBriefing } from "../mcp-handlers/briefing.js";
+import { setCachedBriefing } from "../briefing-cache.js";
 
 const mockCollectContext = vi.mocked(collectContext);
+const mockSetCachedBriefing = vi.mocked(setCachedBriefing);
 
 const MOCK_BRIEFING = {
   generatedAt: "2026-08-01T00:00:00.000Z",
@@ -105,5 +107,23 @@ describe("getBriefing markdown — Quick Board contract", () => {
     ]) {
       expect(text).toContain(field);
     }
+  });
+
+  it("writes briefing cache for markdown format (not only json)", async () => {
+    await handleGetBriefing("/project", "/project/.shitenno", { format: "markdown" });
+    expect(mockSetCachedBriefing).toHaveBeenCalledWith(
+      "/project/.shitenno",
+      MOCK_BRIEFING,
+      expect.any(String)
+    );
+  });
+
+  it("writes briefing cache for summary format (not only json)", async () => {
+    await handleGetBriefing("/project", "/project/.shitenno", { format: "summary" });
+    expect(mockSetCachedBriefing).toHaveBeenCalledWith(
+      "/project/.shitenno",
+      MOCK_BRIEFING,
+      expect.any(String)
+    );
   });
 });

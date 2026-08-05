@@ -164,16 +164,16 @@ export async function handleGetBriefing(
     }
   }
 
+  // Cache the briefing with request hash for future lookups (all formats)
+  if (!cacheHit) {
+    setCachedBriefing(shitennoDir, briefing, requestHash);
+  }
+
   if (format === "markdown") {
     return { content: [{ type: "text", text: formatBriefingMarkdown(briefing, mandatorySkills, mandatoryRules) }] };
   }
   if (format === "summary") {
     return { content: [{ type: "text", text: briefingToSummary(briefing) }] };
-  }
-
-  // Cache the briefing with request hash for future lookups
-  if (!cacheHit) {
-    setCachedBriefing(shitennoDir, briefing, requestHash);
   }
 
   const json = briefingToJson(briefing);

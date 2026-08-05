@@ -123,14 +123,10 @@ export function handleSubmitFeedback(
   }
 
   const cache = readCache(shitennoDir);
-  if (!cache || !cache.entry) {
-    return { content: [{ type: "text", text: "No briefing cache found. A briefing must be generated first." }], isError: true };
-  }
-
   const storage = createFileStorage(shitennoDir);
   recordOutcome(storage, {
-    briefingHash: cache.entry.inputHash,
-    briefingTimestamp: cache.entry.computedAt,
+    briefingHash: cache?.entry?.inputHash ?? "",
+    briefingTimestamp: cache?.entry?.computedAt ?? "",
     outcome,
     notes,
   });

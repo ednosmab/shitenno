@@ -14,8 +14,7 @@
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync, renameSync } from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
+import { join, dirname } from "node:path";
 import type { Briefing } from "./briefing.js";
 import { isBriefingCache } from "./schema-validators.js";
 
@@ -128,7 +127,10 @@ export function readCache(shitennoDir: string): BriefingCache | null {
 function writeCache(shitennoDir: string, cache: BriefingCache): void {
   ensureDir(shitennoDir);
   const cachePath = getCachePath(shitennoDir);
-  const tmpPath = join(tmpdir(), `shitenno-briefing-cache-${Date.now()}.json`);
+  // Write the tmp file in the same directory as the target to guarantee an
+  // atomic rename even when the target lives on a different filesystem than
+  // the OS tmp dir (renameSync across devices throws EXDEV).
+  const tmpPath = join(dirname(cachePath), `briefing-cache-${Date.now()}.tmp`);
   try {
     writeFileSync(tmpPath, JSON.stringify(cache, null, 2), "utf-8");
     renameSync(tmpPath, cachePath);

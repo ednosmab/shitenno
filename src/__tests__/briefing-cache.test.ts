@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { isCacheValid, computeInputHash } from "../briefing-cache.js";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { isCacheValid, computeInputHash, setCachedBriefing, readCache } from "../briefing-cache.js";
 import type { CacheEntry } from "../briefing-cache.js";
 
 describe("briefing-cache", () => {
@@ -92,6 +95,22 @@ describe("briefing-cache", () => {
         briefing: {} as never,
       };
       expect(isCacheValid(entry, "")).toBe(false);
+    });
+  });
+
+  describe("setCachedBriefing round-trip", () => {
+    it("writes a cache entry that readCache can read back", () => {
+      const shitennoDir = mkdtempSync(join(tmpdir(), "shitenno-cache-test-"));
+      const briefing = {
+        generatedAt: "2026-08-05T00:00:00.000Z",
+        project: { domain: "test", scale: "small", stack: ["typescript"], maturityScore: 50 },
+      } as never;
+
+      setCachedBriefing(shitennoDir, briefing, "hash-rt");
+
+      const cache = readCache(shitennoDir);
+      expect(cache?.entry?.inputHash).toBe("hash-rt");
+      expect(cache?.entry?.computedAt).toEqual(expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/));
     });
   });
 });
