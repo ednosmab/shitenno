@@ -19,6 +19,7 @@ export {
   type TransitionResult,
   type BacklogSummary,
   type AddItemInput,
+  type BacklogIntegrityIssue,
   VALID_TRANSITIONS,
   normalizeState,
   getAllowedTransitions,
@@ -29,6 +30,7 @@ export {
 export {
   resolveBacklogPaths,
   parseBacklogItems,
+  parseBacklogWithIntegrity,
   findItem,
 } from "./backlog-parser.js";
 

@@ -11,7 +11,7 @@
 
 import { existsSync } from "node:fs";
 import {
-  parseBacklogItems,
+  parseBacklogWithIntegrity,
   addItem,
   deleteItem,
   transitionItem,
@@ -39,13 +39,16 @@ export function handleGetBacklog(
   args: Record<string, unknown>
 ): ToolResponse {
   const paths = resolveBacklogPaths(shitennoDir);
-  let items = parseBacklogItems(paths.active);
+  const activeParsed = parseBacklogWithIntegrity(paths.active);
+  let items = activeParsed.items;
+  const integrityIssues = [...activeParsed.issues];
 
   // Also load done items if requested
   const includeDone = args.includeDone === true;
   if (includeDone && paths.done) {
-    const doneItems = parseBacklogItems(paths.done);
-    items = [...items, ...doneItems];
+    const doneParsed = parseBacklogWithIntegrity(paths.done);
+    items = [...items, ...doneParsed.items];
+    integrityIssues.push(...doneParsed.issues);
   }
 
   // Apply filters
@@ -74,6 +77,9 @@ export function handleGetBacklog(
   if (format === "summary") {
     const lines = [
       formatSummaryLine(summary),
+      ...(integrityIssues.length > 0
+        ? [`⚠ ${integrityIssues.length} bloco(s) sem header "### " ignorado(s) — ver integrityIssues (format=json)`]
+        : []),
       "",
       ...items.map((item) => `  ${item.id} [${item.state}] — ${item.title}`),
     ];
@@ -83,7 +89,7 @@ export function handleGetBacklog(
   return {
     content: [{
       type: "text",
-      text: JSON.stringify({ summary, items }, null, 2),
+      text: JSON.stringify({ summary, items, integrityIssues }, null, 2),
     }],
   };
 }

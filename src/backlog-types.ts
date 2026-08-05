@@ -67,6 +67,23 @@ export interface AddItemInput {
   source?: string;
 }
 
+/**
+ * Reported when the modular parser finds a "| **Campo** | valor |" table
+ * block that repeats a field already set on the current item — i.e. a
+ * table with no "### ID Titulo" header of its own. Such blocks are no
+ * longer silently merged into the preceding item (which used to corrupt
+ * its state/description); they are excluded and reported here instead.
+ */
+export interface BacklogIntegrityIssue {
+  /** id of the item immediately preceding the orphan block */
+  precedingItemId: string;
+  /** 0-based line number (in the source file) where the orphan block starts */
+  line: number;
+  /** field key that triggered detection (first field seen twice) */
+  repeatedField: string;
+  filePath: string;
+}
+
 // ── State Definitions ──────────────────────────────────────────────────────
 
 export const VALID_TRANSITIONS: Record<BacklogState, BacklogState[]> = {

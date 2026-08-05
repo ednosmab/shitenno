@@ -25,6 +25,7 @@ import { checkREADMEStatistics } from "./validators/check-readme-stats.js";
 import { checkVersionConsistency } from "./validators/check-version-consistency.js";
 import { checkScriptReferences } from "./validators/check-script-refs.js";
 import { checkDocsFrontmatter } from "./validators/check-docs-frontmatter.js";
+import { checkBacklogIntegrity } from "./validators/check-backlog-integrity.js";
 
 // ── CLI Flags ──────────────────────────────────────────────────────────────
 
@@ -92,6 +93,7 @@ async function main() {
   checkVersionConsistency(ctx);
   checkScriptReferences(ctx);
   checkDocsFrontmatter(ctx);
+  checkBacklogIntegrity(ctx);
 
   const errors = ctx.discrepancies.filter((d) => d.severity === "error").length;
   const warnings = ctx.discrepancies.filter((d) => d.severity === "warning").length;
