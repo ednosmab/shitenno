@@ -7,6 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..', '..');
 const GOV = resolve(ROOT, '.shitenno', 'governance');
+const SHITENNO_DIR = resolve(ROOT, '.shitenno');
 
 let exitCode = 0;
 let warnings: string[] = [];
@@ -280,6 +281,73 @@ function runE2eBestEffort() {
   }
 }
 
+// ── 9. Session feedback — display recorded outcomes before closing ─────────
+function displaySessionFeedback() {
+  const recordsPath = resolve(SHITENNO_DIR, 'session-feedback', 'records.jsonl');
+  if (!existsSync(recordsPath)) {
+    pass('FEEDBACK', 'No session feedback recorded yet — run `shugo feedback --outcome <type>` after sessions');
+    return;
+  }
+
+  const lines = readFileSync(recordsPath, 'utf-8').trim().split('\n').filter(Boolean);
+  if (lines.length === 0) {
+    pass('FEEDBACK', 'No session feedback records yet');
+    return;
+  }
+
+  const latest = (() => {
+    try {
+      return JSON.parse(lines[lines.length - 1]) as Record<string, unknown>;
+    } catch {
+      return null;
+    }
+  })();
+
+  const outcomes = lines.map((line) => {
+    try {
+      return (JSON.parse(line) as Record<string, unknown>).outcome as string;
+    } catch {
+      return 'invalid';
+    }
+  });
+  const failureCount = outcomes.filter((o) => o === 'failure').length;
+  const successCount = outcomes.filter((o) => o === 'success').length;
+  const partialCount = outcomes.filter((o) => o === 'partial').length;
+  const failureHotspots = (() => {
+    const areas = new Map<string, number>();
+    for (const line of lines) {
+      try {
+        const rec = JSON.parse(line) as Record<string, unknown>;
+        const outcome = rec.outcome as string;
+        const modifiedAreas = Array.isArray(rec.modifiedAreas) ? rec.modifiedAreas as string[] : [];
+        if (outcome === 'failure') {
+          for (const area of modifiedAreas) {
+            areas.set(area, (areas.get(area) ?? 0) + 1);
+          }
+        }
+      } catch { /* skip malformed */ }
+    }
+    return [...areas.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([area]) => area);
+  })();
+
+  console.log('\n📊 [FEEDBACK] Session outcome history');
+  console.log(`   Total sessions:  ${lines.length}`);
+  console.log(`   Success rate:    ${Math.round((successCount / lines.length) * 100)}%`);
+  console.log(`   Outcomes:        success=${successCount} failure=${failureCount} partial=${partialCount}`);
+
+  if (latest && typeof latest === 'object') {
+    const outcome = (latest.outcome as string) ?? 'unknown';
+    const icon = outcome === 'success' ? '✅' : outcome === 'failure' ? '❌' : '⚠️';
+    console.log(`   Latest session:  ${icon} ${outcome}` + (typeof latest.notes === 'string' && latest.notes ? ` — ${latest.notes}` : ''));
+  }
+
+  if (failureHotspots.length > 0) {
+    console.log(`   Failure hotspots: ${failureHotspots.join(', ')}`);
+    console.log(`   Tip: run 'shugo feedback --outcome failure --areas <area>' to tag failure areas`);
+  }
+  console.log('');
+}
+
 // ── Execute ───────────────────────────────────────────────────────────────
 console.log('\n🔒 CLOSE SESSION — Closing session checklist\n');
 
@@ -291,6 +359,7 @@ checkCommit();
 checkBuildLocal();
 await checkPlanLifecycle();
 runE2eBestEffort();
+displaySessionFeedback();
 
 console.log(`\n${exitCode === 0 ? '✅ Session ready to close' : '❌ Session has issues to resolve'}`);
 if (warnings.length > 0) {

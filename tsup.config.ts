@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["bin/shugo.ts", "src/daemon.ts", "src/plan-lifecycle.ts", "src/verification-lock.ts"],
+  entry: ["bin/shugo.ts", "src/daemon.ts", "src/plan-lifecycle.ts", "src/session-feedback.ts", "src/verification-lock.ts"],
   format: ["esm"],
   dts: true,
   outDir: "dist",
