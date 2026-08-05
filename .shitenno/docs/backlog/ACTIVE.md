@@ -5,7 +5,7 @@ lifecycle: Active
 
 ## Ativo
 
-> **Total:** 45 itens (0 P0, 15 P1, 29 P2, 0 P3)
+> **Total:** 50 itens (0 P0, 23 P1, 27 P2, 0 P3)
 
 ### SA4 SA4 Arquitetura 15%
 
@@ -209,7 +209,7 @@ lifecycle: Active
 | **Owner** | unassigned |
 | **Descricao** | Validar que pessoa sem contexto consegue correr `shugo init` e entender o output sem perguntar nada. |
 
-### 2.15 2.15 Cache intermediario no collectContext
+### 2.20 2.20 Cache intermediario no collectContext
 
 | Campo | Valor |
 |---|---|
@@ -564,3 +564,15 @@ lifecycle: Active
 | **Descricao** | Plano Mestre Único v2 (2026-08-01) — com código verificado contra o repositório real |
 | **Correcao** | Verificar checklist no plano `governance/plans/PLANO-MESTRE-UNICO-v2-2026-08-01.md` |
 
+### RULE-001 RULE-001 PR obrigatorio com 2 revisores para src/__tests__
+
+| Campo | Valor |
+|---|---|
+| **Status** | em investigação |
+| **Severidade** | Medio |
+| **Prioridade** | P2 |
+| **Owner** | Tech Lead |
+| **Data** | 2026-08-05 |
+| **Fonte** | hook pre-commit (detector de regras) |
+| **Modulos** | src/__tests__/ |
+| **Descricao** | Candidata a regra: exigir Pull Request com 2 revisores para qualquer alteracao em `src/__tests__/`. Detectada pelo hook; aguarda aprovacao do Tech Lead antes de ser aplicada. |
