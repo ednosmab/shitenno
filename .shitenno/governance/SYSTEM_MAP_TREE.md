@@ -127,6 +127,8 @@
 │   docs/history/2026-08-04-rule-plan_archived.md
 │   docs/history/2026-08-04-rule-session_close.md
 │   docs/history/2026-08-04-rule-session_end_plans.md
+│   docs/history/2026-08-05-rule-session_close.md
+│   docs/history/2026-08-05-rule-session_end_plans.md
 │   docs/INDEX.md
 │   docs/KNOWLEDGE_LIFECYCLE.md
 │   docs/opencode-context.md
@@ -580,6 +582,7 @@
 │   reports/doc-sync-2026-08-02.json
 │   reports/doc-sync-2026-08-03.json
 │   reports/doc-sync-2026-08-04.json
+│   reports/doc-sync-2026-08-05.json
 │   reports/evolution-2026-07-18.json
 │   reports/evolution-2026-07-25.json
 │   reports/health-2026-07-16.json
@@ -614,6 +617,8 @@
 │   reports/patterns-2026-08-01.json
 │   reports/patterns-2026-08-02.json
 │   reports/patterns-2026-08-03.json
+│   reports/patterns-2026-08-04.json
+│   reports/patterns-2026-08-05.json
 │   scripts/
 │   scripts/add-frontmatter.ts
 │   scripts/backlog.ts
@@ -623,6 +628,7 @@
 │   scripts/sync-docs.ts
 │   scripts/validate-session.ts
 │   scripts/validators/
+│   scripts/validators/check-backlog-integrity.ts
 │   scripts/validators/check-broken-refs.ts
 │   scripts/validators/check-cli-commands.ts
 │   scripts/validators/check-docs-frontmatter.ts
