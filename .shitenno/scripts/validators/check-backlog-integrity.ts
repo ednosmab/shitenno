@@ -12,7 +12,7 @@
  */
 
 import { resolve } from "node:path";
-import { parseBacklogWithIntegrity } from "../../../src/backlog-core.js";
+import { parseBacklogWithIntegrity } from "../../../src/application/backlog-core.js";
 import { SHUGO, type ValidatorContext, error, pass } from "./shared.js";
 
 export function checkBacklogIntegrity(ctx: ValidatorContext) {

@@ -1,5 +1,5 @@
 # Pre-Session Briefing
-*Generated: 2026-08-04T03:55:08.527Z*
+*Generated: 2026-08-06T13:18:18.734Z*
 
 ---
 

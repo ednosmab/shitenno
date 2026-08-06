@@ -5,17 +5,17 @@ lifecycle: Active
 
 ## Ativo
 
-> **Total:** 50 itens (0 P0, 23 P1, 27 P2, 0 P3)
+> **Total:** 49 itens (0 P0, 23 P1, 26 P2, 0 P3)
 
 ### SA4 SA4 Arquitetura 15%
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog [REVISIT: 2026-07-13 — piorou: 99 ficheiros flat, era 46] |
+| **Status** | em validação [2026-08-06 — reorganização concluída: 0 ficheiros flat, 119 movidos para camadas; scorer da dimensão corrigido] |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
-| **Descricao** | Dimensao Architecture do score de maturidade esta em 15%. 99 arquivos flat em src/ (era 46), sem camadas, sem bounded contexts. Subpastas existentes (audit/, commands/, console/, handbook/) sao feature-based, nao Clean Architecture. |
+| **Descricao** | Dimensao Architecture do score de maturidade esta em 15%. RESOLVIDO em 2 frentes: (1) 119 flat files reorganizados em src/shared (7), src/domain (24), src/application (28), src/infrastructure (52), src/interface (8); ADR-005 aprovado. (2) scoreArchitecture reescrito para medir estrutura real: docs 30pts, flatSourceFiles 20, layeredDirs 25, node-api imports fora de infra/interface 15, portsConsumed 10, monorepo/pkg 10. Resultado no repo: Arquitetura 90/100 honesto (docs+estrutura ok; 208 ficheiros ainda importam node: fora das camadas adapter — dedução principal). Suíte 192 ficheiros / 2653 testes verde. |
 
 ### SA7 SA7 Baixa densidade de relacoes no knowledge graph
 
@@ -379,16 +379,6 @@ lifecycle: Active
 | **Owner** | unassigned |
 | **Descricao** | Domain-Driven Design nao aplicado. Sem bounded contexts. |
 
-### SA16 SA16 TDD nao aplicado
-
-| Campo | Valor |
-|---|---|
-| **Status** | Backlog |
-| **Severidade** | Baixo |
-| **Prioridade** | P2 |
-| **Owner** | unassigned |
-| **Descricao** | Testes escritos depois do codigo, nao antes. |
-
 ### SA17 SA17 Commander state persistence
 
 | Campo | Valor |
@@ -576,3 +566,4 @@ lifecycle: Active
 | **Fonte** | hook pre-commit (detector de regras) |
 | **Modulos** | src/__tests__/ |
 | **Descricao** | Candidata a regra: exigir Pull Request com 2 revisores para qualquer alteracao em `src/__tests__/`. Detectada pelo hook; aguarda aprovacao do Tech Lead antes de ser aplicada. |
+

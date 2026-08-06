@@ -74,7 +74,7 @@ async function main() {
   // ── Semantic drift check — runs before SYSTEM_MAP so feedback records
   // created here are captured by the directory tree ───────────────────────
   try {
-    const { runSemanticDocSync } = await import("../../src/doc-semantic-sync.js");
+    const { runSemanticDocSync } = await import("../../src/infrastructure/doc-semantic-sync.js");
     const semanticResult = runSemanticDocSync({ projectRoot: resolve(SHUGO, "..", ".."), shitennoDir: SHUGO });
     if (!ctx.QUIET && semanticResult.driftFound > 0) {
       log(`\n🧠 Drift semântico: ${semanticResult.driftFound} doc(s) desalinhado(s). ${semanticResult.remindersWritten} reminder(s) novo(s) escrito(s) em context_buffer.yaml.`);

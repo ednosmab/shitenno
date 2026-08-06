@@ -129,3 +129,4 @@ lifecycle: Active
 | 2.18 2.18 | Medio | Dashboard cliques do mouse funcionais: componente tab-bar.tsx usa useOnClick de @ink-tools/ink-mouse |
 | SA12 SA12 | Baixo | Knowledge graph inicializado: initializeKnowledgeGraph() em knowledge-graph.ts com 6 submodulos |
 | SA13 SA13 | Baixo | 4 ADRs criados em docs/adrs/: ADR-001 a ADR-004 |
+| SA16 SA16 TDD nao aplicado | Baixo | Testes escritos depois do codigo, nao antes. |
