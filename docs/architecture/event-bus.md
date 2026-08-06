@@ -227,6 +227,6 @@ bus.subscribe("maturity.changed", ({ previous, current }) => {
 
 ## Implementation
 
-- **File:** `src/event-bus.ts` (~200 lines)
+- **File:** `src/domain/ports/event-bus.ts` (~200 lines)
 - **Singleton:** `getEventBus()`
 - **Types:** `ShitennoEventType`, `EventHandler`, `EventBus`

@@ -17,7 +17,7 @@ lifecycle: Active
 
 ## Target State
 
-Shared infrastructure in `src/shared.ts`:
+Shared infrastructure in `src/shared/shared.ts`:
 - `resolveProjectContext()` — replaces init guard
 - `createCommand()` — wraps command creation with banner + JSON
 - `writeReport()` — replaces duplicated report writing
@@ -25,7 +25,7 @@ Shared infrastructure in `src/shared.ts`:
 
 ## Refactor Plan
 
-### Step 1: Create `src/shared.ts`
+### Step 1: Create `src/shared/shared.ts`
 
 ```typescript
 // ~200 lines
@@ -69,7 +69,7 @@ Shared infrastructure in `src/shared.ts`:
 
 ## Implementation Order
 
-1. Create `src/shared.ts`
+1. Create `src/shared/shared.ts`
 2. Add rendering functions to `src/formatting.ts`
 3. Refactor `status.ts` (largest command)
 4. Refactor `validate.ts` (second largest)

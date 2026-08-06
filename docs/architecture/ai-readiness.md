@@ -135,7 +135,7 @@ As AI agents become more common in engineering teams, the projects that are read
 
 ## Implementation
 
-- **Detection:** `detectInstalledCapabilities()` in `src/maturity-profile.ts`
+- **Detection:** `detectInstalledCapabilities()` in `src/application/maturity-profile.ts`
 - **AI dimension:** Part of maturity profile calculation
 - **Capability installation:** `src/commands/upgrade.ts`
 - **Agent contracts:** `src/templates/base/governance/agents/`

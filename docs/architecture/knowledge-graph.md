@@ -171,12 +171,12 @@ function graphToText(graph: GraphAnalysis): string {
 
 ## Implementation
 
-- **Discovery:** `discoverArtifacts()` in `src/knowledge-graph.ts:162`
-- **Relation discovery:** `discoverRelations()` in `src/knowledge-graph.ts:331`
-- **Analysis:** `analyzeGraph()` in `src/knowledge-graph.ts:423`
-- **Cycle detection:** `detectCycles()` in `src/knowledge-graph.ts:486`
-- **Health score:** `calculateGraphHealth()` in `src/knowledge-graph.ts:532`
-- **Storage:** `saveGraph()` / `loadGraph()` in `src/knowledge-graph.ts`
+- **Discovery:** `discoverArtifacts()` in `src/infrastructure/knowledge-graph.ts:162`
+- **Relation discovery:** `discoverRelations()` in `src/infrastructure/knowledge-graph.ts:331`
+- **Analysis:** `analyzeGraph()` in `src/infrastructure/knowledge-graph.ts:423`
+- **Cycle detection:** `detectCycles()` in `src/infrastructure/knowledge-graph.ts:486`
+- **Health score:** `calculateGraphHealth()` in `src/infrastructure/knowledge-graph.ts:532`
+- **Storage:** `saveGraph()` / `loadGraph()` in `src/infrastructure/knowledge-graph.ts`
 
 ## Current Status
 

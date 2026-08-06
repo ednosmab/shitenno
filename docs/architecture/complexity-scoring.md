@@ -105,8 +105,8 @@ Reports are written to `shitenno/reports/` as JSON:
 
 ## Implementation
 
-- **Main function:** `calculateComplexityScore()` in `src/scorer.ts:128`
-- **Static metrics:** `src/scorer.ts:446-551`
-- **Behavioral metrics:** `src/scorer.ts:554-690`
-- **Area scoring:** `src/scorer.ts:264-415`
-- **Report writer:** `writeComplexityReport()` in `src/scorer.ts:874-917`
+- **Main function:** `calculateComplexityScore()` in `src/application/scorer.ts:128`
+- **Static metrics:** `src/application/scorer.ts:446-551`
+- **Behavioral metrics:** `src/application/scorer.ts:554-690`
+- **Area scoring:** `src/application/scorer.ts:264-415`
+- **Report writer:** `writeComplexityReport()` in `src/application/scorer.ts:874-917`

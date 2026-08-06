@@ -117,7 +117,7 @@ Critical and high severity gaps generate urgent recommendations.
 
 ## Implementation
 
-- **Detection:** `detectKnowledgeDebt()` in `src/knowledge-debt.ts:77`
-- **Scoring:** `calculateHealthScore()` in `src/knowledge-debt.ts:424`
-- **Report writer:** `writeKnowledgeDebtReport()` in `src/knowledge-debt.ts:487`
+- **Detection:** `detectKnowledgeDebt()` in `src/application/knowledge-debt.ts:77`
+- **Scoring:** `calculateHealthScore()` in `src/application/knowledge-debt.ts:424`
+- **Report writer:** `writeKnowledgeDebtReport()` in `src/application/knowledge-debt.ts:487`
 - **Integration:** `src/commands/doctor.ts` uses `detectKnowledgeDebt()`

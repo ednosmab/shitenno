@@ -24,7 +24,7 @@ shugo daemon start
 ```
 
 **What it does:**
-- Spawns `src/daemon.ts` as a background process
+- Spawns `src/commands/daemon.ts` as a background process
 - Creates a Unix domain socket at `shitenno/daemon/daemon.sock`
 - Writes PID to `shitenno/daemon/daemon.pid`
 - Starts file watcher on `shitenno/governance/` and `shitenno/docs/`

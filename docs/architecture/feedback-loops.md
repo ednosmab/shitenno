@@ -202,7 +202,7 @@ const summary = getFeedbackSummary();
 
 ## Implementation
 
-- **File:** `src/feedback-loops.ts` (~180 lines)
+- **File:** `src/application/feedback-loops.ts` (~180 lines)
 - **Storage:** `shitenno/feedback/`
-- **Integration:** `src/auto-evolution.ts` consumes feedback
+- **Integration:** `src/application/auto-evolution.ts` consumes feedback
 - **CLI:** `shugo feedback` command (view history)

@@ -237,7 +237,7 @@ export default plugin;
 
 ## Implementation
 
-- **File:** `src/plugin-system.ts` (~200 lines)
+- **File:** `src/infrastructure/plugin-system.ts` (~200 lines)
 - **Hook bus:** `HookBus` class
 - **Plugin loader:** `loadPlugins()`
 - **Integration:** Pipeline stages execute hooks

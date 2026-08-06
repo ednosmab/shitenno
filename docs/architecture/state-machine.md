@@ -170,7 +170,7 @@ bus.subscribe("lifecycle.state_changed", ({ from, to }) => {
 
 ## Implementation
 
-- **File:** `src/shitenno-state-machine.ts` (~220 lines)
+- **File:** `src/infrastructure/shitenno-state-machine.ts` (~220 lines)
 - **Detection:** `detectLifecycleState()`
 - **State machine:** `DefaultShitennoStateMachine`
 - **Integration:** Commands check state before executing

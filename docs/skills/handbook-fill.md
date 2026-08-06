@@ -35,7 +35,7 @@ Para cada template, extrair blocos:
 | `<!-- SEMANTIC:validate <file>:<claim> -->` | Validação | Verificar se afirmação é verdadeira no código |
 | `<!-- SEMANTIC:json <interface> -->` | Schema | Extrair interface TypeScript como JSON exemplo |
 | `<!-- SEMANTIC:glob <pattern> -->` | Glob | Listar ficheiros que matcham pattern |
-| `<!-- SEMANTIC:help-data -->` | Comandos | Ler `src/help-data.ts` para categorias |
+| `<!-- SEMANTIC:help-data -->` | Comandos | Ler `src/domain/types/help-data.ts` para categorias |
 | `<!-- PHILOSOPHY -->` ... `<!-- /PHILOSOPHY -->` | Intocável | Não alterar — conteúdo humano |
 
 ### PASSO 3: Extrair Dados do Código
@@ -63,7 +63,7 @@ node -e "console.log(require('./package.json').version)"
 #### validate
 ```typescript
 // Ler interface e verificar campos
-const content = readFileSync('src/maturity-profile.ts', 'utf-8');
+const content = readFileSync('src/application/maturity-profile.ts', 'utf-8');
 const has7Dimensions = content.includes('architecture') 
   && content.includes('governance')
   && content.includes('quality')
@@ -76,7 +76,7 @@ const has7Dimensions = content.includes('architecture')
 #### help-data
 ```typescript
 // Ler categorias de comandos
-const content = readFileSync('src/help-data.ts', 'utf-8');
+const content = readFileSync('src/domain/types/help-data.ts', 'utf-8');
 // Extrair COMMAND_CATEGORIES
 ```
 
@@ -165,7 +165,7 @@ Total de comandos: [PREENCHER]
 
 ## Conceitos
 
-<!-- SEMANTIC:validate src/maturity-profile.ts:7 dimensions -->
+<!-- SEMANTIC:validate src/application/maturity-profile.ts:7 dimensions -->
 Dimensões de maturidade: [PREENCHER]
 <!-- /SEMANTIC -->
 

@@ -223,7 +223,7 @@ const cmd = createCommand("status", "Health check + complexity scoring", async (
 
 ## Implementation
 
-- **File:** `src/shared.ts` (~200 lines)
+- **File:** `src/shared/shared.ts` (~200 lines)
 - **Rendering:** Additions to `src/formatting.ts`
 - **Refactor:** Update all 13 commands to use shared infrastructure
 - **Tests:** `src/__tests__/shared.test.ts`

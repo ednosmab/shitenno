@@ -141,5 +141,5 @@ The context buffer maps directly to `SessionMemory` in the three-tier state mode
 
 - **Context hierarchy:** `src/templates/base/cognition/context/CONTEXT_HIERARCHY.md`
 - **Context buffer template:** `src/templates/base/governance/context/context_buffer.yaml`
-- **State reader:** `readSessionMemory()` in `src/state-manager.ts:311`
+- **State reader:** `readSessionMemory()` in `src/application/state-manager.ts:311`
 - **Loading profiles:** Defined in CONTEXT_HIERARCHY.md, consumed by agents

@@ -85,7 +85,7 @@ The relevance is computed by comparing the capability's dimension weights agains
 
 | File | Responsibility |
 |------|---------------|
-| `src/maturity-profile.ts` | Capability definitions, detection, recommendation |
+| `src/application/maturity-profile.ts` | Capability definitions, detection, recommendation |
 | `src/capability-mapping.ts` | Filesystem artifact mappings |
 | `src/commands/upgrade.ts` | Capability installation |
 

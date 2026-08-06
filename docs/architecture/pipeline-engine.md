@@ -223,6 +223,6 @@ bus.publish("pipeline.complete", {
 
 ## Implementation
 
-- **File:** `src/pipeline.ts` (~250 lines)
+- **File:** `src/commands/pipeline.ts` (~250 lines)
 - **Stages:** `src/pipeline-stages/` (one file per stage)
 - **Integration:** `src/commands/run.ts` (new command)

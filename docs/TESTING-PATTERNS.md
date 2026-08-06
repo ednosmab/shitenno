@@ -67,7 +67,7 @@ it("handler errors do not affect other handlers", () => {
 
 ## Logger Level Mapping
 
-The logger (`src/logger.ts`) maps levels to console methods:
+The logger (`src/domain/ports/logger.ts`) maps levels to console methods:
 
 | Level | Console Method | failOnConsole catches? |
 |-------|---------------|----------------------|

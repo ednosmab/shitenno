@@ -171,8 +171,8 @@ Rules are stored as JSON files in `governance/rules/`. Each file contains one ru
 
 ## Implementation
 
-- **Engine:** `executeRules()` in `src/rule-engine.ts:359`
-- **Condition evaluator:** `evaluateCondition()` in `src/rule-engine.ts:196`
-- **Action executor:** `executeAction()` in `src/rule-engine.ts:246`
-- **Default rules:** `getDefaultRules()` in `src/rule-engine.ts:455`
-- **Initialization:** `initializeRules()` in `src/rule-engine.ts:551`
+- **Engine:** `executeRules()` in `src/application/rule-engine.ts:359`
+- **Condition evaluator:** `evaluateCondition()` in `src/application/rule-engine.ts:196`
+- **Action executor:** `executeAction()` in `src/application/rule-engine.ts:246`
+- **Default rules:** `getDefaultRules()` in `src/application/rule-engine.ts:455`
+- **Initialization:** `initializeRules()` in `src/application/rule-engine.ts:551`

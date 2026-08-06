@@ -231,8 +231,8 @@ interface EvolutionReport {
 
 ## Implementation
 
-- **File:** `src/auto-evolution.ts` (335 lines, existing)
+- **File:** `src/application/auto-evolution.ts` (335 lines, existing)
 - **Enhancement:** Add feedback integration
 - **Enhancement:** Add confidence adjustment
 - **Enhancement:** Add suppression logic
-- **Integration:** `src/pipeline.ts` (evolve stage)
+- **Integration:** `src/commands/pipeline.ts` (evolve stage)

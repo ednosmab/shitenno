@@ -107,10 +107,10 @@ function computeHealthScore(projectRoot):
 
 | File | Lines | Responsibility |
 |------|-------|---------------|
-| `src/state-manager.ts` | 437 | State consolidation |
-| `src/scorer.ts` | 936 | Complexity scoring |
-| `src/maturity-profile.ts` | 521 | Maturity evaluation |
-| `src/knowledge-debt.ts` | 505 | Debt detection |
+| `src/application/state-manager.ts` | 437 | State consolidation |
+| `src/application/scorer.ts` | 936 | Complexity scoring |
+| `src/application/maturity-profile.ts` | 521 | Maturity evaluation |
+| `src/application/knowledge-debt.ts` | 505 | Debt detection |
 | `src/health-auditor.ts` | 364 | Health scoring |
 
 ---

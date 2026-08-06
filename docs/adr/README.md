@@ -38,16 +38,11 @@ See [TEMPLATE.md](./TEMPLATE.md).
 
 | ADR | Title | Status | Date |
 |-----|-------|--------|------|
-| ADR-001 | Three-Tier State Model | Accepted | 2026-06-28 |
-| ADR-002 | P0-P4 Context Hierarchy | Accepted | 2026-06-28 |
-| ADR-003 | Event-Driven Architecture | Accepted | 2026-06-28 |
-| ADR-004 | Plugin System with HookBus | Accepted | 2026-06-28 |
-| ADR-005 | Pipeline with 5 Stages | Accepted | 2026-06-28 |
-| ADR-006 | 5-State Lifecycle Machine | Accepted | 2026-06-28 |
-| ADR-007 | Knowledge Graph with 14 Artifact Types | Accepted | 2026-06-28 |
-| ADR-008 | Scoring Engine Approach | Accepted | 2026-06-28 |
-| ADR-009 | Single-Agent Full-Stack Architect | Accepted | 2026-06-28 |
-| ADR-010 | 4-Step Context Management | Accepted | 2026-06-28 |
+| ADR-001 | Single Agent Architecture | Accepted | 2026-06-28 |
+| ADR-002 | Event-Driven Architecture with Centralized Engineering State | Accepted | 2026-06-28 |
+| ADR-003 | Knowledge Graph as Foundation for Documentation | Accepted | 2026-06-28 |
+| ADR-004 | Event Bus Orphaned Events Triage | Accepted | 2026-06-28 |
+| ADR-005 | Layered Source Structure for src/ | Accepted | 2026-08-06 |
 
 ## Governance
 
@@ -58,4 +53,4 @@ See [TEMPLATE.md](./TEMPLATE.md).
 
 ---
 
-*Last updated: 2026-06-29*
+*Last updated: 2026-08-06*

@@ -95,7 +95,7 @@ O servidor MCP (`shitenno-mcp`) expõe as seguintes tools para agentes IA:
 ### rule-manifest.yaml
 
 **Localização:** `governance/rule-manifest.yaml`
-**Loader:** `src/rule-manifest.ts`
+**Loader:** `src/infrastructure/rule-manifest.ts`
 
 Define quais regras de governança se aplicam a cada tarefa. Schema:
 
@@ -192,12 +192,12 @@ Perfil de maturidade serializado. Schema: `MaturityProfile`.
 Estes módulos são **internos** e podem mudar sem aviso:
 
 - Todas as engines consolidadas (`src/prioritization/*`, `src/engineering-state/*`)
-- `src/analyser.ts`, `src/scorer.ts`, `src/pipeline.ts`
+- `src/analyser.ts`, `src/application/scorer.ts`, `src/commands/pipeline.ts`
 - `src/audit/*` (todos os detectores)
-- `src/daemon/*`, `src/event-bus.ts`
+- `src/daemon/*`, `src/domain/ports/event-bus.ts`
 - `src/decision-core/*`
 - `src/capability-engine/*`, `src/knowledge-debt/*`, `src/knowledge-graph/*`
-- `src/health-auditor.ts`, `src/auto-evolution.ts`
+- `src/health-auditor.ts`, `src/application/auto-evolution.ts`
 - Todos os comandos CLI não listados em §1
 - Todas as tools MCP não listadas em §2
 - Interfaces TypeScript não listadas em §3
