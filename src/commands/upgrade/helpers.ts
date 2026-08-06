@@ -5,15 +5,15 @@
 import { join, resolve } from "node:path";
 import { existsSync } from "node:fs";
 import fse from "fs-extra";
-import { getCapabilityFiles } from "../../capability-mapping.js";
+import { getCapabilityFiles } from "../../domain/types/capability-mapping.js";
 
 const { copySync, ensureDirSync } = fse;
 
-import { getTemplatesDir } from "../../paths.js";
+import { getTemplatesDir } from "../../shared/paths.js";
 
 export function installCapabilities(
   targetDir: string,
-  capabilities: import("../../maturity-profile.js").Capability[]
+  capabilities: import("../../application/maturity-profile.js").Capability[]
 ): { filesInstalled: number; directoriesCreated: number } {
   const templatesDir = getTemplatesDir();
   let directoriesCreated = 0;

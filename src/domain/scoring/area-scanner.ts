@@ -6,8 +6,8 @@
  */
 
 import { existsSync } from "node:fs";
-import { walkSourceFiles } from "../../utils.js";
-import type { FileContentCache } from "../../utils.js";
+import { walkSourceFiles } from "../../infrastructure/utils.js";
+import type { FileContentCache } from "../../infrastructure/utils.js";
 
 // ── Area Metrics ────────────────────────────────────────────────────────────
 

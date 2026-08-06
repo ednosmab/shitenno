@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { Pipeline, createPipelineContext } from "../pipeline.js";
-import type { PipelineContext, PipelineStage } from "../pipeline.js";
+import { Pipeline, createPipelineContext } from "../application/pipeline.js";
+import type { PipelineContext, PipelineStage } from "../application/pipeline.js";
 
 describe("Pipeline", () => {
   const createStage = (name: string, delay = 0): PipelineStage => ({

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import type { SemanticDomain } from "./taxonomy.js";
 import type { DetectedPattern } from "./pattern-rules.js";
 import type { ChangeJournal } from "./change-journal.js";

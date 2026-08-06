@@ -9,7 +9,7 @@ vi.mock("node:fs", async (importOriginal) => {
 });
 
 // Suppress vitest-fail-on-console for logger.warn calls in error paths
-vi.mock("../logger.js", () => ({
+vi.mock("../shared/logger.js", () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -30,7 +30,7 @@ import {
   mapSeverityToPriority,
   severityLabel,
   type BacklogItem,
-} from "../backlog-writer.js";
+} from "../application/backlog-writer.js";
 
 let tempDir: string;
 

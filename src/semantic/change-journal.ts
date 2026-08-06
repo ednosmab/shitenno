@@ -11,7 +11,7 @@
 
 import { existsSync, appendFileSync, readFileSync, mkdirSync, statSync, writeFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import type { SemanticClassification, SemanticDomain, SignalType } from "./taxonomy.js";
 
 // ── Types ───────────────────────────────────────────────────────────────────

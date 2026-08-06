@@ -7,9 +7,9 @@
 import chalk from "chalk";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { output, outputBlank } from "../../output.js";
-import { logger } from "../../logger.js";
-import { markChallengeResolved, undoChallengeResolution, getActionCommand, type PendingChallenge } from "../../challenge-responder.js";
+import { output, outputBlank } from "../../shared/output.js";
+import { logger } from "../../shared/logger.js";
+import { markChallengeResolved, undoChallengeResolution, getActionCommand, type PendingChallenge } from "../../infrastructure/challenge-responder.js";
 
 // ── Interactive Challenge Prompt ────────────────────────────────────────────
 
@@ -65,7 +65,7 @@ export function findLastResolvedChallenge(shitennoDir: string): number {
 }
 
 export async function promptForChallenges(shitennoDir: string, noInteractive: boolean): Promise<void> {
-  const { getPendingChallenges } = await import("../../challenge-responder.js");
+  const { getPendingChallenges } = await import("../../infrastructure/challenge-responder.js");
   const challenges = getPendingChallenges(shitennoDir);
   if (challenges.length === 0 || noInteractive) return;
   const inquirer = await import("inquirer");

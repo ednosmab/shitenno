@@ -4,11 +4,11 @@
 
 import chalk from "chalk";
 import { join } from "node:path";
-import { guardNotInitialized } from "../../shared.js";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { MarkdownPlanEngine } from "../../markdown-plan-engine.js";
-import { outputJson } from "../../formatting.js";
-import { output, outputBlank } from "../../output.js";
+import { guardNotInitialized } from "../../shared/shared.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import { MarkdownPlanEngine } from "../../infrastructure/markdown-plan-engine.js";
+import { outputJson } from "../../shared/formatting.js";
+import { output, outputBlank } from "../../shared/output.js";
 
 export function registerMdShow(cmd: import("commander").Command) {
   cmd

@@ -7,15 +7,15 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
-import { output, outputBlank } from "../output.js";
-import { analyzeEvolution, writeEvolutionReport } from "../auto-evolution.js";
+import { output, outputBlank } from "../shared/output.js";
+import { analyzeEvolution, writeEvolutionReport } from "../application/auto-evolution.js";
 import { detectFeedbackPatterns, getAllFeedbackSummaries } from "../feedback/core.js";
-import { recordFeedback, recordDimensionFeedback, type PerformanceMetric } from "../feedback-loops.js";
-import { getEventBus } from "../event-bus.js";
-import { outputJson } from "../formatting.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { recordPathChoice } from "../growth-profile.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
+import { recordFeedback, recordDimensionFeedback, type PerformanceMetric } from "../application/feedback-loops.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { outputJson } from "../shared/formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { recordPathChoice } from "../infrastructure/growth-profile.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
 import { outputReportHuman, outputReportJson } from "./evolve/semantic-display.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -172,7 +172,7 @@ export const evolveCommand = new Command("evolve")
       if (isJson) {
         outputJson({ error: "evolution_failed", message: String(error) });
       } else {
-        const { logger } = await import("../logger.js") as { logger: { error: (name: string, msg: string) => void } };
+        const { logger } = await import("../shared/logger.js") as { logger: { error: (name: string, msg: string) => void } };
         logger.error("evolve", `Evolution analysis failed: ${error}`);
       }
       outputBlank();

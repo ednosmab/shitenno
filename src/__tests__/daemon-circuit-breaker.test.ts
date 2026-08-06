@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { existsSync, rmSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { DaemonCircuitBreaker } from "../daemon-circuit-breaker.js";
+import { DaemonCircuitBreaker } from "../infrastructure/daemon-circuit-breaker.js";
 
 const TEST_DIR = join(__dirname, ".test-circuit-breaker");
 

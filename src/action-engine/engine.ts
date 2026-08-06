@@ -9,7 +9,7 @@
 import { randomUUID, createHash } from "node:crypto";
 import { runPolicyGate } from "../decision-core/invoke.js";
 import { getResourceId } from "../decision-core/precedence.js";
-import { claimResource, releaseResource } from "../resource-claims.js";
+import { claimResource, releaseResource } from "../application/resource-claims.js";
 import type { RuleAction, RuleContext } from "../domain/rules/rule.js";
 import { RunScriptExecutor, CreateReminderExecutor } from "../decision-core/executors/index.js";
 import type { ActionRequest, ExecutionRecord, ActionFilter, ExecutionRepository, ActionExecutor, ActionStatus } from "./types.js";

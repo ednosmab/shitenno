@@ -1,5 +1,5 @@
-import { getEventBus } from "../../event-bus.js";
-import { BoundedQueue } from "../../daemon-resources.js";
+import { getEventBus } from "../../infrastructure/event-bus.js";
+import { BoundedQueue } from "../../domain/types/daemon-resources.js";
 import { MAX_CAPABILITY_HISTORY, type CapabilityLifecycleState } from "./types.js";
 
 export class CapabilityLifecycleTracker {

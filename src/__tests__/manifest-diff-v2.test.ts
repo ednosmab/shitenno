@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   diffManifestsV2,
   type Manifest,
-} from "../manifest.js";
+} from "../infrastructure/manifest.js";
 
 
 

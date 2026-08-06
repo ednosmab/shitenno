@@ -1,7 +1,7 @@
 import chalk from "chalk";
-import { healthBar } from "../../formatting.js";
-import { output, outputBlank } from "../../output.js";
-import { getEventBus } from "../../event-bus.js";
+import { healthBar } from "../../shared/formatting.js";
+import { output, outputBlank } from "../../shared/output.js";
+import { getEventBus } from "../../infrastructure/event-bus.js";
 import type { DoctorFinding, DoctorReport } from "./analysis.js";
 
 export function displayDoctorHeader(): void {

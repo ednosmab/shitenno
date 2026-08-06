@@ -15,7 +15,7 @@ import {
   type StateMutation,
   type MutationSource,
 } from "../engineering-state/index.js";
-import { type EngineeringState } from "../engineering-state.js";
+import { type EngineeringState } from "../application/engineering-state.js";
 
 function makeValidState(): EngineeringState {
   return {

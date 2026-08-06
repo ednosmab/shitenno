@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { getEventBus, resetEventBus } from "../event-bus.js";
-import { initializeEngineeringState } from "../engineering-state.js";
+import { getEventBus, resetEventBus } from "../infrastructure/event-bus.js";
+import { initializeEngineeringState } from "../application/engineering-state.js";
 
 describe("initializeEngineeringState", () => {
   beforeEach(() => {

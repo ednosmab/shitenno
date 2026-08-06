@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isCacheValid, computeInputHash, setCachedBriefing, readCache } from "../briefing-cache.js";
-import type { CacheEntry } from "../briefing-cache.js";
+import { isCacheValid, computeInputHash, setCachedBriefing, readCache } from "../infrastructure/briefing-cache.js";
+import type { CacheEntry } from "../infrastructure/briefing-cache.js";
 
 describe("briefing-cache", () => {
   describe("computeInputHash", () => {

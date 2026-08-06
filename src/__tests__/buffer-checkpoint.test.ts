@@ -26,7 +26,7 @@ afterEach(() => {
   rmSync(tempDir, { recursive: true, force: true });
 });
 
-vi.mock("../../src/logger.js", () => ({
+vi.mock("../shared/logger.js", () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),

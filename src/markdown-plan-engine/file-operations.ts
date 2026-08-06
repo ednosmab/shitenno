@@ -7,8 +7,8 @@
 import { existsSync, renameSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
-import { getEventBus } from "../event-bus.js";
-import { logger } from "../logger.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { logger } from "../shared/logger.js";
 import { YAML_BLOCK_RE } from "./parser.js";
 import { isCompletionStatus, statusDisplayText, type MarkdownPlanStatus } from "./status.js";
 

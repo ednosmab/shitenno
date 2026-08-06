@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import type { EngineeringAsset } from "../domain/entities/engineering-state.js";
 
 function discoverAdrs(shitennoDir: string, now: string): EngineeringAsset[] {

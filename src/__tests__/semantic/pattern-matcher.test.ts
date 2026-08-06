@@ -11,7 +11,7 @@ import { join } from "node:path";
 import { ChangeJournal, resetChangeJournal } from "../../semantic/change-journal.js";
 import { getPatternMatcher, resetPatternMatcher, detectPatterns } from "../../semantic/pattern-matcher.js";
 import { getPatternRule, getPatternTypes } from "../../semantic/pattern-rules.js";
-import { getEventBus, resetEventBus } from "../../event-bus.js";
+import { getEventBus, resetEventBus } from "../../infrastructure/event-bus.js";
 import type { SemanticClassification } from "../../semantic/taxonomy.js";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────

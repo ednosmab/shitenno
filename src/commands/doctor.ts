@@ -9,10 +9,10 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
-import { healthBar, outputJson } from "../formatting.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { output, outputBlank, outputError } from "../output.js";
+import { healthBar, outputJson } from "../shared/formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { output, outputBlank, outputError } from "../shared/output.js";
 import { runDoctorAnalysis, type DoctorReport } from "./doctor/analysis.js";
 export { analyzeRisks, analyzeImprovements, analyzeTeaching, runDoctorAnalysis } from "./doctor/analysis.js";
 export type { DoctorFinding, DoctorReport } from "./doctor/analysis.js";

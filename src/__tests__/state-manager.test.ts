@@ -15,7 +15,7 @@ import {
   readSessionMemory,
   consolidateState,
   stateToText,
-} from "../state-manager.js";
+} from "../application/state-manager.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

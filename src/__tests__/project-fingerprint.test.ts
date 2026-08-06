@@ -6,8 +6,8 @@ import {
   loadFingerprint,
   isFingerprintStale,
   type ProjectFingerprint,
-} from "../project-fingerprint.js";
-import type { ProjectAnalysis } from "../analyser.js";
+} from "../infrastructure/project-fingerprint.js";
+import type { ProjectAnalysis } from "../infrastructure/analyser.js";
 
 vi.mock("node:fs", () => ({
   existsSync: vi.fn(),
@@ -39,6 +39,10 @@ function makeAnalysis(overrides: Partial<ProjectAnalysis> = {}): ProjectAnalysis
     hasCI: false,
     hasTypeScript: true,
     totalCommits: 100,
+    flatSourceFiles: 0,
+    layeredDirs: 0,
+    nodeApiImportsOutsideLayers: 0,
+    portsConsumed: false,
     ...overrides,
   };
 }

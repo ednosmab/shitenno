@@ -4,11 +4,11 @@ import { resolve, join } from "node:path";
 import chalk from "chalk";
 import ora from "ora";
 import fse from "fs-extra";
-import { invalidateCache } from "../cache.js";
-import { outputJson } from "../formatting.js";
-import { checkLifecycleGate } from "../shared.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
-import { output, outputBlank, outputError } from "../output.js";
+import { invalidateCache } from "../infrastructure/cache.js";
+import { outputJson } from "../shared/formatting.js";
+import { checkLifecycleGate } from "../shared/shared.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
+import { output, outputBlank, outputError } from "../shared/output.js";
 import { getFilesToSync, shouldPreserveCustomizations, mergeWithCustomizations } from "./sync/merge.js";
 
 const { copySync, ensureDirSync, writeFileSync } = fse;

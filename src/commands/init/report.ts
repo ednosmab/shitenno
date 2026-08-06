@@ -5,7 +5,7 @@
  */
 
 import chalk from "chalk";
-import { output, outputBlank } from "../../output.js";
+import { output, outputBlank } from "../../shared/output.js";
 import type { DiscoveryResult } from "./discovery.js";
 
 /**

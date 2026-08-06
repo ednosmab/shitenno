@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { join } from "node:path";
 import { mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
 
 describe("MarkdownPlanEngine", () => {
   let tmpDir: string;

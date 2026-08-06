@@ -4,9 +4,9 @@
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { getTemplatesDir } from "../../paths.js";
-import type { Capability } from "../../maturity-profile.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import { getTemplatesDir } from "../../shared/paths.js";
+import type { Capability } from "../../application/maturity-profile.js";
 
 export function updateAgentsMdWithCapabilities(
   targetDir: string,

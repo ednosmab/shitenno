@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { getEventBus, resetEventBus } from "../event-bus.js";
+import { getEventBus, resetEventBus } from "../infrastructure/event-bus.js";
 import {
   checkPrecedence,
   getResourceId,

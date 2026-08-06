@@ -9,7 +9,7 @@ import {
   diffManifests,
   updateManifest,
   type Manifest,
-} from "../manifest.js";
+} from "../infrastructure/manifest.js";
 
 vi.mock("node:fs", () => ({
   existsSync: vi.fn(),

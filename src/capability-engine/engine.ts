@@ -1,5 +1,5 @@
-import { CAPABILITIES } from "../maturity-profile.js";
-import type { EngineeringState } from "../engineering-state.js";
+import { CAPABILITIES } from "../application/maturity-profile.js";
+import type { EngineeringState } from "../application/engineering-state.js";
 import type { CapabilityEngineResult, CapabilityMaturity, CapabilityEntity, CapabilityRecommendation } from "./types.js";
 import { buildCapabilityEntity } from "./maturity.js";
 import { generateCapabilityRecommendations } from "./recommendations.js";

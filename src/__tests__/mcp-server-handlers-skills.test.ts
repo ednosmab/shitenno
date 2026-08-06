@@ -10,12 +10,12 @@ import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 // Mock daemon-client to avoid real daemon calls
-vi.mock("../daemon-client.js", () => ({
+vi.mock("../infrastructure/daemon-client.js", () => ({
   isDaemonRunning: vi.fn(() => false),
   queryDaemon: vi.fn(() => Promise.resolve(null)),
 }));
 
-import { handleGetSkills } from "../mcp-server-handlers.js";
+import { handleGetSkills } from "../interface/mcp/mcp-server-handlers.js";
 
 describe("handleGetSkills — scope-aware resolution", () => {
   let shitennoDir: string;

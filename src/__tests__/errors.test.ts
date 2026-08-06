@@ -4,7 +4,7 @@ import {
   NotInitializedError,
   InvalidRuleError,
   ScriptNotAllowedError,
-} from "../errors.js";
+} from "../domain/types/errors.js";
 
 describe("ShitennoError", () => {
   it("has name, message, and code", () => {

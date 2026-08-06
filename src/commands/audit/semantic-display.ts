@@ -5,9 +5,9 @@
  */
 
 import chalk from "chalk";
-import { output, outputBlank } from "../../output.js";
+import { output, outputBlank } from "../../shared/output.js";
 import { runSemanticAnalysis } from "../../semantic/index.js";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 
 // ── Semantic Audit Patterns ─────────────────────────────────────────────────
 

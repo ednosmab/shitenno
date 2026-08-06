@@ -4,23 +4,23 @@
  * Generates project briefings with optional mandatory rules and skills.
  */
 
-import { collectContext } from "../context-collector.js";
+import { collectContext } from "../application/context-collector.js";
 import {
   briefingToJson,
   briefingToSummary,
   briefingToMarkdown,
   type Briefing,
-} from "../briefing.js";
-import { computeRequestHash, setCachedBriefing, getCachedBriefingByRequest } from "../briefing-cache.js";
-import { queryDaemon, isDaemonRunning } from "../daemon-client.js";
-import { loadSkillManifest, partitionSkills, type TaskMetadata } from "../skill-manifest.js";
-import { getSkill } from "../knowledge-loader.js";
-import { logger } from "../logger.js";
-import { recordSkillResolution } from "../context-buffer-writer.js";
+} from "../application/briefing.js";
+import { computeRequestHash, setCachedBriefing, getCachedBriefingByRequest } from "../infrastructure/briefing-cache.js";
+import { queryDaemon, isDaemonRunning } from "../infrastructure/daemon-client.js";
+import { loadSkillManifest, partitionSkills, type TaskMetadata } from "../infrastructure/skill-manifest.js";
+import { getSkill } from "../infrastructure/knowledge-loader.js";
+import { logger } from "../shared/logger.js";
+import { recordSkillResolution } from "../application/context-buffer-writer.js";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { recordHit, recordMiss } from "../cache-metrics.js";
-import type { ToolResponse } from "../mcp-types.js";
+import { recordHit, recordMiss } from "../shared/cache-metrics.js";
+import type { ToolResponse } from "../domain/types/mcp-types.js";
 import { loadMandatoryRulesWithContent } from "./rules.js";
 
 // ── Formatting ──────────────────────────────────────────────────────────────

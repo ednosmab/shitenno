@@ -11,14 +11,14 @@ import { describe, bench, beforeAll, afterAll } from "vitest";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { scaffoldShitenno } from "../scaffolder.js";
-import { calculateComplexityScore } from "../scorer.js";
-import { detectPatterns } from "../pattern-detector.js";
-import { auditHealth } from "../health-auditor.js";
-import { analyseProject } from "../analyser.js";
+import { scaffoldShitenno } from "../infrastructure/scaffolder.js";
+import { calculateComplexityScore } from "../application/scorer.js";
+import { detectPatterns } from "../infrastructure/pattern-detector.js";
+import { auditHealth } from "../application/health-auditor.js";
+import { analyseProject } from "../infrastructure/analyser.js";
 import { getEngineeringState, clearEngineeringStateCache } from "../engineering-state/index.js";
-import type { UserAnswers } from "../prompts.js";
-import type { Capability } from "../maturity-profile.js";
+import type { UserAnswers } from "../interface/cli/prompts.js";
+import type { Capability } from "../application/maturity-profile.js";
 
 // ── Fixture Generators ──────────────────────────────────────────────────────
 

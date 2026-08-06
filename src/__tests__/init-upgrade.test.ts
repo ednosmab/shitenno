@@ -9,7 +9,7 @@ import {
   getConsentFilePath,
   readLatestConsent,
 } from "../commands/init/consent.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 function makeRepo(prefix: string): string {
   const dir = mkdtempSync(join(tmpdir(), `shitenno-upgrade-${prefix}-`));

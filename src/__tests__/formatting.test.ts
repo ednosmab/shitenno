@@ -5,7 +5,7 @@ import {
   outputJson,
   statusIcon,
   banner,
-} from "../formatting.js";
+} from "../shared/formatting.js";
 
 // ── healthBar ────────────────────────────────────────────────────────────────
 

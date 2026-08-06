@@ -7,12 +7,12 @@
 
 import { Command } from "commander";
 import chalk from "chalk";
-import { guardNotInitialized } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { outputJson } from "../formatting.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
-import { output, outputBlank } from "../output.js";
-import type { Reminder, ReminderPriority, ReminderCategory } from "../briefing.js";
+import { guardNotInitialized } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { outputJson } from "../shared/formatting.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
+import { output, outputBlank } from "../shared/output.js";
+import type { Reminder, ReminderPriority, ReminderCategory } from "../application/briefing.js";
 import {
   VALID_PRIORITIES, VALID_CATEGORIES, PRIORITY_ICONS, CATEGORY_ICONS,
   loadReminders, saveReminders,

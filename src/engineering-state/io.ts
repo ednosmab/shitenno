@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import type { EngineeringState } from "../domain/entities/engineering-state.js";
-import { isEngineeringState } from "../schema-validators.js";
+import { isEngineeringState } from "../domain/types/schema-validators.js";
 
 // ── Retention Policy ────────────────────────────────────────────────────────
 

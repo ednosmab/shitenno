@@ -5,13 +5,13 @@
  */
 
 import chalk from "chalk";
-import { output, outputBlank } from "../../output.js";
-import { queryDaemon, isDaemonRunning } from "../../daemon-client.js";
-import { logger } from "../../logger.js";
+import { output, outputBlank } from "../../shared/output.js";
+import { queryDaemon, isDaemonRunning } from "../../infrastructure/daemon-client.js";
+import { logger } from "../../shared/logger.js";
 
 // ── Fingerprint Display ─────────────────────────────────────────────────────
 
-import type { ProjectAnalysis } from "../../analyser.js";
+import type { ProjectAnalysis } from "../../infrastructure/analyser.js";
 
 export async function displayFingerprint(
   projectRoot: string,
@@ -19,7 +19,7 @@ export async function displayFingerprint(
   analysis: ProjectAnalysis,
   overallScore: number | undefined,
 ): Promise<void> {
-  const { loadFingerprint, isFingerprintStale, generateProjectFingerprint, saveFingerprint } = await import("../../project-fingerprint.js");
+  const { loadFingerprint, isFingerprintStale, generateProjectFingerprint, saveFingerprint } = await import("../../infrastructure/project-fingerprint.js");
   const staleFingerprint = isFingerprintStale(shitennoDir);
   let fingerprint = loadFingerprint(shitennoDir);
   if (!fingerprint || staleFingerprint) {
@@ -40,8 +40,8 @@ export async function displayFingerprint(
 
 export async function displayBriefing(projectRoot: string, shitennoDir: string): Promise<void> {
   try {
-    const { collectContext } = await import("../../context-collector.js");
-    const { computeInputHash, getCachedBriefing } = await import("../../briefing-cache.js");
+    const { collectContext } = await import("../../application/context-collector.js");
+    const { computeInputHash, getCachedBriefing } = await import("../../infrastructure/briefing-cache.js");
     let briefing;
     if (isDaemonRunning(shitennoDir)) {
       const result = await queryDaemon<{ type: string; data: typeof briefing }>(shitennoDir, { type: "query_briefing" });
@@ -107,7 +107,7 @@ export async function displayDaemonHealth(shitennoDir: string): Promise<void> {
 
 export async function displayCapabilityEngine(projectRoot: string, shitennoDir: string): Promise<void> {
   try {
-    const { evaluateCapabilities } = await import("../../capability-engine.js");
+    const { evaluateCapabilities } = await import("../../application/capability-engine.js");
     const { subscribeToEngineeringState } = await import("../../engineering-state/index.js");
     const { getState, unsubscribe } = subscribeToEngineeringState(projectRoot, shitennoDir);
     const state = getState();

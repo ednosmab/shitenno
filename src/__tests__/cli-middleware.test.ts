@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { installMiddleware, type MiddlewareContext } from "../cli-middleware.js";
+import { installMiddleware, type MiddlewareContext } from "../interface/cli/cli-middleware.js";
 
-vi.mock("../plugin-system.js", () => ({
+vi.mock("../infrastructure/plugin-system.js", () => ({
   loadPlugins: vi.fn().mockResolvedValue([]),
   getHookBus: vi.fn().mockReturnValue({
     registerPlugin: vi.fn(),
@@ -9,17 +9,17 @@ vi.mock("../plugin-system.js", () => ({
   }),
 }));
 
-vi.mock("../session-tracker.js", () => ({
+vi.mock("../infrastructure/session-tracker.js", () => ({
   trackCommand: vi.fn(),
 }));
 
-vi.mock("../event-bus.js", () => ({
+vi.mock("../infrastructure/event-bus.js", () => ({
   getEventBus: vi.fn().mockReturnValue({
     publish: vi.fn(),
   }),
 }));
 
-vi.mock("../session-feedback.js", () => ({
+vi.mock("../infrastructure/session-feedback.js", () => ({
   createFileStorage: vi.fn(),
   recordOutcome: vi.fn(),
 }));
@@ -70,7 +70,7 @@ describe("installMiddleware", () => {
       await handler.call(mockProgram, mockProgram, mockActionCommand);
     }
 
-    const { trackCommand } = await import("../session-tracker.js");
+    const { trackCommand } = await import("../infrastructure/session-tracker.js");
     expect(vi.mocked(trackCommand)).toHaveBeenCalledWith(
       "/project/shitenno",
       "session-abc",
@@ -99,7 +99,7 @@ describe("installMiddleware", () => {
       await handler.call(mockProgram, mockProgram, mockActionCommand);
     }
 
-    const { trackCommand } = await import("../session-tracker.js");
+    const { trackCommand } = await import("../infrastructure/session-tracker.js");
     expect(vi.mocked(trackCommand)).not.toHaveBeenCalled();
   });
 
@@ -124,7 +124,7 @@ describe("installMiddleware", () => {
       await handler.call(mockThisCommand, mockThisCommand);
     }
 
-    const { getEventBus } = await import("../event-bus.js");
+    const { getEventBus } = await import("../infrastructure/event-bus.js");
     const bus = vi.mocked(getEventBus)();
     expect(bus.publish).toHaveBeenCalledWith(
       "command.completed",
@@ -153,7 +153,7 @@ describe("installMiddleware", () => {
       await handler.call(mockProgram, mockProgram, mockActionCommand);
     }
 
-    const { getEventBus } = await import("../event-bus.js");
+    const { getEventBus } = await import("../infrastructure/event-bus.js");
     const bus = vi.mocked(getEventBus)();
     expect(bus.publish).toHaveBeenCalledWith(
       "action.pre_sensitive",
@@ -182,7 +182,7 @@ describe("installMiddleware", () => {
       await handler.call(mockProgram, mockProgram, mockActionCommand);
     }
 
-    const { getEventBus } = await import("../event-bus.js");
+    const { getEventBus } = await import("../infrastructure/event-bus.js");
     const bus = vi.mocked(getEventBus)();
     expect(bus.publish).not.toHaveBeenCalledWith(
       "action.pre_sensitive",

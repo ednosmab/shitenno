@@ -17,12 +17,12 @@ import {
   updateManifest,
   type Manifest,
   type ManifestDiff,
-} from "../manifest.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { outputJson } from "../formatting.js";
-import { getEventBus } from "../event-bus.js";
-import { output, outputBlank, outputSection, outputInfo } from "../output.js";
-import { logger } from "../logger.js";
+} from "../infrastructure/manifest.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { outputJson } from "../shared/formatting.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { output, outputBlank, outputSection, outputInfo } from "../shared/output.js";
+import { logger } from "../shared/logger.js";
 import {
   displayDiff, applyUpdates, outputNoManifest, outputUpToDate,
   outputDryRun, outputChangesSummary, outputUpdateResult,
@@ -82,8 +82,8 @@ async function tryAutoCreateManifest(
 ): Promise<UpdateData | null> {
   const spinner = ora("No manifest found — creating from current state...").start();
   try {
-    const { createManifest } = await import("../manifest.js");
-    const { loadMaturityProfile } = await import("../maturity-profile.js");
+    const { createManifest } = await import("../infrastructure/manifest.js");
+    const { loadMaturityProfile } = await import("../application/maturity-profile.js");
     const profile = loadMaturityProfile(ctx.shitennoDir);
     const capabilities = profile?.installedCapabilities ?? ["core"];
     const maturityScore = profile?.overallScore ?? 0;

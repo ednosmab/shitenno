@@ -4,7 +4,7 @@
  * Extracted from daemon/index.ts to keep modules focused.
  */
 
-import { getEventBus } from "../event-bus.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 import { classifyEvent } from "../semantic/signal-classifier.js";
 import { getChangeJournal, resetChangeJournal } from "../semantic/change-journal.js";
 import { getPatternMatcher, resetPatternMatcher } from "../semantic/pattern-matcher.js";

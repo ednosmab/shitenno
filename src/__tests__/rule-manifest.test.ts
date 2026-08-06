@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { resolveRules, partitionRules, type RuleManifestEntry } from "../rule-manifest.js";
+import { resolveRules, partitionRules, type RuleManifestEntry } from "../infrastructure/rule-manifest.js";
 
 const MANIFEST: RuleManifestEntry[] = [
   { id: "forbidden-operations", path: "docs/FORBIDDEN_OPERATIONS.md", mandatory: true, priority: 0 },

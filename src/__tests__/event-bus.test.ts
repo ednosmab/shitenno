@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getEventBus, resetEventBus } from "../event-bus.js";
+import { getEventBus, resetEventBus } from "../infrastructure/event-bus.js";
 
-import type { CorrelationId, TraceId } from "../event-payloads.js";
+import type { CorrelationId, TraceId } from "../domain/types/event-payloads.js";
 
 describe("EventBus", () => {
   beforeEach(() => {

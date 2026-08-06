@@ -8,7 +8,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { SOURCE_SKIP_PATTERNS } from "./constants.js";
-import { walkSourceFiles } from "../utils.js";
+import { walkSourceFiles } from "../infrastructure/utils.js";
 import type { SourceFileInfo, HistoryEntry, HealthIssue } from "./types.js";
 
 /**

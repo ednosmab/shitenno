@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import type { SessionOutcome } from "../../session-feedback.js";
+import type { SessionOutcome } from "../../infrastructure/session-feedback.js";
 
 export type SkillLevel = "junior" | "pleno" | "senior";
 
@@ -27,7 +27,7 @@ export interface FeedbackItem {
   practicalRule?: string;
 }
 
-export type { SessionFeedbackRecord } from "../../session-feedback.js";
+export type { SessionFeedbackRecord } from "../../infrastructure/session-feedback.js";
 
 export interface LeadershipMetrics {
   name: string;

@@ -4,9 +4,9 @@
  * Extracted from daemon/index.ts to keep modules focused.
  */
 
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
-import { runAutoVerification, checkAndArchiveDonePlans } from "../plan-lifecycle.js";
-import { acquireVerificationLock, releaseVerificationLock } from "../verification-lock.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
+import { runAutoVerification, checkAndArchiveDonePlans } from "../application/plan-lifecycle.js";
+import { acquireVerificationLock, releaseVerificationLock } from "../infrastructure/verification-lock.js";
 import { daemonLog } from "./log-rotation.js";
 
 // ── Verification Loop ───────────────────────────────────────────────────────

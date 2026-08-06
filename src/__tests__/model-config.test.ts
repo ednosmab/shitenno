@@ -18,7 +18,7 @@ import {
   loadAnswers,
   initializeFromAnswers,
   type ModelConfig,
-} from "../model-config.js";
+} from "../infrastructure/model-config.js";
 
 describe("registerModel / getModelConfig", () => {
   it("registers and retrieves a model", () => {

@@ -8,15 +8,15 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import chalk from "chalk";
 import ora from "ora";
-import { analyseProject } from "../../analyser.js";
-import { askQuestions, type UserAnswers } from "../../prompts.js";
-import { guardInteractive } from "../../shared.js";
-import { loadMaturityProfile, calculateMaturityProfile, type MaturityProfile } from "../../maturity-profile.js";
-import { healthBar } from "../../formatting.js";
-import { output, outputBlank } from "../../output.js";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
+import { analyseProject } from "../../infrastructure/analyser.js";
+import { askQuestions, type UserAnswers } from "../../interface/cli/prompts.js";
+import { guardInteractive } from "../../shared/shared.js";
+import { loadMaturityProfile, calculateMaturityProfile, type MaturityProfile } from "../../application/maturity-profile.js";
+import { healthBar } from "../../shared/formatting.js";
+import { output, outputBlank } from "../../shared/output.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
 import { displayProjectAnalysis, displayMaturityDimensions, displayCapabilities } from "./display.js";
-import type { ProjectAnalysis } from "../../analyser.js";
+import type { ProjectAnalysis } from "../../infrastructure/analyser.js";
 
 // ── Starter Detection ───────────────────────────────────────────────────────
 

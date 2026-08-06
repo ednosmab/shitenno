@@ -12,16 +12,16 @@ import chalk from "chalk";
 import ora from "ora";
 import { join } from "node:path";
 import { readdirSync, readFileSync } from "node:fs";
-import { writeHealthReport, issueFingerprint, type HealthAuditReport } from "../health-auditor.js";
-import { outputJson, banner } from "../formatting.js";
-import { output, outputBlank } from "../output.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { discoverArtifacts, discoverRelations, analyzeGraph, saveArtifacts, saveRelations } from "../knowledge-graph.js";
-import { muteLogs } from "../logger.js";
+import { writeHealthReport, issueFingerprint, type HealthAuditReport } from "../application/health-auditor.js";
+import { outputJson, banner } from "../shared/formatting.js";
+import { output, outputBlank } from "../shared/output.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { discoverArtifacts, discoverRelations, analyzeGraph, saveArtifacts, saveRelations } from "../infrastructure/knowledge-graph.js";
+import { muteLogs } from "../shared/logger.js";
 import { loadSuppressions, addSuppression } from "../audit/suppression.js";
 
-import { printDaemonBanner } from "../daemon-context-banner.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
 import { displayWhatWasMeasured } from "./audit/display.js";
 import { runAuditExecution, handleJsonOutput, displayHumanPostAudit } from "./audit/handlers.js";
 

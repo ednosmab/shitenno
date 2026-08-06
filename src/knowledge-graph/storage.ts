@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import type { Artifact, Relation } from "./types.js";
 
 const GRAPH_DIR = "governance/knowledge-graph";

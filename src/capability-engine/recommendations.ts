@@ -1,4 +1,4 @@
-import type { MaturityDimensions } from "../maturity-profile.js";
+import type { MaturityDimensions } from "../application/maturity-profile.js";
 import type { CapabilityEntity, CapabilityRecommendation } from "./types.js";
 
 function computeRelevance(cap: CapabilityEntity, dimensions: MaturityDimensions): number {

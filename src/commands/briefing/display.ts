@@ -7,12 +7,12 @@
 import chalk from "chalk";
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { briefingToMarkdown, briefingToJson, type Briefing } from "../../briefing.js";
-import { differentialBriefing, generateOptimizationHints, type BriefingDepth } from "../../token-optimizer.js";
-import { outputJson, banner } from "../../formatting.js";
-import { output, outputBlank, outputSection } from "../../output.js";
-import { getPendingChallenges, getActionCommand, type PendingChallenge } from "../../challenge-responder.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import { briefingToMarkdown, briefingToJson, type Briefing } from "../../application/briefing.js";
+import { differentialBriefing, generateOptimizationHints, type BriefingDepth } from "../../domain/rules/token-optimizer.js";
+import { outputJson, banner } from "../../shared/formatting.js";
+import { output, outputBlank, outputSection } from "../../shared/output.js";
+import { getPendingChallenges, getActionCommand, type PendingChallenge } from "../../infrastructure/challenge-responder.js";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 

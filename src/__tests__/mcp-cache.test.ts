@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { withCache, invalidateCache, clearCache, getCacheStats } from "../mcp-cache.js";
+import { withCache, invalidateCache, clearCache, getCacheStats } from "../infrastructure/mcp-cache.js";
 
 describe("mcp-cache", () => {
   beforeEach(() => {

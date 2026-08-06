@@ -4,7 +4,7 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 
 const DAEMON_STATE_FILE = "daemon-state.json";
 

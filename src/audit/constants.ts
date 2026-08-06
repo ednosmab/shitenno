@@ -22,7 +22,7 @@ export const SOURCE_SKIP_PATTERNS = [/\.test\.(ts|tsx|js|jsx)$/, /\.bench\.(ts|t
 
 // ── Violation Keywords ───────────────────────────────────────────────────────
 // Re-export from single source of truth in src/constants.ts
-export { VIOLATION_KEYWORDS } from "../constants.js";
+export { VIOLATION_KEYWORDS } from "../domain/types/constants.js";
 
 // ── Blocked Licenses ─────────────────────────────────────────────────────────
 

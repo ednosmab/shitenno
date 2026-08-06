@@ -8,7 +8,7 @@ import {
   getEngineeringRiskScore,
   getKnowledgeHealthScore,
   getOverallHealth,
-} from "../health-score-registry.js";
+} from "../domain/rules/health-score-registry.js";
 
 describe("health-score-registry", () => {
   describe("getCodeSecurityScore", () => {

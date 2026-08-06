@@ -6,9 +6,9 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import type { HealthIssue } from "../types.js";
-import { listSkills } from "../../knowledge-loader.js";
+import { listSkills } from "../../infrastructure/knowledge-loader.js";
 import { ISSUE_TYPE_TO_SKILL } from "../skill-refs.js";
 
 /**

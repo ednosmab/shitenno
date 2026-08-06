@@ -21,7 +21,7 @@ export {
   saveEngineeringState,
   loadEngineeringState,
   engineeringStateToText,
-} from "../engineering-state.js";
+} from "../application/engineering-state.js";
 
 // Re-export from sub-modules
 export { getEngineeringState, clearEngineeringStateCache, isInitialized } from "./access.js";

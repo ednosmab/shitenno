@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { logger, setLogLevel, muteLogs } from "../logger.js";
+import { logger, setLogLevel, muteLogs } from "../shared/logger.js";
 
 // ── Logger SHITENNO_QUIET tests ────────────────────────────────────────────────
 

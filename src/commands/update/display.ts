@@ -2,14 +2,14 @@ import chalk from "chalk";
 import fse from "fs-extra";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { type ManifestDiff } from "../../manifest.js";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { outputJson } from "../../formatting.js";
-import { output, outputBlank, outputSection, outputSuccess, outputError, outputWarning } from "../../output.js";
+import { type ManifestDiff } from "../../infrastructure/manifest.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import { outputJson } from "../../shared/formatting.js";
+import { output, outputBlank, outputSection, outputSuccess, outputError, outputWarning } from "../../shared/output.js";
 
 const { copySync, ensureDirSync, removeSync } = fse;
 
-import { getTemplatesDir } from "../../paths.js";
+import { getTemplatesDir } from "../../shared/paths.js";
 
 function hasChanges(diff: ManifestDiff): boolean {
   return diff.added.length > 0 || diff.removed.length > 0 || diff.changed.length > 0 || (diff.conflict?.length ?? 0) > 0;

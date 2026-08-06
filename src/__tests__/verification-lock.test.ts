@@ -20,7 +20,7 @@ import { tmpdir } from "node:os";
 import {
   acquireVerificationLock,
   releaseVerificationLock,
-} from "../verification-lock.js";
+} from "../infrastructure/verification-lock.js";
 
 function createTempDir(): string {
   const dir = join(

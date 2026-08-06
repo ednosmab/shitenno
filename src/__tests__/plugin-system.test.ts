@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getHookBus, resetHookBus, type ShitennoPlugin } from "../plugin-system.js";
+import { getHookBus, resetHookBus, type ShitennoPlugin } from "../infrastructure/plugin-system.js";
 
 describe("PluginSystem", () => {
   beforeEach(() => {

@@ -14,9 +14,9 @@ import {
   IncrementalConsolidator,
   type StateDelta,
 } from "../engineering-state/index.js";
-import type { EngineeringState, EngineeringAsset, AssetType } from "../engineering-state.js";
-import type { ShitennoLifecycleState } from "../shitenno-state-machine.js";
-import { resetEventBus } from "../event-bus.js";
+import type { EngineeringState, EngineeringAsset, AssetType } from "../application/engineering-state.js";
+import type { ShitennoLifecycleState } from "../infrastructure/shitenno-state-machine.js";
+import { resetEventBus } from "../infrastructure/event-bus.js";
 
 // ── CapabilityLifecycleTracker Tests ───────────────────────────────────────
 

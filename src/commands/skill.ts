@@ -11,10 +11,10 @@
 import { Command } from "commander";
 import { join } from "node:path";
 import chalk from "chalk";
-import { output, outputBlank } from "../output.js";
-import { outputJson } from "../formatting.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { createSkillFile, listSkillFiles, validateSkillFile } from "../skill-io.js";
+import { output, outputBlank } from "../shared/output.js";
+import { outputJson } from "../shared/formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { createSkillFile, listSkillFiles, validateSkillFile } from "../infrastructure/skill-io.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

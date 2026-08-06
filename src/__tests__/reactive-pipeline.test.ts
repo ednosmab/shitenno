@@ -12,7 +12,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { join, dirname } from "node:path";
 import { mkdirSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { getEventBus, resetEventBus, enableEventPersistence, readPersistedEvents } from "../event-bus.js";
+import { getEventBus, resetEventBus, enableEventPersistence, readPersistedEvents } from "../infrastructure/event-bus.js";
 import {
   initializeRuleEngine,
   loadRules,
@@ -21,7 +21,7 @@ import {
   getDefaultRules,
   type Rule,
   type RuleContext,
-} from "../rule-engine.js";
+} from "../application/rule-engine.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

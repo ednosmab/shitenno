@@ -12,16 +12,16 @@ import chalk from "chalk";
 // block and `ensureHeavyBootstrap`) so that lightweight commands never pay the
 // cost of loading or initializing subsystems they don't use.
 
-import { getEventBus, enableEventPersistence } from "../src/event-bus.js";
-import { startSession, endSession } from "../src/session-tracker.js";
-import { setSessionContext, clearSessionContext } from "../src/session-context.js";
-import { installMiddleware } from "../src/cli-middleware.js";
-import { setGlobalJsonMode, isGlobalJsonMode, output as outputCli } from "../src/output.js";
+import { getEventBus, enableEventPersistence } from "../src/infrastructure/event-bus.js";
+import { startSession, endSession } from "../src/infrastructure/session-tracker.js";
+import { setSessionContext, clearSessionContext } from "../src/shared/session-context.js";
+import { installMiddleware } from "../src/interface/cli/cli-middleware.js";
+import { setGlobalJsonMode, isGlobalJsonMode, output as outputCli } from "../src/shared/output.js";
 import { stopWatching } from "../src/infrastructure/persistence/file-watcher.js";
-import { COMMAND_CATEGORIES, findCommand } from "../src/help-data.js";
-import { SHITENNO_DIR_NAME } from "../src/constants.js";
-import { initDesktopNotifier } from "../src/desktop-notifier.js";
-import { resolveBacklogPaths } from "../src/backlog-core.js";
+import { COMMAND_CATEGORIES, findCommand } from "../src/domain/types/help-data.js";
+import { SHITENNO_DIR_NAME } from "../src/domain/types/constants.js";
+import { initDesktopNotifier } from "../src/infrastructure/desktop-notifier.js";
+import { resolveBacklogPaths } from "../src/application/backlog-core.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -120,15 +120,15 @@ async function ensureHeavyBootstrap(): Promise<void> {
   if (heavyBootstrapDone || !isInitialized) return;
   heavyBootstrapDone = true;
 
-  const { initializeRules, initializeRuleEngine } = await import("../src/rule-engine.js");
-  const { initializeKnowledgeGraph } = await import("../src/knowledge-graph.js");
-  const { initializeCapabilityEngine } = await import("../src/capability-engine.js");
-  const { initializeEngineeringState, consolidateEngineeringState } = await import("../src/engineering-state.js");
+  const { initializeRules, initializeRuleEngine } = await import("../src/application/rule-engine.js");
+  const { initializeKnowledgeGraph } = await import("../src/infrastructure/knowledge-graph.js");
+  const { initializeCapabilityEngine } = await import("../src/application/capability-engine.js");
+  const { initializeEngineeringState, consolidateEngineeringState } = await import("../src/application/engineering-state.js");
   const { initializeProactiveEngine } = await import("../src/prioritization/triggers.js");
-  const { initializeFromAnswers } = await import("../src/model-config.js");
-  const { registerDocSyncHook } = await import("../src/doc-sync-hook.js");
-  const { DocEngine } = await import("../src/doc-engine.js");
-  const { initPlanBacklogSync } = await import("../src/plan-backlog-sync.js");
+  const { initializeFromAnswers } = await import("../src/infrastructure/model-config.js");
+  const { registerDocSyncHook } = await import("../src/infrastructure/doc-sync-hook.js");
+  const { DocEngine } = await import("../src/infrastructure/doc-engine.js");
+  const { initPlanBacklogSync } = await import("../src/application/plan-backlog-sync.js");
 
   enableEventPersistence(shitennoDir);
   getEventBus().enableDeadLetterQueue(shitennoDir);
@@ -187,8 +187,8 @@ async function autoRegenerateBriefing(projectRoot: string, shitennoDir: string):
   const ageMs = Date.now() - stat.mtimeMs;
   if (ageMs <= 86400000) return;
 
-  const { collectContext } = await import("../src/context-collector.js");
-  const { briefingToMarkdown } = await import("../src/briefing.js");
+  const { collectContext } = await import("../src/application/context-collector.js");
+  const { briefingToMarkdown } = await import("../src/application/briefing.js");
   const { writeFileSync } = await import("node:fs");
   const snapshot = collectContext(projectRoot, shitennoDir);
   const md = briefingToMarkdown(snapshot.briefing);
@@ -448,7 +448,7 @@ program.hook("preAction", async (_thisCommand, actionCommand) => {
   if (planBacklogScanDone) return;
   if (PLAN_BACKLOG_COMMANDS.has(fullCommandPath(actionCommand)) && isInitialized) {
     planBacklogScanDone = true;
-    const { runRetroactiveScan } = await import("../src/plan-backlog-sync.js");
+    const { runRetroactiveScan } = await import("../src/application/plan-backlog-sync.js");
     runRetroactiveScan(projectRoot, shitennoDir);
   }
 });

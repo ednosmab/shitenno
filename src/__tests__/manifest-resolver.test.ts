@@ -10,7 +10,7 @@ import {
   resolveEntries,
   partitionEntries,
   type ManifestEntry,
-} from "../manifest-resolver.js";
+} from "../domain/rules/manifest-resolver.js";
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 

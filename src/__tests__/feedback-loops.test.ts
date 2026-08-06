@@ -10,7 +10,7 @@ import {
   adjustConfidence,
   shouldSuppress,
   detectFeedbackPatterns,
-} from "../feedback-loops.js";
+} from "../application/feedback-loops.js";
 
 let tempDir: string;
 

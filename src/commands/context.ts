@@ -8,12 +8,12 @@
  */
 
 import { getEngineeringState } from "../engineering-state/index.js";
-import { generateForecast } from "../trend-engine.js";
-import { logger } from "../logger.js";
+import { generateForecast } from "../domain/rules/trend-engine.js";
+import { logger } from "../shared/logger.js";
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 import chalk from "chalk";
-import { output, outputBlank } from "../output.js";
+import { output, outputBlank } from "../shared/output.js";
 import { Command } from "commander";
 
 

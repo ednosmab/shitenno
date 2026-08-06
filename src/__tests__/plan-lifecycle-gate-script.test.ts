@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { checkTests } from "../plan-lifecycle.js";
+import { checkTests } from "../application/plan-lifecycle.js";
 
 describe("checkTests — usa test:unit quando disponível, nunca a suíte pesada", () => {
   it("roda test:unit, não test, quando ambos existem", () => {

@@ -7,7 +7,7 @@ import {
   detectLifecycleState,
   createStateMachine,
   canRunCommand,
-} from "../shitenno-state-machine.js";
+} from "../infrastructure/shitenno-state-machine.js";
 
 let tempDir: string;
 

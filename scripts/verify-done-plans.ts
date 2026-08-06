@@ -9,7 +9,7 @@ let failed = false;
 function checkForDirectDoneWrites(): boolean {
   try {
     const output = execSync(
-      `grep -rn 'updateStatus([^,]*,\\\\s*["\\\\']done["\\\\']' src --include="*.ts" | grep -v "src/plan-lifecycle.ts" | grep -v "__tests__"`,
+      `grep -rn 'updateStatus([^,]*,\\\\s*["\\\\']done["\\\\']' src --include="*.ts" | grep -v "src/application/plan-lifecycle.ts" | grep -v "__tests__"`,
       { encoding: "utf-8" }
     );
     if (output.trim()) {

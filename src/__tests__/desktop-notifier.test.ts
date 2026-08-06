@@ -3,14 +3,14 @@ import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
-vi.mock("../notify.js", () => ({
+vi.mock("../infrastructure/notify.js", () => ({
   sendDesktopNotification: vi.fn(() => true),
   logNotificationOnly: vi.fn(),
 }));
 
-import { initDesktopNotifier, _resetForTesting } from "../desktop-notifier.js";
-import { sendDesktopNotification, logNotificationOnly } from "../notify.js";
-import { getEventBus } from "../event-bus.js";
+import { initDesktopNotifier, _resetForTesting } from "../infrastructure/desktop-notifier.js";
+import { sendDesktopNotification, logNotificationOnly } from "../infrastructure/notify.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 
 describe("desktop-notifier", () => {
   let testDir: string;

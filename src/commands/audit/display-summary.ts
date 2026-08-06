@@ -3,10 +3,10 @@
  */
 
 import chalk from "chalk";
-import { healthBar } from "../../formatting.js";
-import { output, outputBlank } from "../../output.js";
+import { healthBar } from "../../shared/formatting.js";
+import { output, outputBlank } from "../../shared/output.js";
 import { dimensionIcon, dimensionLabel, type AuditDimension } from "../../audit/dimensions.js";
-import { issueFingerprint, type HealthAuditReport } from "../../health-auditor.js";
+import { issueFingerprint, type HealthAuditReport } from "../../application/health-auditor.js";
 import type { AuditActionCtx } from "./types.js";
 import { categorizeIssues, groupByType, formatTypeGroup, identifyQuickWins } from "./reporter.js";
 import { displayIssueCategory } from "./display.js";

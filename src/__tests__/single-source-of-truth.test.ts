@@ -2,10 +2,10 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { scaffoldShitenno } from "../scaffolder.js";
+import { scaffoldShitenno } from "../infrastructure/scaffolder.js";
 import { getEngineeringState } from "../engineering-state/index.js";
-import type { UserAnswers } from "../prompts.js";
-import type { Capability } from "../maturity-profile.js";
+import type { UserAnswers } from "../interface/cli/prompts.js";
+import type { Capability } from "../application/maturity-profile.js";
 
 let testDir: string;
 

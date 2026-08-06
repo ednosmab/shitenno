@@ -4,7 +4,7 @@ import {
   getSessionId,
   getSessionStartedAt,
   clearSessionContext,
-} from "../session-context.js";
+} from "../shared/session-context.js";
 
 beforeEach(() => {
   clearSessionContext();

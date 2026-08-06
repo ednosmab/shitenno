@@ -8,8 +8,8 @@
 
 import { Command } from "commander";
 import chalk from "chalk";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { outputJson, healthBar as sharedHealthBar } from "../formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { outputJson, healthBar as sharedHealthBar } from "../shared/formatting.js";
 import { collectConsoleData } from "../console/data-collector.js";
 
 export function dashboardCommand(): Command {

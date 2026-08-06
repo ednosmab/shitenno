@@ -12,7 +12,7 @@
 
 import { existsSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
-import { execAsync } from "../../exec-async.js";
+import { execAsync } from "../../infrastructure/exec-async.js";
 
 export const WORKTREE_BRANCH = "shitenno/init";
 

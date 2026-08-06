@@ -9,10 +9,10 @@ import chalk from "chalk";
 // eslint-disable-next-line no-restricted-imports -- daemon log viewer needs direct fs access
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { guardNotInitialized } from "../shared.js";
-import { isDaemonRunning, startDaemon, stopDaemon, shouldSkipDaemon, getSocketPath, isDaemonApproved, queryDaemonStatus } from "../daemon-client.js";
-import { DaemonCircuitBreaker } from "../daemon-circuit-breaker.js";
-import { output, outputBlank } from "../output.js";
+import { guardNotInitialized } from "../shared/shared.js";
+import { isDaemonRunning, startDaemon, stopDaemon, shouldSkipDaemon, getSocketPath, isDaemonApproved, queryDaemonStatus } from "../infrastructure/daemon-client.js";
+import { DaemonCircuitBreaker } from "../infrastructure/daemon-circuit-breaker.js";
+import { output, outputBlank } from "../shared/output.js";
 import { colorizeLogLine, displayRunningDaemonStatus, attachToDaemonLog } from "./daemon/display.js";
 
 async function handleStartAction(opts: Record<string, unknown>): Promise<void> {
@@ -177,7 +177,7 @@ async function handleNotificationsAction(opts: Record<string, unknown>): Promise
   const ctx = guardNotInitialized(opts, false);
   if (!ctx) return;
 
-  const { readNotificationLog } = await import("../notify.js");
+  const { readNotificationLog } = await import("../infrastructure/notify.js");
   const entries = readNotificationLog(ctx.shitennoDir, { last: Number(opts.lines) || 20 });
 
   if (entries.length === 0) {

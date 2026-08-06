@@ -5,9 +5,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { logger } from "../logger.js";
-import { getEventBus } from "../event-bus.js";
-import type { Reminder, ReminderPriority, ReminderCategory } from "../briefing.js";
+import { logger } from "../shared/logger.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import type { Reminder, ReminderPriority, ReminderCategory } from "../application/briefing.js";
 
 export interface QuickBoardResult {
   currentTask: string;

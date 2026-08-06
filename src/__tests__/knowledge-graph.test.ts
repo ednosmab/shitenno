@@ -19,7 +19,7 @@ import {
   analyzeGraph,
   type Artifact,
   type Relation,
-} from "../knowledge-graph.js";
+} from "../infrastructure/knowledge-graph.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { extractKeywords, detectDrift, detectDriftBatch, scanCodebase, type CodebaseFacts } from "../semantic-drift-detector.js";
+import { extractKeywords, detectDrift, detectDriftBatch, scanCodebase, type CodebaseFacts } from "../infrastructure/semantic-drift-detector.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

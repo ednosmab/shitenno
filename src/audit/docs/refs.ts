@@ -6,10 +6,10 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import type { HealthIssue } from "../types.js";
 import { collectBacktickRefs, isTemplateRef, refExists } from "./helpers.js";
-import { EXTERNAL_INDEX_REL_PATH } from "../../constants.js";
+import { EXTERNAL_INDEX_REL_PATH } from "../../domain/types/constants.js";
 
 interface ExternalManifestEntry {
   type: string;

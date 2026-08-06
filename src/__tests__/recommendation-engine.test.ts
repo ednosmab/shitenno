@@ -4,8 +4,8 @@ import {
   recommendationEngineToText,
   type RecommendationEngineResult,
 } from "../prioritization/recommend.js";
-import type { EngineeringState } from "../engineering-state.js";
-import type { CapabilityEngineResult } from "../capability-engine.js";
+import type { EngineeringState } from "../application/engineering-state.js";
+import type { CapabilityEngineResult } from "../application/capability-engine.js";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";

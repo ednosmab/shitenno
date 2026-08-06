@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { resetEventBus, getEventBus } from "../event-bus.js";
+import { resetEventBus, getEventBus } from "../infrastructure/event-bus.js";
 
 describe("event-topology", () => {
   let bus: ReturnType<typeof getEventBus>;

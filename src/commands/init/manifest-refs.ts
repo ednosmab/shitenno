@@ -9,7 +9,7 @@
 
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
-import { EXTERNAL_INDEX_REL_PATH } from "../../constants.js";
+import { EXTERNAL_INDEX_REL_PATH } from "../../domain/types/constants.js";
 import type { GovernanceInventory } from "./discovery.js";
 
 export { EXTERNAL_INDEX_REL_PATH };

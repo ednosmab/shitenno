@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { existsSync, readFileSync, createReadStream, statSync } from "node:fs";
 import { join } from "node:path";
-import { output, outputBlank } from "../../output.js";
-import { isDaemonRunning } from "../../daemon-client.js";
+import { output, outputBlank } from "../../shared/output.js";
+import { isDaemonRunning } from "../../infrastructure/daemon-client.js";
 import { colorizeLogLine } from "./display.js";
 
 export async function attachToDaemonLog(logPath: string, numLines: number): Promise<void> {
@@ -52,7 +52,7 @@ export async function attachToDaemonLog(logPath: string, numLines: number): Prom
 }
 
 export async function handleLogsAction(opts: Record<string, unknown>): Promise<void> {
-  const { guardNotInitialized } = await import("../../shared.js");
+  const { guardNotInitialized } = await import("../../shared/shared.js");
   const ctx = guardNotInitialized(opts, false);
   if (!ctx) return;
 

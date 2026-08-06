@@ -8,7 +8,7 @@ import {
   runUndo,
   type RestoreResult,
 } from "../commands/init/restore.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 function makeDir(prefix: string): string {
   const dir = mkdtempSync(join(tmpdir(), `shitenno-restore-${prefix}-`));

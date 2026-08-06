@@ -7,7 +7,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 

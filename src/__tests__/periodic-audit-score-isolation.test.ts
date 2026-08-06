@@ -45,12 +45,12 @@ function makeCtx(projectRoot: string) {
   };
 }
 
-vi.mock("../health-auditor.js", () => ({
+vi.mock("../application/health-auditor.js", () => ({
   auditHealth: vi.fn(),
 }));
 
 import { runPeriodicAudit } from "../daemon/timers.js";
-import { auditHealth } from "../health-auditor.js";
+import { auditHealth } from "../application/health-auditor.js";
 
 describe("runPeriodicAudit — metric isolation", () => {
   beforeEach(() => {

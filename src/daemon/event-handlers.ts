@@ -4,15 +4,15 @@
  * Extracted from daemon/index.ts to keep modules focused.
  */
 
-import { getEventBus } from "../event-bus.js";
-import type { ResourceClaimedPayload, ResourceReleasedPayload } from "../event-payloads.js";
-import { LRUCache } from "../daemon-resources.js";
-import { checkAndArchiveDonePlans } from "../plan-lifecycle.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import type { ResourceClaimedPayload, ResourceReleasedPayload } from "../domain/types/event-payloads.js";
+import { LRUCache } from "../domain/types/daemon-resources.js";
+import { checkAndArchiveDonePlans } from "../application/plan-lifecycle.js";
 import { moveCompletedBacklogToDone } from "./startup-scan.js";
 import { recordEvent, recordNotificationStat, MAX_SESSIONS } from "./state.js";
 import { daemonLog } from "./log-rotation.js";
 import type { DaemonContext } from "./pid-manager.js";
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
 import { subscribeObservabilityEvents } from "./observability-handlers.js";
 
 // ── Resource Arbitration ────────────────────────────────────────────────────

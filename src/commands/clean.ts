@@ -2,12 +2,12 @@ import { Command } from "commander";
 import { existsSync, unlinkSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import chalk from "chalk";
-import { invalidateCache } from "../cache.js";
-import { outputJson, banner } from "../formatting.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { logger } from "../logger.js";
-import { output, outputBlank } from "../output.js";
+import { invalidateCache } from "../infrastructure/cache.js";
+import { outputJson, banner } from "../shared/formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { logger } from "../shared/logger.js";
+import { output, outputBlank } from "../shared/output.js";
 
 function removeCacheFile(projectRoot: string): string | null {
   const cachePath = join(projectRoot, ".shitenno-cache.json");

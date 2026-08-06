@@ -9,7 +9,7 @@
  * the same output. No randomness, no LLMs, no ambiguity.
  */
 
-import type { EventEnvelope } from "../event-bus.js";
+import type { EventEnvelope } from "../infrastructure/event-bus.js";
 import type {
   SemanticClassification,
   SemanticDomain,

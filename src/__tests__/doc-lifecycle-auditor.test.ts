@@ -10,7 +10,7 @@ import {
   applyMoves,
   type DocumentInfo,
   type DetectionSignals,
-} from "../doc-lifecycle-auditor.js";
+} from "../application/doc-lifecycle-auditor.js";
 
 let tempDir: string;
 let shitennoDir: string;

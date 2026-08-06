@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("../briefing-cache.js", () => ({
+vi.mock("../infrastructure/briefing-cache.js", () => ({
   readCache: vi.fn(),
 }));
 
-vi.mock("../session-feedback.js", () => ({
+vi.mock("../infrastructure/session-feedback.js", () => ({
   recordOutcome: vi.fn(),
   createFileStorage: vi.fn(),
 }));
 
-import { readCache } from "../briefing-cache.js";
-import { recordOutcome, createFileStorage } from "../session-feedback.js";
+import { readCache } from "../infrastructure/briefing-cache.js";
+import { recordOutcome, createFileStorage } from "../infrastructure/session-feedback.js";
 import { handleSubmitFeedback } from "../mcp-handlers/context.js";
 
 const mockReadCache = vi.mocked(readCache);

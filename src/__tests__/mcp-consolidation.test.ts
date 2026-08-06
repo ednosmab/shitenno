@@ -15,11 +15,11 @@ vi.mock("node:child_process", () => ({
   spawn: (...args: unknown[]) => mockSpawn(...args),
 }));
 
-vi.mock("../logger.js", () => ({
+vi.mock("../shared/logger.js", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
 
-import { scheduleConsolidation } from "../mcp-consolidation.js";
+import { scheduleConsolidation } from "../interface/mcp/mcp-consolidation.js";
 
 // ── Tests ───────────────────────────────────────────────────────────────────
 

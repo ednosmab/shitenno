@@ -16,10 +16,10 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ActionType, RuleAction, RuleContext } from "../domain/rules/rule.js";
 import { PolicyEngine, FilePolicyRepository } from "../rule-engine/index.js";
-import { computeExecutionHash, type ExecutionRecord } from "../action-engine.js";
+import { computeExecutionHash, type ExecutionRecord } from "../application/action-engine.js";
 import { checkPolicyGate } from "./policy-gate.js";
 import { checkPrecedence, getResourceId, type InvokeMode } from "./precedence.js";
-import { claimResource, releaseResource } from "../resource-claims.js";
+import { claimResource, releaseResource } from "../application/resource-claims.js";
 import type { ActionExecutor } from "./executors/types.js";
 import {
   RunScriptExecutor,

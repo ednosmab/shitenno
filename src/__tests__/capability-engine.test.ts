@@ -7,8 +7,8 @@ import {
   capabilityEngineToText,
   type CapabilityEngineResult,
   type CapabilityEntity,
-} from "../capability-engine.js";
-import type { EngineeringState } from "../engineering-state.js";
+} from "../application/capability-engine.js";
+import type { EngineeringState } from "../application/engineering-state.js";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";

@@ -17,14 +17,14 @@ import {
   type PerformanceReport,
   type DimensionReport,
   type Insight,
-} from "../performance-reporter.js";
-import { healthBar, outputJson } from "../formatting.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
-import { METRIC_LABELS, type PerformanceMetric } from "../feedback-loops.js";
-import { output, outputBlank, outputSection } from "../output.js";
-import { logger } from "../logger.js";
+} from "../application/performance-reporter.js";
+import { healthBar, outputJson } from "../shared/formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
+import { METRIC_LABELS, type PerformanceMetric } from "../application/feedback-loops.js";
+import { output, outputBlank, outputSection } from "../shared/output.js";
+import { logger } from "../shared/logger.js";
 
 // ── Formatting Helpers ───────────────────────────────────────────────────────
 

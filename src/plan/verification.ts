@@ -8,8 +8,8 @@ import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { CompletionCheck, VerificationRecord } from "../plan-lifecycle.js";
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
+import type { CompletionCheck, VerificationRecord } from "../application/plan-lifecycle.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
 import { checkBuild, checkTests, checkLint, checkGateIntegrity, checkDocumentation, checkPlanFormat } from "./checks.js";
 
 export function computeDiffHash(projectRoot: string): string {

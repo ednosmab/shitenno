@@ -9,7 +9,7 @@ import {
   calculateGrowthCapacity,
   calculateChallengeLevel,
   detectGrowthPatterns,
-} from "../growth-profile.js";
+} from "../infrastructure/growth-profile.js";
 
 let tempDir: string;
 let shitennoDir: string;

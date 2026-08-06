@@ -4,8 +4,8 @@
  * Extracted from daemon/index.ts to keep modules focused.
  */
 
-import { killActiveProcesses } from "../exec-async.js";
-import { releaseVerificationLock } from "../verification-lock.js";
+import { killActiveProcesses } from "../infrastructure/exec-async.js";
+import { releaseVerificationLock } from "../infrastructure/verification-lock.js";
 import { persistState } from "./state.js";
 import { cleanup } from "./pid-manager.js";
 import { cleanupSemanticLayer } from "./semantic-runner.js";

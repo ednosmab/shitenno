@@ -1,4 +1,4 @@
-import type { EngineeringState, EngineeringAsset } from "../../engineering-state.js";
+import type { EngineeringState, EngineeringAsset } from "../../application/engineering-state.js";
 
 export const MAX_STATE_EVENTS = 10_000;
 export const MAX_CAPABILITY_HISTORY = 50;

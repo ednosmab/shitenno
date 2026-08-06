@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import type { HealthIssue } from "../types.js";
 
 export function detectRuleExecutionCompliance(shitennoDir: string): HealthIssue[] {

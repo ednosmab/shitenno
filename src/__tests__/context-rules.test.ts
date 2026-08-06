@@ -3,9 +3,9 @@ import {
   generateContextRules,
   contextRulesToMarkdown,
   type ContextRule,
-} from "../context-rules.js";
-import type { ProjectFingerprint } from "../project-fingerprint.js";
-import type { RiskMap } from "../risk-map.js";
+} from "../domain/rules/context-rules.js";
+import type { ProjectFingerprint } from "../infrastructure/project-fingerprint.js";
+import type { RiskMap } from "../infrastructure/risk-map.js";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 

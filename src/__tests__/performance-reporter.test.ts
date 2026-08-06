@@ -5,9 +5,9 @@ import { tmpdir } from "node:os";
 import {
   generatePerformanceReport,
   writePerformanceReport,
-} from "../performance-reporter.js";
-import { recordDimensionFeedback } from "../feedback-loops.js";
-import { startSession, trackCommand, trackFeedback, endSession } from "../session-tracker.js";
+} from "../application/performance-reporter.js";
+import { recordDimensionFeedback } from "../application/feedback-loops.js";
+import { startSession, trackCommand, trackFeedback, endSession } from "../infrastructure/session-tracker.js";
 
 let tempDir: string;
 let shitennoDir: string;

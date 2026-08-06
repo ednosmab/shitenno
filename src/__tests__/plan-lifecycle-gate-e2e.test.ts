@@ -15,7 +15,7 @@ import { createHash } from "node:crypto";
 
 // ── Mocks ────────────────────────────────────────────────────────────────
 
-vi.mock("../logger.js", () => ({
+vi.mock("../shared/logger.js", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
@@ -47,8 +47,8 @@ vi.mock("node:child_process", async (importOriginal) => {
   };
 });
 
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
-import { runAutoVerification, checkDocumentation } from "../plan-lifecycle.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
+import { runAutoVerification, checkDocumentation } from "../application/plan-lifecycle.js";
 
 // Track sync:docs call behavior for auto-fix tests
 let syncDocsFailCount = 0;

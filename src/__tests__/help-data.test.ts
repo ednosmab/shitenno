@@ -3,7 +3,7 @@ import {
   COMMAND_CATEGORIES,
   findCommand,
   getAllCommandNames,
-} from "../help-data.js";
+} from "../domain/types/help-data.js";
 
 // ── COMMAND_CATEGORIES ─────────────────────────────────────────────────────
 

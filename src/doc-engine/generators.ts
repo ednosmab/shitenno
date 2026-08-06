@@ -1,4 +1,4 @@
-import type { EngineeringState, EngineeringAsset, AssetType } from "../engineering-state.js";
+import type { EngineeringState, EngineeringAsset, AssetType } from "../application/engineering-state.js";
 
 export function generateSystemMap(state: EngineeringState): string {
   const lines: string[] = [

@@ -6,32 +6,32 @@ import { describe, it, expect } from "vitest";
 
 describe("Orphaned Modules Activation (Phase E)", () => {
   it("doc-engine.ts exports DocEngine class", async () => {
-    const mod = await import("../doc-engine.js");
+    const mod = await import("../infrastructure/doc-engine.js");
     expect(typeof mod.DocEngine).toBe("function");
   });
 
   it("context-buffer-writer.ts exports expected functions", async () => {
-    const mod = await import("../context-buffer-writer.js");
+    const mod = await import("../application/context-buffer-writer.js");
     expect(typeof mod.updateSession).toBe("function");
   });
 
   it("advanced-infrastructure.ts exports DeadLetterQueue", async () => {
-    const mod = await import("../advanced-infrastructure.js");
+    const mod = await import("../infrastructure/advanced-infrastructure.js");
     expect(typeof mod.DeadLetterQueue).toBe("function");
   });
 
   it("doc-sync-hook.ts exports registerDocSyncHook", async () => {
-    const mod = await import("../doc-sync-hook.js");
+    const mod = await import("../infrastructure/doc-sync-hook.js");
     expect(typeof mod.registerDocSyncHook).toBe("function");
   });
 
   it("validation.ts exports expected functions", async () => {
-    const mod = await import("../validation.js");
+    const mod = await import("../infrastructure/validation.js");
     expect(typeof mod.safeJsonParse).toBe("function");
   });
 
   it("errors.ts exports expected functions", async () => {
-    const mod = await import("../errors.js");
+    const mod = await import("../domain/types/errors.js");
     expect(typeof mod.ShitennoError).toBe("function");
   });
 

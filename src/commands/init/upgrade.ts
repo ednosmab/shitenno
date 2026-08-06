@@ -10,8 +10,8 @@
 import { resolve } from "node:path";
 import inquirer from "inquirer";
 import { existsSync } from "node:fs";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { output, outputBlank } from "../../output.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import { output, outputBlank } from "../../shared/output.js";
 import { discoverProject } from "./discovery.js";
 import {
   getConsentFilePath,

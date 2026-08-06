@@ -4,9 +4,9 @@ import { promisify } from "node:util";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { scaffoldShitenno, type ScaffoldResult } from "../scaffolder.js";
-import type { UserAnswers } from "../prompts.js";
-import type { Capability } from "../maturity-profile.js";
+import { scaffoldShitenno, type ScaffoldResult } from "../infrastructure/scaffolder.js";
+import type { UserAnswers } from "../interface/cli/prompts.js";
+import type { Capability } from "../application/maturity-profile.js";
 
 const execAsync = promisify(exec);
 

@@ -1,7 +1,7 @@
-import { type EngineeringState, consolidateEngineeringState } from "../../engineering-state.js";
-import { detectKnowledgeDebt, type KnowledgeDebtReport } from "../../knowledge-debt.js";
-import { getEngineeringRiskScore } from "../../health-score-registry.js";
-import { logger } from "../../logger.js";
+import { type EngineeringState, consolidateEngineeringState } from "../../application/engineering-state.js";
+import { detectKnowledgeDebt, type KnowledgeDebtReport } from "../../application/knowledge-debt.js";
+import { getEngineeringRiskScore } from "../../domain/rules/health-score-registry.js";
+import { logger } from "../../shared/logger.js";
 
 export interface DoctorFinding {
   category: "risk" | "improvement" | "info" | "teaching";

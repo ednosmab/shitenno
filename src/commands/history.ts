@@ -8,12 +8,12 @@
 
 import { Command } from "commander";
 import chalk from "chalk";
-import { guardNotInitialized } from "../shared.js";
-import { outputJson } from "../formatting.js";
+import { guardNotInitialized } from "../shared/shared.js";
+import { outputJson } from "../shared/formatting.js";
 import { listSnapshots, getSnapshotAt, diffSnapshots } from "../engineering-state/index.js";
-import { output, outputBlank } from "../output.js";
+import { output, outputBlank } from "../shared/output.js";
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 function displaySnapshotList(snapshots: Array<{ timestamp: string }>): void {
   output(chalk.bold(`\nEngineering State History (${snapshots.length} snapshots)\n`));

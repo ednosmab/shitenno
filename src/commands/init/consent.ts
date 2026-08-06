@@ -15,7 +15,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import inquirer from "inquirer";
 import { resolveGitCommonDir } from "./git.js";
-import { GIT_METADATA_DIR_NAME } from "../../constants.js";
+import { GIT_METADATA_DIR_NAME } from "../../domain/types/constants.js";
 
 export type ConsentLevel = 1 | 2;
 

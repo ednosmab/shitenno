@@ -11,7 +11,7 @@ import { join } from "node:path";
 import { createHash } from "node:crypto";
 import type { TaintIssue } from "./types.js";
 import { DataFlowGraph } from "./graph.js";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import {
   visit,
   visitSinksOnly,

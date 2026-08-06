@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { generateContext, type ContextOutput } from "../commands/context.js";
 import { clearEngineeringStateCache } from "../engineering-state/index.js";
 
-vi.mock("../daemon-client.js", () => ({
+vi.mock("../infrastructure/daemon-client.js", () => ({
   isDaemonRunning: vi.fn(() => false),
   queryDaemon: vi.fn(() => Promise.resolve(null)),
 }));

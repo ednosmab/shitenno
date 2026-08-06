@@ -16,13 +16,13 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { join } from "node:path";
-import { startMcpServer, TOOLS } from "../mcp-server.js";
-import { scheduleConsolidation } from "../mcp-consolidation.js";
-import { consolidateEngineeringState } from "../engineering-state.js";
+import { startMcpServer, TOOLS } from "../interface/mcp/mcp-server.js";
+import { scheduleConsolidation } from "../interface/mcp/mcp-consolidation.js";
+import { consolidateEngineeringState } from "../application/engineering-state.js";
 import { isInitialized } from "../engineering-state/index.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
-import { outputError } from "../output.js";
-import { logger } from "../logger.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
+import { outputError } from "../shared/output.js";
+import { logger } from "../shared/logger.js";
 
 async function startServerAction(projectRoot: string, shitennoDir: string): Promise<void> {
   logger.info("mcp", `Starting MCP server over stdio...`);

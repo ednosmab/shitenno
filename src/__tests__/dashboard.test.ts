@@ -4,7 +4,7 @@ import { promisify } from "node:util";
 import { mkdirSync, rmSync, writeFileSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { scaffoldShitenno } from "../scaffolder.js";
+import { scaffoldShitenno } from "../infrastructure/scaffolder.js";
 
 const execAsync = promisify(exec);
 const CLI_PATH = resolve(import.meta.dirname, "../../dist/bin/shugo.js");

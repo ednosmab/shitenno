@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { computeKeyChecksums, getCached, setCache, invalidateCache, ShitennoCache } from "../cache.js";
+import { computeKeyChecksums, getCached, setCache, invalidateCache, ShitennoCache } from "../infrastructure/cache.js";
 
 let tempDir: string;
 let shitennoDir: string;

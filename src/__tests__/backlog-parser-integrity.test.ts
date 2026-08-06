@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
-import { parseBacklogItems, parseBacklogWithIntegrity } from "../backlog-core.js";
+import { parseBacklogItems, parseBacklogWithIntegrity } from "../application/backlog-core.js";
 
 // Regression test for a real corruption found by validating the MCP's
 // getBacklog output against docs/backlog/ACTIVE.md: a table block with no

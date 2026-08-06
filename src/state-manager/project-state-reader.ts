@@ -4,8 +4,8 @@
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { analyseProject } from "../analyser.js";
-import { logger } from "../logger.js";
+import { analyseProject } from "../infrastructure/analyser.js";
+import { logger } from "../shared/logger.js";
 import type { ProjectState } from "./types.js";
 
 function loadMaturity(shitennoDir: string): Pick<ProjectState, "maturity" | "installedCapabilities" | "recommendedCapabilities"> {

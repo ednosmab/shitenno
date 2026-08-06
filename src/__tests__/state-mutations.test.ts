@@ -13,8 +13,8 @@ import {
   type StateMutation,
   type MutationSource,
 } from "../engineering-state/index.js";
-import { resetEventBus, getEventBus } from "../event-bus.js";
-import type { EngineeringState } from "../engineering-state.js";
+import { resetEventBus, getEventBus } from "../infrastructure/event-bus.js";
+import type { EngineeringState } from "../application/engineering-state.js";
 
 function createTmpDir(): string {
   const dir = join(tmpdir(), `test-mutations-${Date.now()}`);

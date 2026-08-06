@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { readFileSync, statSync, createReadStream } from "node:fs";
-import { output, outputBlank } from "../../output.js";
-import type { DaemonStatusResponse } from "../../daemon-client.js";
+import { output, outputBlank } from "../../shared/output.js";
+import type { DaemonStatusResponse } from "../../infrastructure/daemon-client.js";
 
 export function formatUptime(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;

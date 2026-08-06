@@ -6,7 +6,7 @@
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import type { HealthIssue } from "../types.js";
 import { KNOWN_CORRECTIONS, EXTENSION_SWAP, DOCS_TO_SCAN, findFileInDirs, isBranchConvention } from "./helpers.js";
 

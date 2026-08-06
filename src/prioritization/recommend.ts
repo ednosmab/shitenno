@@ -10,10 +10,10 @@
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
-import type { EngineeringState } from "../engineering-state.js";
-import type { CapabilityEngineResult } from "../capability-engine.js";
-import { getAllFeedbackSummaries, adjustConfidence, shouldSuppress } from "../feedback-loops.js";
+import { logger } from "../shared/logger.js";
+import type { EngineeringState } from "../application/engineering-state.js";
+import type { CapabilityEngineResult } from "../application/capability-engine.js";
+import { getAllFeedbackSummaries, adjustConfidence, shouldSuppress } from "../application/feedback-loops.js";
 import type { Recommendation, RecommendationSource, RecommendationEngineResult, RecommendationEngineOptions } from "./recommend/types.js";
 import {
   generateFromCapabilityEngine,
@@ -119,7 +119,7 @@ export function runRecommendationEngine(
 
   const allRecommendations: Recommendation[] = [
     ...generateFromCapabilityEngine(capResult),
-    ...generateFromKnowledgeDebt(knowledgeDebtReport ?? (state.knowledgeDebt as import("../knowledge-debt.js").KnowledgeDebtReport | null)),
+    ...generateFromKnowledgeDebt(knowledgeDebtReport ?? (state.knowledgeDebt as import("../application/knowledge-debt.js").KnowledgeDebtReport | null)),
     ...generateFromPatternDetection(patternReport ?? null),
     ...generateFromEntropy(state),
     ...generateFromAIReadiness(state),

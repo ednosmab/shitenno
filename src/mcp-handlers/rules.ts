@@ -5,16 +5,16 @@
  * dynamic rules (from git history), and engine rules (declarative).
  */
 
-import { loadRules } from "../rule-engine.js";
-import { generateDynamicRules } from "../dynamic-rules.js";
-import { loadManifest, partitionRules } from "../rule-manifest.js";
-import { queryDaemon, isDaemonRunning } from "../daemon-client.js";
-import { collectContext } from "../context-collector.js";
-import { logger } from "../logger.js";
+import { loadRules } from "../application/rule-engine.js";
+import { generateDynamicRules } from "../infrastructure/dynamic-rules.js";
+import { loadManifest, partitionRules } from "../infrastructure/rule-manifest.js";
+import { queryDaemon, isDaemonRunning } from "../infrastructure/daemon-client.js";
+import { collectContext } from "../application/context-collector.js";
+import { logger } from "../shared/logger.js";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Briefing } from "../briefing.js";
-import type { ToolResponse } from "../mcp-types.js";
+import type { Briefing } from "../application/briefing.js";
+import type { ToolResponse } from "../domain/types/mcp-types.js";
 
 // ── Mandatory Rules ─────────────────────────────────────────────────────────
 

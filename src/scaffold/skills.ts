@@ -5,8 +5,8 @@
 import fse from "fs-extra";
 const { copySync, existsSync } = fse;
 import { join } from "node:path";
-import type { Capability } from "../maturity-profile.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import type { Capability } from "../application/maturity-profile.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 export function selectSkills(capabilities: Capability[]): string[] {
   const coreSkills = [

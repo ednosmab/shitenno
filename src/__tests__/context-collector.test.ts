@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { collectContext, type ContextDeps } from "../context-collector.js";
-import type { ProjectFingerprint } from "../project-fingerprint.js";
-import type { Briefing } from "../briefing.js";
+import { collectContext, type ContextDeps } from "../application/context-collector.js";
+import type { ProjectFingerprint } from "../infrastructure/project-fingerprint.js";
+import type { Briefing } from "../application/briefing.js";
 
 // Mock briefing for testing
 const mockBriefing: Briefing = {
@@ -60,6 +60,10 @@ const mockDeps: ContextDeps = {
     hasCI: false,
     hasTypeScript: true,
     totalCommits: 0,
+    flatSourceFiles: 0,
+    layeredDirs: 0,
+    nodeApiImportsOutsideLayers: 0,
+    portsConsumed: false,
   }),
   loadMaturityProfile: () => null,
   generateProjectFingerprint: () => ({

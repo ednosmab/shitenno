@@ -3,7 +3,7 @@ import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

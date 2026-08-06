@@ -2,8 +2,8 @@ import { Command } from "commander";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import chalk from "chalk";
-import { banner } from "../formatting.js";
-import { output, outputBlank } from "../output.js";
+import { banner } from "../shared/formatting.js";
+import { output, outputBlank } from "../shared/output.js";
 
 const HOOKS_DIR = ".husky";
 const POST_COMMIT_HOOK = "post-commit";

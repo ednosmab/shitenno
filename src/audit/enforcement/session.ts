@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import { checkpointBuffer } from "../../governance/buffer-checkpoint.js";
 import type { HealthIssue } from "../types.js";
 

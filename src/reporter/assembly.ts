@@ -2,10 +2,10 @@
  * reporter/assembly.ts — Performance Report Assembly
  */
 
-import type { PerformanceMetric, DimensionSummary, FeedbackRecord, FeedbackPattern } from "../feedback-loops.js";
-import type { SessionMetrics } from "../session-tracker.js";
-import type { GrowthProfile } from "../growth-profile.js";
-import type { DimensionReport, PerformanceReport, Insight } from "../performance-reporter.js";
+import type { PerformanceMetric, DimensionSummary, FeedbackRecord, FeedbackPattern } from "../application/feedback-loops.js";
+import type { SessionMetrics } from "../infrastructure/session-tracker.js";
+import type { GrowthProfile } from "../infrastructure/growth-profile.js";
+import type { DimensionReport, PerformanceReport, Insight } from "../application/performance-reporter.js";
 
 import { calculateDimensionScore, detectTrend } from "./telemetry-readers.js";
 

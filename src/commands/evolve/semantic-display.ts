@@ -1,11 +1,11 @@
 import chalk from "chalk";
-import { output, outputBlank } from "../../output.js";
-import { logger } from "../../logger.js";
-import { formatDualPath, formatDualPathJson, formatGrowthProgress } from "../../dual-path-presenter.js";
+import { output, outputBlank } from "../../shared/output.js";
+import { logger } from "../../shared/logger.js";
+import { formatDualPath, formatDualPathJson, formatGrowthProgress } from "../../domain/types/dual-path-presenter.js";
 import { createSemanticDualPath, formatSemanticDualPath, formatSemanticDualPathJson, runSemanticAnalysis } from "../../semantic/index.js";
 import { detectFeedbackPatterns } from "../../feedback/core.js";
-import { analyzeEvolution } from "../../auto-evolution.js";
-import { outputJson } from "../../formatting.js";
+import { analyzeEvolution } from "../../application/auto-evolution.js";
+import { outputJson } from "../../shared/formatting.js";
 
 export function buildSemanticReport(ctx: { projectRoot: string; shitennoDir: string }): Record<string, unknown> {
   try {

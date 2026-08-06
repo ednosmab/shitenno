@@ -5,7 +5,7 @@
  */
 
 import { existsSync, readFileSync, writeFileSync, unlinkSync, renameSync } from "node:fs";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import { daemonLog } from "./log-rotation.js";
 
 // ── PID Management ──────────────────────────────────────────────────────────

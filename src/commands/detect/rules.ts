@@ -1,9 +1,9 @@
 import chalk from "chalk";
-import { getCached, computeKeyChecksums } from "../../cache.js";
-import { outputJson } from "../../formatting.js";
-import { recordFeedback } from "../../feedback-loops.js";
-import { output, outputBlank, outputError } from "../../output.js";
-import type { PatternDetectionReport } from "../../pattern-detector.js";
+import { getCached, computeKeyChecksums } from "../../infrastructure/cache.js";
+import { outputJson } from "../../shared/formatting.js";
+import { recordFeedback } from "../../application/feedback-loops.js";
+import { output, outputBlank, outputError } from "../../shared/output.js";
+import type { PatternDetectionReport } from "../../infrastructure/pattern-detector.js";
 
 export function handleApproveReject(
   options: { approve?: string; reject?: string },

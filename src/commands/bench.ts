@@ -17,12 +17,12 @@ import { Command } from "commander";
 import chalk from "chalk";
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { collectContext, type ContextSnapshot } from "../context-collector.js";
-import { computeInputHash, setCachedBriefing, readCache, invalidateBriefingCache } from "../briefing-cache.js";
-import { outputJson } from "../formatting.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
-import { output, outputBlank, outputSection } from "../output.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { collectContext, type ContextSnapshot } from "../application/context-collector.js";
+import { computeInputHash, setCachedBriefing, readCache, invalidateBriefingCache } from "../infrastructure/briefing-cache.js";
+import { outputJson } from "../shared/formatting.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
+import { output, outputBlank, outputSection } from "../shared/output.js";
 
 // ── Benchmark Helpers ──────────────────────────────────────────────────────
 

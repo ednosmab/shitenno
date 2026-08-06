@@ -6,9 +6,9 @@ import {
   formatDualPath,
   formatDualPathJson,
   formatGrowthProgress,
-} from "../dual-path-presenter.js";
-import { loadGrowthProfile, } from "../growth-profile.js";
-import type { EvolutionRecommendation } from "../auto-evolution.js";
+} from "../domain/types/dual-path-presenter.js";
+import { loadGrowthProfile, } from "../infrastructure/growth-profile.js";
+import type { EvolutionRecommendation } from "../application/auto-evolution.js";
 
 let tempDir: string;
 let shitennoDir: string;

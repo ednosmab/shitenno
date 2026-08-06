@@ -1,9 +1,9 @@
 import chalk from "chalk";
-import { detectComplexity } from "../../complexity-detector.js";
-import { getActiveRules } from "../../rule-loader.js";
-import { readMaturityHistory, type MaturityProfile } from "../../maturity-profile.js";
-import { outputJson, healthBar } from "../../formatting.js";
-import { output, outputBlank } from "../../output.js";
+import { detectComplexity } from "../../infrastructure/complexity-detector.js";
+import { getActiveRules } from "../../infrastructure/rule-loader.js";
+import { readMaturityHistory, type MaturityProfile } from "../../application/maturity-profile.js";
+import { outputJson, healthBar } from "../../shared/formatting.js";
+import { output, outputBlank } from "../../shared/output.js";
 
 export function displayDimensionBar(label: string, value: number, prev?: number): void {
   const barWidth = 20;

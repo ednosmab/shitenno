@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { matchesTaskId } from "../id-matcher.js";
+import { matchesTaskId } from "../domain/rules/id-matcher.js";
 
 describe("matchesTaskId — sem colisão por prefixo numérico", () => {
   it("não casa TASK-1 com TASK-10", () => {

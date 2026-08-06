@@ -29,15 +29,15 @@ import { setupPeriodicTimers, scheduleCheckNag, runPeriodicAudit, scheduleInitia
 import { createVerifyAllPendingPlans } from "./verification.js";
 import { initializeDaemonEngines } from "./engine-init.js";
 import { setupShutdown, type ShutdownTimers } from "./shutdown.js";
-import { checkAndArchiveDonePlans } from "../plan-lifecycle.js";
+import { checkAndArchiveDonePlans } from "../application/plan-lifecycle.js";
 import {
   checkInconsistencies,
   validateReminders,
   moveCompletedBacklogToDone,
   recoverOrphanSidecars,
 } from "./startup-scan.js";
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
-import { getEventBus } from "../event-bus.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 
 // Re-export public API for consumers that import from daemon/index.js
 export { getPaths, daemonLog } from "./log-rotation.js";
@@ -224,7 +224,7 @@ export async function runDaemon(shitennoDir: string, projectRoot?: string): Prom
   const initialFullAuditTimer = scheduleInitialFullAudit(ctx);
 
   // Import circuit breaker dynamically to avoid circular deps
-  const { DaemonCircuitBreaker } = await import("../daemon-circuit-breaker.js");
+  const { DaemonCircuitBreaker } = await import("../infrastructure/daemon-circuit-breaker.js");
   const breaker = new DaemonCircuitBreaker(shitennoDir);
   const stableTimer = setTimeout(() => {
     breaker.reset();

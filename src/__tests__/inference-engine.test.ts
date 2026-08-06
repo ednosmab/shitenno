@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { join } from "node:path";
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { InferenceEngine } from "../inference-engine.js";
+import { InferenceEngine } from "../application/inference-engine.js";
 
 describe("InferenceEngine", () => {
   let tmpDir: string;

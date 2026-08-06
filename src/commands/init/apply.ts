@@ -13,19 +13,19 @@
 
 import { existsSync, copyFileSync, mkdirSync } from "node:fs";
 import { join, relative } from "node:path";
-import { scaffoldShitenno, type ScaffoldResult } from "../../scaffolder.js";
+import { scaffoldShitenno, type ScaffoldResult } from "../../infrastructure/scaffolder.js";
 import {
   calculateMaturityProfile,
   saveMaturityProfile,
   recordMaturitySnapshot,
   type MaturityProfile,
   type Capability,
-} from "../../maturity-profile.js";
-import { initializeRules } from "../../rule-engine.js";
-import { createManifest, writeManifest } from "../../manifest.js";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import type { UserAnswers } from "../../prompts.js";
-import type { ProjectAnalysis } from "../../analyser.js";
+} from "../../application/maturity-profile.js";
+import { initializeRules } from "../../application/rule-engine.js";
+import { createManifest, writeManifest } from "../../infrastructure/manifest.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import type { UserAnswers } from "../../interface/cli/prompts.js";
+import type { ProjectAnalysis } from "../../infrastructure/analyser.js";
 import type { ConsentLevel } from "./consent.js";
 import type { DiscoveryResult, GovernanceInventory } from "./discovery.js";
 import { writeExternalIndex } from "./manifest-refs.js";

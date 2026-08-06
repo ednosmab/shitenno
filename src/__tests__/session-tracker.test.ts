@@ -9,7 +9,7 @@ import {
   endSession,
   getSessions,
   getSessionMetrics,
-} from "../session-tracker.js";
+} from "../infrastructure/session-tracker.js";
 
 let tempDir: string;
 let shitennoDir: string;

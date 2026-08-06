@@ -5,10 +5,10 @@
  */
 
 import chalk from "chalk";
-import { output, outputBlank } from "../../output.js";
-import { CAPABILITIES, type MaturityProfile } from "../../maturity-profile.js";
-import type { ProjectAnalysis } from "../../analyser.js";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
+import { output, outputBlank } from "../../shared/output.js";
+import { CAPABILITIES, type MaturityProfile } from "../../application/maturity-profile.js";
+import type { ProjectAnalysis } from "../../infrastructure/analyser.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
 
 // ── Display Functions ───────────────────────────────────────────────────────
 

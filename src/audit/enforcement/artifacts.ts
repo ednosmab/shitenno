@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import type { HealthIssue } from "../types.js";
 
 export function detectMissingPremortem(shitennoDir: string): HealthIssue[] {

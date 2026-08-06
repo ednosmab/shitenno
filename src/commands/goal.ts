@@ -7,12 +7,12 @@
 import { Command } from "commander";
 import chalk from "chalk";
 
-import { guardNotInitialized } from "../shared.js";
+import { guardNotInitialized } from "../shared/shared.js";
 import { GoalEngine, type Goal, type GoalStatus, type GoalPriority, FileGoalRepository } from "../prioritization/goals.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
-import { outputJson } from "../formatting.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
-import { output, outputBlank, outputSuccess, outputError, outputWarning } from "../output.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
+import { outputJson } from "../shared/formatting.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
+import { output, outputBlank, outputSuccess, outputError, outputWarning } from "../shared/output.js";
 import { formatGoal, displayGoalList, displayGoalDetail, displayGoalStats } from "./goal/display.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────

@@ -10,11 +10,11 @@
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { detectLifecycleState, type ShitennoLifecycleState } from "../shitenno-state-machine.js";
-import { getSessionMetrics, type SessionMetrics } from "../session-tracker.js";
-import { getEventBus, type EventEnvelope } from "../event-bus.js";
-import type { GrowthProfile } from "../growth-profile.js";
-import type { EngineeringState } from "../engineering-state.js";
+import { detectLifecycleState, type ShitennoLifecycleState } from "../infrastructure/shitenno-state-machine.js";
+import { getSessionMetrics, type SessionMetrics } from "../infrastructure/session-tracker.js";
+import { getEventBus, type EventEnvelope } from "../infrastructure/event-bus.js";
+import type { GrowthProfile } from "../infrastructure/growth-profile.js";
+import type { EngineeringState } from "../application/engineering-state.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -27,20 +27,20 @@ export interface ConsoleData {
   lifecycle: ShitennoLifecycleState;
 
   // Engineering State
-  engineering: import("../engineering-state.js").EngineeringState;
+  engineering: import("../application/engineering-state.js").EngineeringState;
 
   // Maturity
-  maturity: import("../maturity-profile.js").MaturityProfile | null;
+  maturity: import("../application/maturity-profile.js").MaturityProfile | null;
 
   // Knowledge Graph
-  graph: import("../knowledge-graph.js").GraphAnalysis;
+  graph: import("../infrastructure/knowledge-graph.js").GraphAnalysis;
 
   // Knowledge Debt
-  debt: import("../knowledge-debt.js").KnowledgeDebtReport | null;
+  debt: import("../application/knowledge-debt.js").KnowledgeDebtReport | null;
 
   // Capabilities
-  capabilities: import("../maturity-profile.js").Capability[];
-  capabilityEntities: import("../capability-engine.js").CapabilityEntity[];
+  capabilities: import("../application/maturity-profile.js").Capability[];
+  capabilityEntities: import("../application/capability-engine.js").CapabilityEntity[];
 
   // Goals (raw JSON files)
   goals: GoalData[];
@@ -118,12 +118,12 @@ export async function collectConsoleData(projectRoot: string, shitennoDir: strin
   const lifecycle = detectLifecycleState(projectRoot, shitennoDir);
 
   // Lazy-load heavy modules
-  const { loadMaturityProfile, detectCapabilitySignalsFromFilesystem } = await import("../maturity-profile.js");
-  const { consolidateEngineeringState } = await import("../engineering-state.js");
-  const { loadArtifacts, loadRelations, analyzeGraph } = await import("../knowledge-graph.js");
-  const { detectKnowledgeDebt } = await import("../knowledge-debt.js");
-  const { evaluateCapabilities } = await import("../capability-engine.js");
-  const { loadGrowthProfile } = await import("../growth-profile.js");
+  const { loadMaturityProfile, detectCapabilitySignalsFromFilesystem } = await import("../application/maturity-profile.js");
+  const { consolidateEngineeringState } = await import("../application/engineering-state.js");
+  const { loadArtifacts, loadRelations, analyzeGraph } = await import("../infrastructure/knowledge-graph.js");
+  const { detectKnowledgeDebt } = await import("../application/knowledge-debt.js");
+  const { evaluateCapabilities } = await import("../application/capability-engine.js");
+  const { loadGrowthProfile } = await import("../infrastructure/growth-profile.js");
 
   const maturity = loadMaturityProfile(shitennoDir);
   const engineering = consolidateEngineeringState(projectRoot, shitennoDir, maturity);

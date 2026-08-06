@@ -53,6 +53,6 @@ describe("close-session script — path resolution (static analysis)", () => {
 
   it("session-feedback.ts is a tsup entry so close-session can read feedback from dist", () => {
     const tsupSource = readFileSync(resolve(__dirname, "..", "..", "tsup.config.ts"), "utf-8");
-    expect(tsupSource).toContain("src/session-feedback.ts");
+    expect(tsupSource).toContain("src/infrastructure/session-feedback.ts");
   });
 });

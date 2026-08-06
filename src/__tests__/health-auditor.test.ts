@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { auditHealth, writeHealthReport, collectSourceFiles, detectHardcodedSecrets, detectSQLInjection, detectXSS, detectUnsafeEval, detectConsoleSecrets, detectWeakCrypto, detectInsecureHTTP, detectPrototypePollution, detectPathTraversal, detectRegexDos, detectUnsafeDeserialization, detectDependencyConfusion, detectCircularDeps } from "../health-auditor.js";
+import { auditHealth, writeHealthReport, collectSourceFiles, detectHardcodedSecrets, detectSQLInjection, detectXSS, detectUnsafeEval, detectConsoleSecrets, detectWeakCrypto, detectInsecureHTTP, detectPrototypePollution, detectPathTraversal, detectRegexDos, detectUnsafeDeserialization, detectDependencyConfusion, detectCircularDeps } from "../application/health-auditor.js";
 import { TaintAnalyzer } from "../audit/taint/index.js";
 import { clearProgramCache } from "../audit/ts-program-cache.js";
 

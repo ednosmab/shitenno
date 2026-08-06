@@ -5,12 +5,12 @@
  */
 
 import { Command } from "commander";
-import { outputJson, banner } from "../formatting.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
-import { outputBlank } from "../output.js";
-import { muteLogs } from "../logger.js";
+import { outputJson, banner } from "../shared/formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
+import { outputBlank } from "../shared/output.js";
+import { muteLogs } from "../shared/logger.js";
 
 import { runValidationChecks } from "./validate/checks.js";
 import { displayValidationResults } from "./validate/display.js";

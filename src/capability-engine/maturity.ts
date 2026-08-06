@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
-import { CAPABILITIES, type Capability, type CapabilityInfo } from "../maturity-profile.js";
+import { logger } from "../shared/logger.js";
+import { CAPABILITIES, type Capability, type CapabilityInfo } from "../application/maturity-profile.js";
 import type { CapabilityMaturity, CapabilityEntity } from "./types.js";
 
 export function detectCapabilityMaturity(

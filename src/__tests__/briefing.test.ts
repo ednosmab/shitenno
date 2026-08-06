@@ -6,7 +6,7 @@ import {
   generateDiff,
   briefingToMarkdown,
   type Briefing,
-} from "../briefing.js";
+} from "../application/briefing.js";
 
 function makeBriefing(overrides: Partial<Briefing> = {}): Briefing {
   const defaults: Briefing = {

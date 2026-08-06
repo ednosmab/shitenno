@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createEventPayload } from "../event-payloads.js";
+import { createEventPayload } from "../domain/types/event-payloads.js";
 
 // ── createEventPayload ─────────────────────────────────────────────────────
 

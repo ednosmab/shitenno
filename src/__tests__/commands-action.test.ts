@@ -369,8 +369,8 @@ describe("sync command action handler", () => {
 // feedback command — user rating/comment/tags flags
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { recordOutcome, type SessionFeedbackRecord } from "../session-feedback.js";
-import { parseUserRating, parseUserTags } from "../feedback-utils.js";
+import { recordOutcome, type SessionFeedbackRecord } from "../infrastructure/session-feedback.js";
+import { parseUserRating, parseUserTags } from "../domain/rules/feedback-utils.js";
 
 describe("feedback command — user rating/comment/tags parsing", () => {
   // These tests verify the shared parsing helpers from feedback-utils.ts

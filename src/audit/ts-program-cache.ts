@@ -8,7 +8,7 @@
 import * as ts from "typescript";
 import { statSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import { createHash } from "node:crypto";
 
 const programCache = new Map<string, ts.Program>();

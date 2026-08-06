@@ -8,7 +8,7 @@
  */
 
 import { randomUUID } from "node:crypto";
-import { getEventBus } from "../event-bus.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 import type { Policy, PolicyMode, PolicyEffect, PolicyCondition, PolicyAction, PolicyResult, PolicyEvaluation, PolicyFilter } from "./policy/types.js";
 import { evaluateCondition } from "./policy/conditions.js";
 import type { PolicyRepository } from "./policy/repository.js";

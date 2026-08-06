@@ -10,15 +10,15 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { outputJson } from "../formatting.js";
-import { getEventBus } from "../event-bus.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { outputJson } from "../shared/formatting.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
 import { execSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
-import { output, outputBlank, outputError } from "../output.js";
+import { logger } from "../shared/logger.js";
+import { output, outputBlank, outputError } from "../shared/output.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

@@ -2,7 +2,7 @@ import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
 
-import { output, outputBlank } from "../output.js";
+import { output, outputBlank } from "../shared/output.js";
 
 import {
   auditDocLifecycle,
@@ -11,11 +11,11 @@ import {
   type DocLifecycleReport,
   type DocLifecycleStatus,
   type DocType,
-} from "../doc-lifecycle-auditor.js";
-import { outputJson } from "../formatting.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
+} from "../application/doc-lifecycle-auditor.js";
+import { outputJson } from "../shared/formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
 
 export const docsAuditCommand = new Command("docs-audit")
   .description("Audit documentation lifecycle (Plans + ADRs) and propose organization")

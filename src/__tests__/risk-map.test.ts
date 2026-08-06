@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { generateRiskMap } from "../risk-map.js";
+import { generateRiskMap } from "../infrastructure/risk-map.js";
 
 let tempDir: string;
 

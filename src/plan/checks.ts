@@ -7,9 +7,9 @@
 import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
-import type { CompletionCheck } from "../plan-lifecycle.js";
-import { logger } from "../logger.js";
-import { validatePlanFormat } from "../plan-format-validator.js";
+import type { CompletionCheck } from "../application/plan-lifecycle.js";
+import { logger } from "../shared/logger.js";
+import { validatePlanFormat } from "../domain/rules/plan-format-validator.js";
 import { ensureLegacyFields } from "../commands/plan.js";
 
 export interface PackageJson {

@@ -4,8 +4,8 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
-import { safeJsonParseValidated } from "../validation.js";
+import { logger } from "../shared/logger.js";
+import { safeJsonParseValidated } from "../infrastructure/validation.js";
 import type { ActionExecutor, ExecutionRecord, ActionFilter, ExecutionRepository } from "./types.js";
 
 /**

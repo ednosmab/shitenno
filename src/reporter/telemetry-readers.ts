@@ -4,7 +4,7 @@
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { DimensionSummary } from "../feedback-loops.js";
+import type { DimensionSummary } from "../application/feedback-loops.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

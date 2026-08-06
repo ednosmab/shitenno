@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { join } from "node:path";
 import type { HealthIssue, SourceFileInfo } from "../types.js";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import * as ts from "typescript";
 import { getOrCreateProgram } from "../ts-program-cache.js";
 import { analyzeComplexity } from "../complexity/analyzer.js";

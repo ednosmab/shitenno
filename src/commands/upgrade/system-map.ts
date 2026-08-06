@@ -4,10 +4,10 @@
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { updateSystemMapCapabilityStatus } from "../../scaffolder.js";
-import { getTemplatesDir } from "../../paths.js";
-import type { Capability } from "../../maturity-profile.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import { updateSystemMapCapabilityStatus } from "../../infrastructure/scaffolder.js";
+import { getTemplatesDir } from "../../shared/paths.js";
+import type { Capability } from "../../application/maturity-profile.js";
 
 export function updateSystemMapStatus(
   targetDir: string,

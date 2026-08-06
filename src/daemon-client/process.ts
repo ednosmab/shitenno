@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import { getPidPath, getSocketPath } from "./paths.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

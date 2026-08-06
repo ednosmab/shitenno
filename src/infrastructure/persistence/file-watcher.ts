@@ -11,8 +11,8 @@
 import { watch, type FSWatcher } from "chokidar";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
-import { getEventBus } from "../../event-bus.js";
-import { logger } from "../../logger.js";
+import { getEventBus } from "../event-bus.js";
+import { logger } from "../../shared/logger.js";
 import type { WatcherOptions, WatcherContext } from "./file-watcher/types.js";
 import { handleFileAdd, handleFileDelete, handleFileChange, publishGitEvent } from "./file-watcher/handlers.js";
 

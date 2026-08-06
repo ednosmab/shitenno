@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { guardInteractive } from "../shared.js";
+import { guardInteractive } from "../shared/shared.js";
 
 describe("guardInteractive", () => {
   afterEach(() => {

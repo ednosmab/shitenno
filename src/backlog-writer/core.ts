@@ -4,7 +4,7 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import {
   type BacklogItem,
   type BacklogState,
@@ -12,8 +12,8 @@ import {
   type AddItemInput,
   getAllowedTransitions,
   isValidTransition,
-} from "../backlog-types.js";
-import { parseBacklogItems, findItem } from "../backlog-parser.js";
+} from "../domain/types/backlog-types.js";
+import { parseBacklogItems, findItem } from "../infrastructure/backlog-parser.js";
 
 export function addItem(filePath: string, input: AddItemInput): { success: boolean; message: string } {
   const dir = dirname(filePath);
@@ -115,12 +115,20 @@ function validateAdiadoRevisit(
   return null;
 }
 
-function updateModularStatus(filePath: string, lineIdx: number, toState: BacklogState, date: string): void {
+function updateModularStatus(filePath: string, headerLineIdx: number, toState: BacklogState, date: string): void {
   const content = readFileSync(filePath, "utf-8");
   const lines = content.split("\n");
   const statusLabel = toState === "concluído" ? `Done — ${date}` : toState;
-  lines[lineIdx] = `| **Status** | ${statusLabel} |`;
-  writeFileSync(filePath, lines.join("\n"), "utf-8");
+
+  for (let i = headerLineIdx + 1; i < lines.length; i++) {
+    const line = lines[i]!;
+    if (line.startsWith("### ")) break;
+    if (/^\s*\|\s*\*\*Status\*\*\s*\|/.test(line)) {
+      lines[i] = `| **Status** | ${statusLabel} |`;
+      writeFileSync(filePath, lines.join("\n"), "utf-8");
+      return;
+    }
+  }
 }
 
 function updateLegacyStatus(filePath: string, line: string | undefined, lineIdx: number, toState: BacklogState): void {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { runValidationPhase, runFullValidation, getPhaseConfig, type CommandRunner } from "../validation-pipeline.js";
+import { runValidationPhase, runFullValidation, getPhaseConfig, type CommandRunner } from "../infrastructure/validation-pipeline.js";
 
 const mockRunner: CommandRunner = (cmd, _timeout) => ({
   success: true,

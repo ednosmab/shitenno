@@ -11,7 +11,7 @@
 
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { consolidateEngineeringState, saveEngineeringState, loadEngineeringState, type EngineeringState } from "../engineering-state.js";
+import { consolidateEngineeringState, saveEngineeringState, loadEngineeringState, type EngineeringState } from "../application/engineering-state.js";
 
 let cachedState: EngineeringState | null = null;
 

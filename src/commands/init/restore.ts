@@ -10,7 +10,7 @@
 import { copyFileSync, existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { REPLACEABLE_ROOT_FILES } from "./apply.js";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
 
 export interface RestoreResult {
   /** Files restored from `.shitenno/backup/pre-init/`. */

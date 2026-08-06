@@ -3,8 +3,8 @@ import {
   getCapabilityMapping,
   getCapabilityFiles,
   getCapabilityDirectories,
-} from "../capability-mapping.js";
-import type { Capability } from "../maturity-profile.js";
+} from "../domain/types/capability-mapping.js";
+import type { Capability } from "../application/maturity-profile.js";
 
 // ── getCapabilityMapping ───────────────────────────────────────────────────
 

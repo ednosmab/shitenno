@@ -14,8 +14,8 @@ import {
   createVersionedEvent,
   migrateEvent,
   getEventVersion,
-} from "../advanced-infrastructure.js";
-import { getEventBus, resetEventBus } from "../event-bus.js";
+} from "../infrastructure/advanced-infrastructure.js";
+import { getEventBus, resetEventBus } from "../infrastructure/event-bus.js";
 
 // ── DeadLetterQueue Tests ──────────────────────────────────────────────────
 

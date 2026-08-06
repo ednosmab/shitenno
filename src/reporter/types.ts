@@ -2,11 +2,11 @@
  * reporter/types.ts — Performance Reporting Types
  */
 
-import type { PerformanceMetric } from "../feedback-loops.js";
+import type { PerformanceMetric } from "../application/feedback-loops.js";
 
 // ── Re-export feedback-loops types ─────────────────────────────────────────
 
-export type { PerformanceMetric } from "../feedback-loops.js";
+export type { PerformanceMetric } from "../application/feedback-loops.js";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
@@ -93,10 +93,10 @@ export interface DimensionExtremes {
 
 export interface InsightContext {
   dimensions: Record<PerformanceMetric, DimensionReport>;
-  sessionMetrics: import("../session-tracker.js").SessionMetrics;
+  sessionMetrics: import("../infrastructure/session-tracker.js").SessionMetrics;
   debtTrend: import("./telemetry-readers.js").TelemetryTrend;
   maturityTrend: import("./telemetry-readers.js").TelemetryTrend;
-  growthProfile: import("../growth-profile.js").GrowthProfile;
+  growthProfile: import("../infrastructure/growth-profile.js").GrowthProfile;
 }
 
 export interface PerformanceRecommendation {

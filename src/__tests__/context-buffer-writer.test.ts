@@ -18,7 +18,7 @@ import {
   addReminder,
   clearRemindersByCategory,
   recordSkillResolution,
-} from "../context-buffer-writer.js";
+} from "../application/context-buffer-writer.js";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 

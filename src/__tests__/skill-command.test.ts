@@ -6,7 +6,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { mkdtempSync, rmSync, existsSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { createSkillFile, listSkillFiles, validateSkillFile } from "../skill-io.js";
+import { createSkillFile, listSkillFiles, validateSkillFile } from "../infrastructure/skill-io.js";
 
 describe("skill command utilities", () => {
   let tempDir: string;

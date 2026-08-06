@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { join } from "node:path";
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { loadTrace, type TraceEntry } from "../events-data.js";
+import { loadTrace, type TraceEntry } from "../infrastructure/events-data.js";
 
 describe("loadTrace", () => {
   let tmpDir: string;

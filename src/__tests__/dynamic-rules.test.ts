@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { execSync } from "node:child_process";
-import { generateDynamicRules, dynamicRulesToMarkdown, type DynamicRule } from "../dynamic-rules.js";
+import { generateDynamicRules, dynamicRulesToMarkdown, type DynamicRule } from "../infrastructure/dynamic-rules.js";
 
 vi.mock("node:fs", () => ({
   existsSync: vi.fn(),

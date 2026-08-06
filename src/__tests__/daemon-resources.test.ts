@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { BoundedQueue, LRUCache } from "../daemon-resources.js";
+import { BoundedQueue, LRUCache } from "../domain/types/daemon-resources.js";
 
 // ── BoundedQueue ──────────────────────────────────────────────────────────────
 

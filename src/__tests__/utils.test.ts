@@ -7,7 +7,7 @@ import {
   countSourceFilesInDir,
   FileContentCache,
   detectShitennoProject,
-} from "../utils.js";
+} from "../infrastructure/utils.js";
 
 let tempDir: string;
 

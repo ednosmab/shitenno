@@ -27,10 +27,10 @@ import {
   formatSummaryLine,
   type BacklogPriority,
   type BacklogSeverity,
-} from "../backlog-core.js";
-import { guardNotInitialized } from "../shared.js";
-import { output, outputBlank } from "../output.js";
-import { getEventBus } from "../event-bus.js";
+} from "../application/backlog-core.js";
+import { guardNotInitialized } from "../shared/shared.js";
+import { output, outputBlank } from "../shared/output.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 
 // ── Shared Helpers ─────────────────────────────────────────────────────────
 

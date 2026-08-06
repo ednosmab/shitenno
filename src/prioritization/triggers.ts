@@ -8,12 +8,12 @@
  * not wait for the user to ask.
  */
 
-import { getEventBus, type EventBus } from "../event-bus.js";
-import { consolidateEngineeringState, type EngineeringState } from "../engineering-state.js";
-import { generateForecast, type TrendForecast } from "../trend-engine.js";
+import { getEventBus, type EventBus } from "../infrastructure/event-bus.js";
+import { consolidateEngineeringState, type EngineeringState } from "../application/engineering-state.js";
+import { generateForecast, type TrendForecast } from "../domain/rules/trend-engine.js";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 
 // ── Rate Limiting & Dedup ──────────────────────────────────────────────────
 

@@ -14,7 +14,7 @@ import {
   getRecommendedContextLength,
   getPreferredOutputFormat,
   type ModelConfig,
-} from "../model-config.js";
+} from "../infrastructure/model-config.js";
 
 function createTmpDir(): string {
   const dir = join(tmpdir(), `test-ai-interface-${Date.now()}`);

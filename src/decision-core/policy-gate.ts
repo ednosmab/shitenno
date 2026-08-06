@@ -9,7 +9,7 @@
 
 import type { PolicyEngine, PolicyEvaluation } from "../rule-engine/index.js";
 import type { RuleAction, RuleContext } from "../domain/rules/rule.js";
-import { getEventBus } from "../event-bus.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 
 export interface PolicyGateResult {
   allowed: boolean;

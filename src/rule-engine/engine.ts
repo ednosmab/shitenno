@@ -7,9 +7,9 @@
 
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
-import { InvalidRuleError } from "../errors.js";
-import { logger } from "../logger.js";
-import { loadMaturityProfile } from "../maturity-profile.js";
+import { InvalidRuleError } from "../domain/types/errors.js";
+import { logger } from "../shared/logger.js";
+import { loadMaturityProfile } from "../application/maturity-profile.js";
 import type { Rule, RuleContext, RuleResult, EngineResult, TriggerType } from "../domain/rules/rule.js";
 import { validateRule } from "./validation.js";
 import { isValidRuleId } from "./security.js";
@@ -203,7 +203,7 @@ export function initializeRules(shitennoDir: string): void {
 
 // ── Event Bus Integration ───────────────────────────────────────────────────
 
-import { getEventBus, type ShitennoEventType } from "../event-bus.js";
+import { getEventBus, type ShitennoEventType } from "../infrastructure/event-bus.js";
 
 /** Map event bus events to rule engine triggers. */
 const EVENT_TO_TRIGGER: Partial<Record<ShitennoEventType, TriggerType>> = {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseUserRating, parseUserTags } from "../feedback-utils.js";
+import { parseUserRating, parseUserTags } from "../domain/rules/feedback-utils.js";
 
 describe("parseUserRating", () => {
   it("returns undefined when input is undefined", () => {

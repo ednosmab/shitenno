@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { classifyEvent, classifyEvents, resetSignalClassifier, getSignalClassifier } from "../../semantic/signal-classifier.js";
-import type { EventEnvelope } from "../../event-bus.js";
+import type { EventEnvelope } from "../../infrastructure/event-bus.js";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 

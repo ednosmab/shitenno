@@ -1,4 +1,4 @@
-import { calculateHealthPenalty } from "../formatting.js";
+import { calculateHealthPenalty } from "../shared/formatting.js";
 import type { KnowledgeGap, DebtType } from "./types.js";
 
 export function calculateDebtHealth(gaps: KnowledgeGap[]): number {

@@ -14,7 +14,7 @@ import {
   type ProjectType,
 } from "../commands/init/project-type.js";
 import { isGitRepository, resolveGitCommonDir } from "../commands/init/git.js";
-import type { ProjectAnalysis } from "../analyser.js";
+import type { ProjectAnalysis } from "../infrastructure/analyser.js";
 
 function makeAnalysis(overrides: Partial<ProjectAnalysis> = {}): ProjectAnalysis {
   return {
@@ -34,6 +34,10 @@ function makeAnalysis(overrides: Partial<ProjectAnalysis> = {}): ProjectAnalysis
     hasCI: false,
     hasTypeScript: false,
     totalCommits: 0,
+    flatSourceFiles: 0,
+    layeredDirs: 0,
+    nodeApiImportsOutsideLayers: 0,
+    portsConsumed: false,
     ...overrides,
   };
 }

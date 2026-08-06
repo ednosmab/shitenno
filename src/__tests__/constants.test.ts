@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { VIOLATION_KEYWORDS, COMMAND_GATES, GIT_TIMEOUT, RULE_SCRIPT_TIMEOUT, VALID_ACTION_TYPES } from "../constants.js";
+import { VIOLATION_KEYWORDS, COMMAND_GATES, GIT_TIMEOUT, RULE_SCRIPT_TIMEOUT, VALID_ACTION_TYPES } from "../domain/types/constants.js";
 
 describe("VIOLATION_KEYWORDS", () => {
   it("is a non-empty array of strings", () => {

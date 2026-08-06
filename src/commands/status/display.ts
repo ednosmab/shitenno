@@ -5,11 +5,11 @@
  */
 
 import chalk from "chalk";
-import { healthBar, statusIcon, banner } from "../../formatting.js";
-import { CAPABILITIES, type MaturityProfile } from "../../maturity-profile.js";
-import { output, outputBlank } from "../../output.js";
-import { muteLogs } from "../../logger.js";
-import { getEventBus } from "../../event-bus.js";
+import { healthBar, statusIcon, banner } from "../../shared/formatting.js";
+import { CAPABILITIES, type MaturityProfile } from "../../application/maturity-profile.js";
+import { output, outputBlank } from "../../shared/output.js";
+import { muteLogs } from "../../shared/logger.js";
+import { getEventBus } from "../../infrastructure/event-bus.js";
 import type { StatusCheck } from "./health-checks.js";
 
 // ── Types ───────────────────────────────────────────────────────────────────

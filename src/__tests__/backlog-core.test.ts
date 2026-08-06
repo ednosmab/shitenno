@@ -17,7 +17,7 @@ import {
   getBacklogSummary,
   formatSummaryLine,
   type BacklogItem,
-} from "../backlog-core.js";
+} from "../application/backlog-core.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -447,6 +447,26 @@ describe("backlog-core", () => {
 
       const content = readFileSync(backlogPath, "utf-8");
       expect(content).toContain("| **Status** | em implementação |");
+    });
+
+    it("preserves the item header when transitioning in modular format", () => {
+      const backlogPath = join(testDir, "ACTIVE.md");
+      writeFileSync(
+        backlogPath,
+        MODULAR_HEADER + modularItem("BACKLOG-001", "Test", "planeado") + "\n" +
+          modularItem("BACKLOG-002", "Other", "planeado") + "\n",
+        "utf-8",
+      );
+
+      const result = transitionItem(backlogPath, "BACKLOG-001", "em implementação");
+      expect(result.success).toBe(true);
+
+      const content = readFileSync(backlogPath, "utf-8");
+      expect(content).toContain("### BACKLOG-001 Test");
+      expect(content).toContain("### BACKLOG-002 Other");
+      expect(content).toContain("| **Status** | em implementação |");
+      expect(content).toMatch(/### BACKLOG-001 Test\n\n\| Campo \| Valor \|\n\|---\|---\|\n\| \*\*Status\*\* \| em implementação \|/);
+      expect(content).toMatch(/### BACKLOG-002 Other[\s\S]*\| \*\*Status\*\* \| planeado \|/);
     });
 
     it("rejects invalid transition", () => {

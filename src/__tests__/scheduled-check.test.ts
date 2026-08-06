@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { scheduledCheck } from "../commands/scheduled-check.js";
-import { getEventBus } from "../event-bus.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 
 vi.mock("node:child_process", () => ({
   execSync: vi.fn(),
 }));
 
-vi.mock("../event-bus.js", () => ({
+vi.mock("../infrastructure/event-bus.js", () => ({
   getEventBus: vi.fn(),
 }));
 
-vi.mock("../logger.js", () => ({
+vi.mock("../shared/logger.js", () => ({
   logger: { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 

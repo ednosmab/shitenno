@@ -1,10 +1,10 @@
 import chalk from "chalk";
 import { join } from "node:path";
-import { resolveWithinRoot } from "../../path-safety.js";
-import { getFeedbackRecords, computeFeedbackSummary } from "../../session-feedback.js";
-import { loadUserProfile, generatePersonalizedFeedback, formatFeedbackAsMarkdown } from "../../feedback-engine.js";
-import { outputJson } from "../../formatting.js";
-import { output, outputBlank, outputSection, outputError, outputWarning } from "../../output.js";
+import { resolveWithinRoot } from "../../domain/rules/path-safety.js";
+import { getFeedbackRecords, computeFeedbackSummary } from "../../infrastructure/session-feedback.js";
+import { loadUserProfile, generatePersonalizedFeedback, formatFeedbackAsMarkdown } from "../../application/feedback-engine.js";
+import { outputJson } from "../../shared/formatting.js";
+import { output, outputBlank, outputSection, outputError, outputWarning } from "../../shared/output.js";
 
 type Ctx = {
   projectRoot: string;

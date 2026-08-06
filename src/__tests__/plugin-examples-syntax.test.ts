@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 describe("bundled example plugins", () => {
   const pluginsDir = join(process.cwd(), SHITENNO_DIR_NAME, "plugins");

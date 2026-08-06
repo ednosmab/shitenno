@@ -1,4 +1,4 @@
-import type { CommandCategory } from "../help-data.js";
+import type { CommandCategory } from "../domain/types/help-data.js";
 
 export const CORE_CATEGORIES: CommandCategory[] = [
   {

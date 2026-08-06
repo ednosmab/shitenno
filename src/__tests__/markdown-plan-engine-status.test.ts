@@ -13,7 +13,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, writeFileSync, readFileSync, rmSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { MarkdownPlanEngine, type MarkdownPlanStatus } from "../markdown-plan-engine.js";
+import { MarkdownPlanEngine, type MarkdownPlanStatus } from "../infrastructure/markdown-plan-engine.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

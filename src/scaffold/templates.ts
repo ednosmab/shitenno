@@ -5,8 +5,8 @@
 import fse from "fs-extra";
 const { copySync, readFileSync, writeFileSync, existsSync, ensureDirSync, removeSync } = fse;
 import { join, dirname } from "node:path";
-import type { UserAnswers } from "../prompts.js";
-import type { Capability } from "../maturity-profile.js";
+import type { UserAnswers } from "../interface/cli/prompts.js";
+import type { Capability } from "../application/maturity-profile.js";
 
 export function fillPlaceholders(content: string, answers: UserAnswers): string {
   const stackStr = Array.isArray(answers.stack) && answers.stack.length > 0

@@ -15,12 +15,12 @@
 
 import { Command } from "commander";
 import chalk from "chalk";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getFeedbackRecords, computeFeedbackSummary } from "../session-feedback.js";
-import { getSessionMetrics } from "../session-tracker.js";
-import { outputJson } from "../formatting.js";
-import { getEventBus } from "../event-bus.js";
-import { output, outputBlank, outputSection } from "../output.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getFeedbackRecords, computeFeedbackSummary } from "../infrastructure/session-feedback.js";
+import { getSessionMetrics } from "../infrastructure/session-tracker.js";
+import { outputJson } from "../shared/formatting.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { output, outputBlank, outputSection } from "../shared/output.js";
 
 // ── Display Helpers ────────────────────────────────────────────────────────
 

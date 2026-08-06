@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { sendDesktopNotification, readNotificationLog } from "../notify.js";
+import { sendDesktopNotification, readNotificationLog } from "../infrastructure/notify.js";
 import { existsSync, mkdirSync, rmSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";

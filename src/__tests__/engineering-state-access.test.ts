@@ -9,7 +9,7 @@ import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { getEngineeringState, clearEngineeringStateCache } from "../engineering-state/index.js";
-import { saveEngineeringState, type EngineeringState } from "../engineering-state.js";
+import { saveEngineeringState, type EngineeringState } from "../application/engineering-state.js";
 
 describe("engineering-state-access", () => {
   let tmpDir: string;

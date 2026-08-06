@@ -17,7 +17,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import {
   acquireVerificationLock,
   releaseVerificationLock,
-} from "../verification-lock.js";
+} from "../infrastructure/verification-lock.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ function getLockPath(shitennoDir: string): string {
  */
 function createWorkerScript(dir: string): string {
   const scriptPath = join(dir, "worker.ts");
-  const lockModulePath = join(process.cwd(), "src", "verification-lock.ts");
+  const lockModulePath = join(process.cwd(), "src", "infrastructure", "verification-lock.ts");
   const script = [
     `import { acquireVerificationLock, releaseVerificationLock } from ${JSON.stringify(lockModulePath)};`,
     `import { createInterface } from "node:readline";`,

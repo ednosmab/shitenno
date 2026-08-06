@@ -6,17 +6,17 @@
 
 import { Command } from "commander";
 import chalk from "chalk";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { recordOutcome, createFileStorage, type SessionOutcome } from "../session-feedback.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
-import { trackFeedback } from "../session-tracker.js";
-import { getSessionId } from "../session-context.js";
-import { outputJson } from "../formatting.js";
-import { getEventBus } from "../event-bus.js";
-import { readCache } from "../briefing-cache.js";
-import { updateProfileFromSession, saveUserProfile } from "../feedback-engine.js";
-import { parseUserRating, parseUserTags } from "../feedback-utils.js";
-import { output, outputError } from "../output.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { recordOutcome, createFileStorage, type SessionOutcome } from "../infrastructure/session-feedback.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
+import { trackFeedback } from "../infrastructure/session-tracker.js";
+import { getSessionId } from "../shared/session-context.js";
+import { outputJson } from "../shared/formatting.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { readCache } from "../infrastructure/briefing-cache.js";
+import { updateProfileFromSession, saveUserProfile } from "../application/feedback-engine.js";
+import { parseUserRating, parseUserTags } from "../domain/rules/feedback-utils.js";
+import { output, outputError } from "../shared/output.js";
 import { handlePersonalizedMode, handleListMode, handleSummaryMode, outputRecordedFeedback } from "./feedback/display.js";
 
 type Options = Record<string, unknown>;

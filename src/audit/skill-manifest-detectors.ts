@@ -8,9 +8,9 @@
 
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import type { HealthIssue } from "./types.js";
-import { loadSkillManifest } from "../skill-manifest.js";
+import { loadSkillManifest } from "../infrastructure/skill-manifest.js";
 
 /**
  * Detect skills that exist as files but have no entry in skill-manifest.yaml —

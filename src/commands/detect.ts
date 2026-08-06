@@ -1,13 +1,13 @@
 import { Command } from "commander";
 import ora from "ora";
-import { detectPatterns, writePatternReport, type PatternDetectionReport } from "../pattern-detector.js";
-import { getCached, setCache, computeKeyChecksums } from "../cache.js";
-import { outputJson, banner } from "../formatting.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { checkAndArchiveDonePlans } from "../plan-lifecycle.js";
-import { output, outputBlank, outputError } from "../output.js";
-import { logger, muteLogs } from "../logger.js";
+import { detectPatterns, writePatternReport, type PatternDetectionReport } from "../infrastructure/pattern-detector.js";
+import { getCached, setCache, computeKeyChecksums } from "../infrastructure/cache.js";
+import { outputJson, banner } from "../shared/formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { checkAndArchiveDonePlans } from "../application/plan-lifecycle.js";
+import { output, outputBlank, outputError } from "../shared/output.js";
+import { logger, muteLogs } from "../shared/logger.js";
 import { handleApproveReject, recordCandidateRuleFeedback } from "./detect/rules.js";
 import { outputHumanReadable, outputJsonReport, outputMarkdownReport } from "./detect/display.js";
 

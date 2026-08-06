@@ -6,7 +6,7 @@
  * proactive.digest_ready.
  */
 
-import { getEventBus } from "../event-bus.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 import { recordEvent } from "./state.js";
 import { daemonLog } from "./log-rotation.js";
 import type { DaemonContext } from "./pid-manager.js";

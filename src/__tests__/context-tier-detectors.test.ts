@@ -27,11 +27,11 @@ const { readPersistedEventsMock } = vi.hoisted(() => ({
   readPersistedEventsMock: vi.fn((): MockEvent[] => []),
 }));
 
-vi.mock("../event-bus.js", () => ({
+vi.mock("../infrastructure/event-bus.js", () => ({
   readPersistedEvents: readPersistedEventsMock,
 }));
 
-vi.mock("../logger.js", () => ({
+vi.mock("../shared/logger.js", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 

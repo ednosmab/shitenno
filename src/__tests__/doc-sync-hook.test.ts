@@ -8,14 +8,14 @@ vi.mock("node:fs", () => ({
   existsSync: vi.fn(),
 }));
 
-vi.mock("../event-bus.js", () => ({
+vi.mock("../infrastructure/event-bus.js", () => ({
   getEventBus: vi.fn().mockReturnValue({
     subscribe: vi.fn().mockReturnValue(vi.fn()),
     publish: vi.fn(),
   }),
 }));
 
-vi.mock("../logger.js", () => ({
+vi.mock("../shared/logger.js", () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -34,7 +34,7 @@ beforeEach(() => {
 
 describe("runDocSync", () => {
   it("returns failure when sync script not found", async () => {
-    const { runDocSync } = await import("../doc-sync-hook.js");
+    const { runDocSync } = await import("../infrastructure/doc-sync-hook.js");
     const { existsSync } = await import("node:fs");
 
     vi.mocked(existsSync).mockReturnValue(false);
@@ -47,7 +47,7 @@ describe("runDocSync", () => {
   });
 
   it("executes sync command and returns success", async () => {
-    const { runDocSync } = await import("../doc-sync-hook.js");
+    const { runDocSync } = await import("../infrastructure/doc-sync-hook.js");
     const { existsSync } = await import("node:fs");
     const { execSync } = await import("node:child_process");
 
@@ -63,7 +63,7 @@ describe("runDocSync", () => {
   });
 
   it("appends --quiet flag for silent mode", async () => {
-    const { runDocSync } = await import("../doc-sync-hook.js");
+    const { runDocSync } = await import("../infrastructure/doc-sync-hook.js");
     const { existsSync } = await import("node:fs");
     const { execSync } = await import("node:child_process");
 
@@ -79,7 +79,7 @@ describe("runDocSync", () => {
   });
 
   it("appends --quiet flag for minimal mode", async () => {
-    const { runDocSync } = await import("../doc-sync-hook.js");
+    const { runDocSync } = await import("../infrastructure/doc-sync-hook.js");
     const { existsSync } = await import("node:fs");
     const { execSync } = await import("node:child_process");
 
@@ -95,7 +95,7 @@ describe("runDocSync", () => {
   });
 
   it("does not append flags for verbose mode", async () => {
-    const { runDocSync } = await import("../doc-sync-hook.js");
+    const { runDocSync } = await import("../infrastructure/doc-sync-hook.js");
     const { existsSync } = await import("node:fs");
     const { execSync } = await import("node:child_process");
 
@@ -111,7 +111,7 @@ describe("runDocSync", () => {
   });
 
   it("handles execSync failure", async () => {
-    const { runDocSync } = await import("../doc-sync-hook.js");
+    const { runDocSync } = await import("../infrastructure/doc-sync-hook.js");
     const { existsSync } = await import("node:fs");
     const { execSync } = await import("node:child_process");
 
@@ -131,8 +131,8 @@ describe("runDocSync", () => {
 
 describe("registerDocSyncHook", () => {
   it("returns unsubscribe function when auto-sync disabled", async () => {
-    const { registerDocSyncHook } = await import("../doc-sync-hook.js");
-    const { logger } = await import("../logger.js");
+    const { registerDocSyncHook } = await import("../infrastructure/doc-sync-hook.js");
+    const { logger } = await import("../shared/logger.js");
 
     const unsub = registerDocSyncHook({ projectRoot: "/project", enableAutoSync: false });
     expect(typeof unsub).toBe("function");
@@ -140,8 +140,8 @@ describe("registerDocSyncHook", () => {
   });
 
   it("subscribes to docs.sync.triggered when enabled", async () => {
-    const { registerDocSyncHook } = await import("../doc-sync-hook.js");
-    const { getEventBus } = await import("../event-bus.js");
+    const { registerDocSyncHook } = await import("../infrastructure/doc-sync-hook.js");
+    const { getEventBus } = await import("../infrastructure/event-bus.js");
 
     const unsub = registerDocSyncHook({ projectRoot: "/project", enableAutoSync: true });
     expect(typeof unsub).toBe("function");
@@ -152,8 +152,8 @@ describe("registerDocSyncHook", () => {
   });
 
   it("uses custom sync command", async () => {
-    const { registerDocSyncHook } = await import("../doc-sync-hook.js");
-    const { getEventBus } = await import("../event-bus.js");
+    const { registerDocSyncHook } = await import("../infrastructure/doc-sync-hook.js");
+    const { getEventBus } = await import("../infrastructure/event-bus.js");
 
     registerDocSyncHook({
       projectRoot: "/project",

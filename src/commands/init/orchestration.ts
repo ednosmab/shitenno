@@ -10,28 +10,28 @@ import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import ora from "ora";
 import fse from "fs-extra";
-import { scaffoldShitenno } from "../../scaffolder.js";
-import { invalidateCache } from "../../cache.js";
-import { loadPlugins, getHookBus } from "../../plugin-system.js";
+import { scaffoldShitenno } from "../../infrastructure/scaffolder.js";
+import { invalidateCache } from "../../infrastructure/cache.js";
+import { loadPlugins, getHookBus } from "../../infrastructure/plugin-system.js";
 import {
   saveMaturityProfile,
   recordMaturitySnapshot,
   loadMaturityProfile,
   type MaturityProfile,
   type Capability,
-} from "../../maturity-profile.js";
-import { saveUserProfile } from "../../feedback-engine.js";
-import { initializeRules } from "../../rule-engine.js";
-import { createManifest, writeManifest } from "../../manifest.js";
-import { getEventBus } from "../../event-bus.js";
-import { logger } from "../../logger.js";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { installReactiveHooks } from "../../git-hooks-installer.js";
-import { output, outputBlank, outputError } from "../../output.js";
+} from "../../application/maturity-profile.js";
+import { saveUserProfile } from "../../application/feedback-engine.js";
+import { initializeRules } from "../../application/rule-engine.js";
+import { createManifest, writeManifest } from "../../infrastructure/manifest.js";
+import { getEventBus } from "../../infrastructure/event-bus.js";
+import { logger } from "../../shared/logger.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import { installReactiveHooks } from "../../infrastructure/git-hooks-installer.js";
+import { output, outputBlank, outputError } from "../../shared/output.js";
 import { displaySuccessResults } from "./display.js";
 import { generateMcpJson } from "./mcp.js";
-import type { ProjectAnalysis } from "../../analyser.js";
-import type { UserAnswers } from "../../prompts.js";
+import type { ProjectAnalysis } from "../../infrastructure/analyser.js";
+import type { UserAnswers } from "../../interface/cli/prompts.js";
 
 // ── Event Publishing ────────────────────────────────────────────────────────
 
@@ -128,13 +128,13 @@ export async function generateFingerprintAndBriefing(
   analysis: ProjectAnalysis,
   profile: MaturityProfile,
 ): Promise<void> {
-  const { generateProjectFingerprint, saveFingerprint } = await import("../../project-fingerprint.js");
+  const { generateProjectFingerprint, saveFingerprint } = await import("../../infrastructure/project-fingerprint.js");
   const fingerprint = generateProjectFingerprint(targetDir, analysis, profile.overallScore);
   saveFingerprint(shitennoDir, fingerprint);
 
   try {
-    const { generateRiskMap } = await import("../../risk-map.js");
-    const { generateBriefing, briefingToMarkdown } = await import("../../briefing.js");
+    const { generateRiskMap } = await import("../../infrastructure/risk-map.js");
+    const { generateBriefing, briefingToMarkdown } = await import("../../application/briefing.js");
     const riskMap = generateRiskMap(targetDir, shitennoDir);
     const briefing = generateBriefing({ fingerprint, riskMap, contextRules: [], dynamicRules: [], maturityProfile: profile, projectRoot: targetDir });
     const briefingPath = join(shitennoDir, "BRIEFING.md");

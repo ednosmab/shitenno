@@ -4,8 +4,8 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { logger } from "../logger.js";
-import type { BacklogItem, BacklogPriority, BacklogSeverity } from "../backlog-types.js";
+import { logger } from "../shared/logger.js";
+import type { BacklogItem, BacklogPriority, BacklogSeverity } from "../domain/types/backlog-types.js";
 
 export function mapSeverityToPriority(
   auditSeverity: number,

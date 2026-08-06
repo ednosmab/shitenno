@@ -15,17 +15,17 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { join } from "node:path";
-import { guardNotInitialized } from "../shared.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
+import { guardNotInitialized } from "../shared/shared.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
 import {
   DecisionEngine,
   FileDecisionRepository,
   type DecisionRecommendation,
   type RiskLevel,
 } from "../prioritization/evaluators.js";
-import { outputJson } from "../formatting.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
-import { output, outputBlank, outputSection, outputError } from "../output.js";
+import { outputJson } from "../shared/formatting.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
+import { output, outputBlank, outputSection, outputError } from "../shared/output.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

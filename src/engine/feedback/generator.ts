@@ -4,7 +4,7 @@
  * Orchestrates feedback item generation, guidance, and leadership metrics.
  */
 
-import type { SessionFeedbackRecord } from "../../session-feedback.js";
+import type { SessionFeedbackRecord } from "../../infrastructure/session-feedback.js";
 import type { UserProfile, FeedbackTone, FeedbackItem, PersonalizedFeedback } from "./profile.js";
 import { calibrateTone } from "./profile.js";
 import {

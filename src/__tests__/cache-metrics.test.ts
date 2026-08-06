@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { recordHit, recordMiss, recordEviction, getCacheStats, getAllCacheStats, resetMetrics, resetAllMetrics, getPerformanceReport } from "../cache-metrics.js";
+import { recordHit, recordMiss, recordEviction, getCacheStats, getAllCacheStats, resetMetrics, resetAllMetrics, getPerformanceReport } from "../shared/cache-metrics.js";
 
 describe("cache-metrics", () => {
   beforeEach(() => {

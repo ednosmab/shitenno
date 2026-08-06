@@ -8,7 +8,7 @@ import { writeExternalIndex, EXTERNAL_INDEX_REL_PATH } from "../commands/init/ma
 import { detectBrokenManifestRefs } from "../audit/docs/refs.js";
 import { STANDARD_DETECTORS } from "../audit/constants/detectors-standard.js";
 import { buildGovernanceDetectors } from "../audit/detector-map/governance.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 import type { DetectorContext } from "../audit/detector-map/context.js";
 import type { HealthIssue } from "../audit/types.js";
 

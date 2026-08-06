@@ -8,8 +8,8 @@
  * Uses persisted events from context.p4_loaded to count on-demand loads.
  */
 
-import { logger } from "../logger.js";
-import { readPersistedEvents, type EventEnvelope } from "../event-bus.js";
+import { logger } from "../shared/logger.js";
+import { readPersistedEvents, type EventEnvelope } from "../infrastructure/event-bus.js";
 import type { HealthIssue } from "./types.js";
 
 // ── Constants ──────────────────────────────────────────────────────────────

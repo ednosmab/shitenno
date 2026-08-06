@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { join } from "node:path";
 import { mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { installReactiveHooks } from "../git-hooks-installer.js";
+import { installReactiveHooks } from "../infrastructure/git-hooks-installer.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

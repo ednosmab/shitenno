@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import type { Reminder, ReminderPriority, ReminderCategory } from "../../briefing.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import type { Reminder, ReminderPriority, ReminderCategory } from "../../application/briefing.js";
 
 export const VALID_PRIORITIES: ReminderPriority[] = ["high", "medium", "low"];
 export const VALID_CATEGORIES: ReminderCategory[] = ["bug", "feature", "debt", "security", "docs", "infra"];

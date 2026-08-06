@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { analyseProject } from "../analyser.js";
-import { calculateComplexityScore } from "../scorer.js";
+import { analyseProject } from "../infrastructure/analyser.js";
+import { calculateComplexityScore } from "../application/scorer.js";
 
 let tempDir: string;
 

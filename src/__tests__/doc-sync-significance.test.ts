@@ -7,7 +7,7 @@ import {
   calculateSignificance,
   ChangeHistoryTracker,
   type ChangeFrequency,
-} from "../doc-sync-significance.js";
+} from "../domain/rules/doc-sync-significance.js";
 
 const SHUGO = "/project/shitenno";
 

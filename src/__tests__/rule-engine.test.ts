@@ -16,7 +16,7 @@ import {
   getDefaultRules,
   type Rule,
   type RuleContext,
-} from "../rule-engine.js";
+} from "../application/rule-engine.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

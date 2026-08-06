@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { consolidateEngineeringState } from "../engineering-state.js";
+import { consolidateEngineeringState } from "../application/engineering-state.js";
 
 describe("Single Source of Truth (Phase 4)", () => {
   it("consolidateEngineeringState returns a valid state", () => {

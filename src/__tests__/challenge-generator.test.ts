@@ -8,10 +8,10 @@ import {
   detectParadigmShift,
   ensureFlowState,
 
-} from "../challenge-generator.js";
-import { loadGrowthProfile, } from "../growth-profile.js";
-import type { EvolutionRecommendation } from "../auto-evolution.js";
-import type { ShitennoState } from "../state-manager.js";
+} from "../application/challenge-generator.js";
+import { loadGrowthProfile, } from "../infrastructure/growth-profile.js";
+import type { EvolutionRecommendation } from "../application/auto-evolution.js";
+import type { ShitennoState } from "../application/state-manager.js";
 
 let tempDir: string;
 let shitennoDir: string;

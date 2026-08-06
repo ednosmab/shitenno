@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { briefingToJson, briefingToSummary, generateDiff, type Briefing, type Reminder } from "../briefing.js";
+import { briefingToJson, briefingToSummary, generateDiff, type Briefing, type Reminder } from "../application/briefing.js";
 
 function makeReminder(overrides?: Partial<Reminder>): Reminder {
   return {

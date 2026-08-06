@@ -2,7 +2,7 @@
  * engine/feedback/items/guidance.ts — Next-Level Guidance and Leadership Metrics
  */
 
-import type { SessionFeedbackRecord, SessionOutcome } from "../../../session-feedback.js";
+import type { SessionFeedbackRecord, SessionOutcome } from "../../../infrastructure/session-feedback.js";
 import type { UserProfile, FeedbackTone, LeadershipMetrics } from "../profile.js";
 
 export function generateNextLevelGuidance(

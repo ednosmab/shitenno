@@ -13,7 +13,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 import type { PatternType } from "./pattern-rules.js";
-import type { GrowthProfile, PathChoice } from "../growth-profile.js";
+import type { GrowthProfile, PathChoice } from "../infrastructure/growth-profile.js";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 

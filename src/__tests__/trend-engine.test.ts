@@ -9,8 +9,8 @@ import {
   generatePredictions,
   generateForecast,
   type TrendSnapshot,
-} from "../trend-engine.js";
-import type { EngineeringState } from "../engineering-state.js";
+} from "../domain/rules/trend-engine.js";
+import type { EngineeringState } from "../application/engineering-state.js";
 
 function createMockState(overrides: Partial<EngineeringState> = {}): EngineeringState {
   return {

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { HealthIssue } from "../types.js";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 
 const TEMPLATE_PATTERNS = ["YYYY", "MM-DD", "<", "*", "[camada]"];
 const SKIP_DIRS = ["governance/", "docs/", "shitenno/"];

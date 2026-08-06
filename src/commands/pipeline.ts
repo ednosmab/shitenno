@@ -5,19 +5,19 @@
  */
 
 import { Command } from "commander";
-import { outputJson, banner } from "../formatting.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { printDaemonBanner } from "../daemon-context-banner.js";
-import { outputBlank, output, outputError } from "../output.js";
-import { muteLogs } from "../logger.js";
+import { outputJson, banner } from "../shared/formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { printDaemonBanner } from "../interface/cli/daemon-context-banner.js";
+import { outputBlank, output, outputError } from "../shared/output.js";
+import { muteLogs } from "../shared/logger.js";
 import {
   runValidationPhase,
   runFullValidation,
   getPhaseConfig,
   type ValidationPhase,
   type ValidationReport,
-} from "../validation-pipeline.js";
+} from "../infrastructure/validation-pipeline.js";
 
 // ── Display ────────────────────────────────────────────────────────────────
 

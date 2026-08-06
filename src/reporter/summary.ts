@@ -2,9 +2,9 @@
  * reporter/summary.ts — Summary Generation for Performance Reports
  */
 
-import type { PerformanceMetric, DimensionReport } from "../performance-reporter.js";
-import type { SessionMetrics } from "../session-tracker.js";
-import type { GrowthProfile } from "../growth-profile.js";
+import type { PerformanceMetric, DimensionReport } from "../application/performance-reporter.js";
+import type { SessionMetrics } from "../infrastructure/session-tracker.js";
+import type { GrowthProfile } from "../infrastructure/growth-profile.js";
 
 export interface SummaryContext {
   dimensions: Record<PerformanceMetric, DimensionReport>;

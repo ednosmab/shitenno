@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { calculateComplexityScore, writeComplexityReport } from "../scorer.js";
-import type { ProjectAnalysis } from "../analyser.js";
+import { calculateComplexityScore, writeComplexityReport } from "../application/scorer.js";
+import type { ProjectAnalysis } from "../infrastructure/analyser.js";
 
 let tempDir: string;
 let shitennoDir: string;
@@ -36,6 +36,10 @@ function makeAnalysis(overrides: Partial<ProjectAnalysis> = {}): ProjectAnalysis
     hasCI: false,
     hasTypeScript: false,
     totalCommits: 0,
+    flatSourceFiles: 0,
+    layeredDirs: 0,
+    nodeApiImportsOutsideLayers: 0,
+    portsConsumed: false,
     ...overrides,
   };
 }

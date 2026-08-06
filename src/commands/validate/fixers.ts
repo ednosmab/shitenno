@@ -6,7 +6,7 @@
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
 import type { ValidationResult } from "./checks.js";
 
 // ── Fix Functions ───────────────────────────────────────────────────────────

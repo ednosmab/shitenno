@@ -2,12 +2,12 @@
  * context-collector/enrichments.ts — Briefing enrichment functions
  */
 
-import type { Briefing } from "../briefing.js";
+import type { Briefing } from "../application/briefing.js";
 import type { PatternDetectionReport, DetectedPattern } from "../domain/entities/engineering-state.js";
-import { listAdrs, listSkills } from "../knowledge-loader.js";
-import { getFeedbackRecords, computeFeedbackSummary } from "../session-feedback.js";
-import { readPersistedEvents, type EventEnvelope } from "../event-bus.js";
-import { logger } from "../logger.js";
+import { listAdrs, listSkills } from "../infrastructure/knowledge-loader.js";
+import { getFeedbackRecords, computeFeedbackSummary } from "../infrastructure/session-feedback.js";
+import { readPersistedEvents, type EventEnvelope } from "../infrastructure/event-bus.js";
+import { logger } from "../shared/logger.js";
 import type { ContextDeps } from "./types.js";
 
 export function enrichBriefingWithGovernanceKnowledge(

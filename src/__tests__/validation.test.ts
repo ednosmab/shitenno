@@ -14,7 +14,7 @@ import {
   isSafeFieldName,
   sanitizeForYaml,
   sanitizeIdentifier,
-} from "../validation.js";
+} from "../infrastructure/validation.js";
 
 const TEST_DIR = join(tmpdir(), "shitenno-validation-test");
 

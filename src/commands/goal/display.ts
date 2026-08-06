@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { type Goal, type GoalStatus, type GoalPriority } from "../../prioritization/goals.js";
-import { output, outputBlank, outputSection } from "../../output.js";
+import { output, outputBlank, outputSection } from "../../shared/output.js";
 
 export const STATUS_COLORS: Record<GoalStatus, (s: string) => string> = {
   draft: (s) => chalk.gray(s),

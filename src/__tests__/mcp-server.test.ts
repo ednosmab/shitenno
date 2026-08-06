@@ -9,28 +9,28 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // ── Mocks ───────────────────────────────────────────────────────────────────
 
-vi.mock("../context-collector.js", () => ({
+vi.mock("../application/context-collector.js", () => ({
   collectContext: vi.fn(),
 }));
 
-vi.mock("../risk-map.js", () => ({
+vi.mock("../infrastructure/risk-map.js", () => ({
   generateRiskMap: vi.fn(),
 }));
 
-vi.mock("../rule-engine.js", () => ({
+vi.mock("../application/rule-engine.js", () => ({
   loadRules: vi.fn(() => []),
 }));
 
-vi.mock("../dynamic-rules.js", () => ({
+vi.mock("../infrastructure/dynamic-rules.js", () => ({
   generateDynamicRules: vi.fn(() => []),
 }));
 
-vi.mock("../daemon-client.js", () => ({
+vi.mock("../infrastructure/daemon-client.js", () => ({
   isDaemonRunning: vi.fn(() => false),
   queryDaemon: vi.fn(() => Promise.resolve(null)),
 }));
 
-vi.mock("../briefing-cache.js", () => ({
+vi.mock("../infrastructure/briefing-cache.js", () => ({
   computeRequestHash: vi.fn(() => "test-hash"),
   getCachedBriefingByRequest: vi.fn(() => null),
   setCachedBriefing: vi.fn(),
@@ -39,29 +39,29 @@ vi.mock("../briefing-cache.js", () => ({
   computeInputHash: vi.fn(() => "test-input-hash"),
 }));
 
-vi.mock("../mcp-cache.js", () => ({
+vi.mock("../infrastructure/mcp-cache.js", () => ({
   withCache: vi.fn(async (handler: () => Promise<unknown>) => handler()),
   clearCache: vi.fn(),
   invalidateCache: vi.fn(),
   getCacheStats: vi.fn(() => ({ size: 0, hitRate: 0, totalHits: 0, totalMisses: 0 })),
 }));
 
-vi.mock("../cache-metrics.js", () => ({
+vi.mock("../shared/cache-metrics.js", () => ({
   recordHit: vi.fn(),
   recordMiss: vi.fn(),
   recordEviction: vi.fn(),
 }));
 
-import { collectContext } from "../context-collector.js";
-import { generateRiskMap } from "../risk-map.js";
-import { loadRules } from "../rule-engine.js";
-import { generateDynamicRules } from "../dynamic-rules.js";
+import { collectContext } from "../application/context-collector.js";
+import { generateRiskMap } from "../infrastructure/risk-map.js";
+import { loadRules } from "../application/rule-engine.js";
+import { generateDynamicRules } from "../infrastructure/dynamic-rules.js";
 import {
   handleGetBriefing,
   handleGetRiskMap,
   handleGetRules,
-} from "../mcp-server.js";
-import { clearCache } from "../mcp-cache.js";
+} from "../interface/mcp/mcp-server.js";
+import { clearCache } from "../infrastructure/mcp-cache.js";
 
 const mockCollectContext = vi.mocked(collectContext);
 const mockGenerateRiskMap = vi.mocked(generateRiskMap);
@@ -483,18 +483,18 @@ describe("Error Handling", () => {
 
 describe("createMcpServer", () => {
   it("creates a server with correct name and version", async () => {
-    const { createMcpServer } = await import("../mcp-server.js");
+    const { createMcpServer } = await import("../interface/mcp/mcp-server.js");
     const server = createMcpServer("/project", "/project/shitenno");
     expect(server).toBeDefined();
   });
 
   it("can be instantiated without errors", async () => {
-    const { createMcpServer } = await import("../mcp-server.js");
+    const { createMcpServer } = await import("../interface/mcp/mcp-server.js");
     expect(() => createMcpServer("/project")).not.toThrow();
   });
 
   it("handles missing shugo directory gracefully", async () => {
-    const { createMcpServer } = await import("../mcp-server.js");
+    const { createMcpServer } = await import("../interface/mcp/mcp-server.js");
     expect(() =>
       createMcpServer("/project", "/nonexistent/shitenno")
     ).not.toThrow();

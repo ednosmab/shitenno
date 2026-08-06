@@ -1,6 +1,6 @@
 import { ORPHAN_SEVERITY_THRESHOLD, OVERSIZED_WARNING_THRESHOLD, OVERSIZED_INFO_THRESHOLD } from "../constants.js";
 import type { HealthIssue, SourceFileInfo } from "../types.js";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 
 function extractFileExports(files: SourceFileInfo[]): Map<string, Set<string>> {
   const exportRegex = /^export\s+(?:function|const|class|interface|type|enum)\s+(\w+)/gm;

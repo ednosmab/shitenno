@@ -1,9 +1,9 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync } from "node:fs";
 import { join, dirname, basename } from "node:path";
-import { resolveWithinRoot } from "../../path-safety.js";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { logger } from "../../logger.js";
-import { getEventBus } from "../../event-bus.js";
+import { resolveWithinRoot } from "../../domain/rules/path-safety.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import { logger } from "../../shared/logger.js";
+import { getEventBus } from "../../infrastructure/event-bus.js";
 import type {
   DocLifecycleStatus,
   DocumentClassification,

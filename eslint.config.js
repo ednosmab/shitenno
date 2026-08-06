@@ -55,10 +55,10 @@ export default [
   // Exceptions: infrastructure modules that own filesystem access
   {
     files: [
-      "src/engineering-state.ts",
-      "src/maturity-profile.ts",
-      "src/state-manager.ts",
-      "src/analyser.ts",
+      "src/application/engineering-state.ts",
+      "src/application/maturity-profile.ts",
+      "src/application/state-manager.ts",
+      "src/infrastructure/analyser.ts",
     ],
     rules: {
       "no-restricted-imports": "off",
@@ -66,7 +66,7 @@ export default [
   },
   // Exception: constants.ts is where SHITENNO_DIR_NAME is defined — must contain the literal
   {
-    files: ["src/constants.ts"],
+    files: ["src/domain/types/constants.ts"],
     rules: {
       "no-restricted-syntax": "off",
     },

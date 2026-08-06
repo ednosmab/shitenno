@@ -17,16 +17,16 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { join } from "node:path";
-import { guardNotInitialized } from "../shared.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { guardNotInitialized } from "../shared/shared.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 import {
   ActionEngine,
   FileExecutionRepository,
   type ActionStatus,
   type ActionResult,
-} from "../action-engine.js";
-import { outputJson } from "../formatting.js";
-import { output, outputBlank, outputSection, outputSuccess, outputError } from "../output.js";
+} from "../application/action-engine.js";
+import { outputJson } from "../shared/formatting.js";
+import { output, outputBlank, outputSection, outputSuccess, outputError } from "../shared/output.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

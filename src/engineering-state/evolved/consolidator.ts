@@ -1,4 +1,4 @@
-import type { EngineeringState, AssetType } from "../../engineering-state.js";
+import type { EngineeringState, AssetType } from "../../application/engineering-state.js";
 import { MAX_PENDING_DELTAS, type StateDelta } from "./types.js";
 
 export class IncrementalConsolidator {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { recordOutcome, computeFeedbackSummary } from "../session-feedback.js";
-import type { SessionFeedbackRecord } from "../session-feedback.js";
+import { recordOutcome, computeFeedbackSummary } from "../infrastructure/session-feedback.js";
+import type { SessionFeedbackRecord } from "../infrastructure/session-feedback.js";
 
 describe("session-feedback", () => {
   describe("recordOutcome", () => {

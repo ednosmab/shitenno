@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { execSync } from "node:child_process";
 import { resolve } from "node:path";
-import { getEventBus } from "../event-bus.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 
 const LARGE_COMMIT_THRESHOLD = 50;
 

@@ -1,6 +1,6 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import type { MaturityDimensions } from "../domain/entities/engineering-state.js";
 
 export interface MaturityAnswers {
@@ -30,15 +30,26 @@ export interface ProjectAnalysis {
   hasLinter: boolean;
   hasTypeScript: boolean;
   sourceFileCount: number;
+  flatSourceFiles: number;
+  layeredDirs: number;
+  nodeApiImportsOutsideLayers: number;
+  portsConsumed: boolean;
 }
 
 function scoreArchitecture(answers: MaturityAnswers, analysis: ProjectAnalysis): number {
   let score = 0;
-  if (answers.hasArchitectureDocs) score += 30;
-  if (answers.hasADRs) score += 25;
-  if (answers.hasTechnicalReviews) score += 20;
-  if (analysis.monorepo) score += 15;
-  if (analysis.packageCount >= 3) score += 10;
+  if (answers.hasArchitectureDocs) score += 15;
+  if (answers.hasADRs) score += 10;
+  if (answers.hasTechnicalReviews) score += 5;
+  if (analysis.monorepo) score += 5;
+  if (analysis.packageCount >= 3) score += 5;
+  if (analysis.flatSourceFiles === 0) score += 20;
+  else if (analysis.flatSourceFiles <= 3) score += 10;
+  else if (analysis.flatSourceFiles <= 10) score += 5;
+  score += Math.min(analysis.layeredDirs * 5, 25);
+  if (analysis.nodeApiImportsOutsideLayers === 0) score += 15;
+  else if (analysis.nodeApiImportsOutsideLayers <= 2) score += 8;
+  if (analysis.portsConsumed) score += 10;
   return score;
 }
 

@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { execSync } from "node:child_process";
 import { resolve } from "node:path";
-import { getEventBus } from "../event-bus.js";
-import { logger } from "../logger.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { logger } from "../shared/logger.js";
 
 const UNCOMMITTED_FILES_THRESHOLD = 20;
 const UNCOMMITTED_MINUTES_THRESHOLD = 120;

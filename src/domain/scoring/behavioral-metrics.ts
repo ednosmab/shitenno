@@ -8,8 +8,8 @@
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { ProjectAnalysis } from "../../analyser.js";
-import { logger } from "../../logger.js";
+import type { ProjectAnalysis } from "../../infrastructure/analyser.js";
+import { logger } from "../../shared/logger.js";
 import type { StaticMetric, BehavioralMetric } from "../entities/engineering-state.js";
 
 // ── Constants for calculation ────────────────────────────────────────────────

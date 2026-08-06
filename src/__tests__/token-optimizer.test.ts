@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { suggestDepth, generateOptimizationHints, compressedSummary, differentialBriefing, type Briefing } from "../token-optimizer.js";
+import { suggestDepth, generateOptimizationHints, compressedSummary, differentialBriefing, type Briefing } from "../domain/rules/token-optimizer.js";
 
 function makeBriefing(overrides?: Partial<Briefing>): Briefing {
   return {

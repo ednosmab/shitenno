@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { getCachedPlanInference, getCachedSummary, invalidatePlanCache, invalidateAllCache, getCacheStats } from "../inference-cache.js";
+import { getCachedPlanInference, getCachedSummary, invalidatePlanCache, invalidateAllCache, getCacheStats } from "../infrastructure/inference-cache.js";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";

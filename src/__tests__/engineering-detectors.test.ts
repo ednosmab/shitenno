@@ -489,7 +489,7 @@ describe("detectOrphanModules", () => {
   it("does not flag module only imported by test files", () => {
     const files = [
       makeFile("src/utils.ts", "export function helper() { return 1; }"),
-      makeFile("src/__tests__/utils.test.ts", 'import { helper } from "../utils.js"\ntest("helper", () => helper());'),
+      makeFile("src/__tests__/utils.test.ts", 'import { helper } from "../infrastructure/utils.js"\ntest("helper", () => helper());'),
     ];
     const issues = detectOrphanModules(tempDir, files);
     const orphanUtils = issues.find((i) => i.description.includes("utils.ts"));
@@ -657,7 +657,7 @@ describe("detectUnusedExports", () => {
   it("flags exports only used by test files as unused", () => {
     const files = [
       makeFile("src/utils.ts", "export function helper() { return 1; }"),
-      makeFile("src/__tests__/utils.test.ts", 'import { helper } from "../utils.js"\ntest("helper", () => helper());'),
+      makeFile("src/__tests__/utils.test.ts", 'import { helper } from "../infrastructure/utils.js"\ntest("helper", () => helper());'),
     ];
     const issues = detectUnusedExports(tempDir, files);
     expect(issues.length).toBeGreaterThanOrEqual(1);
@@ -667,7 +667,7 @@ describe("detectUnusedExports", () => {
   it("flags exports not used by any non-test file", () => {
     const files = [
       makeFile("src/utils.ts", "export function helper() { return 1; }\nexport function trulyUnused() { return 2; }"),
-      makeFile("src/__tests__/utils.test.ts", 'import { helper } from "../utils.js"\ntest("helper", () => helper());'),
+      makeFile("src/__tests__/utils.test.ts", 'import { helper } from "../infrastructure/utils.js"\ntest("helper", () => helper());'),
       makeFile("src/main.ts", 'import { helper } from "./utils.js"\nhelper();'),
     ];
     const issues = detectUnusedExports(tempDir, files);

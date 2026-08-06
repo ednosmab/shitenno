@@ -6,9 +6,9 @@
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
-import type { MarkdownPlan } from "../markdown-plan-engine.js";
-import type { ValidationResult } from "../plan-lifecycle.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
+import type { MarkdownPlan } from "../infrastructure/markdown-plan-engine.js";
+import type { ValidationResult } from "../application/plan-lifecycle.js";
 
 export function detectActivePlans(shitennoDir: string): MarkdownPlan[] {
   const plansDir = join(shitennoDir, "governance", "plans");

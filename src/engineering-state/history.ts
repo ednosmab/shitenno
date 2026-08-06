@@ -9,7 +9,7 @@
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { type EngineeringState } from "../engineering-state.js";
+import { type EngineeringState } from "../application/engineering-state.js";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 

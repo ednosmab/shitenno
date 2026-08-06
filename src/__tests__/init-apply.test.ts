@@ -6,7 +6,7 @@ import { execSync } from "node:child_process";
 import { applyByLevel, backupExistingConfigs, REPLACEABLE_ROOT_FILES } from "../commands/init/apply.js";
 import { resolveMcpCommand } from "../commands/init/mcp.js";
 import { discoverProject } from "../commands/init/discovery.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 function makeDir(prefix: string): string {
   const dir = mkdtempSync(join(tmpdir(), `shitenno-apply-${prefix}-`));

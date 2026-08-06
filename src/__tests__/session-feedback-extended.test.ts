@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { recordOutcome, computeFeedbackSummary, type SessionFeedbackRecord } from "../session-feedback.js";
+import { recordOutcome, computeFeedbackSummary, type SessionFeedbackRecord } from "../infrastructure/session-feedback.js";
 
 describe("session-feedback extended functions", () => {
   describe("getFeedbackForSession", () => {

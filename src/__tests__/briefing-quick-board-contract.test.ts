@@ -1,30 +1,30 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("../context-collector.js", () => ({
+vi.mock("../application/context-collector.js", () => ({
   collectContext: vi.fn(),
 }));
 
-vi.mock("../briefing-cache.js", () => ({
+vi.mock("../infrastructure/briefing-cache.js", () => ({
   computeRequestHash: vi.fn(() => "test-hash"),
   setCachedBriefing: vi.fn(),
   getCachedBriefingByRequest: vi.fn(() => null),
 }));
 
-vi.mock("../daemon-client.js", () => ({
+vi.mock("../infrastructure/daemon-client.js", () => ({
   queryDaemon: vi.fn(),
   isDaemonRunning: vi.fn(() => false),
 }));
 
-vi.mock("../skill-manifest.js", () => ({
+vi.mock("../infrastructure/skill-manifest.js", () => ({
   loadSkillManifest: vi.fn(),
   partitionSkills: vi.fn(() => ({ mandatory: [], optional: [] })),
 }));
 
-vi.mock("../knowledge-loader.js", () => ({
+vi.mock("../infrastructure/knowledge-loader.js", () => ({
   getSkill: vi.fn(),
 }));
 
-vi.mock("../context-buffer-writer.js", () => ({
+vi.mock("../application/context-buffer-writer.js", () => ({
   recordSkillResolution: vi.fn(),
 }));
 
@@ -32,14 +32,14 @@ vi.mock("./rules.js", () => ({
   loadMandatoryRulesWithContent: vi.fn(() => []),
 }));
 
-vi.mock("../cache-metrics.js", () => ({
+vi.mock("../shared/cache-metrics.js", () => ({
   recordHit: vi.fn(),
   recordMiss: vi.fn(),
 }));
 
-import { collectContext } from "../context-collector.js";
+import { collectContext } from "../application/context-collector.js";
 import { handleGetBriefing } from "../mcp-handlers/briefing.js";
-import { setCachedBriefing } from "../briefing-cache.js";
+import { setCachedBriefing } from "../infrastructure/briefing-cache.js";
 
 const mockCollectContext = vi.mocked(collectContext);
 const mockSetCachedBriefing = vi.mocked(setCachedBriefing);

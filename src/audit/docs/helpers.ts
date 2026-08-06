@@ -4,7 +4,7 @@
 
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import { PLACEHOLDER_NAMES } from "../constants.js";
 
 export function collectEmptyDirsSync(

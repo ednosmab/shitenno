@@ -2,9 +2,9 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { scaffoldShitenno, } from "../scaffolder.js";
-import type { UserAnswers } from "../prompts.js";
-import type { Capability } from "../maturity-profile.js";
+import { scaffoldShitenno, } from "../infrastructure/scaffolder.js";
+import type { UserAnswers } from "../interface/cli/prompts.js";
+import type { Capability } from "../application/maturity-profile.js";
 
 let tempDir: string;
 

@@ -14,8 +14,8 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { join } from "node:path";
 import { mkdirSync, writeFileSync, rmSync, existsSync, utimesSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { acquireScanLock, releaseScanLock } from "../plan-backlog-sync-lock.js";
-import { shouldSkipScan, markScanRun } from "../plan-backlog-sync-cooldown.js";
+import { acquireScanLock, releaseScanLock } from "../infrastructure/plan-backlog-sync-lock.js";
+import { shouldSkipScan, markScanRun } from "../infrastructure/plan-backlog-sync-cooldown.js";
 
 function createTempDir(): string {
   const dir = join(tmpdir(), `shitenno-lock-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);

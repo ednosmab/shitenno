@@ -29,10 +29,10 @@ import {
 } from "../commands/report.js";
 
 // ── Types ───────────────────────────────────────────────────────────────────
-import type { EngineeringState } from "../engineering-state.js";
-import type { KnowledgeDebtReport } from "../knowledge-debt.js";
-import type { DimensionReport, Insight, PerformanceReport } from "../performance-reporter.js";
-import type { PerformanceMetric } from "../feedback-loops.js";
+import type { EngineeringState } from "../application/engineering-state.js";
+import type { KnowledgeDebtReport } from "../application/knowledge-debt.js";
+import type { DimensionReport, Insight, PerformanceReport } from "../application/performance-reporter.js";
+import type { PerformanceMetric } from "../application/feedback-loops.js";
 
 let tempDir: string;
 

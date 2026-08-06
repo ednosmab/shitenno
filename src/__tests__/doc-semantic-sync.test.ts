@@ -8,13 +8,13 @@ import { join } from "node:path";
 import { mkdirSync, rmSync, writeFileSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 
-vi.mock("../semantic-drift-detector.js", () => ({
+vi.mock("../infrastructure/semantic-drift-detector.js", () => ({
   scanCodebase: vi.fn(),
   detectDriftBatch: vi.fn(),
 }));
 
-import { runSemanticDocSync } from "../doc-semantic-sync.js";
-import * as detector from "../semantic-drift-detector.js";
+import { runSemanticDocSync } from "../infrastructure/doc-semantic-sync.js";
+import * as detector from "../infrastructure/semantic-drift-detector.js";
 
 const SAMPLE_BUFFER = `session:
   id: session-001

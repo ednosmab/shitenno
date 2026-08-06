@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { HealthIssue } from "../types.js";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 
 export function detectScriptWiring(projectRoot: string, shitennoDir: string): HealthIssue[] {
   const issues: HealthIssue[] = [];

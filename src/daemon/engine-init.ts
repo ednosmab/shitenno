@@ -6,10 +6,10 @@
 
 import { initializeRuleEngine } from "../rule-engine/engine.js";
 import { initializeProactiveEngine } from "../prioritization/triggers.js";
-import { initDesktopNotifier } from "../desktop-notifier.js";
-import { initAutoBriefing } from "../auto-briefing.js";
-import { initProactiveDigest } from "../proactive-digest.js";
-import { initializeKnowledgeGraph } from "../knowledge-graph.js";
+import { initDesktopNotifier } from "../infrastructure/desktop-notifier.js";
+import { initAutoBriefing } from "../application/auto-briefing.js";
+import { initProactiveDigest } from "../infrastructure/proactive-digest.js";
+import { initializeKnowledgeGraph } from "../infrastructure/knowledge-graph.js";
 import { startWatching } from "../infrastructure/persistence/file-watcher.js";
 import { daemonLog } from "./log-rotation.js";
 import { initializeSemanticJournal } from "./semantic-runner.js";

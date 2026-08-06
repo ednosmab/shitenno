@@ -5,10 +5,10 @@
 import { readFileSync } from "node:fs";
 import { join, basename } from "node:path";
 import type { WatcherContext, ChangeInfo, ArtifactType } from "./types.js";
-import { getEventBus } from "../../../event-bus.js";
-import { calculateSignificance, ChangeHistoryTracker } from "../../../doc-sync-significance.js";
-import { logger } from "../../../logger.js";
-import { isSyncWriteInProgress } from "../../../sync-write-guard.js";
+import { getEventBus } from "../../event-bus.js";
+import { calculateSignificance, ChangeHistoryTracker } from "../../../domain/rules/doc-sync-significance.js";
+import { logger } from "../../../shared/logger.js";
+import { isSyncWriteInProgress } from "../../../domain/rules/sync-write-guard.js";
 
 export const changeHistory = new ChangeHistoryTracker();
 
@@ -145,7 +145,7 @@ export function handleBacklogChange(
     (filePath.includes("/backlog/") && (fileName === "ACTIVE.md" || fileName === "DONE.md"));
 
   if (!isBacklogFile) return;
-  import("../../../plan-backlog-sync.js").then(({ syncBacklogToPlan }) => {
+  import("../../../application/plan-backlog-sync.js").then(({ syncBacklogToPlan }) => {
     const sectionRegex = /### (BACKLOG-[A-Z_0-9]+)(?:\s*—\s*(.+))?/g;
     let match;
     while ((match = sectionRegex.exec(newContent)) !== null) {

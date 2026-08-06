@@ -2,7 +2,7 @@
  * updates.ts — Session and task lifecycle buffer updates.
  */
 
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import { readBufferObject, writeBufferObject } from "./buffer-io.js";
 
 export interface SessionUpdate {

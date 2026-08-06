@@ -9,10 +9,10 @@
 import { Command } from "commander";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { parseAllDocuments } from "yaml";
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
-import { validatePlanFormat, extractChecklistItems, extractStepHeadings } from "../plan-format-validator.js";
-import { getEventBus } from "../event-bus.js";
-import { resolveBacklogPaths } from "../backlog-core.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
+import { validatePlanFormat, extractChecklistItems, extractStepHeadings } from "../domain/rules/plan-format-validator.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { resolveBacklogPaths } from "../application/backlog-core.js";
 
 // ── Sub-command imports ────────────────────────────────────────────────────
 

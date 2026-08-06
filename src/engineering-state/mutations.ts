@@ -7,9 +7,9 @@
  * PRINCIPLE: State changes must have provenance. No silent mutations.
  */
 
-import { getEventBus } from "../event-bus.js";
-import { saveEngineeringState, type EngineeringState } from "../engineering-state.js";
-import { logger } from "../logger.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { saveEngineeringState, type EngineeringState } from "../application/engineering-state.js";
+import { logger } from "../shared/logger.js";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 

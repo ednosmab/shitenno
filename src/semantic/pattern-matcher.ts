@@ -9,8 +9,8 @@
  * always produces the same detected patterns.
  */
 
-import { logger } from "../logger.js";
-import { getEventBus } from "../event-bus.js";
+import { logger } from "../shared/logger.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 import type { ChangeJournal } from "./change-journal.js";
 import { PATTERN_RULES, type DetectedPattern, type PatternType } from "./pattern-rules.js";
 

@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import {
   getPendingChallenges,
   markChallengeResolved,
-} from "../challenge-responder.js";
+} from "../infrastructure/challenge-responder.js";
 
 let tempDir: string;
 let shitennoDir: string;

@@ -1,14 +1,14 @@
 import chalk from "chalk";
-import { outputJson } from "../../formatting.js";
-import { output, outputBlank, outputSection, outputSuccess } from "../../output.js";
-import { logger } from "../../logger.js";
-import { loadGrowthProfile } from "../../growth-profile.js";
-import { formatGrowthProgress } from "../../dual-path-presenter.js";
+import { outputJson } from "../../shared/formatting.js";
+import { output, outputBlank, outputSection, outputSuccess } from "../../shared/output.js";
+import { logger } from "../../shared/logger.js";
+import { loadGrowthProfile } from "../../infrastructure/growth-profile.js";
+import { formatGrowthProgress } from "../../domain/types/dual-path-presenter.js";
 import { runSemanticAnalysis, createSemanticDualPath, formatSemanticDualPath, formatSemanticDualPathJson } from "../../semantic/index.js";
 import type { SemanticInsight } from "../../semantic/reasoner.js";
 import type { Correlation } from "../../semantic/correlator.js";
 import type { DetectedPattern } from "../../semantic/pattern-rules.js";
-import type { PatternDetectionReport } from "../../pattern-detector.js";
+import type { PatternDetectionReport } from "../../infrastructure/pattern-detector.js";
 
 export function displayPattern(pattern: PatternDetectionReport["patterns"][number]): void {
   const severityColor = pattern.severity >= 4 ? chalk.red : pattern.severity >= 2 ? chalk.yellow : chalk.gray;

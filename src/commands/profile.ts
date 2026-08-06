@@ -21,17 +21,17 @@
 import { Command } from "commander";
 import chalk from "chalk";
 
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { outputJson } from "../formatting.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { outputJson } from "../shared/formatting.js";
 import {
   loadUserProfile,
   saveUserProfile,
   type UserProfile,
   type SkillLevel,
   type FeedbackTone,
-} from "../feedback-engine.js";
-import { getEventBus } from "../event-bus.js";
-import { output, outputBlank, outputSection, outputSuccess, outputError } from "../output.js";
+} from "../application/feedback-engine.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { output, outputBlank, outputSection, outputSuccess, outputError } from "../shared/output.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

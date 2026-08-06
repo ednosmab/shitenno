@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it, expect } from "vitest";
-import { validateRule } from "../rule-engine.js";
+import { validateRule } from "../application/rule-engine.js";
 
 describe("shipped rule templates", () => {
   const dir = "src/templates/base/governance/rules";

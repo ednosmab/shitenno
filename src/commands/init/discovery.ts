@@ -9,9 +9,9 @@
 
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { auditHealth, type HealthAuditReport } from "../../health-auditor.js";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { analyseProject, type ProjectAnalysis } from "../../analyser.js";
+import { auditHealth, type HealthAuditReport } from "../../application/health-auditor.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
+import { analyseProject, type ProjectAnalysis } from "../../infrastructure/analyser.js";
 
 export interface ArtifactPresence {
   present: boolean;

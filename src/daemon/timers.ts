@@ -5,9 +5,9 @@
  */
 
 import { execSync } from "node:child_process";
-import { getEventBus } from "../event-bus.js";
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
-import { auditHealth } from "../health-auditor.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
+import { auditHealth } from "../application/health-auditor.js";
 import { recordEvent, persistState } from "./state.js";
 import { runSemanticCycle } from "./semantic-runner.js";
 import { daemonLog } from "./log-rotation.js";

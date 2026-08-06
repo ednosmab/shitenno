@@ -2,10 +2,10 @@
  * reporter/insights.ts — Insight Generation for Performance Reports
  */
 
-import type { PerformanceMetric, DimensionReport, Insight, DimensionExtremes, InsightContext } from "../performance-reporter.js";
-import { METRIC_LABELS } from "../feedback-loops.js";
-import type { SessionMetrics } from "../session-tracker.js";
-import type { GrowthProfile } from "../growth-profile.js";
+import type { PerformanceMetric, DimensionReport, Insight, DimensionExtremes, InsightContext } from "../application/performance-reporter.js";
+import { METRIC_LABELS } from "../application/feedback-loops.js";
+import type { SessionMetrics } from "../infrastructure/session-tracker.js";
+import type { GrowthProfile } from "../infrastructure/growth-profile.js";
 import type { TelemetryTrend } from "./telemetry-readers.js";
 
 export function findDimensionExtremes(dimensions: Record<PerformanceMetric, DimensionReport>): DimensionExtremes {

@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, appendFileSync as fsAppendFileSync } from "node:fs";
 import { join } from "node:path";
-import { getEventBus } from "../../event-bus.js";
-import { logger } from "../../logger.js";
-import { BoundedQueue } from "../../daemon-resources.js";
+import { getEventBus } from "../../infrastructure/event-bus.js";
+import { logger } from "../../shared/logger.js";
+import { BoundedQueue } from "../../domain/types/daemon-resources.js";
 import { MAX_STATE_EVENTS, type StateEvent } from "./types.js";
 
 export class EventSourcedState {

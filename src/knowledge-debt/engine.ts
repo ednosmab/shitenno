@@ -1,6 +1,6 @@
 import { existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { getEventBus } from "../event-bus.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 import type { KnowledgeGap, DebtType, DebtSeverity, KnowledgeDebtReport } from "./types.js";
 import {
   detectMissingAdrs,

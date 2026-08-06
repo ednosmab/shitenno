@@ -9,15 +9,15 @@ import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import ora from "ora";
-import { invalidateCache } from "../cache.js";
-import { outputJson } from "../formatting.js";
-import { CAPABILITIES, detectCapabilitySignalsFromFilesystem, loadMaturityProfile, type Capability } from "../maturity-profile.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { getEventBus } from "../event-bus.js";
-import { recordFeedback } from "../feedback-loops.js";
-import { readManifest, writeManifest, updateManifest } from "../manifest.js";
-import { logger } from "../logger.js";
-import { output, outputBlank, outputSection, outputSuccess, outputError, outputWarning } from "../output.js";
+import { invalidateCache } from "../infrastructure/cache.js";
+import { outputJson } from "../shared/formatting.js";
+import { CAPABILITIES, detectCapabilitySignalsFromFilesystem, loadMaturityProfile, type Capability } from "../application/maturity-profile.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { recordFeedback } from "../application/feedback-loops.js";
+import { readManifest, writeManifest, updateManifest } from "../infrastructure/manifest.js";
+import { logger } from "../shared/logger.js";
+import { output, outputBlank, outputSection, outputSuccess, outputError, outputWarning } from "../shared/output.js";
 import { installCapabilities } from "./upgrade/helpers.js";
 import { updateSystemMapStatus } from "./upgrade/system-map.js";
 import { updateAgentsMdWithCapabilities } from "./upgrade/agents-md.js";
@@ -110,13 +110,13 @@ async function finalizeCapabilityInstall(opts: FinalizeInstallOpts) {
 
 async function generatePostInstallArtifacts(shitennoDir: string, targetDir: string, isJson: boolean) {
   try {
-    const { generateProjectFingerprint, loadFingerprint } = await import("../project-fingerprint.js");
-    const { generateRiskMap } = await import("../risk-map.js");
-    const { generateContextRules } = await import("../context-rules.js");
-    const analysis = (await import("../analyser.js")).analyseProject(targetDir);
+    const { generateProjectFingerprint, loadFingerprint } = await import("../infrastructure/project-fingerprint.js");
+    const { generateRiskMap } = await import("../infrastructure/risk-map.js");
+    const { generateContextRules } = await import("../domain/rules/context-rules.js");
+    const analysis = (await import("../infrastructure/analyser.js")).analyseProject(targetDir);
     let fingerprint = loadFingerprint(shitennoDir);
     if (!fingerprint) {
-      const { saveFingerprint } = await import("../project-fingerprint.js");
+      const { saveFingerprint } = await import("../infrastructure/project-fingerprint.js");
       fingerprint = generateProjectFingerprint(targetDir, analysis);
       saveFingerprint(shitennoDir, fingerprint);
     }

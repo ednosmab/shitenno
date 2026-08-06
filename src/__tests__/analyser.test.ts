@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { analyseProject } from "../analyser.js";
+import { analyseProject } from "../infrastructure/analyser.js";
 
 let tempDir: string;
 
@@ -138,5 +138,54 @@ describe("analyseProject", () => {
     expect(result.stack).toContain("react");
     expect(result.stack).toContain("tailwindcss");
     expect(result.stack).toContain("zod");
+  });
+
+  it("counts flat source files in src root only", () => {
+    mkdirSync(join(tempDir, "src", "domain"), { recursive: true });
+    writeFileSync(join(tempDir, "src", "a.ts"), "");
+    writeFileSync(join(tempDir, "src", "b.tsx"), "");
+    writeFileSync(join(tempDir, "src", "nested.ts"), "");
+    writeFileSync(join(tempDir, "src", "index.d.ts"), "");
+    writeFileSync(join(tempDir, "src", "domain", "c.ts"), "");
+    const result = analyseProject(tempDir);
+    expect(result.flatSourceFiles).toBe(3);
+  });
+
+  it("counts recognized layer directories", () => {
+    for (const layer of ["shared", "domain", "application", "infrastructure", "interface"]) {
+      mkdirSync(join(tempDir, "src", layer), { recursive: true });
+    }
+    mkdirSync(join(tempDir, "src", "features"), { recursive: true });
+    const result = analyseProject(tempDir);
+    expect(result.layeredDirs).toBe(5);
+  });
+
+  it("counts node imports outside the adapter layers", () => {
+    mkdirSync(join(tempDir, "src", "application"), { recursive: true });
+    mkdirSync(join(tempDir, "src", "infrastructure"), { recursive: true });
+    mkdirSync(join(tempDir, "src", "__tests__"), { recursive: true });
+    writeFileSync(join(tempDir, "src", "application", "usecase.ts"), 'import { readFileSync } from "node:fs";\n');
+    writeFileSync(join(tempDir, "src", "application", "pure.ts"), 'export const x = 1;\n');
+    writeFileSync(join(tempDir, "src", "infrastructure", "adapter.ts"), 'import { join } from "node:path";\n');
+    writeFileSync(join(tempDir, "src", "__tests__", "spec.test.ts"), 'import { readFileSync } from "node:fs";\n');
+    const result = analyseProject(tempDir);
+    expect(result.nodeApiImportsOutsideLayers).toBe(1);
+  });
+
+  it("detects port consumption outside the domain layer", () => {
+    mkdirSync(join(tempDir, "src", "domain", "ports"), { recursive: true });
+    mkdirSync(join(tempDir, "src", "application"), { recursive: true });
+    writeFileSync(join(tempDir, "src", "domain", "ports", "logger.ts"), "export interface Logger {}\n");
+    writeFileSync(join(tempDir, "src", "application", "usecase.ts"), 'import type { Logger } from "../domain/ports/logger.js";\n');
+    const result = analyseProject(tempDir);
+    expect(result.portsConsumed).toBe(true);
+  });
+
+  it("does not report port consumption when only domain references ports", () => {
+    mkdirSync(join(tempDir, "src", "domain", "ports"), { recursive: true });
+    writeFileSync(join(tempDir, "src", "domain", "ports", "logger.ts"), "export interface Logger {}\n");
+    writeFileSync(join(tempDir, "src", "domain", "index.ts"), 'export type { Logger } from "./ports/logger.js";\n');
+    const result = analyseProject(tempDir);
+    expect(result.portsConsumed).toBe(false);
   });
 });

@@ -8,7 +8,7 @@
 
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { displayDiff } from "../commands/update/display.js";
-import type { ManifestDiff } from "../manifest.js";
+import type { ManifestDiff } from "../infrastructure/manifest.js";
 
 function makeDiff(overrides: Partial<ManifestDiff> = {}): ManifestDiff {
   return {

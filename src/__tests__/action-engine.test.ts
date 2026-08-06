@@ -18,7 +18,7 @@ import {
   type ExecutionRecord,
   type ActionFilter,
   type ActionExecutor,
-} from "../action-engine.js";
+} from "../application/action-engine.js";
 
 // ── In-Memory Repository ───────────────────────────────────────────────────
 

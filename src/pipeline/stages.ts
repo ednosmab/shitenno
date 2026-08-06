@@ -2,15 +2,15 @@
  * pipeline/stages.ts — Stage builder functions for the default pipeline
  */
 
-import type { ProjectAnalysis } from "../analyser.js";
-import type { ComplexityReport } from "../scorer.js";
-import type { PatternDetectionReport } from "../pattern-detector.js";
-import type { KnowledgeDebtReport } from "../knowledge-debt.js";
-import type { CapabilityEngineResult } from "../capability-engine.js";
-import type { EngineeringState } from "../engineering-state.js";
+import type { ProjectAnalysis } from "../infrastructure/analyser.js";
+import type { ComplexityReport } from "../application/scorer.js";
+import type { PatternDetectionReport } from "../infrastructure/pattern-detector.js";
+import type { KnowledgeDebtReport } from "../application/knowledge-debt.js";
+import type { CapabilityEngineResult } from "../application/capability-engine.js";
+import type { EngineeringState } from "../application/engineering-state.js";
 import type { RecommendationEngineResult } from "../prioritization/recommend.js";
-import type { EvolutionReport } from "../auto-evolution.js";
-import type { PipelineStage } from "../pipeline.js";
+import type { EvolutionReport } from "../application/auto-evolution.js";
+import type { PipelineStage } from "../application/pipeline.js";
 
 export function buildCoreStages(
   analyseProject: (root: string) => ProjectAnalysis,

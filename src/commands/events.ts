@@ -8,10 +8,10 @@
 
 import { Command } from "commander";
 import chalk from "chalk";
-import { guardNotInitialized } from "../shared.js";
-import { outputJson, banner } from "../formatting.js";
-import { loadTrace } from "../events-data.js";
-import { output, outputBlank } from "../output.js";
+import { guardNotInitialized } from "../shared/shared.js";
+import { outputJson, banner } from "../shared/formatting.js";
+import { loadTrace } from "../infrastructure/events-data.js";
+import { output, outputBlank } from "../shared/output.js";
 
 export const eventsCommand = new Command("events")
   .description("Show rule engine execution trace")

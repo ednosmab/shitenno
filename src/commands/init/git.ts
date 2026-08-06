@@ -6,7 +6,7 @@
  */
 
 import { isAbsolute, resolve } from "node:path";
-import { execAsync } from "../../exec-async.js";
+import { execAsync } from "../../infrastructure/exec-async.js";
 
 const GIT_TIMEOUT = 30_000;
 

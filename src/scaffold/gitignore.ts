@@ -5,7 +5,7 @@
 import fse from "fs-extra";
 const { readFileSync, writeFileSync, existsSync } = fse;
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 export function updateGitignore(targetDir: string): void {
   const gitignorePath = join(targetDir, ".gitignore");

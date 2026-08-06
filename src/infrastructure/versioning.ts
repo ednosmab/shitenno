@@ -4,7 +4,7 @@
  * Handles schema versioning for events to support graceful evolution.
  */
 
-import type { ShitennoEventType } from "../event-bus.js";
+import type { ShitennoEventType } from "./event-bus.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

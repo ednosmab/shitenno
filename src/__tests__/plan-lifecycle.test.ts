@@ -7,10 +7,10 @@ import {
   type CompletionCheck,
   type ValidationResult,
   type LifecycleResult,
-} from "../plan-lifecycle.js";
+} from "../application/plan-lifecycle.js";
 import { detectCommand } from "../commands/detect.js";
 
-vi.mock("../markdown-plan-engine.js", () => {
+vi.mock("../infrastructure/markdown-plan-engine.js", () => {
   const mockList = vi.fn().mockReturnValue([
     { id: "plan-1", status: "active", title: "Test Plan 1", isActive: true },
     { id: "plan-2", status: "done", title: "Test Plan 2", isActive: false },
@@ -93,7 +93,7 @@ describe("detectActivePlans", () => {
 
 describe("archivePlan", () => {
   it("calls updateStatus with done", async () => {
-    const mod = await import("../markdown-plan-engine.js") as any;
+    const mod = await import("../infrastructure/markdown-plan-engine.js") as any;
     archivePlan("/shugo", "plan-1");
     expect(mod.__mockUpdate).toHaveBeenCalledWith("plan-1", "done");
   });
@@ -103,7 +103,7 @@ describe("archivePlan", () => {
 
 describe("removePlan", () => {
   it("calls updateStatus with done", async () => {
-    const mod = await import("../markdown-plan-engine.js") as any;
+    const mod = await import("../infrastructure/markdown-plan-engine.js") as any;
     removePlan("/shugo", "plan-1");
     expect(mod.__mockUpdate).toHaveBeenCalledWith("plan-1", "done");
   });
@@ -147,20 +147,20 @@ describe("checkAndArchiveDonePlans", () => {
 
   it("calls archiveIfDone for each active plan", async () => {
     checkAndArchiveDonePlans("/shugo");
-    const mod = await import("../markdown-plan-engine.js") as any;
+    const mod = await import("../infrastructure/markdown-plan-engine.js") as any;
     expect(mod.__mockArchiveIfDone).toHaveBeenCalledWith("plan-1");
     expect(mod.__mockArchiveIfDone).toHaveBeenCalledWith("plan-3");
   });
 
   it("skips inactive plans (already in done/)", async () => {
     checkAndArchiveDonePlans("/shugo");
-    const mod = await import("../markdown-plan-engine.js") as any;
+    const mod = await import("../infrastructure/markdown-plan-engine.js") as any;
     // plan-2 has isActive: false — should NOT be called
     expect(mod.__mockArchiveIfDone).not.toHaveBeenCalledWith("plan-2");
   });
 
   it("populates archivedIds when archiveIfDone returns true", async () => {
-    const mod = await import("../markdown-plan-engine.js") as any;
+    const mod = await import("../infrastructure/markdown-plan-engine.js") as any;
     // Make mockArchiveIfDone return true for plan-3
     mod.__mockArchiveIfDone.mockImplementation((id: string) => id === "plan-3");
 

@@ -3,7 +3,7 @@ import { execSync } from "node:child_process";
 import { join } from "node:path";
 import { MISSING_TEST_WARNING_THRESHOLD } from "../constants.js";
 import type { HealthIssue, SourceFileInfo } from "../types.js";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 
 export function detectTestHealth(projectRoot: string): HealthIssue[] {
   const issues: HealthIssue[] = [];

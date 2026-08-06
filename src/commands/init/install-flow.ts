@@ -12,7 +12,7 @@
 
 import chalk from "chalk";
 import { resolve } from "node:path";
-import { output, outputBlank, outputError } from "../../output.js";
+import { output, outputBlank, outputError } from "../../shared/output.js";
 import type { ProjectTypeOptions } from "./project-type.js";
 import { discoverProject, type DiscoveryResult } from "./discovery.js";
 import { displayDiscoveryReport, displayHooksCaveat } from "./report.js";

@@ -11,7 +11,7 @@ import {
   listSnapshots,
   diffSnapshots,
 } from "../engineering-state/index.js";
-import type { EngineeringState } from "../engineering-state.js";
+import type { EngineeringState } from "../application/engineering-state.js";
 
 function createTmpDir(): string {
   const dir = join(tmpdir(), `test-history-${Date.now()}`);

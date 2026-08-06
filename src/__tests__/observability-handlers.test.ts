@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { resetEventBus, getEventBus } from "../event-bus.js";
+import { resetEventBus, getEventBus } from "../infrastructure/event-bus.js";
 
 vi.mock("../daemon/state.js", () => ({
   recordEvent: vi.fn(),

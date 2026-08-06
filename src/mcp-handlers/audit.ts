@@ -1,9 +1,9 @@
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { collectContext } from "../context-collector.js";
+import { collectContext } from "../application/context-collector.js";
 import { detectKnowledgeDebt } from "../knowledge-debt/engine.js";
-import { loadGrowthProfile } from "../growth-profile.js";
-import type { ToolResponse } from "../mcp-types.js";
+import { loadGrowthProfile } from "../infrastructure/growth-profile.js";
+import type { ToolResponse } from "../domain/types/mcp-types.js";
 
 type AuditReport = {
   healthScore: number;

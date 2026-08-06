@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../../logger.js";
+import { logger } from "../../shared/logger.js";
 import type { HealthIssue, SourceFileInfo } from "../types.js";
 
 export function detectUnsafeTypeAssertions(_projectRoot: string, files: SourceFileInfo[]): HealthIssue[] {

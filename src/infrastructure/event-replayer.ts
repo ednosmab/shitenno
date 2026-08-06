@@ -5,8 +5,8 @@
  */
 
 import { randomUUID } from "node:crypto";
-import type { EventBus } from "../event-bus.js";
-import { LRUCache } from "../daemon-resources.js";
+import type { EventBus } from "./event-bus.js";
+import { LRUCache } from "../domain/types/daemon-resources.js";
 import type { VersionedEvent } from "./versioning.js";
 import { EVENT_VERSIONS } from "./versioning.js";
 import { DeadLetterQueue } from "./dead-letter.js";
@@ -90,9 +90,9 @@ export class EventReplayer {
     const history = this.bus.getHistory();
     const events: VersionedEvent[] = history.map((entry) => ({
       id: randomUUID(),
-      type: entry.type as import("../event-bus.js").ShitennoEventType,
+      type: entry.type as import("./event-bus.js").ShitennoEventType,
       payload: entry.payload,
-      version: EVENT_VERSIONS[entry.type as import("../event-bus.js").ShitennoEventType] ?? 1,
+      version: EVENT_VERSIONS[entry.type as import("./event-bus.js").ShitennoEventType] ?? 1,
       timestamp: entry.timestamp,
     }));
 

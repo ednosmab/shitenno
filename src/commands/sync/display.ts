@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { outputJson } from "../../formatting.js";
-import { output, outputBlank } from "../../output.js";
+import { outputJson } from "../../shared/formatting.js";
+import { output, outputBlank } from "../../shared/output.js";
 
 interface FileChange {
   path: string;

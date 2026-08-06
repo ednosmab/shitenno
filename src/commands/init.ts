@@ -16,8 +16,8 @@
 import { Command } from "commander";
 import { resolve } from "node:path";
 import chalk from "chalk";
-import { banner } from "../formatting.js";
-import { output, outputBlank } from "../output.js";
+import { banner } from "../shared/formatting.js";
+import { output, outputBlank } from "../shared/output.js";
 
 import { handleDryRun } from "./init/display.js";
 import { shouldBlockInit, handleAlreadyInitialized, analyseAndDisplay, getAnswers, calculateAndDisplayProfile } from "./init/prompts.js";

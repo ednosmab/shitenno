@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { withCache } from "../mcp-cache.js";
-import { getCachedPlanInference } from "../inference-cache.js";
-import { sendDesktopNotification } from "../notify.js";
+import { withCache } from "../infrastructure/mcp-cache.js";
+import { getCachedPlanInference } from "../infrastructure/inference-cache.js";
+import { sendDesktopNotification } from "../infrastructure/notify.js";
 import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";

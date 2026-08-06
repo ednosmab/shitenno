@@ -3,7 +3,7 @@
  */
 
 import chalk from "chalk";
-import { output, outputBlank } from "../../output.js";
+import { output, outputBlank } from "../../shared/output.js";
 import { groupOptimizationsByAction, categorizeIssues, groupByType, formatTypeGroup, identifyQuickWins } from "./reporter.js";
 import { generateFixSuggestions, prioritizeSuggestions } from "../../audit/suggestion-engine.js";
 import { runPolicyGate } from "../../decision-core/invoke.js";
@@ -11,7 +11,7 @@ import { applyAllFixes, type AutofixReport } from "../../audit/autofix-engine.js
 export { displaySemanticAudit, collectSemanticData } from "./semantic-display.js";
 export { displayKnowledgeGraph, displayWhatWasMeasured, displaySuppressedIssues, displayHumanAuditReport } from "./display-summary.js";
 export type { HumanReportInput } from "./display-summary.js";
-import type { HealthAuditReport } from "../../health-auditor.js";
+import type { HealthAuditReport } from "../../application/health-auditor.js";
 import type { AuditActionCtx } from "./types.js";
 
 export interface IssueCategoryInput {
@@ -53,7 +53,7 @@ export function displayOptimizations(optimizations: Array<{ action: string }>): 
 
 export async function displayDynamicRules(projectRoot: string, shitennoDir: string): Promise<void> {
   try {
-    const { generateDynamicRules } = await import("../../dynamic-rules.js");
+    const { generateDynamicRules } = await import("../../infrastructure/dynamic-rules.js");
     const dynamicRules = generateDynamicRules(projectRoot, shitennoDir);
     if (dynamicRules.length > 0) {
       output(chalk.bold("  🚨 Dynamic Rules (from History):"));

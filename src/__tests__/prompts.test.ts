@@ -63,7 +63,7 @@ async function callAskQuestions() {
   });
   vi.mocked(inquirer.prompt).mockImplementation(mockPrompt);
 
-  const { askQuestions } = await import("../prompts.js");
+  const { askQuestions } = await import("../interface/cli/prompts.js");
   return askQuestions(makeAnalysis());
 }
 
@@ -165,7 +165,7 @@ describe("askQuestions", () => {
     });
     vi.mocked(inquirer.prompt).mockImplementation(mockPrompt);
 
-    const { askQuestions } = await import("../prompts.js");
+    const { askQuestions } = await import("../interface/cli/prompts.js");
     const result = await askQuestions(makeAnalysis());
 
     expect(result.userProfile?.focusAreas).toEqual(["vision", "leadership", "testing"]);
@@ -210,7 +210,7 @@ describe("askQuestions", () => {
     });
     vi.mocked(inquirer.prompt).mockImplementation(mockPrompt);
 
-    const { askQuestions } = await import("../prompts.js");
+    const { askQuestions } = await import("../interface/cli/prompts.js");
     const result = await askQuestions(makeAnalysis({ stack: ["react", "typescript"] }));
 
     expect(result.stack).toContain("react");

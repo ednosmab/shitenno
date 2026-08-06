@@ -8,9 +8,9 @@
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
-import { walkSourceFiles } from "../../utils.js";
-import { logger } from "../../logger.js";
+import { SHITENNO_DIR_NAME } from "../types/constants.js";
+import { walkSourceFiles } from "../../infrastructure/utils.js";
+import { logger } from "../../shared/logger.js";
 
 // ── Batch Git Churn ─────────────────────────────────────────────────────────
 

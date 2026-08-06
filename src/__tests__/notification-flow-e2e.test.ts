@@ -20,14 +20,14 @@ import { tmpdir } from "node:os";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
-vi.mock("../notify.js", () => ({
+vi.mock("../infrastructure/notify.js", () => ({
   sendDesktopNotification: vi.fn(() => true),
   logNotificationOnly: vi.fn(),
 }));
 
-import { initDesktopNotifier, _resetForTesting } from "../desktop-notifier.js";
-import { sendDesktopNotification, logNotificationOnly } from "../notify.js";
-import { getEventBus, resetEventBus } from "../event-bus.js";
+import { initDesktopNotifier, _resetForTesting } from "../infrastructure/desktop-notifier.js";
+import { sendDesktopNotification, logNotificationOnly } from "../infrastructure/notify.js";
+import { getEventBus, resetEventBus } from "../infrastructure/event-bus.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

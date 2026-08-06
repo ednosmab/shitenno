@@ -4,11 +4,11 @@
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { getEventBus } from "../event-bus.js";
-import { logger } from "../logger.js";
-import { addImpediment } from "../context-buffer-writer.js";
-import { acquireScanLock, releaseScanLock } from "../plan-backlog-sync-lock.js";
-import { shouldSkipScan, markScanRun } from "../plan-backlog-sync-cooldown.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { logger } from "../shared/logger.js";
+import { addImpediment } from "../application/context-buffer-writer.js";
+import { acquireScanLock, releaseScanLock } from "../infrastructure/plan-backlog-sync-lock.js";
+import { shouldSkipScan, markScanRun } from "../infrastructure/plan-backlog-sync-cooldown.js";
 
 /**
  * Retroactive scan: process plans that exist but have no BACKLOG entry.

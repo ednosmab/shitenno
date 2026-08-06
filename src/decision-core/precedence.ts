@@ -11,7 +11,7 @@
 
 import type { ActionType } from "../domain/rules/rule.js";
 import { ACTION_TIER, type ActionTier } from "./tiers.js";
-import { getEventBus } from "../event-bus.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 
 export type InvokeMode = "autonomous" | "deliberate";
 

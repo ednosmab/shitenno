@@ -1,10 +1,10 @@
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { InferenceEngine } from "../inference-engine.js";
-import { getEventBus } from "../event-bus.js";
-import { logger } from "../logger.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { InferenceEngine } from "../application/inference-engine.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { logger } from "../shared/logger.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 // ── Proactive Startup Functions ──────────────────────────────────────────────
 

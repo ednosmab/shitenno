@@ -8,7 +8,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import fse from "fs-extra";
-import { NPM_PACKAGE_NAME } from "../../constants.js";
+import { NPM_PACKAGE_NAME } from "../../domain/types/constants.js";
 const { copySync } = fse;
 
 // ── MCP Configuration ───────────────────────────────────────────────────────

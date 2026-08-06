@@ -15,7 +15,7 @@ import {
   pingDaemon,
   queryDaemonStatus,
   getSocketPath,
-} from "../daemon-client.js";
+} from "../infrastructure/daemon-client.js";
 
 const TEST_DIR = join(__dirname, ".test-daemon-client");
 

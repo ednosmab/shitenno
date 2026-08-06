@@ -19,7 +19,7 @@ afterEach(() => {
   rmSync(tempDir, { recursive: true, force: true });
 });
 
-vi.mock("../logger.js", () => ({
+vi.mock("../shared/logger.js", () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -28,7 +28,7 @@ vi.mock("../logger.js", () => ({
   },
 }));
 
-import { buildP4Index, loadP4Index } from "../context-index-builder.js";
+import { buildP4Index, loadP4Index } from "../infrastructure/context-index-builder.js";
 
 describe("buildP4Index", () => {
   it("creates empty index when no history or feedback dirs exist", () => {

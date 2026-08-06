@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { SHITENNO_DIR_NAME } from "../../constants.js";
+import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
 import type { HealthIssue, SourceFileInfo } from "../types.js";
 
 export function detectComplianceReport(projectRoot: string, _files: SourceFileInfo[]): HealthIssue[] {

@@ -7,7 +7,7 @@
 import { existsSync, readFileSync, statSync, appendFileSync, unlinkSync, renameSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 
 const __dirname_file = (() => {
   try {

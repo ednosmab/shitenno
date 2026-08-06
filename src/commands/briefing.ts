@@ -17,12 +17,12 @@
 
 import { Command } from "commander";
 import ora from "ora";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { type BriefingDepth } from "../token-optimizer.js";
-import { outputJson } from "../formatting.js";
-import { output, outputSection } from "../output.js";
-import { logger } from "../logger.js";
-import { getEventBus } from "../event-bus.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { type BriefingDepth } from "../domain/rules/token-optimizer.js";
+import { outputJson } from "../shared/formatting.js";
+import { output, outputSection } from "../shared/output.js";
+import { logger } from "../shared/logger.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 
 import { displayFullBriefing } from "./briefing/display.js";
 import { promptForChallenges } from "./briefing/challenges.js";

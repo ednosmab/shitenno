@@ -4,7 +4,7 @@
  * Generates strengths and improvements based on session outcome and tone.
  */
 
-import type { SessionFeedbackRecord } from "../../../session-feedback.js";
+import type { SessionFeedbackRecord } from "../../../infrastructure/session-feedback.js";
 import type { UserProfile, FeedbackTone, FeedbackItem } from "../profile.js";
 
 export function generateSuccessStrengths(

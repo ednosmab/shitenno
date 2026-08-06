@@ -1,18 +1,18 @@
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { generateRiskMap, type RiskMap } from "../risk-map.js";
+import { generateRiskMap, type RiskMap } from "../infrastructure/risk-map.js";
 import { getEngineeringState } from "../engineering-state/index.js";
-import { readCache } from "../briefing-cache.js";
-import { recordOutcome, createFileStorage } from "../session-feedback.js";
-import { sanitizePlanName } from "../path-safety.js";
-import { loadManifest, partitionRules } from "../rule-manifest.js";
-import { loadSkillManifest, partitionSkills, type TaskMetadata } from "../skill-manifest.js";
-import { queryDaemon, isDaemonRunning } from "../daemon-client.js";
+import { readCache } from "../infrastructure/briefing-cache.js";
+import { recordOutcome, createFileStorage } from "../infrastructure/session-feedback.js";
+import { sanitizePlanName } from "../domain/rules/path-safety.js";
+import { loadManifest, partitionRules } from "../infrastructure/rule-manifest.js";
+import { loadSkillManifest, partitionSkills, type TaskMetadata } from "../infrastructure/skill-manifest.js";
+import { queryDaemon, isDaemonRunning } from "../infrastructure/daemon-client.js";
 import { readMaturityHistory } from "../maturity-profile/telemetry.js";
 import { readBuffer } from "../context-buffer-writer/buffer-io.js";
-import { logger } from "../logger.js";
-import { withCache } from "../mcp-cache.js";
-import type { ToolResponse } from "../mcp-types.js";
+import { logger } from "../shared/logger.js";
+import { withCache } from "../infrastructure/mcp-cache.js";
+import type { ToolResponse } from "../domain/types/mcp-types.js";
 
 
 export async function handleGetRiskMap(

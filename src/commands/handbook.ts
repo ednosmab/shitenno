@@ -17,8 +17,8 @@ import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import React from "react";
-import { banner } from "../formatting.js";
-import { output, outputBlank } from "../output.js";
+import { banner } from "../shared/formatting.js";
+import { output, outputBlank } from "../shared/output.js";
 
 function findHandbookRoot(startDir: string): string {
   let dir = startDir;

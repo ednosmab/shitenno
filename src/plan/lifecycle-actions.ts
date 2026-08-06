@@ -6,8 +6,8 @@
 
 import chalk from "chalk";
 import { createInterface } from "node:readline";
-import type { LifecycleResult } from "../plan-lifecycle.js";
-import { MarkdownPlanEngine } from "../markdown-plan-engine.js";
+import type { LifecycleResult } from "../application/plan-lifecycle.js";
+import { MarkdownPlanEngine } from "../infrastructure/markdown-plan-engine.js";
 import { runAutoVerification } from "./verification.js";
 
 interface LifecycleActionContext {
@@ -29,7 +29,7 @@ export async function executePlanAction(ctx: LifecycleActionContext): Promise<vo
   const plans = engine.listAll();
   const plan = plans.find((p) => p.id === ctx.planId);
   if (!plan) {
-    const { outputError } = await import("../output.js");
+    const { outputError } = await import("../shared/output.js");
     outputError(`Plan not found: ${ctx.planId}`);
     return;
   }
@@ -50,7 +50,7 @@ export async function handleInteractiveMode(ctx: LifecycleActionContext): Promis
   const engine = new MarkdownPlanEngine(ctx.shitennoDir);
   const plans = engine.listAll();
   const plan = plans.find((p) => p.id === ctx.planId);
-  if (!plan) return;    const { output, outputBlank } = await import("../output.js");
+  if (!plan) return;    const { output, outputBlank } = await import("../shared/output.js");
     output(chalk.bold(`  Plan: ${plan.title}`));
   outputBlank();
   const answer = await askQuestion("  Mark as done? (y/n): ");

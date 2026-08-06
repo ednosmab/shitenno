@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { executeAction } from "../rule-engine/actions.js";
-import { getEventBus, resetEventBus } from "../event-bus.js";
+import { getEventBus, resetEventBus } from "../infrastructure/event-bus.js";
 import type { RuleAction, RuleContext } from "../domain/rules/rule.js";
 
 /**
@@ -12,7 +12,7 @@ import type { RuleAction, RuleContext } from "../domain/rules/rule.js";
  * See: PLANO-UNICO-CONSOLIDADO-2026-08-01-v2.md — Phase C.15
  */
 
-vi.mock("../backlog-state-machine.js", () => ({
+vi.mock("../application/backlog-state-machine.js", () => ({
   transitionTask: vi.fn((_shitennoDir: string, taskId: string, fromState: string, toState: string) => {
     return { success: true, message: `Transitioned ${taskId}: ${fromState} → ${toState}` };
   }),
@@ -107,7 +107,7 @@ describe("executeUpdateBacklogStatus — task.completed event publishing", () =>
   });
 
   it("does NOT publish task.completed when transition fails", async () => {
-    const { transitionTask } = await import("../backlog-state-machine.js");
+    const { transitionTask } = await import("../application/backlog-state-machine.js");
     vi.mocked(transitionTask).mockReturnValueOnce({
       success: false,
       message: "Invalid transition",

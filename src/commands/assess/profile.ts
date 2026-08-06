@@ -2,17 +2,17 @@ import chalk from "chalk";
 import ora from "ora";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { type ProjectAnalysis } from "../../analyser.js";
-import { askQuestions } from "../../prompts.js";
+import { type ProjectAnalysis } from "../../infrastructure/analyser.js";
+import { askQuestions } from "../../interface/cli/prompts.js";
 import {
   calculateMaturityProfile,
   loadMaturityProfile,
   type MaturityProfile,
-} from "../../maturity-profile.js";
-import { outputJson } from "../../formatting.js";
-import { output, outputBlank } from "../../output.js";
-import { guardInteractive } from "../../shared.js";
-import { recordDimensionFeedback, type PerformanceMetric } from "../../feedback-loops.js";
+} from "../../application/maturity-profile.js";
+import { outputJson } from "../../shared/formatting.js";
+import { output, outputBlank } from "../../shared/output.js";
+import { guardInteractive } from "../../shared/shared.js";
+import { recordDimensionFeedback, type PerformanceMetric } from "../../application/feedback-loops.js";
 
 interface AssessContext { projectRoot: string; shitennoDir: string; isJson: boolean; }
 

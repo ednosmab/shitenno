@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import {
   detectKnowledgeDebt,
   writeDebtReport,
-} from "../knowledge-debt.js";
+} from "../application/knowledge-debt.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

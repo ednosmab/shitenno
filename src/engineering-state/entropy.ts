@@ -6,8 +6,8 @@
  */
 
 import type { AssetType, EngineeringAsset } from "../domain/entities/engineering-state.js";
-import type { Relation } from "../knowledge-graph.js";
-import type { ShitennoLifecycleState } from "../shitenno-state-machine.js";
+import type { Relation } from "../infrastructure/knowledge-graph.js";
+import type { ShitennoLifecycleState } from "../infrastructure/shitenno-state-machine.js";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 

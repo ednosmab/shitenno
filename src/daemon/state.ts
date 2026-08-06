@@ -1,7 +1,7 @@
 import { existsSync, writeFileSync, readFileSync } from "node:fs";
-import { logger } from "../logger.js";
-import { getEventBus } from "../event-bus.js";
-import { isDaemonState } from "../schema-validators.js";
+import { logger } from "../shared/logger.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { isDaemonState } from "../domain/types/schema-validators.js";
 
 // ── Daemon State ──────────────────────────────────────────────────────────────
 

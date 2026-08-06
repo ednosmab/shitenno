@@ -1,9 +1,9 @@
-import { listAdrs, getAdr, listSkills, getSkill } from "../knowledge-loader.js";
-import { loadSkillManifest, partitionSkills, type TaskMetadata } from "../skill-manifest.js";
-import { recordSkillResolution } from "../context-buffer-writer.js";
+import { listAdrs, getAdr, listSkills, getSkill } from "../infrastructure/knowledge-loader.js";
+import { loadSkillManifest, partitionSkills, type TaskMetadata } from "../infrastructure/skill-manifest.js";
+import { recordSkillResolution } from "../application/context-buffer-writer.js";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import type { ToolResponse } from "../mcp-types.js";
+import type { ToolResponse } from "../domain/types/mcp-types.js";
 
 export async function handleGetADRs(
   _projectRoot: string,

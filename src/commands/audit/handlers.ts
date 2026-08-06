@@ -9,18 +9,18 @@ import ora from "ora";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
-import { auditHealth, type HealthAuditReport, type AuditLevel } from "../../health-auditor.js";
-import { getCached, computeKeyChecksums } from "../../cache.js";
-import { output, outputBlank, outputError } from "../../output.js";
-import { appendBacklogSection, issueToBacklogItem, type BacklogItem } from "../../backlog-writer.js";
-import { resolveBacklogPaths } from "../../backlog-core.js";
+import { auditHealth, type HealthAuditReport, type AuditLevel } from "../../application/health-auditor.js";
+import { getCached, computeKeyChecksums } from "../../infrastructure/cache.js";
+import { output, outputBlank, outputError } from "../../shared/output.js";
+import { appendBacklogSection, issueToBacklogItem, type BacklogItem } from "../../application/backlog-writer.js";
+import { resolveBacklogPaths } from "../../application/backlog-core.js";
 import { getChangedFiles } from "../../audit/changed-files.js";
-import { loadGrowthProfile } from "../../growth-profile.js";
-import { checkBuild, checkTests, checkLint } from "../../plan-lifecycle.js";
+import { loadGrowthProfile } from "../../infrastructure/growth-profile.js";
+import { checkBuild, checkTests, checkLint } from "../../application/plan-lifecycle.js";
 
 import { buildIssueCounts } from "./display.js";
 import { collectSemanticData } from "./semantic-display.js";
-import { outputJson } from "../../formatting.js";
+import { outputJson } from "../../shared/formatting.js";
 import type { AutofixReport as AutofixReportType } from "../../audit/autofix-engine.js";
 import type { AuditActionCtx } from "./types.js";
 
@@ -184,11 +184,11 @@ export async function displayHumanPostAudit(input: HumanPostAuditInput): Promise
   if (options.showSuppressed && report.suppressedIssues.length > 0) {
     displaySuppressedIssues(report.suppressedIssues);
   }
-  const { formatGrowthProgress } = await import("../../dual-path-presenter.js");
+  const { formatGrowthProgress } = await import("../../domain/types/dual-path-presenter.js");
   output(formatGrowthProgress(growthProfile));
   outputBlank();
   displaySemanticAudit(ctx.projectRoot, ctx.shitennoDir);
-  const { getEventBus } = await import("../../event-bus.js");
+  const { getEventBus } = await import("../../infrastructure/event-bus.js");
   getEventBus().publish("health.checked", {
     status: resolveHealthStatus(report.healthScore),
     healthScore: report.healthScore,
@@ -237,7 +237,7 @@ export async function handleJsonOutput(input: JsonOutputInput): Promise<void> {
 // ── Custom Check Results ────────────────────────────────────────────────────
 
 async function displayCustomCheckResults(ctx: AuditActionCtx, report: HealthAuditReport): Promise<void> {
-  const { getHookBus } = await import("../../plugin-system.js");
+  const { getHookBus } = await import("../../infrastructure/plugin-system.js");
   const hookBus = getHookBus();
   const customResults = await hookBus.collectHook("custom-check", async (plugin) => {
     if (plugin.hooks?.["custom-check"]) return await plugin.hooks["custom-check"]({ projectRoot: ctx.projectRoot, shitennoDir: ctx.shitennoDir, healthReport: report });

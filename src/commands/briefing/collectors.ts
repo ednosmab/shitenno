@@ -4,13 +4,13 @@
  * Extracted from commands/briefing.ts to keep modules focused.
  */
 
-import { collectContext, type ContextSnapshot } from "../../context-collector.js";
-import { computeInputHash, setCachedBriefing, invalidateBriefingCache, readCache } from "../../briefing-cache.js";
-import { type Briefing } from "../../briefing.js";
-import { compressedSummary, differentialBriefing, suggestDepth, type BriefingDepth } from "../../token-optimizer.js";
-import { outputJson } from "../../formatting.js";
-import { output } from "../../output.js";
-import { isDaemonRunning, queryDaemon } from "../../daemon-client.js";
+import { collectContext, type ContextSnapshot } from "../../application/context-collector.js";
+import { computeInputHash, setCachedBriefing, invalidateBriefingCache, readCache } from "../../infrastructure/briefing-cache.js";
+import { type Briefing } from "../../application/briefing.js";
+import { compressedSummary, differentialBriefing, suggestDepth, type BriefingDepth } from "../../domain/rules/token-optimizer.js";
+import { outputJson } from "../../shared/formatting.js";
+import { output } from "../../shared/output.js";
+import { isDaemonRunning, queryDaemon } from "../../infrastructure/daemon-client.js";
 
 // ── Data Collection ─────────────────────────────────────────────────────────
 

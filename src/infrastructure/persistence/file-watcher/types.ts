@@ -2,8 +2,8 @@
  * types.ts — File watcher types.
  */
 
-import type { SignificanceResult } from "../../../doc-sync-significance.js";
-import type { getEventBus } from "../../../event-bus.js";
+import type { SignificanceResult } from "../../../domain/rules/doc-sync-significance.js";
+import type { getEventBus } from "../../event-bus.js";
 
 export interface WatcherOptions {
   debounceMs?: number;

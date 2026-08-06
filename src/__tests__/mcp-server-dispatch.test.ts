@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // ── Mocks ───────────────────────────────────────────────────────────────────
 
-vi.mock("../mcp-server-handlers.js", () => ({
+vi.mock("../interface/mcp/mcp-server-handlers.js", () => ({
   handleGetBriefing: vi.fn(),
   handleGetRiskMap: vi.fn(),
   handleGetRules: vi.fn(),
@@ -25,7 +25,7 @@ vi.mock("../mcp-server-handlers.js", () => ({
   handleGetMandatoryContext: vi.fn(),
 }));
 
-vi.mock("../backlog-mcp-tools.js", () => ({
+vi.mock("../interface/mcp/backlog-mcp-tools.js", () => ({
   handleGetBacklog: vi.fn(),
   handleAddBacklogItem: vi.fn(),
   handleTransitionBacklogItem: vi.fn(),
@@ -37,43 +37,43 @@ vi.mock("../backlog-mcp-tools.js", () => ({
   ],
 }));
 
-vi.mock("../context-collector.js", () => ({ collectContext: vi.fn() }));
-vi.mock("../risk-map.js", () => ({ generateRiskMap: vi.fn() }));
-vi.mock("../daemon-client.js", () => ({
+vi.mock("../application/context-collector.js", () => ({ collectContext: vi.fn() }));
+vi.mock("../infrastructure/risk-map.js", () => ({ generateRiskMap: vi.fn() }));
+vi.mock("../infrastructure/daemon-client.js", () => ({
   isDaemonRunning: vi.fn(() => false),
   queryDaemon: vi.fn(() => Promise.resolve(null)),
 }));
-vi.mock("../knowledge-loader.js", () => ({
+vi.mock("../infrastructure/knowledge-loader.js", () => ({
   listAdrs: vi.fn(() => []),
   getAdr: vi.fn(() => null),
   listSkills: vi.fn(() => []),
   getSkill: vi.fn(() => null),
 }));
-vi.mock("../rule-engine.js", () => ({ loadRules: vi.fn(() => []) }));
-vi.mock("../dynamic-rules.js", () => ({ generateDynamicRules: vi.fn(() => []) }));
-vi.mock("../rule-manifest.js", () => ({
+vi.mock("../application/rule-engine.js", () => ({ loadRules: vi.fn(() => []) }));
+vi.mock("../infrastructure/dynamic-rules.js", () => ({ generateDynamicRules: vi.fn(() => []) }));
+vi.mock("../infrastructure/rule-manifest.js", () => ({
   loadManifest: vi.fn(() => ({ rules: [] })),
   partitionRules: vi.fn(() => ({ mandatory: [], contextual: [] })),
 }));
-vi.mock("../skill-manifest.js", () => ({
+vi.mock("../infrastructure/skill-manifest.js", () => ({
   loadSkillManifest: vi.fn(() => ({ skills: [] })),
   partitionSkills: vi.fn(() => ({ mandatory: [], contextual: [] })),
 }));
-vi.mock("../session-feedback.js", () => ({
+vi.mock("../infrastructure/session-feedback.js", () => ({
   readCache: vi.fn(() => null),
   createFileStorage: vi.fn(),
   recordOutcome: vi.fn(),
 }));
-vi.mock("../context-buffer-writer.js", () => ({
+vi.mock("../application/context-buffer-writer.js", () => ({
   recordSkillResolution: vi.fn(),
 }));
-vi.mock("../usage-tracker.js", () => ({
+vi.mock("../infrastructure/usage-tracker.js", () => ({
   recordToolCall: vi.fn(),
 }));
 
 // ── Imports (after mocks) ──────────────────────────────────────────────────
 
-import { dispatchTool, TOOLS } from "../mcp-server.js";
+import { dispatchTool, TOOLS } from "../interface/mcp/mcp-server.js";
 import {
   handleGetBriefing,
   handleGetRiskMap,
@@ -88,13 +88,13 @@ import {
   handleGetAuditReport,
   handleGetEvolution,
   handleGetMandatoryContext,
-} from "../mcp-server-handlers.js";
+} from "../interface/mcp/mcp-server-handlers.js";
 import {
   handleGetBacklog,
   handleAddBacklogItem,
   handleTransitionBacklogItem,
   handleDeleteBacklogItem,
-} from "../backlog-mcp-tools.js";
+} from "../interface/mcp/backlog-mcp-tools.js";
 
 const mockHandleGetBriefing = vi.mocked(handleGetBriefing);
 const mockHandleGetRiskMap = vi.mocked(handleGetRiskMap);
@@ -221,7 +221,7 @@ describe("dispatchTool", () => {
   });
 
   it("waits for the ready gate before dispatching tool calls", async () => {
-    const { createMcpServer } = await import("../mcp-server.js");
+    const { createMcpServer } = await import("../interface/mcp/mcp-server.js");
     const { InMemoryTransport } = await import("@modelcontextprotocol/sdk/inMemory.js");
     const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
 
@@ -321,17 +321,17 @@ describe("TOOLS definitions", () => {
 
 describe("createMcpServer", () => {
   it("creates a server without throwing", async () => {
-    const { createMcpServer } = await import("../mcp-server.js");
+    const { createMcpServer } = await import("../interface/mcp/mcp-server.js");
     expect(() => createMcpServer(PROJECT_ROOT, SHITENNO_DIR)).not.toThrow();
   });
 
   it("creates a server with default shitenno dir", async () => {
-    const { createMcpServer } = await import("../mcp-server.js");
+    const { createMcpServer } = await import("../interface/mcp/mcp-server.js");
     expect(() => createMcpServer(PROJECT_ROOT)).not.toThrow();
   });
 
   it("returns a Server instance", async () => {
-    const { createMcpServer } = await import("../mcp-server.js");
+    const { createMcpServer } = await import("../interface/mcp/mcp-server.js");
     const server = createMcpServer(PROJECT_ROOT, SHITENNO_DIR);
     expect(server).toBeDefined();
   });

@@ -10,7 +10,7 @@
 
 import { existsSync, mkdirSync, copyFileSync, readdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 

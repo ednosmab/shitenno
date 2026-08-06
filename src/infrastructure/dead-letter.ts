@@ -6,9 +6,9 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
-import type { ShitennoEventType, EventBus } from "../event-bus.js";
-import { logger } from "../logger.js";
-import { BoundedQueue } from "../daemon-resources.js";
+import type { ShitennoEventType, EventBus } from "./event-bus.js";
+import { logger } from "../shared/logger.js";
+import { BoundedQueue } from "../domain/types/daemon-resources.js";
 import type { VersionedEvent } from "./versioning.js";
 
 // ── Constants ──────────────────────────────────────────────────────────────

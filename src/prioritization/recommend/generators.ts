@@ -2,10 +2,10 @@
  * generators.ts — Individual recommendation generators.
  */
 
-import type { EngineeringState, AssetType } from "../../engineering-state.js";
-import type { CapabilityEngineResult } from "../../capability-engine.js";
-import type { KnowledgeDebtReport } from "../../knowledge-debt.js";
-import type { PatternDetectionReport } from "../../pattern-detector.js";
+import type { EngineeringState, AssetType } from "../../application/engineering-state.js";
+import type { CapabilityEngineResult } from "../../application/capability-engine.js";
+import type { KnowledgeDebtReport } from "../../application/knowledge-debt.js";
+import type { PatternDetectionReport } from "../../infrastructure/pattern-detector.js";
 import type { Recommendation } from "./types.js";
 
 export function generateFromCapabilityEngine(

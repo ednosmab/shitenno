@@ -7,8 +7,8 @@
  * PRINCIPLE: Commands receive state via events, not by reading files directly.
  */
 
-import { getEventBus } from "../event-bus.js";
-import { consolidateEngineeringState, type EngineeringState } from "../engineering-state.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
+import { consolidateEngineeringState, type EngineeringState } from "../application/engineering-state.js";
 
 /**
  * Subscribe to Engineering State updates.

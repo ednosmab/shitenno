@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { isStarterProject } from "../commands/init.js";
-import type { ProjectAnalysis } from "../analyser.js";
+import type { ProjectAnalysis } from "../infrastructure/analyser.js";
 
 function makeAnalysis(overrides: Partial<ProjectAnalysis> = {}): ProjectAnalysis {
   return {
@@ -20,6 +20,10 @@ function makeAnalysis(overrides: Partial<ProjectAnalysis> = {}): ProjectAnalysis
     hasCI: false,
     hasTypeScript: false,
     totalCommits: 0,
+    flatSourceFiles: 0,
+    layeredDirs: 0,
+    nodeApiImportsOutsideLayers: 0,
+    portsConsumed: false,
     ...overrides,
   };
 }

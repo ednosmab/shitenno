@@ -2,7 +2,7 @@
  * reminders.ts — Reminder buffer operations.
  */
 
-import type { ReminderPriority, ReminderCategory } from "../briefing.js";
+import type { ReminderPriority, ReminderCategory } from "../application/briefing.js";
 import { readBufferObject, writeBufferObject } from "./buffer-io.js";
 
 export interface ReminderInput {

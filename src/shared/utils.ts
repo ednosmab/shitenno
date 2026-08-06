@@ -6,8 +6,8 @@
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { logger } from "../logger.js";
-import { SHITENNO_DIR_NAME } from "../constants.js";
+import { logger } from "./logger.js";
+import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 
 /** Extensões de ficheiros de código fonte. */
 const SOURCE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".vue", ".svelte"];

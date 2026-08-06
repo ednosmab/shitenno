@@ -1,6 +1,6 @@
 import type { Socket } from "node:net";
 import { appendFileSync } from "node:fs";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import { type DaemonState, type TimerInfo, type TimerInfoResponse, MAX_EVENTS, MAX_SESSIONS } from "./state.js";
 
 export interface IpcMessage {
@@ -169,7 +169,7 @@ async function handleQueryBriefing(opts: HandleMessageOptions): Promise<void> {
   const { state, shitennoDir, projectRoot, logPath, socket } = opts;
   if (!state.briefingCache) {
     try {
-      const { collectContext } = await import("../context-collector.js");
+      const { collectContext } = await import("../application/context-collector.js");
       const snapshot = collectContext(projectRoot, shitennoDir);
       state.briefingCache = {
         computedAt: new Date().toISOString(),
@@ -189,7 +189,7 @@ async function handleQueryRiskmap(opts: HandleMessageOptions): Promise<void> {
   const { state, shitennoDir, projectRoot, logPath, socket } = opts;
   if (!state.riskMapCache) {
     try {
-      const { generateRiskMap } = await import("../risk-map.js");
+      const { generateRiskMap } = await import("../infrastructure/risk-map.js");
       const riskMap = generateRiskMap(projectRoot, shitennoDir);
       state.riskMapCache = {
         computedAt: new Date().toISOString(),

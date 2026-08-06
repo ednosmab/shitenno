@@ -16,8 +16,8 @@ import {
   generatePersonalizedFeedback,
   formatFeedbackAsMarkdown,
   type UserProfile,
-} from "../feedback-engine.js";
-import type { SessionFeedbackRecord } from "../session-feedback.js";
+} from "../application/feedback-engine.js";
+import type { SessionFeedbackRecord } from "../infrastructure/session-feedback.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

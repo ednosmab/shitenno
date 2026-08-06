@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../logger.js";
+import { logger } from "../shared/logger.js";
 import type { KnowledgeGap } from "./types.js";
 
 export function detectMissingAdrs(shitennoDir: string, now: string): KnowledgeGap[] {

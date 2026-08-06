@@ -1,4 +1,4 @@
-import type { Capability, MaturityDimensions } from "../maturity-profile.js";
+import type { Capability, MaturityDimensions } from "../application/maturity-profile.js";
 
 /** Capability maturity level. */
 export type CapabilityMaturity =

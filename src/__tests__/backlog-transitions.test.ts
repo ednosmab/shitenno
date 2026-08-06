@@ -4,7 +4,7 @@ import {
   getCurrentStatus,
   transitionBacklogStatus,
   type BacklogStatus,
-} from "../backlog-transitions.js";
+} from "../infrastructure/backlog-transitions.js";
 import { writeFileSync, unlinkSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";

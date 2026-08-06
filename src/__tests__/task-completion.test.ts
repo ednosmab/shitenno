@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { validateCompletionGate } from "../task-completion.js";
+import { validateCompletionGate } from "../application/task-completion.js";
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -8,7 +8,7 @@ import { randomUUID } from "node:crypto";
 const mockCheckTests = vi.fn();
 const mockCheckLint = vi.fn();
 
-vi.mock("../plan-lifecycle.js", () => ({
+vi.mock("../application/plan-lifecycle.js", () => ({
   checkTests: (...args: unknown[]) => mockCheckTests(...args),
   checkLint: (...args: unknown[]) => mockCheckLint(...args),
 }));

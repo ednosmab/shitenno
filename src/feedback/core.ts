@@ -5,8 +5,8 @@
  */
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
-import { logger } from "../logger.js";
-import { getEventBus } from "../event-bus.js";
+import { logger } from "../shared/logger.js";
+import { getEventBus } from "../infrastructure/event-bus.js";
 import type { FeedbackRecord, FeedbackSummary, FeedbackPattern } from "./types.js";
 import { getRecordsDir, getSummaryPath } from "./storage.js";
 

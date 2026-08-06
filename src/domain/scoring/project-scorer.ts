@@ -1,7 +1,7 @@
 import { join } from "node:path";
-import { getEventBus } from "../../event-bus.js";
-import { FileContentCache } from "../../utils.js";
-import type { ProjectAnalysis } from "../../analyser.js";
+import { getEventBus } from "../../infrastructure/event-bus.js";
+import { FileContentCache } from "../../infrastructure/utils.js";
+import type { ProjectAnalysis } from "../../infrastructure/analyser.js";
 import type { AreaScore, ComplexityReport } from "../entities/engineering-state.js";
 import type { ProjectProfile } from "./profile-loader.js";
 import { batchScoreArea, batchGitChurn, preReadHistory, countContextPressure, type AreaMetrics } from "./area-scorer.js";

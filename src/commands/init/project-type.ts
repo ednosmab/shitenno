@@ -11,9 +11,9 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import inquirer from "inquirer";
 import chalk from "chalk";
-import { analyseProject, type ProjectAnalysis } from "../../analyser.js";
-import { guardInteractive } from "../../shared.js";
-import { output, outputBlank } from "../../output.js";
+import { analyseProject, type ProjectAnalysis } from "../../infrastructure/analyser.js";
+import { guardInteractive } from "../../shared/shared.js";
+import { output, outputBlank } from "../../shared/output.js";
 import { isGitRepository, initGitRepository } from "./git.js";
 
 export type ProjectType = "new" | "existing";

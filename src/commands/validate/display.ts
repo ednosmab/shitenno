@@ -5,8 +5,8 @@
  */
 
 import chalk from "chalk";
-import { statusIcon } from "../../formatting.js";
-import { output, outputBlank } from "../../output.js";
+import { statusIcon } from "../../shared/formatting.js";
+import { output, outputBlank } from "../../shared/output.js";
 import type { ValidationResult } from "./checks.js";
 import { attemptFixes } from "./fixers.js";
 

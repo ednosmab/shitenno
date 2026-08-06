@@ -10,7 +10,7 @@ import {
   parseBacklog,
   findBacklogItem,
   completeTask,
-} from "../backlog-state-machine.js";
+} from "../application/backlog-state-machine.js";
 
 describe("backlog-state-machine", () => {
   let testDir: string;

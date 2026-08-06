@@ -9,16 +9,16 @@
 
 import { Command } from "commander";
 import chalk from "chalk";
-import { calculateComplexityScore, writeComplexityReport, type ComplexityReport } from "../scorer.js";
-import { analyseProject, type ProjectAnalysis } from "../analyser.js";
-import { getCached, setCache, computeKeyChecksums } from "../cache.js";
-import { loadMaturityProfile, type MaturityProfile } from "../maturity-profile.js";
-import { guardNotInitialized, checkLifecycleGate } from "../shared.js";
-import { loadGrowthProfile } from "../growth-profile.js";
-import { formatGrowthProgress } from "../dual-path-presenter.js";
+import { calculateComplexityScore, writeComplexityReport, type ComplexityReport } from "../application/scorer.js";
+import { analyseProject, type ProjectAnalysis } from "../infrastructure/analyser.js";
+import { getCached, setCache, computeKeyChecksums } from "../infrastructure/cache.js";
+import { loadMaturityProfile, type MaturityProfile } from "../application/maturity-profile.js";
+import { guardNotInitialized, checkLifecycleGate } from "../shared/shared.js";
+import { loadGrowthProfile } from "../infrastructure/growth-profile.js";
+import { formatGrowthProgress } from "../domain/types/dual-path-presenter.js";
 
-import { output, outputBlank } from "../output.js";
-import { isDaemonRunning } from "../daemon-client.js";
+import { output, outputBlank } from "../shared/output.js";
+import { isDaemonRunning } from "../infrastructure/daemon-client.js";
 import { runHealthChecks, type StatusCheck } from "./status/health-checks.js";
 import {
   displayHeader, displayProjectRootText, displayResults, displayFixMode,
@@ -67,7 +67,7 @@ async function resolveComplexity(
 
 // ── JSON Output ─────────────────────────────────────────────────────────────
 
-import { outputJson } from "../formatting.js";
+import { outputJson } from "../shared/formatting.js";
 
 function displayJsonOutput(data: StatusOutputData): void {
   outputJson({

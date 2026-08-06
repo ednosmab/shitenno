@@ -12,8 +12,8 @@ import {
   readMaturityHistory,
   profileToLegacyLevel,
   type MaturityAnswers,
-} from "../maturity-profile.js";
-import type { ProjectAnalysis } from "../analyser.js";
+} from "../application/maturity-profile.js";
+import type { ProjectAnalysis } from "../infrastructure/analyser.js";
 
 // ── Test Fixtures ──────────────────────────────────────────────────────────
 
@@ -74,6 +74,19 @@ const BASE_ANALYSIS: ProjectAnalysis = {
   hasCI: false,
   hasTypeScript: true,
   totalCommits: 0,
+  flatSourceFiles: 20,
+  layeredDirs: 0,
+  nodeApiImportsOutsideLayers: 10,
+  portsConsumed: false,
+};
+
+const STRUCTURED_ANALYSIS: ProjectAnalysis = {
+  ...BASE_ANALYSIS,
+  sourceFileCount: 120,
+  flatSourceFiles: 0,
+  layeredDirs: 5,
+  nodeApiImportsOutsideLayers: 0,
+  portsConsumed: true,
 };
 
 let tempDir: string;
@@ -115,8 +128,8 @@ describe("calculateMaturityProfile", () => {
   });
 
   describe("full project (all true)", () => {
-    it("architecture dimension >= 70", () => {
-      const profile = calculateMaturityProfile(FULL_ANSWERS, BASE_ANALYSIS);
+    it("architecture dimension >= 70 for a layered project", () => {
+      const profile = calculateMaturityProfile(FULL_ANSWERS, STRUCTURED_ANALYSIS);
       expect(profile.dimensions.architecture).toBeGreaterThanOrEqual(70);
     });
 
@@ -165,6 +178,37 @@ describe("calculateMaturityProfile", () => {
       const withTS = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, hasTypeScript: true });
       const withoutTS = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, hasTypeScript: false });
       expect(withTS.dimensions.automation).toBeGreaterThan(withoutTS.dimensions.automation);
+    });
+  });
+
+  describe("architecture measures code structure", () => {
+    it("regression: full documentation alone does not reach 70 on a flat project", () => {
+      const profile = calculateMaturityProfile(FULL_ANSWERS, BASE_ANALYSIS);
+      expect(profile.dimensions.architecture).toBeLessThan(70);
+    });
+
+    it("layered directories increase architecture", () => {
+      const layered = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, layeredDirs: 4 });
+      const flat = calculateMaturityProfile(EMPTY_ANSWERS, BASE_ANALYSIS);
+      expect(layered.dimensions.architecture).toBeGreaterThan(flat.dimensions.architecture);
+    });
+
+    it("flat source files penalize architecture", () => {
+      const structured = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, flatSourceFiles: 0 });
+      const flat = calculateMaturityProfile(EMPTY_ANSWERS, BASE_ANALYSIS);
+      expect(structured.dimensions.architecture).toBeGreaterThan(flat.dimensions.architecture);
+    });
+
+    it("node imports outside the adapter layers penalize architecture", () => {
+      const clean = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, nodeApiImportsOutsideLayers: 0 });
+      const coupled = calculateMaturityProfile(EMPTY_ANSWERS, BASE_ANALYSIS);
+      expect(clean.dimensions.architecture).toBeGreaterThan(coupled.dimensions.architecture);
+    });
+
+    it("consumed domain ports increase architecture", () => {
+      const withPorts = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, portsConsumed: true });
+      const withoutPorts = calculateMaturityProfile(EMPTY_ANSWERS, BASE_ANALYSIS);
+      expect(withPorts.dimensions.architecture).toBeGreaterThan(withoutPorts.dimensions.architecture);
     });
   });
 

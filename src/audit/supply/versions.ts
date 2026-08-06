@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { logger } from "../../logger.js";
-import { safeJsonParseValidated, isRecord } from "../../validation.js";
+import { logger } from "../../shared/logger.js";
+import { safeJsonParseValidated, isRecord } from "../../infrastructure/validation.js";
 import type { HealthIssue } from "../types.js";
 
 export function detectUnpinnedVersions(projectRoot: string): HealthIssue[] {

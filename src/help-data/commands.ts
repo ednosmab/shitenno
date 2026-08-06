@@ -1,4 +1,4 @@
-import type { CommandCategory } from "../help-data.js";
+import type { CommandCategory } from "../domain/types/help-data.js";
 import { CORE_CATEGORIES } from "./commands-core.js";
 import { EXTENDED_CATEGORIES } from "./commands-extended.js";
 
