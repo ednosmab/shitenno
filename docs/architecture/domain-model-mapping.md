@@ -13,6 +13,8 @@ Every module in the Shitenno should map clearly to one of the [Meta Model](../do
 
 If a module cannot be associated with a Meta Model concept, its responsibility should be re-evaluated.
 
+> Each module also belongs to a bounded context — see [Bounded Contexts Map](bounded-contexts.md).
+
 ---
 
 ## Core Modules

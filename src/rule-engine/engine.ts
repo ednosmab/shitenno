@@ -12,8 +12,8 @@ import { logger } from "../shared/logger.js";
 import { loadMaturityProfile } from "../application/maturity-profile.js";
 import type { Rule, RuleContext, RuleResult, EngineResult, TriggerType } from "../domain/rules/rule.js";
 import { validateRule } from "./validation.js";
-import { isValidRuleId } from "./security.js";
-import { evaluateCondition } from "./conditions.js";
+import { isValidRuleId } from "../shared/security.js";
+import { evaluateCondition } from "../shared/conditions.js";
 import { getDefaultRules } from "./defaults.js";
 import { invokeAction } from "../decision-core/invoke.js";
 

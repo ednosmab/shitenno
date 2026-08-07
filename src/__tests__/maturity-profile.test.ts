@@ -78,6 +78,8 @@ const BASE_ANALYSIS: ProjectAnalysis = {
   layeredDirs: 0,
   nodeApiImportsOutsideLayers: 10,
   portsConsumed: false,
+  boundedContextCoverage: 0,
+  contextBoundaryViolations: 0,
 };
 
 const STRUCTURED_ANALYSIS: ProjectAnalysis = {
@@ -87,6 +89,8 @@ const STRUCTURED_ANALYSIS: ProjectAnalysis = {
   layeredDirs: 5,
   nodeApiImportsOutsideLayers: 0,
   portsConsumed: true,
+  boundedContextCoverage: 1,
+  contextBoundaryViolations: 0,
 };
 
 let tempDir: string;
@@ -209,6 +213,18 @@ describe("calculateMaturityProfile", () => {
       const withPorts = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, portsConsumed: true });
       const withoutPorts = calculateMaturityProfile(EMPTY_ANSWERS, BASE_ANALYSIS);
       expect(withPorts.dimensions.architecture).toBeGreaterThan(withoutPorts.dimensions.architecture);
+    });
+
+    it("full bounded context coverage with zero violations increases architecture", () => {
+      const bounded = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, boundedContextCoverage: 1, contextBoundaryViolations: 0 });
+      const flat = calculateMaturityProfile(EMPTY_ANSWERS, BASE_ANALYSIS);
+      expect(bounded.dimensions.architecture).toBeGreaterThan(flat.dimensions.architecture);
+    });
+
+    it("boundary violations cancel bounded context points", () => {
+      const clean = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, boundedContextCoverage: 1, contextBoundaryViolations: 0 });
+      const violated = calculateMaturityProfile(EMPTY_ANSWERS, { ...BASE_ANALYSIS, boundedContextCoverage: 1, contextBoundaryViolations: 2 });
+      expect(violated.dimensions.architecture).toBeLessThan(clean.dimensions.architecture);
     });
   });
 

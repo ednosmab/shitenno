@@ -8,7 +8,7 @@
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { isScriptAllowed, isShugoCommandAllowed, getAllowedScriptCommand, getAllowedShugoCommand } from "../../rule-engine/security.js";
+import { isScriptAllowed, isShugoCommandAllowed, getAllowedScriptCommand, getAllowedShugoCommand } from "../../shared/security.js";
 import type { ActionExecutor } from "./types.js";
 
 export class RunScriptExecutor implements ActionExecutor {

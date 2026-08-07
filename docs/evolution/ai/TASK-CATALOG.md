@@ -42,7 +42,7 @@ Tasks follow the format: `NX-{CATEGORY}-{NNN}`
 | NX-ARCH-002 | Document existing decisions as ADRs | P1 | Pending |
 | NX-ARCH-003 | Separate domain logic from CLI | P1 | Pending |
 | NX-ARCH-004 | Introduce application layer | P2 | Pending |
-| NX-ARCH-005 | Define bounded contexts | P2 | Pending |
+| NX-ARCH-005 | Define bounded contexts | P2 | Done (ADR-012, 2026-08-06) |
 | NX-ARCH-006 | Create reference documentation | P2 | Pending |
 
 ### Wave 3 — Platform

@@ -64,6 +64,8 @@ const mockDeps: ContextDeps = {
     layeredDirs: 0,
     nodeApiImportsOutsideLayers: 0,
     portsConsumed: false,
+    boundedContextCoverage: 0,
+    contextBoundaryViolations: 0,
   }),
   loadMaturityProfile: () => null,
   generateProjectFingerprint: () => ({

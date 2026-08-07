@@ -17,7 +17,7 @@ export {
   getAllowedShugoCommand,
   isValidRuleId,
   DANGEROUS_KEYS,
-} from "../rule-engine/security.js";
+} from "../shared/security.js";
 
 export {
   VALID_ACTION_TYPES,
@@ -28,7 +28,7 @@ export {
 export {
   evaluateCondition,
   resolveField,
-} from "../rule-engine/conditions.js";
+} from "../shared/conditions.js";
 
 export { executeAction } from "../rule-engine/actions.js";
 export { getDefaultRules } from "../rule-engine/defaults.js";

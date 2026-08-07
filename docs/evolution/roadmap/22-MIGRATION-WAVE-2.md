@@ -32,6 +32,8 @@ NX-ARCH-003
 
 Introduzir Bounded Contexts
 
+> ✅ **Concluído (2026-08-06)** — SA15 / ADR-012: bounded contexts declarados em `src/domain/types/context-map.ts`, matriz de dependências em `src/domain/rules/context-dependencies.ts`, enforcement e medição no architecture score. Ver `docs/architecture/bounded-contexts.md`.
+
 ---
 
 NX-ARCH-004

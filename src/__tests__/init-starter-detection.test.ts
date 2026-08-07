@@ -24,6 +24,8 @@ function makeAnalysis(overrides: Partial<ProjectAnalysis> = {}): ProjectAnalysis
     layeredDirs: 0,
     nodeApiImportsOutsideLayers: 0,
     portsConsumed: false,
+    boundedContextCoverage: 0,
+    contextBoundaryViolations: 0,
     ...overrides,
   };
 }

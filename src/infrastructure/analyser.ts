@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { SHITENNO_DIR_NAME } from "../domain/types/constants.js";
 import { walkSourceFiles } from "./utils.js";
+import { analyseContextBoundaries } from "./context-boundary.js";
 
 export interface ProjectAnalysis {
   rootDir: string;
@@ -25,6 +26,8 @@ export interface ProjectAnalysis {
   layeredDirs: number;
   nodeApiImportsOutsideLayers: number;
   portsConsumed: boolean;
+  boundedContextCoverage: number;
+  contextBoundaryViolations: number;
 }
 
 /**
@@ -41,6 +44,7 @@ export interface ProjectAnalysis {
  * ```
  */
 export function analyseProject(rootDir: string): ProjectAnalysis {
+  const boundaries = analyseContextBoundaries(rootDir);
   return {
     rootDir,
     hasGit: existsSync(join(rootDir, ".git")),
@@ -62,6 +66,8 @@ export function analyseProject(rootDir: string): ProjectAnalysis {
     layeredDirs: countLayeredDirs(rootDir),
     nodeApiImportsOutsideLayers: countNodeImportsOutsideLayers(rootDir),
     portsConsumed: detectPortConsumption(rootDir),
+    boundedContextCoverage: boundaries.coverage,
+    contextBoundaryViolations: boundaries.violations.length,
   };
 }
 

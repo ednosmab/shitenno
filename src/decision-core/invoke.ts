@@ -15,7 +15,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ActionType, RuleAction, RuleContext } from "../domain/rules/rule.js";
-import { PolicyEngine, FilePolicyRepository } from "../rule-engine/index.js";
+import { PolicyEngine, FilePolicyRepository } from "../infrastructure/policy.js";
 import { computeExecutionHash, type ExecutionRecord } from "../application/action-engine.js";
 import { checkPolicyGate } from "./policy-gate.js";
 import { checkPrecedence, getResourceId, type InvokeMode } from "./precedence.js";
@@ -27,7 +27,7 @@ import {
   RunShugoCommandExecutor,
   CreateReminderExecutor,
   ApplyAutofixExecutor,
-  GenericRuleActionExecutor,
+  RuleActionsExecutor,
 } from "./executors/index.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -68,16 +68,19 @@ const EXECUTORS: Record<string, ActionExecutor> = {
   run_shugo_command: new RunShugoCommandExecutor(),
   create_reminder: new CreateReminderExecutor(),
   apply_autofix: new ApplyAutofixExecutor(),
+  update_context_buffer: new RuleActionsExecutor("update_context_buffer"),
+  update_quick_board: new RuleActionsExecutor("update_quick_board"),
+  log_event: new RuleActionsExecutor("log_event"),
+  trigger_assessment: new RuleActionsExecutor("trigger_assessment"),
+  trigger_health_check: new RuleActionsExecutor("trigger_health_check"),
+  update_backlog: new RuleActionsExecutor("update_backlog"),
+  update_backlog_status: new RuleActionsExecutor("update_backlog_status"),
+  archive_plan: new RuleActionsExecutor("archive_plan"),
+  auto_populate_next_p0: new RuleActionsExecutor("auto_populate_next_p0"),
 };
 
-/** Actions that have dedicated executors above. */
-const DEDICATED_EXECUTOR_TYPES = new Set(Object.keys(EXECUTORS));
-
 function getExecutor(actionType: ActionType): ActionExecutor {
-  if (DEDICATED_EXECUTOR_TYPES.has(actionType)) {
-    return EXECUTORS[actionType]!;
-  }
-  return new GenericRuleActionExecutor(actionType);
+  return EXECUTORS[actionType] ?? new RuleActionsExecutor(actionType);
 }
 
 // ── Policy Engine Singleton ────────────────────────────────────────────────

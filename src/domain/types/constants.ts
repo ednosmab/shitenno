@@ -58,5 +58,5 @@ export const NPM_PACKAGE_NAME = "shitenno";
 /** Metadata subfolder name used inside the git common dir (consent records). */
 export const GIT_METADATA_DIR_NAME = "shitenno";
 
-/** Valid action types for rule engine — single source of truth in rule-engine.ts. */
-export { VALID_ACTION_TYPES } from "../../application/rule-engine.js";
+/** Valid action types for rule engine — single source of truth in domain. */
+export { VALID_ACTION_TYPES } from "../rules/rule.js";

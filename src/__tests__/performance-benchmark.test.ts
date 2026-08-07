@@ -52,19 +52,16 @@ describe("Performance Benchmarks", () => {
       };
       
       const filePath = "/tmp/test-plan.md";
-      
+
       // First call - should compute
-      const start1 = Date.now();
       getCachedPlanInference("plan1", filePath, computeFn);
-      const duration1 = Date.now() - start1;
-      
+
       // Second call - should use cache
-      const start2 = Date.now();
       getCachedPlanInference("plan1", filePath, computeFn);
-      const duration2 = Date.now() - start2;
-      
+
+      // Caching is proven by computeCount: the compute function runs exactly once.
+      // Timing assertions are avoided — Date.now() timing is flaky under load.
       expect(computeCount).toBe(1);
-      expect(duration2).toBeLessThanOrEqual(duration1 + 2);
     });
   });
 

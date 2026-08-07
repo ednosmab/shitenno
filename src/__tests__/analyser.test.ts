@@ -188,4 +188,30 @@ describe("analyseProject", () => {
     const result = analyseProject(tempDir);
     expect(result.portsConsumed).toBe(false);
   });
+
+  it("reports zero bounded context metrics for a project without src", () => {
+    const result = analyseProject(tempDir);
+    expect(result.boundedContextCoverage).toBe(0);
+    expect(result.contextBoundaryViolations).toBe(0);
+  });
+
+  it("reports full coverage and zero violations for a clean layered project", () => {
+    mkdirSync(join(tempDir, "src", "feedback"), { recursive: true });
+    mkdirSync(join(tempDir, "src", "governance"), { recursive: true });
+    writeFileSync(join(tempDir, "src", "feedback", "a.ts"), 'import { x } from "../governance/b.js";\nexport const a = x;\n');
+    writeFileSync(join(tempDir, "src", "governance", "b.ts"), "export const b = 1;\n");
+    const result = analyseProject(tempDir);
+    expect(result.boundedContextCoverage).toBe(1);
+    expect(result.contextBoundaryViolations).toBe(0);
+  });
+
+  it("counts undeclared cross-context imports as boundary violations", () => {
+    mkdirSync(join(tempDir, "src", "feedback"), { recursive: true });
+    mkdirSync(join(tempDir, "src", "planning"), { recursive: true });
+    writeFileSync(join(tempDir, "src", "feedback", "a.ts"), 'import { x } from "../planning/b.js";\nexport const a = x;\n');
+    writeFileSync(join(tempDir, "src", "planning", "b.ts"), "export const b = 1;\n");
+    const result = analyseProject(tempDir);
+    expect(result.boundedContextCoverage).toBe(1);
+    expect(result.contextBoundaryViolations).toBe(1);
+  });
 });

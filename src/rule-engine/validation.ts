@@ -3,6 +3,7 @@
  */
 
 import type { ActionType } from "../domain/rules/rule.js";
+import { VALID_ACTION_TYPES } from "../domain/rules/rule.js";
 
 // ── Schema Validation ────────────────────────────────────────────────────────
 
@@ -11,14 +12,7 @@ export interface ValidationResult {
   errors: string[];
 }
 
-export const VALID_ACTION_TYPES: readonly ActionType[] = [
-  "update_context_buffer", "create_reminder", "remove_reminder",
-  "update_quick_board", "create_adr", "create_skill", "log_event",
-  "send_notification", "trigger_assessment", "trigger_health_check",
-  "update_backlog", "run_local_script", "run_script", "run_shugo_command",
-  "update_file", "create_file", "remove_file", "update_backlog_status",
-  "archive_plan", "auto_populate_next_p0", "apply_autofix",
-];
+export { VALID_ACTION_TYPES };
 
 function validateRuleShape(rule: unknown): string[] {
   const errors: string[] = [];

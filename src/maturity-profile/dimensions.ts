@@ -34,6 +34,8 @@ export interface ProjectAnalysis {
   layeredDirs: number;
   nodeApiImportsOutsideLayers: number;
   portsConsumed: boolean;
+  boundedContextCoverage: number;
+  contextBoundaryViolations: number;
 }
 
 function scoreArchitecture(answers: MaturityAnswers, analysis: ProjectAnalysis): number {
@@ -50,7 +52,15 @@ function scoreArchitecture(answers: MaturityAnswers, analysis: ProjectAnalysis):
   if (analysis.nodeApiImportsOutsideLayers === 0) score += 15;
   else if (analysis.nodeApiImportsOutsideLayers <= 2) score += 8;
   if (analysis.portsConsumed) score += 10;
+  score += scoreBoundedContexts(analysis);
   return score;
+}
+
+function scoreBoundedContexts(analysis: ProjectAnalysis): number {
+  if (analysis.contextBoundaryViolations > 0) return 0;
+  if (analysis.boundedContextCoverage >= 0.9) return 10;
+  if (analysis.boundedContextCoverage >= 0.5) return 5;
+  return 0;
 }
 
 function scoreGovernance(answers: MaturityAnswers, shitennoDir?: string): number {

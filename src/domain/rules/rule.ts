@@ -61,6 +61,16 @@ export type ActionType =
   | "auto_populate_next_p0"
   | "apply_autofix";
 
+/** Canonical list of valid action types — single source of truth. */
+export const VALID_ACTION_TYPES: readonly ActionType[] = [
+  "update_context_buffer", "create_reminder", "remove_reminder",
+  "update_quick_board", "create_adr", "create_skill", "log_event",
+  "send_notification", "trigger_assessment", "trigger_health_check",
+  "update_backlog", "run_local_script", "run_script", "run_shugo_command",
+  "update_file", "create_file", "remove_file", "update_backlog_status",
+  "archive_plan", "auto_populate_next_p0", "apply_autofix",
+];
+
 export interface Rule {
   id: string;
   description: string;

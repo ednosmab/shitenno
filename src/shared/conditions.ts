@@ -3,7 +3,7 @@
  */
 
 import type { RuleCondition, RuleContext } from "../domain/rules/rule.js";
-import { DANGEROUS_KEYS } from "./security.js";
+import { DANGEROUS_KEYS } from "../shared/security.js";
 
 function matchesRegex(fieldValue: unknown, targetValue: unknown): boolean {
   try {
