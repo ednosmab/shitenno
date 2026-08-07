@@ -567,3 +567,15 @@ lifecycle: Active
 | **Modulos** | src/__tests__/ |
 | **Descricao** | Candidata a regra: exigir Pull Request com 2 revisores para qualquer alteracao em `src/__tests__/`. Detectada pelo hook; aguarda aprovacao do Tech Lead antes de ser aplicada. |
 
+
+### SA15-006 Quebrar couplings intelligence→governance restantes (audit/prioritization/semantic)
+
+| Campo | Valor |
+|---|---|
+| **Status** | planeado |
+| **Severidade** | Medio |
+| **Prioridade** | P2 |
+| **Owner** | unassigned |
+| **Data** | 2026-08-06 |
+| **Fonte** | audit |
+| **Descricao** | Follow-up do SA15: o ciclo de execução runtime rule-engine↔decision-core foi quebrado, mas o contexto-level cycle governance↔intelligence permanece via couplings de leitura: (1) audit/supply/* → infrastructure/validation (validar se escapeRegex/validators são puros e podem ir para shared/), (2) prioritization/recommend/* → application/engineering-state + capability-engine, (3) semantic/growth-profile → infrastructure/growth-profile, (4) audit/enforcement/session → governance/buffer-checkpoint. Remover estes couplings eliminaria a aresta intelligence→governance da matriz de dependências (src/domain/rules/context-dependencies.ts) e o cycle do relatório de fronteiras. Manter ADR-012 e bounded-contexts.md atualizados. |
