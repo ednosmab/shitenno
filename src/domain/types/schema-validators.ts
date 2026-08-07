@@ -5,7 +5,7 @@
  * before it enters the system. Follows the safeJsonParseValidated pattern.
  */
 
-import { isRecord } from "../../infrastructure/validation.js";
+import { isRecord } from "../../shared/validation-utils.js";
 
 // ── Daemon State ───────────────────────────────────────────────────────────
 

@@ -68,14 +68,17 @@ and enforcement, without moving files:
 
 ### Negative
 
-- The declared edge set includes today's couplings, several of which form
-  context-level cycles (`governance ↔ intelligence`). The runtime execution
+- The declared edge set reflects today's couplings. The historical
+  `governance ↔ intelligence` cycle is now fully broken: the runtime execution
   cycle (rule-engine ↔ decision-core) was broken by moving the policy engine
   to `infrastructure/`, security/conditions to `shared/`, and the nine rule
-  actions into `decision-core/executors/rule-actions.ts`; the remaining
-  couplings are read-only data accesses from audit/prioritization/semantic.
-  These are accepted as known tech debt and documented in
-  `docs/architecture/bounded-contexts.md`; future refactors should remove them.
+  actions into `decision-core/executors/rule-actions.ts`, and the remaining
+  read couplings from audit/prioritization/semantic/auto-evolution were
+  eliminated (shared/validation-utils, buffer-checkpoint → ops, type-only
+  import erasure, triggers → feedback, capability catalog → domain,
+  growth-profile → ops, DI of consolidated state). The only remaining
+  `governance → intelligence` edge (rule-engine → decision-core executor) is
+  unidirectional and acyclic; the boundary report asserts zero cycles.
 - Coverage measurement excludes `__tests__`, `templates` and `__fixtures__`,
   so enforcement only protects production modules.
 - Application-layer facades re-export across contexts; they are mapped to the

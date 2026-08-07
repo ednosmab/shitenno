@@ -76,8 +76,10 @@ const evolveStage: PipelineStage = {
       output(chalk.yellow("  ⚠ Skipping evolve stage (requires 'governed' state)"));
       return { ...ctx, __lastStageSkipped: true };
     }
+    const { consolidateEngineeringState } = await import("../application/engineering-state.js");
     const { analyzeEvolution, writeEvolutionReport } = await import("../application/auto-evolution.js");
-    const report = analyzeEvolution(ctx.projectRoot, ctx.shitennoDir);
+    const state = consolidateEngineeringState(ctx.projectRoot, ctx.shitennoDir);
+    const report = analyzeEvolution(state, ctx.projectRoot, ctx.shitennoDir);
     writeEvolutionReport(ctx.shitennoDir, report);
     ctx.evolutionReport = report;
     return { ...ctx, __lastStageSkipped: false };

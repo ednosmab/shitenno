@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { logger } from "../../shared/logger.js";
-import { checkpointBuffer } from "../../governance/buffer-checkpoint.js";
+import { checkpointBuffer } from "../../infrastructure/buffer-checkpoint.js";
 import type { HealthIssue } from "../types.js";
 
 export function detectIncompleteSessionClose(shitennoDir: string): HealthIssue[] {

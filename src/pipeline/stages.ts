@@ -59,7 +59,7 @@ export function buildEvaluationStages(
   consolidateEngineeringState: (root: string, dir: string) => EngineeringState,
   evaluateCapabilities: (state: EngineeringState, dir: string) => CapabilityEngineResult,
   runRecommendationEngine: (options: { state: EngineeringState; capResult: CapabilityEngineResult; shitennoDir: string }) => RecommendationEngineResult,
-  analyzeEvolution: (root: string, dir: string) => EvolutionReport,
+  analyzeEvolution: (state: EngineeringState, root: string, dir: string) => EvolutionReport,
 ): PipelineStage[] {
   return [
     {
@@ -96,7 +96,8 @@ export function buildEvaluationStages(
       name: "evolution",
       description: "Analyze evolution opportunities and generate report",
       execute: async (context) => {
-        const evolutionReport = analyzeEvolution(context.projectRoot, context.shitennoDir);
+        if (!context.engineeringState) return context;
+        const evolutionReport = analyzeEvolution(context.engineeringState, context.projectRoot, context.shitennoDir);
         return { ...context, evolutionReport };
       },
     },

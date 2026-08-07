@@ -8,4 +8,4 @@ export {
   getLatestCheckpoint,
   restoreCheckpoint,
   type CheckpointResult,
-} from "./buffer-checkpoint.js";
+} from "../infrastructure/buffer-checkpoint.js";

@@ -40,7 +40,7 @@ import {
   listCheckpoints,
   getLatestCheckpoint,
   restoreCheckpoint,
-} from "../governance/buffer-checkpoint.js";
+} from "../infrastructure/buffer-checkpoint.js";
 
 describe("checkpointBuffer", () => {
   it("creates a checkpoint successfully", () => {

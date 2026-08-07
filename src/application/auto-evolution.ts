@@ -10,9 +10,9 @@
 
 import { existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { consolidateEngineeringState, type EngineeringState } from "./engineering-state.js";
+import { CAPABILITIES } from "../domain/entities/capability-catalog.js";
+import type { EngineeringState } from "./engineering-state.js";
 import { detectKnowledgeDebt, type KnowledgeDebtReport } from "./knowledge-debt.js";
-import { CAPABILITIES } from "./maturity-profile.js";
 import { getAllFeedbackSummaries, adjustConfidence, shouldSuppress, type FeedbackSummary } from "./feedback-loops.js";
 import { loadGrowthProfile, type GrowthProfile } from "../infrastructure/growth-profile.js";
 import { generateChallengingAlternative, type DualPath } from "./challenge-generator.js";
@@ -210,8 +210,7 @@ function buildSummary(
 }
 
 /** Executa análise de evolução autónoma. */
-export function analyzeEvolution(projectRoot: string, shitennoDir: string): EvolutionReport {
-  const state = consolidateEngineeringState(projectRoot, shitennoDir);
+export function analyzeEvolution(state: EngineeringState, projectRoot: string, shitennoDir: string): EvolutionReport {
   let debtReport: KnowledgeDebtReport | null = null;
   try { debtReport = detectKnowledgeDebt(projectRoot, shitennoDir); }
   catch (err) { logger.debug("auto-evolution", "Knowledge debt detection unavailable:", err instanceof Error ? err.message : err); }

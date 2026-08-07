@@ -44,24 +44,30 @@ Infrastructure-layer flat files are mapped individually (e.g.
 ```
 briefing    → feedback, governance, intelligence, knowledge
 governance  → briefing, intelligence, knowledge, planning
-intelligence→ briefing, feedback, governance, knowledge, planning
+intelligence→ briefing, feedback, knowledge, planning
 knowledge   → briefing, governance, intelligence
 planning    → briefing, governance, intelligence
 feedback    → governance, intelligence
 ```
 
-### Known Cycles (accepted tech debt)
+### Cycle Elimination
 
-The edge set still contains context-level cycles, most notably
-`governance ↔ intelligence`. The **runtime execution cycle** (rule-engine ↔
-decision-core) was broken by migrating the policy engine to `infrastructure/`,
-security/conditions to `shared/`, and the nine rule actions into
-`decision-core/executors/rule-actions.ts` (ADR-009). The remaining
-`intelligence → governance` couplings are read-only data accesses:
-audit/supply → infrastructure/validation, prioritization → engineering-state +
-capability-engine, semantic/growth-profile → infrastructure/growth-profile, and
-audit/enforcement/session → governance/buffer-checkpoint. Cycles are reported
-as informational output of the boundary analysis, not as violations.
+The `governance ↔ intelligence` runtime cycle was broken in two steps.
+The **execution cycle** (rule-engine ↔ decision-core) was broken by migrating
+the policy engine to `infrastructure/`, security/conditions to `shared/`, and
+the nine rule actions into `decision-core/executors/rule-actions.ts` (ADR-009).
+The remaining **read couplings** (`intelligence → governance`) were then
+eliminated: audit/supply validators moved to `shared/validation-utils.ts`,
+`governance/buffer-checkpoint.ts` moved to `infrastructure/` (ops), type-only
+imports are erased from the boundary graph, the proactive engine
+(`prioritization/triggers.ts`) was reclassified to `feedback`, the capability
+catalog moved to `domain/entities/capability-catalog.ts`, `growth-profile`
+persistence is ops, and `auto-evolution` receives the consolidated state by
+dependency injection instead of reading it from `governance`. The only
+remaining `governance → intelligence` edge is the rule engine → executor call
+(`rule-engine/engine.ts` → `decision-core/invoke.js`), which is acyclic: no
+runtime `intelligence → governance` edge remains and the boundary report
+reports zero cycles.
 
 ## Verification
 

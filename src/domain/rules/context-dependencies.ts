@@ -21,7 +21,6 @@ const ALLOWED_EDGES: readonly string[] = [
   "governance->knowledge",
   "governance->planning",
   "intelligence->feedback",
-  "intelligence->governance",
   "intelligence->knowledge",
   "intelligence->planning",
   "intelligence->briefing",

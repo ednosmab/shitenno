@@ -62,6 +62,10 @@ describe("contextOfModule (registry)", () => {
     expect(contextOfModule("src/infrastructure/knowledge-graph.ts")).toBe("knowledge");
   });
 
+  it("honors file-level overrides for top-level modules", () => {
+    expect(contextOfModule("src/prioritization/triggers.ts")).toBe("feedback");
+  });
+
   it("returns null for unmapped directories", () => {
     expect(contextOfModule("src/unknown-dir/thing.ts")).toBeNull();
   });
@@ -89,7 +93,6 @@ describe("isAllowedContextEdge", () => {
 
   it("allows declared edges between business contexts", () => {
     expect(isAllowedContextEdge("governance", "intelligence")).toBe(true);
-    expect(isAllowedContextEdge("intelligence", "governance")).toBe(true);
     expect(isAllowedContextEdge("planning", "intelligence")).toBe(true);
     expect(isAllowedContextEdge("knowledge", "governance")).toBe(true);
   });
@@ -98,6 +101,7 @@ describe("isAllowedContextEdge", () => {
     expect(isAllowedContextEdge("feedback", "planning")).toBe(false);
     expect(isAllowedContextEdge("planning", "feedback")).toBe(false);
     expect(isAllowedContextEdge("knowledge", "planning")).toBe(false);
+    expect(isAllowedContextEdge("intelligence", "governance")).toBe(false);
   });
 });
 
@@ -150,5 +154,19 @@ describe("analyseContextBoundaries", () => {
     expect(report.totalModules).toBe(2);
     expect(report.mappedModules).toBe(1);
     expect(report.coverage).toBeLessThan(1);
+  });
+
+  it("ignores type-only imports when collecting edges", () => {
+    writeModule("src/feedback/a.ts", 'import type { X } from "../planning/b.js";\nexport const a = 1;\n');
+    writeModule("src/planning/b.ts", "export interface X { y: number }\n");
+    const report = analyseContextBoundaries(tempDir);
+    expect(report.violations).toEqual([]);
+  });
+
+  it("ignores type-only imports in cycle detection", () => {
+    writeModule("src/feedback/a.ts", 'import type { X } from "../planning/b.js";\nexport const a = 1;\n');
+    writeModule("src/planning/b.ts", 'import type { Y } from "../feedback/a.js";\nexport interface X { y: number }\n');
+    const report = analyseContextBoundaries(tempDir);
+    expect(report.cycles).toEqual([]);
   });
 });

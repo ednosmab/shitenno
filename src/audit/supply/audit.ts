@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { logger } from "../../shared/logger.js";
-import { safeJsonParseValidated, isRecord } from "../../infrastructure/validation.js";
+import { safeJsonParseValidated, isRecord } from "../../shared/validation-utils.js";
 import { BLOCKED_LICENSES } from "../constants.js";
 import type { HealthIssue } from "../types.js";
 

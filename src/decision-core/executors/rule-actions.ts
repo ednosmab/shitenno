@@ -15,7 +15,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
-import { escapeRegex } from "../../infrastructure/validation.js";
+import { escapeRegex } from "../../shared/validation-utils.js";
 import { transitionTask, type BacklogState } from "../../application/backlog-state-machine.js";
 import { replaceSectionField, updateNextP0 } from "../../application/context-buffer-writer.js";
 import { getEventBus } from "../../infrastructure/event-bus.js";

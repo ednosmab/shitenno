@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import {
   analyzeEvolution,
 } from "../application/auto-evolution.js";
+import { consolidateEngineeringState } from "../application/engineering-state.js";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
@@ -26,9 +27,13 @@ afterAll(() => {
   rmSync(TEST_DIR, { recursive: true, force: true });
 });
 
+function consolidatedState() {
+  return consolidateEngineeringState(TEST_DIR, SHITENNO_DIR);
+}
+
 describe("analyzeEvolution", () => {
   it("returns a valid EvolutionReport", () => {
-    const report = analyzeEvolution(TEST_DIR, SHITENNO_DIR);
+    const report = analyzeEvolution(consolidatedState(), TEST_DIR, SHITENNO_DIR);
     expect(report).toBeDefined();
     expect(typeof report.analyzedAt).toBe("string");
     expect(Array.isArray(report.recommendations)).toBe(true);
@@ -37,13 +42,13 @@ describe("analyzeEvolution", () => {
   });
 
   it("includes byType and byPriority breakdowns", () => {
-    const report = analyzeEvolution(TEST_DIR, SHITENNO_DIR);
+    const report = analyzeEvolution(consolidatedState(), TEST_DIR, SHITENNO_DIR);
     expect(report.byType).toBeDefined();
     expect(report.byPriority).toBeDefined();
   });
 
   it("recommendations have required fields", () => {
-    const report = analyzeEvolution(TEST_DIR, SHITENNO_DIR);
+    const report = analyzeEvolution(consolidatedState(), TEST_DIR, SHITENNO_DIR);
     for (const rec of report.recommendations) {
       expect(typeof rec.id).toBe("string");
       expect(typeof rec.title).toBe("string");
@@ -55,7 +60,7 @@ describe("analyzeEvolution", () => {
   });
 
   it("dualPaths link to valid recommendations", () => {
-    const report = analyzeEvolution(TEST_DIR, SHITENNO_DIR);
+    const report = analyzeEvolution(consolidatedState(), TEST_DIR, SHITENNO_DIR);
     for (const dp of report.dualPaths) {
       expect(dp.comfortable).toBeDefined();
       expect(dp.challenging).toBeDefined();

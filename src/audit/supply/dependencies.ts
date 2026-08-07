@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { logger } from "../../shared/logger.js";
-import { safeJsonParseValidated, isRecord } from "../../infrastructure/validation.js";
+import { safeJsonParseValidated, isRecord } from "../../shared/validation-utils.js";
 import type { HealthIssue, SourceFileInfo } from "../types.js";
 
 const NODE_BUILTINS = new Set([

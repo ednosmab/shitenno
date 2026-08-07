@@ -9,6 +9,7 @@ import chalk from "chalk";
 import ora from "ora";
 import { output, outputBlank } from "../shared/output.js";
 import { analyzeEvolution, writeEvolutionReport } from "../application/auto-evolution.js";
+import { consolidateEngineeringState } from "../application/engineering-state.js";
 import { detectFeedbackPatterns, getAllFeedbackSummaries } from "../feedback/core.js";
 import { recordFeedback, recordDimensionFeedback, type PerformanceMetric } from "../application/feedback-loops.js";
 import { getEventBus } from "../infrastructure/event-bus.js";
@@ -146,7 +147,8 @@ export const evolveCommand = new Command("evolve")
     const spinner = isJson ? null : ora("Analyzing evolution recommendations...").start();
 
     try {
-      const report = analyzeEvolution(ctx.projectRoot, ctx.shitennoDir);
+      const state = consolidateEngineeringState(ctx.projectRoot, ctx.shitennoDir);
+      const report = analyzeEvolution(state, ctx.projectRoot, ctx.shitennoDir);
       writeEvolutionReport(ctx.shitennoDir, report);
 
       const patterns = detectFeedbackPatterns(ctx.shitennoDir);

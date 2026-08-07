@@ -110,6 +110,7 @@ const APPLICATION_FACADES: Record<string, BoundedContext> = {
 const INFRASTRUCTURE_FILES: Record<string, BoundedContext> = {
   "advanced-infrastructure": "ops",
   analyser: "intelligence",
+  "buffer-checkpoint": "ops",
   "context-boundary": "ops",
   "atomic-write": "ops",
   "backlog-parser": "planning",
@@ -132,7 +133,7 @@ const INFRASTRUCTURE_FILES: Record<string, BoundedContext> = {
   "events-data": "ops",
   "exec-async": "ops",
   "git-hooks-installer": "ops",
-  "growth-profile": "governance",
+  "growth-profile": "ops",
   "inference-cache": "intelligence",
   "knowledge-graph": "knowledge",
   "knowledge-loader": "knowledge",
@@ -172,6 +173,13 @@ function baseName(modulePath: string): string {
   return parts[parts.length - 1]!.replace(/\.(ts|tsx|js|jsx)$/, "");
 }
 
+/** File-level context overrides for top-level modules that diverge from their directory.
+ *  e.g. the proactive engine in prioritization/ generates challenges, so it belongs
+ *  to the feedback context like challenge-generator. */
+const FILE_CONTEXTS: Record<string, BoundedContext> = {
+  "prioritization/triggers": "feedback",
+};
+
 /**
  * Resolves the context of a module path relative to the project root,
  * e.g. "src/rule-engine/engine.ts". Returns null when the module is not mapped.
@@ -193,6 +201,10 @@ export function contextOfModule(modulePath: string): SourceContext | null {
   if (dir === "infrastructure") {
     if (parts.length === 2) return INFRASTRUCTURE_FILES[baseName(modulePath)] ?? null;
     return "ops";
+  }
+  if (parts.length === 2) {
+    const fileOverride = FILE_CONTEXTS[`${dir}/${baseName(modulePath)}`];
+    if (fileOverride) return fileOverride;
   }
   return DIR_CONTEXTS[dir] ?? null;
 }

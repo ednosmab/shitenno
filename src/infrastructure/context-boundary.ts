@@ -4,6 +4,10 @@
  * Scans a project's src tree, resolves each module to its bounded context via
  * the context registry, and reports coverage, cross-context violations and
  * context-level cycles.
+ *
+ * Type-only imports (`import type`, `export type`) are compile-time contracts
+ * erased at runtime — they do not create runtime coupling and are excluded
+ * from the edge graph.
  */
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, normalize, relative } from "node:path";
@@ -65,8 +69,11 @@ function collectEdges(rootDir: string, modules: Array<{ rel: string; fileName: s
     const from = contextOfModule(module.rel);
     if (from === null) continue;
     const content = readFileSync(join(rootDir, module.rel), "utf-8");
-    const specifiers = [...content.matchAll(/from\s+["']([^"']+)["']/g)].map((m) => m[1]!);
-    for (const specifier of specifiers) {
+    const statements = [...content.matchAll(/(?:^|\n)\s*(?:import|export)\s+(?:(type)\s+)?[\s\S]*?from\s+["']([^"']+)["']/g)];
+    for (const statement of statements) {
+      const specifier = statement[2]!;
+      const isTypeOnly = statement[1] !== undefined;
+      if (isTypeOnly) continue;
       if (!specifier.startsWith(".")) continue;
       const target = resolveImportTarget(rootDir, dirname(module.rel), specifier);
       if (target === null) continue;
