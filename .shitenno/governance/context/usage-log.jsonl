@@ -176,3 +176,8 @@
 {"tool":"getBacklog","timestamp":"2026-08-07T12:49:26.298Z"}
 {"tool":"transitionBacklogItem","timestamp":"2026-08-07T12:51:20.517Z"}
 {"tool":"getBacklog","timestamp":"2026-08-07T12:51:48.112Z"}
+{"tool":"getBriefing","timestamp":"2026-08-07T12:54:19.786Z"}
+{"tool":"getPlans","timestamp":"2026-08-07T12:54:19.879Z"}
+{"tool":"getSkills","timestamp":"2026-08-07T13:00:09.615Z"}
+{"tool":"getSkills","timestamp":"2026-08-07T13:00:09.757Z"}
+{"tool":"getBriefing","timestamp":"2026-08-07T13:22:47.718Z"}

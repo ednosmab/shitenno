@@ -572,7 +572,7 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | planeado |
+| **Status** | concluído |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
