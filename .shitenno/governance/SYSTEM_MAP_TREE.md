@@ -132,6 +132,8 @@
 │   docs/history/2026-08-05-rule-session_end_plans.md
 │   docs/history/2026-08-06-rule-session_close.md
 │   docs/history/2026-08-06-rule-session_end_plans.md
+│   docs/history/2026-08-07-rule-session_close.md
+│   docs/history/2026-08-07-rule-session_end_plans.md
 │   docs/INDEX.md
 │   docs/KNOWLEDGE_LIFECYCLE.md
 │   docs/opencode-context.md

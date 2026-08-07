@@ -373,7 +373,7 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | concluído |
 | **Severidade** | Baixo |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
