@@ -70,13 +70,14 @@ describe("notification-flow-e2e", () => {
   // ── Scenario 1: shugo backlog done → task.completed → desktop notification ──
 
   describe("Scenario 1: backlog done flow", () => {
-    it("should send high-priority notification when task.completed is published", () => {
+    it("should send high-priority notification with the item title when task.completed is published", () => {
       initDesktopNotifier(shitennoDir);
       const bus = getEventBus();
 
       // Simulate what cmdDone publishes
       bus.publish("task.completed", {
         taskId: "BACKLOG-001",
+        itemName: "Implementar auth JWT",
         fromState: "em implementação",
         toState: "concluído",
       });
@@ -85,27 +86,41 @@ describe("notification-flow-e2e", () => {
       expect(notif).toBeDefined();
       expect(notif![0]).toBe(shitennoDir);
       expect(String(notif![1])).toContain("Tarefa Concluída");
-      expect(String(notif![2])).toContain("BACKLOG-001");
+      expect(String(notif![2])).toContain("Implementar auth JWT");
       expect(notif![3]).toBe("high");
     });
 
-    it("should verify cmdDone publishes only task.completed, not backlog.updated", () => {
-      // This test validates the code change in backlog.ts cmdDone()
-      // cmdDone now only publishes task.completed — no backlog.updated
+    it("should publish task.completed and backlog.updated with the item title from cmdDone", () => {
+      // cmdDone now publishes both events, each carrying the item title so
+      // notifications never fall back to a placeholder name.
       initDesktopNotifier(shitennoDir);
       const bus = getEventBus();
 
-      // Simulate ONLY task.completed (what cmdDone now publishes)
       bus.publish("task.completed", {
         taskId: "BACKLOG-001",
+        itemName: "Implementar auth JWT",
         fromState: "em implementação",
         toState: "concluído",
       });
+      bus.publish("backlog.updated", {
+        itemId: "BACKLOG-001",
+        itemName: "Implementar auth JWT",
+        movedCount: 1,
+        source: "cmd_done",
+      });
 
-      // Should get desktop notification via task.completed handler
-      const notif = findNotification("Tarefa Concluída");
-      expect(notif).toBeDefined();
-      expect(String(notif![2])).toContain("BACKLOG-001");
+      const taskNotif = findNotification("Tarefa Concluída");
+      expect(taskNotif).toBeDefined();
+      expect(String(taskNotif![2])).toContain("Implementar auth JWT");
+
+      // backlog.updated is medium priority — throttled by the 60s cooldown
+      // after the high-priority task.completed, but must never show a
+      // placeholder name.
+      const backlogNotif = findNotification("Backlog Concluída");
+      const backlogLog = findLog("Backlog Concluída");
+      const emitted = backlogNotif ?? backlogLog;
+      expect(emitted).toBeDefined();
+      expect(String(emitted![2])).toContain("Implementar auth JWT");
     });
   });
 
@@ -116,16 +131,17 @@ describe("notification-flow-e2e", () => {
       initDesktopNotifier(shitennoDir);
       const bus = getEventBus();
 
-      // Simulate what daemon publishes after moving items
+      // Simulate what the daemon publishes after moving items
       bus.publish("backlog.updated", {
         itemId: "batch",
+        itemName: "Auditoria de segurança",
         movedCount: 3,
       });
 
       const notif = findNotification("Backlog Concluída");
       expect(notif).toBeDefined();
       expect(String(notif![2])).toContain("3");
-      expect(String(notif![2])).toContain("batch");
+      expect(String(notif![2])).toContain("Auditoria de segurança");
       expect(notif![3]).toBe("medium");
     });
 
@@ -135,12 +151,28 @@ describe("notification-flow-e2e", () => {
 
       bus.publish("backlog.updated", {
         itemId: "BACKLOG-042",
+        itemName: "Corrigir bug de login",
         movedCount: 1,
       });
 
       const notif = findNotification("Backlog Concluída");
       expect(notif).toBeDefined();
-      expect(String(notif![2])).toContain("BACKLOG-042");
+      expect(String(notif![2])).toContain("Corrigir bug de login");
+    });
+
+    it("should NOT notify when payload has no item identity (file-watcher sync signal)", () => {
+      // The daemon file watcher publishes backlog.updated with only path and
+      // timestamp. Must never surface a "desconhecido" notification — the
+      // completion notification comes from task.completed with the item title.
+      initDesktopNotifier(shitennoDir);
+      const bus = getEventBus();
+
+      bus.publish("backlog.updated", {
+        path: "docs/backlog/ACTIVE.md",
+        timestamp: new Date().toISOString(),
+      });
+
+      expect(sendDesktopNotification).not.toHaveBeenCalled();
     });
   });
 

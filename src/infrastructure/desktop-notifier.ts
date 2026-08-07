@@ -86,6 +86,7 @@ function throttledNotify(
 
 function handleTaskCompleted(payload: Record<string, unknown>): void {
   const taskId = String(payload.taskId ?? "desconhecida");
+  const itemName = String(payload.itemName ?? taskId);
   const gatesPassed = payload.gatesPassed ?? payload.gates ?? "?";
   const count = typeof gatesPassed === "number"
     ? gatesPassed
@@ -96,7 +97,7 @@ function handleTaskCompleted(payload: Record<string, unknown>): void {
   throttledNotify(
     `task:${taskId}:${Date.now()}`,
     "✅ Tarefa Concluída",
-    `Tarefa ${taskId} finalizada com sucesso (${count} verificações OK)`,
+    `Tarefa ${itemName} finalizada com sucesso (${count} verificações OK)`,
     "high",
   );
 }
@@ -191,12 +192,18 @@ function handleHealthChecked(payload: Record<string, unknown>): void {
 }
 
 function handleBacklogUpdated(payload: Record<string, unknown>): void {
-  const itemId = String(payload.itemId ?? payload.taskId ?? payload.planId ?? "desconhecido");
+  const itemName = String(payload.itemName ?? "");
+  const itemId = String(payload.itemId ?? payload.taskId ?? payload.planId ?? "");
+  // File-watcher sync signals carry no item identity — skip the notification
+  // instead of showing a placeholder name. The completion notification for a
+  // moved item comes from task.completed, which includes the item title.
+  if (!itemName && !itemId) return;
   const count = Number(payload.movedCount ?? payload.count ?? 1);
+  const label = itemName || itemId;
   throttledNotify(
     `backlog-updated:${Date.now()}`,
     "✅ Tarefa do Backlog Concluída",
-    `${count} item(ns) movido(s) para done — ${itemId}`,
+    `${count} item(ns) movido(s) para done — ${label}`,
     "medium",
   );
 }

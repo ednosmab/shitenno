@@ -17,6 +17,7 @@ import { execSync } from "node:child_process";
 import { SHITENNO_DIR_NAME } from "../../domain/types/constants.js";
 import { escapeRegex } from "../../shared/validation-utils.js";
 import { transitionTask, type BacklogState } from "../../application/backlog-state-machine.js";
+import { resolveBacklogPaths, parseBacklogItems, findItem } from "../../application/backlog-core.js";
 import { replaceSectionField, updateNextP0 } from "../../application/context-buffer-writer.js";
 import { getEventBus } from "../../infrastructure/event-bus.js";
 import type { RuleAction, RuleContext } from "../../domain/rules/rule.js";
@@ -135,6 +136,13 @@ function executeUpdateBacklog(action: RuleAction, context: RuleContext): { succe
 
 const TERMINAL_STATES: Set<string> = new Set(["concluído", "encerrado"]);
 
+/** Resolve the backlog item title for a task ID, falling back to the ID. */
+function resolveTaskTitle(shitennoDir: string, taskId: string): string {
+  const { active: backlogPath } = resolveBacklogPaths(shitennoDir);
+  const item = findItem(parseBacklogItems(backlogPath), taskId);
+  return item?.title || taskId;
+}
+
 function executeUpdateBacklogStatus(action: RuleAction, context: RuleContext): { success: boolean; message: string } {
   const taskId = String(action.params.taskId || "");
   const fromState = String(action.params.fromState || "");
@@ -145,6 +153,7 @@ function executeUpdateBacklogStatus(action: RuleAction, context: RuleContext): {
     if (result.success && TERMINAL_STATES.has(toState)) {
       getEventBus().publish("task.completed", {
         taskId,
+        itemName: resolveTaskTitle(context.shitennoDir, taskId),
         fromState,
         toState,
         timestamp: new Date().toISOString(),

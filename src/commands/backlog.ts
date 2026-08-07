@@ -99,6 +99,7 @@ function cmdAdd(shitennoDir: string, id: string, title: string, opts: { priority
 function cmdDone(shitennoDir: string, id: string) {
   const paths = resolveBacklogPaths(shitennoDir);
 
+  const item = findItem(parseBacklogItems(paths.active), id);
   const result = transitionItem(paths.active, id, "concluído");
   if (result.success) {
     output(chalk.green(`✅ ${result.message}`));
@@ -109,10 +110,23 @@ function cmdDone(shitennoDir: string, id: string) {
       }
     }
     // Publish task.completed — triggers daemon audit + desktop notification.
-    // backlog.updated is NOT published here to avoid duplicate audit runs;
-    // the daemon handles file-level backlog sync independently.
+    // Also publish backlog.updated with the item identity so notifications
+    // show the item title instead of a placeholder name. The daemon audit
+    // runs only on task.completed, so this does not duplicate audits.
     const bus = getEventBus();
-    bus.publish("task.completed", { taskId: id, fromState: "em implementação", toState: "concluído" });
+    const itemName = item?.title || id;
+    bus.publish("task.completed", {
+      taskId: id,
+      itemName,
+      fromState: result.previousState ?? "em implementação",
+      toState: "concluído",
+    });
+    bus.publish("backlog.updated", {
+      itemId: id,
+      itemName,
+      movedCount: 1,
+      source: "cmd_done",
+    });
   } else {
     output(chalk.red(`❌ ${result.message}`));
   }

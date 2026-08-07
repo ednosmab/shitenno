@@ -181,3 +181,5 @@
 {"tool":"getSkills","timestamp":"2026-08-07T13:00:09.615Z"}
 {"tool":"getSkills","timestamp":"2026-08-07T13:00:09.757Z"}
 {"tool":"getBriefing","timestamp":"2026-08-07T13:22:47.718Z"}
+{"tool":"getBriefing","timestamp":"2026-08-07T13:57:17.868Z"}
+{"tool":"getMandatoryContext","timestamp":"2026-08-07T13:57:18.138Z"}

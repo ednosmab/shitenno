@@ -10,6 +10,7 @@ import type { EventMeta } from "./types.js";
 
 export interface TaskCompletedPayload extends EventMeta {
   taskId: string;
+  itemName?: string;
   source: string;
   affectedFiles: string[];
   gates: { name: string; passed: boolean }[];
@@ -155,6 +156,9 @@ export interface PlanFormatWarningPayload extends EventMeta {
 export interface BacklogUpdatedPayload extends EventMeta {
   path?: string;
   planId?: string;
+  itemId?: string;
+  itemName?: string;
+  movedCount?: number;
 }
 
 // ── Challenge Events ──────────────────────────────────────────────────────
