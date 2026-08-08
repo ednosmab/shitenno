@@ -83,6 +83,8 @@ const APPLICATION_FACADES: Record<string, BoundedContext> = {
   "backlog-state-machine": "planning",
   "backlog-writer": "planning",
   briefing: "briefing",
+  "briefing-manifest": "briefing",
+  "briefing-types": "briefing",
   "capability-engine": "governance",
   "challenge-generator": "feedback",
   "context-buffer-writer": "briefing",
@@ -110,6 +112,10 @@ const APPLICATION_FACADES: Record<string, BoundedContext> = {
 const INFRASTRUCTURE_FILES: Record<string, BoundedContext> = {
   "advanced-infrastructure": "ops",
   analyser: "intelligence",
+  "analyser-package": "intelligence",
+  "analyser-stack": "intelligence",
+  "analyser-structure": "intelligence",
+  "analyser-tooling": "intelligence",
   "buffer-checkpoint": "ops",
   "context-boundary": "ops",
   "atomic-write": "ops",
@@ -190,7 +196,7 @@ export function contextOfModule(modulePath: string): SourceContext | null {
   if (first === "src") parts.shift();
   if (parts.length === 0) return null;
 
-  const dir = parts[0]!;
+  const dir = parts[0]!.replace(/\.tsx?$/, "");
   if (dir === "domain") return "domain";
   if (dir === "shared") return "shared";
 

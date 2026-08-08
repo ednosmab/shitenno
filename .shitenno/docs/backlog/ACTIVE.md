@@ -579,3 +579,16 @@ lifecycle: Active
 | **Data** | 2026-08-06 |
 | **Fonte** | audit |
 | **Descricao** | Follow-up do SA15: o ciclo de execução runtime rule-engine↔decision-core foi quebrado, mas o contexto-level cycle governance↔intelligence permanece via couplings de leitura: (1) audit/supply/* → infrastructure/validation (validar se escapeRegex/validators são puros e podem ir para shared/), (2) prioritization/recommend/* → application/engineering-state + capability-engine, (3) semantic/growth-profile → infrastructure/growth-profile, (4) audit/enforcement/session → governance/buffer-checkpoint. Remover estes couplings eliminaria a aresta intelligence→governance da matriz de dependências (src/domain/rules/context-dependencies.ts) e o cycle do relatório de fronteiras. Manter ADR-012 e bounded-contexts.md atualizados. |
+
+### SA18 Ficheiros src/ >300 linhas (F-06) — refactoring de god modules restantes
+
+| Campo | Valor |
+|---|---|
+| **Status** | em validação |
+| **Severidade** | Critico |
+| **Prioridade** | P0 |
+| **Owner** | unassigned |
+| **Data** | 2026-08-07 |
+| **Fonte** | pre-commit hook (F-06) + risk map critical |
+| **Descricao** | Regra F-06 (Forbidden Operations) violada: src/infrastructure/analyser.ts (326L), src/application/briefing.ts (305L), src/domain/rules/doc-sync-significance.ts (302L). Pre-commit hook sinaliza e bloqueia merge para main. Refactorar seguindo o padrão dos PLAN-FILE-REFACTOR anteriores (split em módulos coerentes <300L), com TDD. Manter ADR-007 e docs atualizados. |
+
