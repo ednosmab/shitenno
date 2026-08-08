@@ -31,7 +31,7 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | em validação |
 | **Severidade** | Medio |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
