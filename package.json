@@ -25,6 +25,7 @@
     "pretest:e2e": "npm run build",
     "test:watch": "vitest",
     "bench": "vitest bench src/__tests__/benchmarks.bench.ts",
+    "test:load": "vitest run src/__tests__/load.test.ts",
     "clean": "rm -rf dist node_modules *.tsbuildinfo",
     "test:coverage": "vitest run --coverage",
     "validate-publish": "npm run build && npm pack --dry-run && echo 'Ready to publish'",

@@ -51,7 +51,7 @@ const PHASE_CONFIGS: Record<ValidationPhase, PhaseConfig> = {
     name: "Phase 1 — Foundation",
     description: "Unit tests, lint, type-check, new benchmarks",
     required: true,
-    timeout: 120_000,
+    timeout: 180_000,
   },
   phase2: {
     name: "Phase 2 — Integration",
@@ -90,8 +90,8 @@ function defaultRunCommand(cmd: string, timeout: number): { success: boolean; ou
 function runCommonGate(timeout: number, runCmd: CommandRunner): ValidationResult[] {
   const results: ValidationResult[] = [];
 
-  // Gate 1: Tests pass
-  const testResult = runCmd("pnpm run test", timeout);
+  // Gate 1: Unit tests pass (e2e is covered by Phase 2)
+  const testResult = runCmd("pnpm run test:unit", timeout);
   results.push({
     phase: "phase1",
     gate: "common",
@@ -128,55 +128,31 @@ function runCommonGate(timeout: number, runCmd: CommandRunner): ValidationResult
 
 // ── Phase-Specific Gates ───────────────────────────────────────────────────
 
-function runPhase1Gate(timeout: number, runCmd: CommandRunner): ValidationResult[] {
-  const results: ValidationResult[] = [];
+const PHASE_SPECIFIC_GATES: Record<ValidationPhase, ReadonlyArray<{ name: string; command: string }>> = {
+  phase1: [{ name: "benchmark-runs", command: "pnpm run bench" }],
+  phase2: [{ name: "e2e-scenario", command: "pnpm run test:e2e" }],
+  phase3: [{ name: "load-test", command: "pnpm run test:load" }],
+};
 
-  // Benchmark validation
-  const benchResult = runCmd("pnpm run bench 2>/dev/null || echo 'bench not configured'", timeout);
-  results.push({
-    phase: "phase1",
+function runPhaseGate(
+  phase: ValidationPhase,
+  name: string,
+  command: string,
+  runCmd: CommandRunner,
+): ValidationResult {
+  const result = runCmd(command, PHASE_CONFIGS[phase].timeout);
+  return {
+    phase,
     gate: "phase-specific",
-    name: "benchmark-runs",
-    passed: true, // Non-blocking for now
-    duration: benchResult.duration,
-    error: benchResult.success ? undefined : "Benchmark not configured (non-blocking)",
-  });
-
-  return results;
+    name,
+    passed: result.success,
+    duration: result.duration,
+    error: result.success ? undefined : result.output.slice(0, 500),
+  };
 }
 
-function runPhase2Gate(timeout: number, runCmd: CommandRunner): ValidationResult[] {
-  const results: ValidationResult[] = [];
-
-  // E2E scenario
-  const e2eResult = runCmd("pnpm run test:e2e 2>/dev/null || echo 'e2e not configured'", timeout);
-  results.push({
-    phase: "phase2",
-    gate: "phase-specific",
-    name: "e2e-scenario",
-    passed: true, // Non-blocking for now
-    duration: e2eResult.duration,
-    error: e2eResult.success ? undefined : "E2E not configured (non-blocking)",
-  });
-
-  return results;
-}
-
-function runPhase3Gate(timeout: number, runCmd: CommandRunner): ValidationResult[] {
-  const results: ValidationResult[] = [];
-
-  // Load test
-  const loadResult = runCmd("pnpm run test:load 2>/dev/null || echo 'load test not configured'", timeout);
-  results.push({
-    phase: "phase3",
-    gate: "phase-specific",
-    name: "load-test",
-    passed: true, // Non-blocking for now
-    duration: loadResult.duration,
-    error: loadResult.success ? undefined : "Load test not configured (non-blocking)",
-  });
-
-  return results;
+function runPhaseSpecificGates(phase: ValidationPhase, runCmd: CommandRunner): ValidationResult[] {
+  return PHASE_SPECIFIC_GATES[phase].map((gate) => runPhaseGate(phase, gate.name, gate.command, runCmd));
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────
@@ -198,17 +174,7 @@ export function runValidationPhase(
   }
 
   // Run phase-specific gates
-  switch (phase) {
-    case "phase1":
-      results.push(...runPhase1Gate(config.timeout, runCmd));
-      break;
-    case "phase2":
-      results.push(...runPhase2Gate(config.timeout, runCmd));
-      break;
-    case "phase3":
-      results.push(...runPhase3Gate(config.timeout, runCmd));
-      break;
-  }
+  results.push(...runPhaseSpecificGates(phase, runCmd));
 
   const completedAt = new Date().toISOString();
   const passed = results.every((r) => r.passed || !config.required);

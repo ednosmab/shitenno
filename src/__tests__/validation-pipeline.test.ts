@@ -19,7 +19,7 @@ describe("validation-pipeline", () => {
       const config = getPhaseConfig("phase1");
       expect(config.name).toBe("Phase 1 — Foundation");
       expect(config.required).toBe(true);
-      expect(config.timeout).toBe(120_000);
+      expect(config.timeout).toBe(180_000);
     });
 
     it("returns correct config for phase2", () => {
@@ -69,6 +69,39 @@ describe("validation-pipeline", () => {
       expect(report1.results.some((r) => r.name === "benchmark-runs")).toBe(true);
       expect(report2.results.some((r) => r.name === "e2e-scenario")).toBe(true);
       expect(report3.results.some((r) => r.name === "load-test")).toBe(true);
+    });
+
+    it("reports phase-specific gate failure when the underlying command fails", () => {
+      const report1 = runValidationPhase("phase1", failingRunner);
+      const report2 = runValidationPhase("phase2", failingRunner);
+      const report3 = runValidationPhase("phase3", failingRunner);
+
+      const bench = report1.results.find((r) => r.name === "benchmark-runs");
+      const e2e = report2.results.find((r) => r.name === "e2e-scenario");
+      const load = report3.results.find((r) => r.name === "load-test");
+
+      expect(bench?.passed).toBe(false);
+      expect(e2e?.passed).toBe(false);
+      expect(load?.passed).toBe(false);
+    });
+
+    it("reports phase-specific gate success when the underlying command succeeds", () => {
+      const report = runValidationPhase("phase2", mockRunner);
+
+      const e2e = report.results.find((r) => r.name === "e2e-scenario");
+      expect(e2e?.passed).toBe(true);
+    });
+
+    it("runs the phase3 load-test command", () => {
+      const commands: string[] = [];
+      const spyRunner: CommandRunner = (cmd, _timeout) => {
+        commands.push(cmd);
+        return { success: true, output: "", duration: 1 };
+      };
+
+      runValidationPhase("phase3", spyRunner);
+
+      expect(commands).toContain("pnpm run test:load");
     });
 
     it("calculates duration correctly", () => {

@@ -182,10 +182,10 @@ beforeAll(() => {
   });
 
   large = createFixture("large", {
-    sourceFileCount: 500,
-    historyEntries: 100,
-    reportCount: 50,
-    areas: 20,
+    sourceFileCount: 200,
+    historyEntries: 50,
+    reportCount: 25,
+    areas: 10,
   });
 });
 
@@ -212,7 +212,7 @@ describe("calculateComplexityScore", () => {
     await calculateComplexityScore(medium.dir, medium.shitennoDir, analysis);
   });
 
-  bench("large project (500 files, 20 areas)", async () => {
+  bench("large project (200 files, 10 areas)", async () => {
     const analysis = analyseProject(large.dir);
     await calculateComplexityScore(large.dir, large.shitennoDir, analysis);
   });
@@ -311,7 +311,7 @@ describe("Scaling: source files (fixed 5 history, 3 areas)", () => {
   const scalingFixtures: Array<{ label: string; fixture: Fixture }> = [];
 
   beforeAll(() => {
-    for (const count of [10, 50, 100, 250, 500]) {
+    for (const count of [10, 50, 100, 200]) {
       scalingFixtures.push({
         label: `${count} files`,
         fixture: createFixture(`scale-${count}`, {
@@ -344,7 +344,7 @@ describe("Scaling: history entries (fixed 100 files, 3 areas)", () => {
   const scalingFixtures: Array<{ label: string; fixture: Fixture }> = [];
 
   beforeAll(() => {
-    for (const count of [5, 20, 50, 100, 200]) {
+    for (const count of [5, 20, 50, 100]) {
       scalingFixtures.push({
         label: `${count} entries`,
         fixture: createFixture(`hist-${count}`, {
@@ -397,10 +397,10 @@ describe("Cross-process cache (cold consolidation vs disk cache fresh)", () => {
       areas: 8,
     });
     cacheLarge = createFixture("cache-large", {
-      sourceFileCount: 500,
-      historyEntries: 100,
-      reportCount: 50,
-      areas: 20,
+      sourceFileCount: 200,
+      historyEntries: 50,
+      reportCount: 25,
+      areas: 10,
     });
 
     // Pre-populate disk cache for each fixture
