@@ -70,4 +70,59 @@ describe("desktop-notifier", () => {
     );
     expect(highCalls.length).toBeGreaterThanOrEqual(1);
   });
+
+  describe("pipeline.complete", () => {
+    it("sends a high-priority notification when a pipeline phase failed", () => {
+      initDesktopNotifier(shitennoDir);
+      const bus = getEventBus();
+
+      bus.publish("pipeline.complete", {
+        stage: "phase2",
+        status: "failed",
+        duration: 12_000,
+        timestamp: new Date().toISOString(),
+      });
+
+      expect(sendDesktopNotification).toHaveBeenCalledWith(
+        shitennoDir,
+        expect.stringContaining("Pipeline"),
+        expect.stringContaining("phase2"),
+        "high",
+      );
+    });
+
+    it("logs only when a pipeline phase passed (low priority)", () => {
+      initDesktopNotifier(shitennoDir);
+      const bus = getEventBus();
+
+      bus.publish("pipeline.complete", {
+        stage: "phase1",
+        status: "success",
+        duration: 5_000,
+        timestamp: new Date().toISOString(),
+      });
+
+      expect(sendDesktopNotification).not.toHaveBeenCalled();
+      expect(logNotificationOnly).toHaveBeenCalledWith(
+        shitennoDir,
+        expect.stringContaining("Pipeline"),
+        expect.any(String),
+        "low",
+      );
+    });
+
+    it("falls back to a generic stage label when the stage is missing", () => {
+      initDesktopNotifier(shitennoDir);
+      const bus = getEventBus();
+
+      bus.publish("pipeline.complete", { status: "success", timestamp: new Date().toISOString() });
+
+      expect(logNotificationOnly).toHaveBeenCalledWith(
+        shitennoDir,
+        expect.any(String),
+        expect.stringContaining("pipeline"),
+        "low",
+      );
+    });
+  });
 });

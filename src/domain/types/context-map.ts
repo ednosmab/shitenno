@@ -156,6 +156,7 @@ const INFRASTRUCTURE_FILES: Record<string, BoundedContext> = {
   "policy": "ops",
   "proactive-digest": "briefing",
   "project-fingerprint": "intelligence",
+  "pipeline-runner": "governance",
   "risk-map": "intelligence",
   "rule-loader": "governance",
   "rule-manifest": "governance",

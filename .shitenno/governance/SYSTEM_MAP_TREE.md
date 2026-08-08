@@ -633,6 +633,7 @@
 │   reports/patterns-2026-08-06.json
 │   reports/patterns-2026-08-07.json
 │   reports/patterns-2026-08-08.json
+│   reports/pipeline-history.json
 │   scripts/
 │   scripts/add-frontmatter.ts
 │   scripts/backlog.ts

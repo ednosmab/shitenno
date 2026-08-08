@@ -41,7 +41,7 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | In Progress — 2026-07-11 (template + pipelines criados, plan prepare implementado, plan.created event + RULE-020 adicionados) |
+| **Status** | em implementação [2026-08-08 — pipeline exec/status/notify + notificação desktop por fase + templates com contadores humano/agente] |
 | **Severidade** | Medio |
 | **Prioridade** | P1 |
 | **Owner** | executor |

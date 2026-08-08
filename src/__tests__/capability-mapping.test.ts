@@ -123,9 +123,9 @@ describe("getCapabilityDirectories", () => {
     expect(dirs).toContain(".shitenno/cognition");
   });
 
-  it("quality has empty directories", () => {
+  it("quality includes pipelines directory", () => {
     const dirs = getCapabilityDirectories("quality");
-    expect(dirs).toEqual([]);
+    expect(dirs).toContain(".shitenno/docs/pipelines");
   });
 
   it("operations includes runbooks", () => {

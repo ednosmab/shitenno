@@ -239,6 +239,25 @@ function handleUserNotification(payload: Record<string, unknown>): void {
   throttledNotify(`user-notif:${Date.now()}`, title, message, priority);
 }
 
+function handlePipelineComplete(payload: Record<string, unknown>): void {
+  const status = String(payload.status ?? (payload.success === true ? "success" : "failed"));
+  const success = status === "success";
+  const rawStages = Array.isArray(payload.stages) ? (payload.stages as unknown[]).map(String) : [];
+  const stage = String(payload.stage ?? (rawStages.length > 0 ? rawStages.join(", ") : "pipeline"));
+  const durationMs = Number(payload.totalDuration ?? payload.duration ?? 0);
+  const duration = durationMs > 0 ? ` (${Math.round(durationMs / 1000)}s)` : "";
+
+  const title = success ? "✅ Pipeline Passed" : "❌ Pipeline Failed";
+  const message = `${stage}${duration}`;
+
+  throttledNotify(
+    `pipeline:${stage}:${success}:${Date.now()}`,
+    title,
+    message,
+    success ? "low" : "high",
+  );
+}
+
 // ── Initialization ───────────────────────────────────────────────────────
 
 export function initDesktopNotifier(shitennoDir: string): void {
@@ -266,5 +285,8 @@ export function initDesktopNotifier(shitennoDir: string): void {
   // Direct user notifications (bypass challenge rate-limiting)
   bus.subscribe("user.notification", handleUserNotification);
 
-  logger.info("desktop-notifier", "Initialized — subscribed to task.completed, session.end, challenge.generated, drift, plan.inconsistency, briefing.generated, plan.archived, health.checked, backlog.updated, user.notification");
+  // Validation pipeline phases
+  bus.subscribe("pipeline.complete", handlePipelineComplete);
+
+  logger.info("desktop-notifier", "Initialized — subscribed to task.completed, session.end, challenge.generated, drift, plan.inconsistency, briefing.generated, plan.archived, health.checked, backlog.updated, user.notification, pipeline.complete");
 }

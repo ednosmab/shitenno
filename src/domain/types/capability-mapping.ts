@@ -149,12 +149,17 @@ const CAPABILITY_MAPPINGS: Record<Capability, CapabilityMapping> = {
     ],
   },
   quality: {
-    directories: [],
+    directories: [
+      `${SHITENNO_DIR_NAME}/docs/pipelines`,
+    ],
     files: [
       { src: "scripts/validate-session.ts", dest: `${SHITENNO_DIR_NAME}/scripts/validate-session.ts` },
       { src: "scripts/sync-docs.ts", dest: `${SHITENNO_DIR_NAME}/scripts/sync-docs.ts` },
       { src: "scripts/backlog.ts", dest: `${SHITENNO_DIR_NAME}/scripts/backlog.ts` },
       { src: "scripts/generate-changelog.ts", dest: `${SHITENNO_DIR_NAME}/scripts/generate-changelog.ts` },
+      { src: "docs/pipelines/phase1-foundation.md", dest: `${SHITENNO_DIR_NAME}/docs/pipelines/phase1-foundation.md` },
+      { src: "docs/pipelines/phase2-integration.md", dest: `${SHITENNO_DIR_NAME}/docs/pipelines/phase2-integration.md` },
+      { src: "docs/pipelines/phase3-performance.md", dest: `${SHITENNO_DIR_NAME}/docs/pipelines/phase3-performance.md` },
     ],
   },
   metrics: {
