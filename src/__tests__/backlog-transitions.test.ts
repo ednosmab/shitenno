@@ -5,7 +5,7 @@ import {
   transitionBacklogStatus,
   type BacklogStatus,
 } from "../infrastructure/backlog-transitions.js";
-import { writeFileSync, unlinkSync, mkdirSync } from "node:fs";
+import { writeFileSync, unlinkSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
@@ -228,6 +228,20 @@ describe("backlog-transitions", () => {
 
         expect(getCurrentStatus(path, "ITEM-001")).toBe("em implementação");
         expect(getCurrentStatus(path, "ITEM-002")).toBe("planeado");
+      } finally {
+        unlinkSync(path);
+      }
+    });
+
+    it("preserves the item header line after transition", () => {
+      const item = createItem("HEADER-001", "Backlog");
+      const path = createTempBacklog(item);
+      try {
+        const result = transitionBacklogStatus(path, "HEADER-001", "em implementação");
+        expect(result.success).toBe(true);
+
+        const content = readFileSync(path, "utf-8");
+        expect(content).toContain("### HEADER-001 Some Title");
       } finally {
         unlinkSync(path);
       }

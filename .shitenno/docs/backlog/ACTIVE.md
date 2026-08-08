@@ -584,7 +584,7 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | em validação |
+| **Status** | concluído |
 | **Severidade** | Critico |
 | **Prioridade** | P0 |
 | **Owner** | unassigned |
