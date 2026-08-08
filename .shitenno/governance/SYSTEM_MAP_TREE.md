@@ -590,6 +590,7 @@
 │   reports/doc-sync-2026-08-05.json
 │   reports/doc-sync-2026-08-06.json
 │   reports/doc-sync-2026-08-07.json
+│   reports/doc-sync-2026-08-08.json
 │   reports/evolution-2026-07-18.json
 │   reports/evolution-2026-07-25.json
 │   reports/health-2026-07-16.json
@@ -629,6 +630,7 @@
 │   reports/patterns-2026-08-05.json
 │   reports/patterns-2026-08-06.json
 │   reports/patterns-2026-08-07.json
+│   reports/patterns-2026-08-08.json
 │   scripts/
 │   scripts/add-frontmatter.ts
 │   scripts/backlog.ts
