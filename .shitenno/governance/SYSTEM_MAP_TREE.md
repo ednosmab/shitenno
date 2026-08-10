@@ -136,6 +136,8 @@
 │   docs/history/2026-08-07-rule-session_end_plans.md
 │   docs/history/2026-08-08-rule-session_close.md
 │   docs/history/2026-08-08-rule-session_end_plans.md
+│   docs/history/2026-08-10-rule-session_close.md
+│   docs/history/2026-08-10-rule-session_end_plans.md
 │   docs/INDEX.md
 │   docs/KNOWLEDGE_LIFECYCLE.md
 │   docs/opencode-context.md
@@ -593,6 +595,7 @@
 │   reports/doc-sync-2026-08-06.json
 │   reports/doc-sync-2026-08-07.json
 │   reports/doc-sync-2026-08-08.json
+│   reports/doc-sync-2026-08-10.json
 │   reports/evolution-2026-07-18.json
 │   reports/evolution-2026-07-25.json
 │   reports/health-2026-07-16.json
@@ -605,6 +608,7 @@
 │   reports/health-2026-08-01.json
 │   reports/health-2026-08-04.json
 │   reports/health-2026-08-06.json
+│   reports/health-2026-08-10.json
 │   reports/patterns-2026-07-12.json
 │   reports/patterns-2026-07-13.json
 │   reports/patterns-2026-07-14.json
@@ -633,6 +637,7 @@
 │   reports/patterns-2026-08-06.json
 │   reports/patterns-2026-08-07.json
 │   reports/patterns-2026-08-08.json
+│   reports/patterns-2026-08-10.json
 │   reports/pipeline-history.json
 │   scripts/
 │   scripts/add-frontmatter.ts
