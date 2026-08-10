@@ -83,6 +83,7 @@ const APPLICATION_FACADES: Record<string, BoundedContext> = {
   "backlog-state-machine": "planning",
   "backlog-writer": "planning",
   briefing: "briefing",
+  "briefing-injection": "briefing",
   "briefing-manifest": "briefing",
   "briefing-types": "briefing",
   "capability-engine": "governance",
