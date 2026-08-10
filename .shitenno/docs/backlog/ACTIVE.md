@@ -124,11 +124,12 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | concluído [2026-08-10 — commit 3e5e34c] |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
 | **Descricao** | Hook automatico antes de cada tarefa no OpenCode. Injeta briefing no contexto do agente. |
+| **Conclusao** | Plugin shitenno-briefing (chat.message): injeta .shitenno/BRIEFING.md no system prompt, ignora continuacoes triviais. Logica em src/application/briefing-injection.ts (TDD). Template JS auto-contido distribuido via capability ai (.opencode/plugin/). Tests: +7 (2715 total). |
 
 ### A7 A7 Skill template para shitenno-cli
 
