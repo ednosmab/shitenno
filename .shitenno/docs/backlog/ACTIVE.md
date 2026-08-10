@@ -21,11 +21,12 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | concluído [2026-08-10 — commit 6e8aaae] |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
 | **Descricao** | Relacao baixa entre artifacts (24 relacoes para 26 artifacts). Sugestao: adicionar mais conexoes. |
+| **Conclusao** | New relation rules (runbook→script, plan→runbook, workflow→plan, doc→runbook); 205→227 relations, 0 orphans, health 100/100. Tests: +4 (2708 total). |
 
 ### LIVING-005 LIVING-005 Pipeline de validação por fases
 
