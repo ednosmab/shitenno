@@ -16,6 +16,7 @@ import { getEventBus, enableEventPersistence } from "../src/infrastructure/event
 import { startSession, endSession } from "../src/infrastructure/session-tracker.js";
 import { setSessionContext, clearSessionContext } from "../src/shared/session-context.js";
 import { installMiddleware } from "../src/interface/cli/cli-middleware.js";
+import { resetCommanderOptions } from "../src/interface/cli/commander-reset.js";
 import { setGlobalJsonMode, isGlobalJsonMode, output as outputCli } from "../src/shared/output.js";
 import { stopWatching } from "../src/infrastructure/persistence/file-watcher.js";
 import { COMMAND_CATEGORIES, findCommand } from "../src/domain/types/help-data.js";
@@ -265,6 +266,10 @@ async function showBriefingSummary(projectRoot: string, shitennoDir: string): Pr
 /**
  * Create a fresh CLI program instance.
  * Use this when importing shugo as a library to avoid state persistence issues.
+ *
+ * The returned program resets commander's internal option state before
+ * every parse (SA17): repeated `.parse()` calls on the same instance no
+ * longer leak option values from previous invocations.
  */
 export function createProgram(): Command {
   const cmd = new Command();
@@ -290,6 +295,19 @@ export function createProgram(): Command {
     });
 
   return cmd;
+}
+
+/**
+ * Parse with a clean option state. Reset commander's retained
+ * `_optionValues` before parsing so repeated parses are pure (SA17).
+ */
+export function parseWithCleanState(
+  program: Command,
+  argv: string[],
+  options?: { from: "node" | "electron" | "user" }
+): Promise<Command> {
+  resetCommanderOptions(program);
+  return program.parseAsync(argv, options);
 }
 
 // ── CLI Program (singleton for direct execution) ────────────────────────────
@@ -464,7 +482,7 @@ const isMainModule = process.argv[1] &&
    process.argv[1].endsWith("\\shugo.js"));
 
 if (isMainModule) {
-  await program.parseAsync();
+  await parseWithCleanState(program, process.argv);
 
   // ── Post-Execution: Session End ─────────────────────────────────────────────
 
