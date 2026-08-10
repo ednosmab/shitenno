@@ -385,11 +385,12 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | concluído [2026-08-10 — commit f38ec78] |
 | **Severidade** | Baixo |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
 | **Descricao** | Commander singleton retém _optionValues entre chamadas .parse(). |
+| **Conclusao** | resetCommanderOptions() limpa _optionValues/_optionValueSources recursivamente; parseWithCleanState() aplica reset pre-parse (entrada principal + uso como biblioteca). Tests: +3 (2718 total). |
 
 
 
