@@ -41,7 +41,7 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | em implementação [2026-08-08 — pipeline exec/status/notify + notificação desktop por fase + templates com contadores humano/agente] |
+| **Status** | em validação [2026-08-08 — pipeline exec/status/notify + notificação desktop por fase + templates com contadores humano/agente; commit 04c02c0] |
 | **Severidade** | Medio |
 | **Prioridade** | P1 |
 | **Owner** | executor |
