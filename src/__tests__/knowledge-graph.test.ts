@@ -214,6 +214,50 @@ describe("knowledge-graph", () => {
       expect(uses.length).toBeGreaterThanOrEqual(1);
     });
 
+    it("discovers Runbook → Script relations", () => {
+      const artifacts: Artifact[] = [
+        createMockArtifact({ id: "runbook-merge", type: "runbook" }),
+        createMockArtifact({ id: "script-sync", type: "script" }),
+      ];
+
+      const relations = discoverRelations(artifacts);
+      const executes = relations.filter((r) => r.type === "executes");
+      expect(executes.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("discovers Plan → Runbook relations", () => {
+      const artifacts: Artifact[] = [
+        createMockArtifact({ id: "plan-001", type: "plan" }),
+        createMockArtifact({ id: "runbook-merge", type: "runbook" }),
+      ];
+
+      const relations = discoverRelations(artifacts);
+      const uses = relations.filter((r) => r.type === "uses");
+      expect(uses.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("discovers Workflow → Plan relations", () => {
+      const artifacts: Artifact[] = [
+        createMockArtifact({ id: "workflow-main", type: "workflow" }),
+        createMockArtifact({ id: "plan-001", type: "plan" }),
+      ];
+
+      const relations = discoverRelations(artifacts);
+      const triggers = relations.filter((r) => r.type === "triggers");
+      expect(triggers.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("discovers Doc → Runbook relations", () => {
+      const artifacts: Artifact[] = [
+        createMockArtifact({ id: "doc-001", type: "doc" }),
+        createMockArtifact({ id: "runbook-merge", type: "runbook" }),
+      ];
+
+      const relations = discoverRelations(artifacts);
+      const references = relations.filter((r) => r.type === "references");
+      expect(references.length).toBeGreaterThanOrEqual(1);
+    });
+
     it("returns empty array when no artifacts", () => {
       const relations = discoverRelations([]);
       expect(relations).toEqual([]);

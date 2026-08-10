@@ -195,6 +195,30 @@ const RELATION_RULES: RelationRule[] = [
     description: "Workflow references ADR",
   },
   {
+    sourceType: "runbook",
+    targetFilter: (a) => a.type === "script",
+    relationType: "executes",
+    description: "Runbook executes script",
+  },
+  {
+    sourceType: "plan",
+    targetFilter: (a) => a.type === "runbook",
+    relationType: "uses",
+    description: "Plan uses runbook",
+  },
+  {
+    sourceType: "workflow",
+    targetFilter: (a) => a.type === "plan",
+    relationType: "triggers",
+    description: "Workflow triggers plan",
+  },
+  {
+    sourceType: "doc",
+    targetFilter: (a) => a.type === "runbook",
+    relationType: "references",
+    description: "Doc references runbook",
+  },
+  {
     sourceType: "doc",
     targetFilter: (a) => a.type === "code" || a.type === "script",
     relationType: "documents",
