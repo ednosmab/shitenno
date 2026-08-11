@@ -69,60 +69,66 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Formulario de captura de emails para early access. Validar demanda antes de investir em monetizacao. |
 
 ### G3 G3 Definicao de personas
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Quem e o usuario? (1) Tech Lead que quer governance, (2) Dev Solo que quer produtividade, (3) AI Engineer que quer context para agentes. Cada persona tem dor diferente. |
 
 ### G5 G5 Pricing model concreto
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Definir tiers: Free (CLI basico), Starter ($29/mo), Team ($99/mo), Enterprise (custom). Cada tier com features claras. |
 
 ### M1 M1 Sistema de license key
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Chave de ativação por projeto. Formato: `NXS-XXXX-XXXX-XXXX`. Validacao offline com grace period. |
 
 ### M2 M2 Tier enforcement
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Limitar features por tier. Free: init, status, detect. Starter: todos. Team: + dashboard, bench. Enterprise: + SSO, compliance. |
 
 ### M3 M3 Usage tracking
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Rastrear comandos executos para billing. Metricas: comandos/mes, briefings gerados, feedback records. |
 
 ### A2 A2 OpenCode plugin
@@ -250,110 +256,121 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Mapear Credo AI, Modulos, Govern365, Packmind. |
 
 ### G6 G6 Case studies
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | 3 casos de uso reais com metricas antes/depois. |
 
 ### M4 M4 Trial mechanism
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | 14 dias de tier superior automaticamente apos `shugo init`. |
 
 ### M5 M5 Payment integration
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Stripe ou Paddle para cobranca recorrente. |
 
 ### M6 M6 License server
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | API central para validar licenses, verificar tier, registrar uso. |
 
 ### A3 A3 Cursor integration
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Extensao para Cursor IDE que mostra briefing no sidebar. |
 
 ### A4 A4 Git hooks
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Pre-commit: auto-briefing. Pre-push: validation. Post-commit: feedback automatico. |
 
 ### D1 D1 Interactive tutorial
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | `shugo tutorial` — guided tour interativo com exemplos reais. |
 
 ### D2 D2 Example projects
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | 3 templates: web-app, API, library. Cada um com governance pre-configurada. |
 
 ### DA1 DA1 Usage analytics
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Quais comandos sao mais usados, horarios de pico, taxa de sucesso. |
 
 ### DA2 DA2 Error tracking
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | adiado |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
+| **Motivo** | Adiado 2026-08-11 — decisão do utilizador: manter o sistema interno primeiro, construir e testar internamente antes da divulgação do produto. |
 | **Descricao** | Relatorio automatico de erros: tipo, frequencia, contexto. |
 
 ### S1 S1 Penetration testing
