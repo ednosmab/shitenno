@@ -5,8 +5,8 @@ lifecycle: Active
 
 # FORBIDDEN_OPERATIONS — Regras Vinculantes
 
-> **Versão:** 1.1
-> **Data:** 2026-07-17
+> **Versão:** 1.2
+> **Data:** 2026-08-11
 > **Autoridade:** Tech Lead Humano
 > **Aplicável a:** Todos os agentes IA
 
@@ -26,6 +26,7 @@ lifecycle: Active
 |---|---|---|---|---|---|
 | **G-01** | Nenhum `git commit` sem autorização explícita | É proibido executar `git commit` ou `git push` sem autorização prévia do utilizador | Revert imediato + documentar incidente | Parcial | git hook `pre-commit` checando env var |
 | **G-02** | Nenhuma alteração fora do workspace root | Escrita restrita ao directório do projecto | Revert + audit de segurança | Sim | `path-safety.ts` |
+| **G-03** | Nenhuma alteração em `src/__tests__/` sem PR com 2 revisores (ou aprovação explícita do Tech Lead) | Alterações de teste são sensíveis — não podem ser modificadas para "passar" (ver TDD) | Bloqueio de merge | Sim | Branch protection + `CODEOWNERS` (regra social) |
 
 ### F — Fundação e Estrutura
 

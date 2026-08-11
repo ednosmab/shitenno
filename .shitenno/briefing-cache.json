@@ -1,10 +1,10 @@
 {
   "version": 1,
   "entry": {
-    "inputHash": "a057fd771f8e46b0",
-    "computedAt": "2026-08-10T13:17:10.427Z",
+    "inputHash": "5982edf594f47e75",
+    "computedAt": "2026-08-11T03:44:18.547Z",
     "briefing": {
-      "generatedAt": "2026-08-10T13:17:10.165Z",
+      "generatedAt": "2026-08-11T03:44:18.261Z",
       "project": {
         "domain": "monorepo",
         "scale": "large",
@@ -105,12 +105,12 @@
       "dynamicRules": [
         {
           "id": "git-force-push",
-          "rule": "This project has 161 force push(es) in the last 180 days. Avoid \"git push --force\" — use --force-with-lease instead.",
+          "rule": "This project has 162 force push(es) in the last 180 days. Avoid \"git push --force\" — use --force-with-lease instead.",
           "source": "git-incident",
           "severity": "high",
-          "evidence": "161 force push(es) detected in git log",
-          "generatedAt": "2026-08-10T13:17:10.080Z",
-          "incidentCount": 161
+          "evidence": "162 force push(es) detected in git log",
+          "generatedAt": "2026-08-11T03:44:18.170Z",
+          "incidentCount": 162
         },
         {
           "id": "git-hotfixes",
@@ -118,7 +118,7 @@
           "source": "git-incident",
           "severity": "medium",
           "evidence": "8 hotfix(es) detected in git log",
-          "generatedAt": "2026-08-10T13:17:10.110Z",
+          "generatedAt": "2026-08-11T03:44:18.204Z",
           "incidentCount": 8
         }
       ],
@@ -150,7 +150,7 @@
       "semantic": {
         "patterns": [
           {
-            "id": "tech_debt_accumulation-multi-1786367830136",
+            "id": "tech_debt_accumulation-multi-1786419858229",
             "type": "tech_debt_accumulation",
             "domain": "governance",
             "domains": [
@@ -168,12 +168,12 @@
               "Rever dívida técnica acumulada",
               "Considerar sprint de qualidade"
             ],
-            "detectedAt": "2026-08-10T13:17:10.136Z",
+            "detectedAt": "2026-08-11T03:44:18.229Z",
             "windowSessions": 5,
             "evidence": [
               {
-                "id": "7e83f4ad-2418-4c64-9bbe-7102187f3676",
-                "timestamp": "2026-08-10T13:13:59.666Z",
+                "id": "8ca78e24-3942-47f1-83c3-07d5c003ec38",
+                "timestamp": "2026-08-11T03:38:03.016Z",
                 "sessionId": "2026-08-10T12:58:58.938Z",
                 "classification": {
                   "domain": "governance",
@@ -193,8 +193,8 @@
                 ]
               },
               {
-                "id": "986f12c9-4094-421d-8099-11abfc02481d",
-                "timestamp": "2026-08-10T13:13:59.666Z",
+                "id": "277198e0-89aa-43e0-a698-d7045045ebc9",
+                "timestamp": "2026-08-11T03:38:03.016Z",
                 "sessionId": "2026-08-10T12:58:58.938Z",
                 "classification": {
                   "domain": "governance",
@@ -214,8 +214,8 @@
                 ]
               },
               {
-                "id": "4f4de180-c693-4ad4-9944-d4be02250ca3",
-                "timestamp": "2026-08-10T13:13:59.663Z",
+                "id": "52701c47-9da7-44c8-a862-2e5a1eee6ebc",
+                "timestamp": "2026-08-11T03:38:03.014Z",
                 "sessionId": "2026-08-10T12:58:58.938Z",
                 "classification": {
                   "domain": "governance",
@@ -235,8 +235,8 @@
                 ]
               },
               {
-                "id": "aae6ecbb-0984-4e9f-b771-99d8d2618c6f",
-                "timestamp": "2026-08-10T12:59:39.975Z",
+                "id": "e22e9438-888f-4964-83ee-7a4b9a074609",
+                "timestamp": "2026-08-10T15:28:59.704Z",
                 "sessionId": "2026-08-10T12:58:58.938Z",
                 "classification": {
                   "domain": "governance",
@@ -256,9 +256,9 @@
                 ]
               },
               {
-                "id": "e1eaa651-ac8b-4de1-8d59-bcd96d061b5a",
-                "timestamp": "2026-08-10T12:43:26.074Z",
-                "sessionId": "2026-08-08T13:41:29.422Z",
+                "id": "34463f12-2691-4767-b551-8e8a0c6d14c0",
+                "timestamp": "2026-08-10T15:28:59.703Z",
+                "sessionId": "2026-08-10T12:58:58.938Z",
                 "classification": {
                   "domain": "governance",
                   "subdomain": "workflow-config",
@@ -277,30 +277,9 @@
                 ]
               },
               {
-                "id": "d31b6cb4-d683-4f37-9974-185db307713a",
-                "timestamp": "2026-08-10T12:43:26.074Z",
-                "sessionId": "2026-08-08T13:41:29.422Z",
-                "classification": {
-                  "domain": "governance",
-                  "subdomain": "workflow-config",
-                  "confidence": 0.1,
-                  "evidence": [
-                    "No classification rule matched for signal: source.changed"
-                  ],
-                  "signals": [
-                    "source.changed"
-                  ]
-                },
-                "eventCount": 1,
-                "files": [],
-                "signals": [
-                  "source.changed"
-                ]
-              },
-              {
-                "id": "9d0c9f0e-3748-4e0e-8162-5ea2bd0db021",
-                "timestamp": "2026-08-10T12:43:26.072Z",
-                "sessionId": "2026-08-08T13:41:29.422Z",
+                "id": "478dcb7e-b9e2-43d7-b13c-82d6d54e4379",
+                "timestamp": "2026-08-10T15:28:59.701Z",
+                "sessionId": "2026-08-10T12:58:58.938Z",
                 "classification": {
                   "domain": "governance",
                   "subdomain": "workflow-config",
@@ -319,9 +298,9 @@
                 ]
               },
               {
-                "id": "59ad0336-c4eb-4491-8d80-dbe58d1f96ce",
-                "timestamp": "2026-08-08T13:56:29.620Z",
-                "sessionId": "2026-08-08T13:41:29.422Z",
+                "id": "8795bf75-9478-464c-966a-869cb901907c",
+                "timestamp": "2026-08-10T15:14:00.342Z",
+                "sessionId": "2026-08-10T12:58:58.938Z",
                 "classification": {
                   "domain": "governance",
                   "subdomain": "workflow-config",
@@ -340,9 +319,9 @@
                 ]
               },
               {
-                "id": "2eb037d0-b413-4f2f-92c8-d91b92557434",
-                "timestamp": "2026-08-08T13:56:29.619Z",
-                "sessionId": "2026-08-08T13:41:29.422Z",
+                "id": "24c7ff41-1199-4c2f-a514-87e16766d10d",
+                "timestamp": "2026-08-10T15:14:00.341Z",
+                "sessionId": "2026-08-10T12:58:58.938Z",
                 "classification": {
                   "domain": "governance",
                   "subdomain": "workflow-config",
@@ -361,9 +340,9 @@
                 ]
               },
               {
-                "id": "42320add-794d-4bda-b94b-e6e6f0503b03",
-                "timestamp": "2026-08-08T13:56:29.615Z",
-                "sessionId": "2026-08-08T13:41:29.422Z",
+                "id": "7b4a8088-b1c1-4ba8-9fb7-1b063777329b",
+                "timestamp": "2026-08-10T15:14:00.333Z",
+                "sessionId": "2026-08-10T12:58:58.938Z",
                 "classification": {
                   "domain": "governance",
                   "subdomain": "workflow-config",
@@ -379,6 +358,27 @@
                 "files": [],
                 "signals": [
                   "knowledge_debt.detected"
+                ]
+              },
+              {
+                "id": "6c6a39eb-2e09-4877-909b-7e0f4a8be963",
+                "timestamp": "2026-08-10T14:58:59.682Z",
+                "sessionId": "2026-08-10T12:58:58.938Z",
+                "classification": {
+                  "domain": "governance",
+                  "subdomain": "workflow-config",
+                  "confidence": 0.1,
+                  "evidence": [
+                    "No classification rule matched for signal: source.changed"
+                  ],
+                  "signals": [
+                    "source.changed"
+                  ]
+                },
+                "eventCount": 1,
+                "files": [],
+                "signals": [
+                  "source.changed"
                 ]
               }
             ]
@@ -386,7 +386,7 @@
         ],
         "insights": [
           {
-            "id": "da-1786367830151",
+            "id": "da-1786419858245",
             "type": "debt_accumulation",
             "domains": [
               "testing",
@@ -421,7 +421,7 @@
               "Adicionar testes para código não testado"
             ],
             "priority": "medium",
-            "detectedAt": "2026-08-10T13:17:10.151Z",
+            "detectedAt": "2026-08-11T03:44:18.245Z",
             "sourcePatterns": [
               "tech_debt_accumulation-multi-1786367639684"
             ]

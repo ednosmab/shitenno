@@ -11,42 +11,46 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | em validação [2026-08-06 — reorganização concluída: 0 ficheiros flat, 119 movidos para camadas; scorer da dimensão corrigido] |
+| **Status** | concluído |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
+| **Data** | 2026-08-06 |
 | **Descricao** | Dimensao Architecture do score de maturidade esta em 15%. RESOLVIDO em 2 frentes: (1) 119 flat files reorganizados em src/shared (7), src/domain (24), src/application (28), src/infrastructure (52), src/interface (8); ADR-005 aprovado. (2) scoreArchitecture reescrito para medir estrutura real: docs 30pts, flatSourceFiles 20, layeredDirs 25, node-api imports fora de infra/interface 15, portsConsumed 10, monorepo/pkg 10. Resultado no repo: Arquitetura 90/100 honesto (docs+estrutura ok; 208 ficheiros ainda importam node: fora das camadas adapter — dedução principal). Suíte 192 ficheiros / 2653 testes verde. |
+| **Conclusao** | 2026-08-11 — validado: assess architecture 90/100; validate:architecture ok (655 files); 0 flat logic files (único shim daemon.ts compat, 10L); pipeline full 6/6 gates verdes |
 
 ### SA7 SA7 Baixa densidade de relacoes no knowledge graph
 
 | Campo | Valor |
 |---|---|
-| **Status** | concluído [2026-08-10 — commit 6e8aaae] |
+| **Status** | concluído |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
 | **Descricao** | Relacao baixa entre artifacts (24 relacoes para 26 artifacts). Sugestao: adicionar mais conexoes. |
-| **Conclusao** | New relation rules (runbook→script, plan→runbook, workflow→plan, doc→runbook); 205→227 relations, 0 orphans, health 100/100. Tests: +4 (2708 total). |
+| **Conclusao** | 2026-08-10 — commit 6e8aaae: new relation rules (runbook→script, plan→runbook, workflow→plan, doc→runbook); 205→227 relations, 0 orphans, health 100/100. Tests: +4 (2708 total). |
 
 ### LIVING-005 LIVING-005 Pipeline de validação por fases
 
 | Campo | Valor |
 |---|---|
-| **Status** | em validação |
+| **Status** | concluído |
 | **Severidade** | Medio |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
 | **Descricao** | Gate comum (testes+lint limpos, e2e sem regressão) + critérios específicos por fase. Benchmark novo Fase 1, cenário e2e Fase 2, script de carga Fase 3. Dogfooding no próprio repo. |
+| **Conclusao** | 2026-08-11 — pipeline exec --full: 6/6 gates verdes (test:unit, lint, typecheck, bench, test:e2e, test:load) |
 
 ### LIVING-007 LIVING-007 Sistema de Pipelines de Validação
 
 | Campo | Valor |
 |---|---|
-| **Status** | em validação [2026-08-08 — pipeline exec/status/notify + notificação desktop por fase + templates com contadores humano/agente; commit 04c02c0] |
+| **Status** | concluído |
 | **Severidade** | Medio |
 | **Prioridade** | P1 |
 | **Owner** | executor |
 | **Descricao** | Comandos independentes (plan prepare, pipeline exec/notify/status) encadeáveis via shell. Evento plan.created + RULE-020 para trigger automático. Templates de pipeline por fase com contadores humano/agente. Notificação desktop por fase. |
+| **Conclusao** | 2026-08-11 — pipeline exec --full: 6/6 gates verdes (test:unit incl. pipeline-command/runner/desktop-notifier, lint, typecheck, bench, test:e2e, test:load); commit 04c02c0 |
 
 
 
@@ -561,7 +565,7 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | em investigação |
+| **Status** | concluído |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | Tech Lead |
@@ -569,6 +573,7 @@ lifecycle: Active
 | **Fonte** | hook pre-commit (detector de regras) |
 | **Modulos** | src/__tests__/ |
 | **Descricao** | Candidata a regra: exigir Pull Request com 2 revisores para qualquer alteracao em `src/__tests__/`. Detectada pelo hook; aguarda aprovacao do Tech Lead antes de ser aplicada. |
+| **Conclusao** | 2026-08-11 — aprovada como G-03 em FORBIDDEN_OPERATIONS.md v1.2 |
 
 
 ### SA15-006 Quebrar couplings intelligence→governance restantes (audit/prioritization/semantic)
