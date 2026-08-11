@@ -134,7 +134,8 @@ const STATE_ALIASES: Record<string, BacklogState> = {
 
 export function normalizeState(raw: string): BacklogState | null {
   const lower = raw.toLowerCase().trim();
-  return STATE_ALIASES[lower] || null;
+  const base = lower.replace(/\s*\[.*\]$/, "").replace(/\s*\(.*\)$/, "").trim();
+  return STATE_ALIASES[base] || STATE_ALIASES[lower] || null;
 }
 
 export function getAllowedTransitions(state: BacklogState): BacklogState[] {

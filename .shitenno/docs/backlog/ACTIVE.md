@@ -156,11 +156,12 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | concluído |
 | **Severidade** | Medio |
 | **Prioridade** | P2 |
 | **Owner** | unassigned |
 | **Descricao** | O Shugo system não tem mecanismo para transformar automaticamente items de implementação de um plano (`governance/plans/*.md`) em checklists no backlog que se actualizam de acordo com a implementação por item. Actualmente, a sincronização é manual. |
+| **Conclusao** | 2026-08-11 — initPlanBacklogSync ligado no daemon (engine-init); normalizeState tolera anotações (...) e [...]; sync plano→backlog por checklist funcional + testes (4 novos). Pipeline full 6/6. |
 
 ### 2.2 2.2 Feedback ↔ capability-engine
 

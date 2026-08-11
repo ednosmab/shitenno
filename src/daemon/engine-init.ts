@@ -9,6 +9,7 @@ import { initializeProactiveEngine } from "../prioritization/triggers.js";
 import { initDesktopNotifier } from "../infrastructure/desktop-notifier.js";
 import { initAutoBriefing } from "../application/auto-briefing.js";
 import { initProactiveDigest } from "../infrastructure/proactive-digest.js";
+import { initPlanBacklogSync } from "../application/plan-backlog-sync.js";
 import { initializeKnowledgeGraph } from "../infrastructure/knowledge-graph.js";
 import { startWatching } from "../infrastructure/persistence/file-watcher.js";
 import { daemonLog } from "./log-rotation.js";
@@ -32,6 +33,9 @@ function initEngines(ctx: DaemonContext): { stopProactive: () => void; isResourc
 
   initAutoBriefing(ctx.projectRoot, ctx.shitennoDir);
   daemonLog(ctx.logPath, "INFO", "Auto-briefing initialized — will generate BRIEFING.md on session start");
+
+  initPlanBacklogSync(ctx.projectRoot, ctx.shitennoDir);
+  daemonLog(ctx.logPath, "INFO", "Plan-Backlog sync initialized — plan changes propagate to backlog");
 
   const stopDigest = initProactiveDigest(ctx.shitennoDir);
   daemonLog(ctx.logPath, "INFO", "Proactive digest initialized — periodic summary every 30min");

@@ -99,6 +99,17 @@ describe("backlog-core", () => {
       expect(normalizeState("")).toBeNull();
       expect(normalizeState("random text")).toBeNull();
     });
+
+    it("strips bracketed annotations (legacy history notes)", () => {
+      expect(normalizeState("concluído [2026-08-10 — commit 6e8aaae]")).toBe("concluído");
+      expect(normalizeState("em validação [2026-08-06 — reorganização concluída]")).toBe("em validação");
+    });
+
+    it("strips parenthesized annotations (checklist sync percentages)", () => {
+      expect(normalizeState("em implementação (50% — 2/4)")).toBe("em implementação");
+      expect(normalizeState("concluído (100% — 4/4)")).toBe("concluído");
+      expect(normalizeState("planeado (0% — 0/4)")).toBe("planeado");
+    });
   });
 
   // ── isValidTransition ──────────────────────────────────────────────────
