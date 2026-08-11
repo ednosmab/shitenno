@@ -58,11 +58,12 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | Backlog |
+| **Status** | concluído |
 | **Severidade** | Alto |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
 | **Descricao** | Site one-page com proposta de valor, demonstracao visual, CTA para waitlist. Deve comunicar: (1) O problema (context loss entre sessoes), (2) A solucao (briefing dinamico), (3) O resultado (60-80% menos tokens). |
+| **Conclusao** | 2026-08-11 — apps/shitenno-landing criado (Vite+React+Tailwind v4, mesmo design system do dashboard): hero, secções Problem/Solution/Result com terminais demo before/after, CTA waitlist. Build + preview 200 OK. |
 
 ### G2 G2 Waitlist / early access
 
