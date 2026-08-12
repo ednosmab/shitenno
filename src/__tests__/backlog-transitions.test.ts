@@ -202,18 +202,22 @@ describe("backlog-transitions", () => {
       }
     });
 
-    it("transitions to concluído with date", () => {
+    it("transitions to concluído writing the canonical status", () => {
       const content = createItem("TASK-005", "em implementação");
       const path = createTempBacklog(content);
       try {
         const result = transitionBacklogStatus(path, "TASK-005", "em validação");
         expect(result.success).toBe(true);
 
-        const result2 = transitionBacklogStatus(path, "TASK-005", "concluído", { date: "2026-07-06" });
+        const result2 = transitionBacklogStatus(path, "TASK-005", "concluído");
         expect(result2.success).toBe(true);
 
         const updated = getCurrentStatus(path, "TASK-005");
         expect(updated).toBe("concluído");
+
+        const raw = readFileSync(path, "utf-8");
+        expect(raw).toContain("| **Status** | concluído");
+        expect(raw).not.toContain("Done —");
       } finally {
         unlinkSync(path);
       }

@@ -96,7 +96,7 @@ export function getCurrentStatus(
   return currentStatus;
 }
 
-function updateStatusLine(lines: string[], itemId: string, newStatus: BacklogStatus, date: string): boolean {
+function updateStatusLine(lines: string[], itemId: string, newStatus: BacklogStatus): boolean {
   let inTargetItem = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -108,7 +108,7 @@ function updateStatusLine(lines: string[], itemId: string, newStatus: BacklogSta
     if (inTargetItem) {
       const statusMatch = line.match(/^(\s*\|\s*\*\*Status\*\*\s*\|\s*).+?(\s*)$/);
       if (statusMatch) {
-        const statusLabel = newStatus === "concluído" ? `Done — ${date}` : newStatus;
+        const statusLabel = newStatus;
         lines[i] = `${statusMatch[1]}${statusLabel}${statusMatch[2] ?? ""}`;
         return true;
       }
@@ -120,8 +120,7 @@ function updateStatusLine(lines: string[], itemId: string, newStatus: BacklogSta
 export function transitionBacklogStatus(
   backlogPath: string,
   itemId: string,
-  newStatus: BacklogStatus,
-  options?: { date?: string }
+  newStatus: BacklogStatus
 ): TransitionResult {
   if (!existsSync(backlogPath)) {
     return { success: false, itemId, previousStatus: null, newStatus, message: `Backlog file not found: ${backlogPath}` };
@@ -136,11 +135,9 @@ export function transitionBacklogStatus(
     };
   }
 
-  const date = options?.date ?? new Date().toISOString().slice(0, 10);
-
   try {
     const lines = readFileSync(backlogPath, "utf-8").split("\n");
-    if (!updateStatusLine(lines, itemId, newStatus, date)) {
+    if (!updateStatusLine(lines, itemId, newStatus)) {
       return { success: false, itemId, previousStatus: currentStatus, newStatus, message: `Could not find status field for item: ${itemId}` };
     }
     writeFileSync(backlogPath, lines.join("\n"), "utf-8");
