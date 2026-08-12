@@ -146,7 +146,7 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | em implementação |
+| **Status** | em validação |
 | **Severidade** | Medio |
 | **Prioridade** | P1 |
 | **Owner** | unassigned |
