@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { execSync } from "node:child_process";
-import { generateDynamicRules, dynamicRulesToMarkdown, type DynamicRule } from "../infrastructure/dynamic-rules.js";
+import { generateDynamicRules } from "../infrastructure/dynamic-rules.js";
 
 vi.mock("node:fs", () => ({
   existsSync: vi.fn(),
@@ -135,45 +135,5 @@ describe("generateDynamicRules", () => {
 
     const rules = generateDynamicRules("/project", "/shugo");
     expect(rules).toEqual([]);
-  });
-});
-
-// ── dynamicRulesToMarkdown ─────────────────────────────────────────────────
-
-describe("dynamicRulesToMarkdown", () => {
-  it("returns empty string for no rules", () => {
-    expect(dynamicRulesToMarkdown([])).toBe("");
-  });
-
-  it("formats rules with severity icons", () => {
-    const rules: DynamicRule[] = [
-      {
-        id: "git-force-push",
-        rule: "Avoid force push",
-        source: "git-incident",
-        severity: "high",
-        evidence: "5 force pushes",
-        generatedAt: "2026-07-08T00:00:00Z",
-        incidentCount: 5,
-      },
-      {
-        id: "git-reverts",
-        rule: "Test before merge",
-        source: "git-incident",
-        severity: "medium",
-        evidence: "3 reverts",
-        generatedAt: "2026-07-08T00:00:00Z",
-        incidentCount: 3,
-      },
-    ];
-
-    const md = dynamicRulesToMarkdown(rules);
-    expect(md).toContain("## Dynamic Rules (Auto-Generated from History)");
-    expect(md).toContain("git-force-push");
-    expect(md).toContain("git-reverts");
-    expect(md).toContain("Avoid force push");
-    expect(md).toContain("Test before merge");
-    expect(md).toContain("⚠️");
-    expect(md).toContain("ℹ️");
   });
 });

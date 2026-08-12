@@ -13,8 +13,6 @@ import {
   readKnowledgeState,
   readProjectState,
   readSessionMemory,
-  consolidateState,
-  stateToText,
 } from "../application/state-manager.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -187,42 +185,6 @@ blockers:
       expect(memory.reminders).toContain("Remember to commit");
       expect(memory.nextSteps).toContain("Run tests");
       expect(memory.blockers).toContain("Blocked by issue #1");
-    });
-  });
-
-  describe("consolidateState", () => {
-    it("returns a complete ShitennoState", () => {
-      const state = consolidateState(tmpDir, shitennoDir);
-      expect(state).toBeDefined();
-      expect(state.knowledge).toBeDefined();
-      expect(state.project).toBeDefined();
-      expect(state.memory).toBeDefined();
-      expect(state.consolidatedAt).toBeTruthy();
-    });
-
-    it("all sections have correct types", () => {
-      const state = consolidateState(tmpDir, shitennoDir);
-      expect(Array.isArray(state.knowledge.adrs)).toBe(true);
-      expect(typeof state.project.projectInfo).toBe("object");
-      expect(state.memory.sessionId === null || typeof state.memory.sessionId === "string").toBe(true);
-    });
-  });
-
-  describe("stateToText", () => {
-    it("produces readable text output", () => {
-      const state = consolidateState(tmpDir, shitennoDir);
-      const text = stateToText(state);
-      expect(text).toContain("Shugo State Report");
-      expect(text).toContain("Knowledge (Permanent)");
-      expect(text).toContain("Project State (Current)");
-      expect(text).toContain("Session Memory (Temporary)");
-    });
-
-    it("includes ADR count", () => {
-      writeFileSync(join(shitennoDir, "docs", "adrs", "ADR-001.md"), "# ADR 001");
-      const state = consolidateState(tmpDir, shitennoDir);
-      const text = stateToText(state);
-      expect(text).toContain("ADRs: 1");
     });
   });
 });

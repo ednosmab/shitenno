@@ -232,20 +232,6 @@ export function calculateKnowledgeGap(
   };
 }
 
-/** Detect paradigm shift for a recommendation. */
-export function detectParadigmShift(
-  recommendation: EvolutionRecommendation
-): ParadigmShift | null {
-  const template = CHALLENGE_TEMPLATES[recommendation.type];
-
-  // Only return paradigm shift if it's significant
-  if (template.paradigmShift.difficulty === "minor") {
-    return null;
-  }
-
-  return template.paradigmShift;
-}
-
 /** Ensure the challenge is in flow state (not too easy, not too hard). */
 export function ensureFlowState(
   challengeLevel: number,

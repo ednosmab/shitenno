@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { resolveRules, partitionRules, type RuleManifestEntry } from "../infrastructure/rule-manifest.js";
+import { partitionRules, type RuleManifestEntry } from "../infrastructure/rule-manifest.js";
 
 const MANIFEST: RuleManifestEntry[] = [
   { id: "forbidden-operations", path: "docs/FORBIDDEN_OPERATIONS.md", mandatory: true, priority: 0 },
@@ -11,54 +11,6 @@ const MANIFEST: RuleManifestEntry[] = [
 ];
 
 describe("rule-manifest", () => {
-  describe("resolveRules", () => {
-    it("mandatory rules always present even with empty taskMeta", () => {
-      const result = resolveRules(MANIFEST, {});
-      const ids = result.map((r) => r.id);
-      expect(ids).toContain("forbidden-operations");
-      expect(ids).toContain("architecture");
-    });
-
-    it("non-mandatory rule not selected when 'when' field absent from taskMeta", () => {
-      const result = resolveRules(MANIFEST, {});
-      const ids = result.map((r) => r.id);
-      expect(ids).not.toContain("typescript");
-      expect(ids).not.toContain("react");
-      expect(ids).not.toContain("audit-protocol");
-    });
-
-    it("conditional rule selected when taskMeta matches", () => {
-      const result = resolveRules(MANIFEST, { task: "audit" });
-      const ids = result.map((r) => r.id);
-      expect(ids).toContain("audit-protocol");
-      expect(ids).not.toContain("implementation-protocol");
-    });
-
-    it("conditional rule not selected when taskMeta does not match", () => {
-      const result = resolveRules(MANIFEST, { task: "audit" });
-      const ids = result.map((r) => r.id);
-      expect(ids).not.toContain("implementation-protocol");
-    });
-
-    it("results sorted by priority (0 = highest)", () => {
-      const result = resolveRules(MANIFEST, { task: "audit" });
-      const priorities = result.map((r) => r.priority);
-      expect(priorities).toEqual([...priorities].sort((a, b) => a - b));
-    });
-
-    it("multiple conditional rules selected when all fields match", () => {
-      const result = resolveRules(MANIFEST, {
-        task: "implementation",
-        language: "typescript",
-        framework: "react",
-      });
-      const ids = result.map((r) => r.id);
-      expect(ids).toContain("implementation-protocol");
-      expect(ids).toContain("typescript");
-      expect(ids).toContain("react");
-    });
-  });
-
   describe("partitionRules", () => {
     it("separates mandatory and contextual rules", () => {
       const { mandatory, contextual } = partitionRules(MANIFEST, { task: "audit" });

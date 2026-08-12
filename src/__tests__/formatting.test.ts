@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import {
   healthBar,
-  miniBar,
   outputJson,
   statusIcon,
   banner,
@@ -47,42 +46,6 @@ describe("healthBar", () => {
   it("uses custom width", () => {
     const bar = healthBar(50, 100, 10);
     expect(bar).toContain("50%");
-  });
-});
-
-// ── miniBar ──────────────────────────────────────────────────────────────────
-
-describe("miniBar", () => {
-  it("renders full bar at score 10", () => {
-    const bar = miniBar(10, 10);
-    expect(bar).toContain("█");
-  });
-
-  it("renders empty bar at score 0", () => {
-    const bar = miniBar(0, 10);
-    expect(bar).toContain("░");
-  });
-
-  it("renders mixed bar at score 5", () => {
-    const bar = miniBar(5, 10);
-    expect(bar).toContain("█");
-    expect(bar).toContain("░");
-  });
-
-  it("clamps at max", () => {
-    const bar = miniBar(15, 10);
-    expect(bar).toContain("█");
-  });
-
-  it("handles negative score", () => {
-    const bar = miniBar(-3, 10);
-    expect(bar).toContain("░");
-  });
-
-  it("default max is 10", () => {
-    const bar = miniBar(5);
-    expect(bar).toContain("█");
-    expect(bar).toContain("░");
   });
 });
 

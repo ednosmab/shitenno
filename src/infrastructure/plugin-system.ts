@@ -204,8 +204,3 @@ export function getHookBus(): HookBus {
   }
   return globalHookBus;
 }
-
-/** Reset the global hook bus (for testing). */
-export function resetHookBus(): void {
-  globalHookBus = null;
-}

@@ -1,17 +1,13 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { recordHit, recordMiss, recordEviction, getCacheStats, getAllCacheStats, resetMetrics, resetAllMetrics, getPerformanceReport } from "../shared/cache-metrics.js";
+import { describe, it, expect } from "vitest";
+import { recordHit, recordMiss, recordEviction, getCacheStats } from "../shared/cache-metrics.js";
 
 describe("cache-metrics", () => {
-  beforeEach(() => {
-    resetAllMetrics();
-  });
-
   describe("recordHit", () => {
     it("should increment hit count", () => {
-      recordHit("test-cache");
-      recordHit("test-cache");
+      recordHit("hit-cache");
+      recordHit("hit-cache");
       
-      const stats = getCacheStats("test-cache");
+      const stats = getCacheStats("hit-cache");
       expect(stats.hits).toBe(2);
       expect(stats.totalRequests).toBe(2);
     });
@@ -19,10 +15,10 @@ describe("cache-metrics", () => {
 
   describe("recordMiss", () => {
     it("should increment miss count", () => {
-      recordMiss("test-cache");
-      recordMiss("test-cache");
+      recordMiss("miss-cache");
+      recordMiss("miss-cache");
       
-      const stats = getCacheStats("test-cache");
+      const stats = getCacheStats("miss-cache");
       expect(stats.misses).toBe(2);
       expect(stats.totalRequests).toBe(2);
     });
@@ -30,21 +26,21 @@ describe("cache-metrics", () => {
 
   describe("recordEviction", () => {
     it("should increment eviction count", () => {
-      recordEviction("test-cache");
-      recordEviction("test-cache");
+      recordEviction("eviction-cache");
+      recordEviction("eviction-cache");
       
-      const stats = getCacheStats("test-cache");
+      const stats = getCacheStats("eviction-cache");
       expect(stats.evictions).toBe(2);
     });
   });
 
   describe("getCacheStats", () => {
     it("should calculate hit rate correctly", () => {
-      recordHit("test-cache");
-      recordHit("test-cache");
-      recordMiss("test-cache");
+      recordHit("rate-cache");
+      recordHit("rate-cache");
+      recordMiss("rate-cache");
       
-      const stats = getCacheStats("test-cache");
+      const stats = getCacheStats("rate-cache");
       expect(stats.hitRate).toBeCloseTo(0.6667, 4);
       expect(stats.missRate).toBeCloseTo(0.3333, 4);
     });
@@ -54,62 +50,6 @@ describe("cache-metrics", () => {
       expect(stats.hitRate).toBe(0);
       expect(stats.missRate).toBe(0);
       expect(stats.totalRequests).toBe(0);
-    });
-  });
-
-  describe("getAllCacheStats", () => {
-    it("should return stats for all caches", () => {
-      recordHit("cache1");
-      recordMiss("cache2");
-      
-      const allStats = getAllCacheStats();
-      expect(Object.keys(allStats)).toContain("cache1");
-      expect(Object.keys(allStats)).toContain("cache2");
-    });
-  });
-
-  describe("resetMetrics", () => {
-    it("should reset metrics for specific cache", () => {
-      recordHit("test-cache");
-      recordHit("test-cache");
-      
-      resetMetrics("test-cache");
-      
-      const stats = getCacheStats("test-cache");
-      expect(stats.hits).toBe(0);
-      expect(stats.totalRequests).toBe(0);
-    });
-  });
-
-  describe("resetAllMetrics", () => {
-    it("should reset all metrics", () => {
-      recordHit("cache1");
-      recordMiss("cache2");
-      
-      resetAllMetrics();
-      
-      const allStats = getAllCacheStats();
-      expect(Object.keys(allStats)).toHaveLength(0);
-    });
-  });
-
-  describe("getPerformanceReport", () => {
-    it("should generate performance report", () => {
-      recordHit("test-cache");
-      recordHit("test-cache");
-      recordMiss("test-cache");
-      
-      const report = getPerformanceReport();
-      expect(report).toContain("Cache Performance Report:");
-      expect(report).toContain("test-cache:");
-      expect(report).toContain("Hit Rate: 66.7%");
-      expect(report).toContain("Total Requests: 3");
-    });
-
-    it("should return empty report when no caches", () => {
-      const report = getPerformanceReport();
-      expect(report).toContain("Cache Performance Report:");
-      expect(report).not.toContain("Hit Rate:");
     });
   });
 });

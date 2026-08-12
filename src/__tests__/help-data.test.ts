@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   COMMAND_CATEGORIES,
   findCommand,
-  getAllCommandNames,
 } from "../domain/types/help-data.js";
 
 // ── COMMAND_CATEGORIES ─────────────────────────────────────────────────────
@@ -35,12 +34,12 @@ describe("COMMAND_CATEGORIES", () => {
   });
 
   it("no duplicate command names across categories", () => {
-    const names = getAllCommandNames();
+    const names = COMMAND_CATEGORIES.flatMap((cat) => cat.commands.map((c) => c.name));
     expect(new Set(names).size).toBe(names.length);
   });
 
   it("contains expected core commands", () => {
-    const names = getAllCommandNames();
+    const names = COMMAND_CATEGORIES.flatMap((cat) => cat.commands.map((c) => c.name));
     expect(names).toContain("init");
     expect(names).toContain("status");
     expect(names).toContain("audit");
@@ -86,50 +85,5 @@ describe("findCommand", () => {
     const cmd = findCommand("docs-audit");
     expect(cmd).toBeDefined();
     expect(cmd!.examples.length).toBeGreaterThan(0);
-  });
-});
-
-// ── getAllCommandNames ─────────────────────────────────────────────────────
-
-describe("getAllCommandNames", () => {
-  it("returns an array of strings", () => {
-    const names = getAllCommandNames();
-    expect(Array.isArray(names)).toBe(true);
-    expect(names.every((n) => typeof n === "string")).toBe(true);
-  });
-
-  it("returns at least 20 commands", () => {
-    expect(getAllCommandNames().length).toBeGreaterThanOrEqual(20);
-  });
-
-  it("includes setup commands", () => {
-    const names = getAllCommandNames();
-    expect(names).toContain("init");
-    expect(names).toContain("mcp");
-    expect(names).toContain("upgrade");
-    expect(names).toContain("clean");
-  });
-
-  it("includes analysis commands", () => {
-    const names = getAllCommandNames();
-    expect(names).toContain("status");
-    expect(names).toContain("audit");
-    expect(names).toContain("doctor");
-    expect(names).toContain("detect");
-  });
-
-  it("includes pipeline commands", () => {
-    const names = getAllCommandNames();
-    expect(names).toContain("run");
-    expect(names).toContain("evolve");
-    expect(names).toContain("act");
-    expect(names).toContain("plan");
-  });
-
-  it("includes governance commands", () => {
-    const names = getAllCommandNames();
-    expect(names).toContain("goal");
-    expect(names).toContain("decide");
-    expect(names).toContain("policy");
   });
 });

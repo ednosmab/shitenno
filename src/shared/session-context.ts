@@ -9,15 +9,13 @@
  */
 
 let currentSessionId: string | null = null;
-let currentSessionStartedAt: string | null = null;
 
 /** Set the current session (called once at startup). */
 export function setSessionContext(
   sessionId: string,
-  startedAt: string
+  _startedAt: string
 ): void {
   currentSessionId = sessionId;
-  currentSessionStartedAt = startedAt;
 }
 
 /** Get the current session ID, or null if no session is active. */
@@ -25,13 +23,7 @@ export function getSessionId(): string | null {
   return currentSessionId;
 }
 
-/** Get the session start time, or null if no session is active. */
-export function getSessionStartedAt(): string | null {
-  return currentSessionStartedAt;
-}
-
 /** Clear the session (called at shutdown). */
 export function clearSessionContext(): void {
   currentSessionId = null;
-  currentSessionStartedAt = null;
 }

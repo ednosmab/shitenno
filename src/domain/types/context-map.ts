@@ -106,7 +106,6 @@ const APPLICATION_FACADES: Record<string, BoundedContext> = {
   "rule-engine": "governance",
   scorer: "intelligence",
   "state-manager": "governance",
-  "task-completion": "planning",
 };
 
 /** Infrastructure-layer flat files mapped to their context. */
@@ -119,14 +118,11 @@ const INFRASTRUCTURE_FILES: Record<string, BoundedContext> = {
   "analyser-tooling": "intelligence",
   "buffer-checkpoint": "ops",
   "context-boundary": "ops",
-  "atomic-write": "ops",
   "backlog-parser": "planning",
-  "backlog-transitions": "planning",
   "briefing-cache": "briefing",
   cache: "ops",
   "challenge-responder": "feedback",
   "complexity-detector": "intelligence",
-  "context-index-builder": "briefing",
   "daemon-circuit-breaker": "ops",
   "daemon-client": "ops",
   "dead-letter": "ops",
@@ -141,10 +137,8 @@ const INFRASTRUCTURE_FILES: Record<string, BoundedContext> = {
   "exec-async": "ops",
   "git-hooks-installer": "ops",
   "growth-profile": "ops",
-  "inference-cache": "intelligence",
   "knowledge-graph": "knowledge",
   "knowledge-loader": "knowledge",
-  "mandatory-context-generator": "briefing",
   manifest: "ops",
   "markdown-plan-engine": "planning",
   "mcp-cache": "ops",

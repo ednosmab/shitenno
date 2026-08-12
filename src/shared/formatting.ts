@@ -51,21 +51,6 @@ export function healthBar(
 }
 
 /**
- * Render a small inline health bar for area scores (0-10 scale).
- */
-export function miniBar(score: number, max: number = 10): string {
-  const pct = Math.min(1, Math.max(0, score / max));
-  const width = 8;
-  const filled = Math.round(pct * width);
-  const empty = width - filled;
-
-  const barColor =
-    pct >= 0.8 ? chalk.green : pct >= 0.5 ? chalk.yellow : chalk.red;
-
-  return barColor("█".repeat(filled)) + chalk.gray("░".repeat(empty));
-}
-
-/**
  * Output JSON to stdout when --json flag is used.
  */
 export function outputJson(data: Record<string, unknown>): void {

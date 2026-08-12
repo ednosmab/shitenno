@@ -7,10 +7,8 @@ import {
   isValidTransition,
   getAllowedTransitions,
   transitionTask,
-  parseBacklog,
-  findBacklogItem,
-  completeTask,
 } from "../application/backlog-state-machine.js";
+import { parseBacklogItems, findItem, transitionItem } from "../application/backlog-core.js";
 
 describe("backlog-state-machine", () => {
   let testDir: string;
@@ -106,7 +104,7 @@ describe("backlog-state-machine", () => {
         "utf-8"
       );
 
-      const items = parseBacklog(backlogPath);
+      const items = parseBacklogItems(backlogPath);
       expect(items).toHaveLength(3);
       expect(items[0]?.state).toBe("planeado");
       expect(items[1]?.state).toBe("em implementação");
@@ -126,14 +124,14 @@ describe("backlog-state-machine", () => {
         "utf-8"
       );
 
-      const items = parseBacklog(backlogPath);
+      const items = parseBacklogItems(backlogPath);
       expect(items[0]?.state).toBe("concluído");
       expect(items[1]?.state).toBe("em implementação");
       expect(items[2]?.state).toBe("planeado");
     });
 
     it("returns empty array for non-existent file", () => {
-      const items = parseBacklog("/nonexistent/BACKLOG.md");
+      const items = parseBacklogItems("/nonexistent/BACKLOG.md");
       expect(items).toHaveLength(0);
     });
   });
@@ -150,7 +148,7 @@ describe("backlog-state-machine", () => {
         "utf-8"
       );
 
-      const item = findBacklogItem(backlogPath, "TASK-001");
+      const item = findItem(parseBacklogItems(backlogPath), "TASK-001");
       expect(item).not.toBeNull();
       expect(item?.id).toBe("TASK-001");
     });
@@ -166,7 +164,7 @@ describe("backlog-state-machine", () => {
         "utf-8"
       );
 
-      const item = findBacklogItem(backlogPath, "BACKLOG");
+      const item = findItem(parseBacklogItems(backlogPath), "BACKLOG");
       expect(item).not.toBeNull();
       expect(item?.id).toBe("BACKLOG-001");
     });
@@ -182,7 +180,7 @@ describe("backlog-state-machine", () => {
         "utf-8"
       );
 
-      const item = findBacklogItem(backlogPath, "NONEXISTENT");
+      const item = findItem(parseBacklogItems(backlogPath), "NONEXISTENT");
       expect(item).toBeNull();
     });
   });
@@ -256,19 +254,19 @@ describe("backlog-state-machine", () => {
     });
   });
 
-  describe("completeTask", () => {
+  describe("transitionTask to concluído", () => {
     it("completes an in-progress task", () => {
       const backlogPath = join(testDir, "docs", "BACKLOG.md");
       writeFileSync(
         backlogPath,
         `| ID | Title | Priority | Status |
 |---|---|---|---|
-| TASK-001 | First task | High | em implementação |
+| TASK-001 | First task | High | em validação |
 `,
         "utf-8"
       );
 
-      const result = completeTask(testDir, "TASK-001");
+      const result = transitionItem(backlogPath, "TASK-001", "concluído");
       expect(result.success).toBe(true);
       expect(result.newState).toBe("concluído");
     });

@@ -1,5 +1,5 @@
 **Status:** In Progress
-**Updated_at:** 2026-08-11T14:46:28.778Z
+**Updated_at:** 2026-08-12T03:30:40.954Z
 **Date:** 2026-08-11
 
 # Dead code cleanup — remove orphaned modules, duplicate files and dead events
@@ -23,12 +23,12 @@ Critérios de aceitação:
 
 ## Checklist
 
-- [ ] Fase 1: Remover 5 ficheiros substituídos (shared/errors, shared/utils, semantic/insight-rules, semantic/rules/classification-rules, persistence/manifest)
-- [ ] Fase 2: Remover 6 módulos de infraestrutura não ligada (mandatory-context-generator, inference-cache, context-index-builder, backlog-transitions, atomic-write, task-completion)
-- [ ] Fase 3: Remover 5 comandos duplicados (assess/profile, daemon/logs, doctor/display, feedback/modes, sync/display)
-- [ ] Fase 4: Remover publicações de eventos sem consumidor (challenge.resolved, challenge.resolution_undone)
-- [ ] Fase 5: Remover 28 exports test-only
-- [ ] Fase 6: Verificação final — lint, typecheck, test:unit, pipeline full 6/6, sync-docs
+- [x] Fase 1: Remover 5 ficheiros substituídos (shared/errors, shared/utils, semantic/insight-rules, semantic/rules/classification-rules, persistence/manifest)
+- [x] Fase 2: Remover 6 módulos de infraestrutura não ligada (mandatory-context-generator, inference-cache, context-index-builder, backlog-transitions, atomic-write, task-completion)
+- [x] Fase 3: Remover 5 comandos duplicados (assess/profile, daemon/logs, doctor/display, feedback/modes, sync/display)
+- [x] Fase 4: Remover publicações de eventos sem consumidor (challenge.resolved, challenge.resolution_undone)
+- [x] Fase 5: Remover 28 exports test-only
+- [x] Fase 6: Verificação final — lint, typecheck, test:unit, pipeline full 6/6, sync-docs
 
 ## Passos de Implementação
 
@@ -122,7 +122,7 @@ Critérios de aceitação:
 **Verificação:** `pnpm run typecheck` OK; testes `backlog-state-machine.test.ts` atualizados
 
 **Ficheiro:** `src/application/briefing-injection.ts`
-**Acção:** Remover exports `buildBriefingContextBlock`, `isTrivialPrompt` (consumidor previsto `.opencode/plugin/shitenno-briefing.ts` NÃO existe no repo)
+**Acção:** **NÃO REMOVER NADA** (falso positivo — `.opencode/plugin/shitenno-briefing.ts` existe e importa `buildBriefingContextBlock` (linha 16) e `isTrivialPrompt` (linha 17, usada na linha 34); a análise não varreu `.opencode/`)
 **Verificação:** `pnpm run typecheck` OK; testes atualizados
 
 **Ficheiro:** `src/application/challenge-generator.ts`
@@ -146,7 +146,7 @@ Critérios de aceitação:
 **Verificação:** `pnpm run typecheck` OK
 
 **Ficheiro:** `src/domain/types/help-data.ts`
-**Acção:** Remover exports `findCommand`, `getAllCommandNames`
+**Acção:** Remover export `getAllCommandNames`; **MANTER `findCommand`** (falso positivo — usado em `bin/shugo.ts:361`; a análise não varreu `bin/`)
 **Verificação:** `pnpm run typecheck` OK
 
 **Ficheiro:** `src/shared/formatting.ts`
@@ -215,5 +215,7 @@ Critérios de aceitação:
 
 - Análise feita em 2026-08-11 com 3 passes: (1) scan estático de imports (2 agentes), (2) dynamic imports + barrel + configs (1 agente), (3) consumidores indirectos de eventos persistidos + cadeias internas (2 agentes)
 - Resultado corrigido: 17→15 ficheiros órfãos, 5→1 módulos mortos, 4→2 eventos mortos, ~58→28 funções test-only
+- **ACHADO 2026-08-12:** `backlog-transitions.ts` é mesmo órfão (o MCP usa `backlog-writer/core.ts`, não este ficheiro) — MAS o mesmo bug `Done — ${date}` existia no módulo VIVO `src/backlog-writer/core.ts:121` (updateModularStatus). Corrigido: escreve status canónico; legado `Done` continua parseável por `matchStatusFromRaw`/`normalizeState`-legacy. Testes: `backlog-writer-core-selfconsistency.test.ts` (RED→GREEN no caminho MCP), `backlog-core.test.ts` atualizado, `backlog-transitions-selfconsistency.test.ts` + `backlog-transitions.test.ts` atualizados (caminho órfão, a remover na Fase 2).
+- **EXECUÇÃO 2026-08-12:** Fases 1-5 concluídas (17 ficheiros removidos, 28 exports test-only removidos, testes órfãos removidos). Falsos positivos confirmados na prática: `findCommand` usado em `bin/shugo.ts:361`, `briefing-injection.ts` importado por `.opencode/plugin/shitenno-briefing.ts` — ambos mantidos. Registo extra removido: entradas dos módulos apagados em `src/domain/types/context-map.ts`; testes `session-feedback-extended.test.ts` truncados (describes de exports removidos); `session-context.ts` mantém assinatura `setSessionContext(sessionId, _startedAt)` (contrato público usado em `bin/shugo.ts:62`). Verificação: tsc limpo, lint limpo, test:unit 193 files / 2557 testes verdes, sync-docs 0 erros (Test Files 200→196).
 - Context-map registrations (`.shitenno/governance/context-map.md`?) referenciam módulos órfãos — atualizar quando removidos
 - Este plano foi criado para execução posterior (2026-08-11): briefing atualizado, backlog tem item correspondente

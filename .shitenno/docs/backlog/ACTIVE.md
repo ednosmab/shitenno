@@ -625,7 +625,7 @@ lifecycle: Active
 
 | Campo | Valor |
 |---|---|
-| **Status** | planeado |
+| **Status** | em implementação |
 | **Severidade** | Medio |
 | **Prioridade** | P1 |
 | **Owner** | executor |

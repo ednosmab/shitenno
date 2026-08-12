@@ -33,16 +33,3 @@ export function findCommand(name: string): CommandHelp | undefined {
   }
   return undefined;
 }
-
-/**
- * Get all command names.
- */
-export function getAllCommandNames(): string[] {
-  const names: string[] = [];
-  for (const cat of COMMAND_CATEGORIES) {
-    for (const cmd of cat.commands) {
-      names.push(cmd.name);
-    }
-  }
-  return names;
-}

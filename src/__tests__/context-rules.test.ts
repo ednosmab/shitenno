@@ -1,8 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   generateContextRules,
-  contextRulesToMarkdown,
-  type ContextRule,
 } from "../domain/rules/context-rules.js";
 import type { ProjectFingerprint } from "../infrastructure/project-fingerprint.js";
 import type { RiskMap } from "../infrastructure/risk-map.js";
@@ -300,61 +298,3 @@ describe("generateContextRules — sorting and deduplication", () => {
   });
 });
 
-// ── Markdown output ─────────────────────────────────────────────────────────
-
-describe("contextRulesToMarkdown", () => {
-  it("returns empty string for no rules", () => {
-    expect(contextRulesToMarkdown([])).toBe("");
-  });
-
-  it("formats single rule as markdown", () => {
-    const rules: ContextRule[] = [
-      {
-        id: "risk-notest-src",
-        rule: 'Area "src" has 5 file(s) without tests.',
-        rationale: "Missing coverage increases regression risk.",
-        priority: 1,
-        area: "src",
-        basedOn: "risk-map",
-      },
-    ];
-
-    const md = contextRulesToMarkdown(rules);
-
-    expect(md).toContain("## Context-Aware Rules (Auto-Generated)");
-    expect(md).toContain("### risk-notest-src");
-    expect(md).toContain('Area "src" has 5 file(s) without tests.');
-    expect(md).toContain("Missing coverage increases regression risk.");
-    expect(md).toContain("`src`");
-    expect(md).toContain("**Priority:** 1");
-    expect(md).toContain("risk-map");
-  });
-
-  it("formats multiple rules with correct separators", () => {
-    const rules: ContextRule[] = [
-      {
-        id: "rule-1",
-        rule: "First rule",
-        rationale: "Rationale 1",
-        priority: 1,
-        area: "src",
-        basedOn: "risk-map",
-      },
-      {
-        id: "rule-2",
-        rule: "Second rule",
-        rationale: "Rationale 2",
-        priority: 2,
-        area: "packages",
-        basedOn: "fingerprint",
-      },
-    ];
-
-    const md = contextRulesToMarkdown(rules);
-
-    expect(md).toContain("### rule-1");
-    expect(md).toContain("### rule-2");
-    expect(md).toContain("Rationale 1");
-    expect(md).toContain("Rationale 2");
-  });
-});

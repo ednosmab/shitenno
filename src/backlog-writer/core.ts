@@ -115,16 +115,15 @@ function validateAdiadoRevisit(
   return null;
 }
 
-function updateModularStatus(filePath: string, headerLineIdx: number, toState: BacklogState, date: string): void {
+function updateModularStatus(filePath: string, headerLineIdx: number, toState: BacklogState): void {
   const content = readFileSync(filePath, "utf-8");
   const lines = content.split("\n");
-  const statusLabel = toState === "concluído" ? `Done — ${date}` : toState;
 
   for (let i = headerLineIdx + 1; i < lines.length; i++) {
     const line = lines[i]!;
     if (line.startsWith("### ")) break;
     if (/^\s*\|\s*\*\*Status\*\*\s*\|/.test(line)) {
-      lines[i] = `| **Status** | ${statusLabel} |`;
+      lines[i] = `| **Status** | ${toState} |`;
       writeFileSync(filePath, lines.join("\n"), "utf-8");
       return;
     }
@@ -147,8 +146,7 @@ function updateLegacyStatus(filePath: string, line: string | undefined, lineIdx:
 export function transitionItem(
   filePath: string,
   itemId: string,
-  toState: BacklogState,
-  options?: { date?: string }
+  toState: BacklogState
 ): TransitionResult {
   if (!existsSync(filePath)) {
     return { success: false, message: `Backlog file not found: ${filePath}` };
@@ -172,15 +170,13 @@ export function transitionItem(
     };
   }
 
-  const date = options?.date ?? new Date().toISOString().slice(0, 10);
-
   try {
     const content = readFileSync(filePath, "utf-8");
     const lines = content.split("\n");
     const line = lines[item.line];
 
     if (item.format === "modular") {
-      updateModularStatus(filePath, item.line, toState, date);
+      updateModularStatus(filePath, item.line, toState);
     } else {
       updateLegacyStatus(filePath, line, item.line, toState);
     }

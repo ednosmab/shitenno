@@ -11,7 +11,6 @@
 import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 import {
-  resolveEntries,
   partitionEntries,
   type ManifestEntry,
   type TaskMetadata,
@@ -24,17 +23,6 @@ export function loadManifest(manifestPath: string): RuleManifestEntry[] {
   const raw = readFileSync(manifestPath, "utf-8");
   const parsed = parseYaml(raw) as { rules: RuleManifestEntry[] };
   return parsed.rules;
-}
-
-/**
- * Resolve which rules apply to a task, ordered by priority
- * (0 = highest). Mandatory rules always apply regardless of `when`.
- */
-export function resolveRules(
-  manifest: RuleManifestEntry[],
-  taskMeta: TaskMetadata
-): RuleManifestEntry[] {
-  return resolveEntries(manifest, taskMeta, { unconditionalMandatory: true });
 }
 
 /**

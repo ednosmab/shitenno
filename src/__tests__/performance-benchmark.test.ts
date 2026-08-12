@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { withCache } from "../infrastructure/mcp-cache.js";
-import { getCachedPlanInference } from "../infrastructure/inference-cache.js";
 import { sendDesktopNotification } from "../infrastructure/notify.js";
 import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
@@ -29,39 +28,6 @@ describe("Performance Benchmarks", () => {
       
       expect(computeCount).toBe(1);
       expect(duration2).toBeLessThan(duration1);
-    });
-  });
-
-  describe("Inference Cache Performance", () => {
-    it("should demonstrate cache speedup", () => {
-      let computeCount = 0;
-      const computeFn = () => {
-        computeCount++;
-        return {
-          id: "plan1",
-          title: "Test Plan",
-          rawStatus: "active",
-          inferredStatus: "in_progress" as const,
-          checkboxes: { total: 5, closed: 2, open: 3, percentage: 40 },
-          ageInDays: 5,
-          estado: null,
-          recommendation: "keep" as const,
-          reason: "Test",
-          confidence: 0.8,
-        };
-      };
-      
-      const filePath = "/tmp/test-plan.md";
-
-      // First call - should compute
-      getCachedPlanInference("plan1", filePath, computeFn);
-
-      // Second call - should use cache
-      getCachedPlanInference("plan1", filePath, computeFn);
-
-      // Caching is proven by computeCount: the compute function runs exactly once.
-      // Timing assertions are avoided — Date.now() timing is flaky under load.
-      expect(computeCount).toBe(1);
     });
   });
 

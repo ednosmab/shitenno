@@ -1,14 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getHookBus, resetHookBus, type ShitennoPlugin } from "../infrastructure/plugin-system.js";
+import { describe, it, expect, vi } from "vitest";
+import { HookBus, getHookBus, type ShitennoPlugin } from "../infrastructure/plugin-system.js";
 
 describe("PluginSystem", () => {
-  beforeEach(() => {
-    resetHookBus();
-  });
+  function makeBus(): HookBus {
+    return new HookBus();
+  }
 
   describe("HookBus", () => {
     it("registers plugins", () => {
-      const bus = getHookBus();
+      const bus = makeBus();
       const plugin: ShitennoPlugin = {
         name: "test-plugin",
         version: "1.0.0",
@@ -22,7 +22,7 @@ describe("PluginSystem", () => {
 
     it("rejects duplicate plugins", () => {
       vi.spyOn(console, "warn").mockImplementation(() => {});
-      const bus = getHookBus();
+      const bus = makeBus();
       const plugin: ShitennoPlugin = {
         name: "test-plugin",
         version: "1.0.0",
@@ -36,7 +36,7 @@ describe("PluginSystem", () => {
     });
 
     it("executeHook calls plugin hooks", async () => {
-      const bus = getHookBus();
+      const bus = makeBus();
       let called = false;
 
       const plugin: ShitennoPlugin = {
@@ -61,7 +61,7 @@ describe("PluginSystem", () => {
     });
 
     it("executeHook transforms input through plugins", async () => {
-      const bus = getHookBus();
+      const bus = makeBus();
 
       const plugin1: ShitennoPlugin = {
         name: "plugin-1",
@@ -101,7 +101,7 @@ describe("PluginSystem", () => {
 
     it("executeHook handles plugin errors gracefully", async () => {
       vi.spyOn(console, "error").mockImplementation(() => {});
-      const bus = getHookBus();
+      const bus = makeBus();
 
       const failingPlugin: ShitennoPlugin = {
         name: "failing",
@@ -137,7 +137,7 @@ describe("PluginSystem", () => {
     });
 
     it("getPlugins returns copy of plugins", () => {
-      const bus = getHookBus();
+      const bus = makeBus();
       bus.registerPlugin({
         name: "test",
         version: "1.0.0",
@@ -158,9 +158,9 @@ describe("PluginSystem", () => {
     });
   });
 
-  it("returns singleton instance", () => {
-    const bus1 = getHookBus();
-    const bus2 = getHookBus();
-    expect(bus1).toBe(bus2);
+  it("getHookBus returns the singleton instance", () => {
+    const singleton = getHookBus();
+    const other = getHookBus();
+    expect(singleton).toBe(other);
   });
 });

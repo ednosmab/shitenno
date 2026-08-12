@@ -12,7 +12,6 @@
 
 import { existsSync, mkdirSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
-import { getEventBus } from "./event-bus.js";
 import { readDaemonState, writeDaemonState } from "../challenge-responder/storage.js";
 import { type ChallengeType, type ChallengeSeverity, getSuggestedActions, normalizeChallengeType, normalizeSeverity } from "../challenge-responder/actions.js";
 
@@ -99,15 +98,6 @@ export function markChallengeResolved(
     appendFileSync(recordsPath, JSON.stringify(record) + "\n", "utf-8");
   } catch { /* Feedback recording is non-critical */ }
 
-  try {
-    const bus = getEventBus();
-    bus.publish("challenge.resolved" as never, {
-      challengeType: String(challenge.type ?? "unknown"),
-      action,
-      resolvedAt: new Date().toISOString(),
-    });
-  } catch { /* Event publishing is non-critical */ }
-
   return {
     challengeId: `CHL-${challengeIndex}`,
     action,
@@ -151,13 +141,6 @@ export function undoChallengeResolution(
     };
     appendFileSync(join(feedbackDir, "records.jsonl"), JSON.stringify(record) + "\n", "utf-8");
   } catch { /* Feedback recording is non-critical */ }
-
-  try {
-    getEventBus().publish("challenge.resolution_undone" as never, {
-      challengeType,
-      undoneAt: new Date().toISOString(),
-    });
-  } catch { /* Event publishing is non-critical */ }
 
   const type = normalizeChallengeType(String(challenge.type ?? "unknown"));
   const severity = normalizeSeverity(String(challenge.severity ?? "medium"));

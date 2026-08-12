@@ -161,22 +161,3 @@ export function generateDynamicRules(
     return true;
   });
 }
-
-export function dynamicRulesToMarkdown(rules: DynamicRule[]): string {
-  if (rules.length === 0) return "";
-
-  const lines = ["## Dynamic Rules (Auto-Generated from History)", ""];
-  lines.push("*These rules are generated based on your project's actual incident history.*");
-  lines.push("");
-
-  for (const rule of rules) {
-    const severityIcon = rule.severity === "critical" ? "🚨" : rule.severity === "high" ? "⚠️" : "ℹ️";
-    lines.push(`### ${severityIcon} ${rule.id}`);
-    lines.push(`**Rule:** ${rule.rule}`);
-    lines.push(`**Evidence:** ${rule.evidence}`);
-    lines.push(`**Source:** ${rule.source} | **Severity:** ${rule.severity} | **Incidents:** ${rule.incidentCount}`);
-    lines.push("");
-  }
-
-  return lines.join("\n");
-}

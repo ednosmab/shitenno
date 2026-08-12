@@ -172,25 +172,6 @@ export function getFeedbackRecords(shitennoDir: string): SessionFeedbackRecord[]
 }
 
 /**
- * Get feedback records for a specific session-tracker session.
- * Bridges session-feedback with session-tracker.
- */
-export function getFeedbackForSession(
-  shitennoDir: string,
-  sessionId: string
-): SessionFeedbackRecord[] {
-  return getFeedbackRecords(shitennoDir).filter((r) => r.sessionId === sessionId);
-}
-
-/**
- * Get the latest feedback record (for pattern analysis).
- */
-export function getLatestFeedback(shitennoDir: string): SessionFeedbackRecord | null {
-  const records = getFeedbackRecords(shitennoDir);
-  return records.at(-1) ?? null;
-}
-
-/**
  * Compute a summary of all feedback records.
  */
 export function computeFeedbackSummary(

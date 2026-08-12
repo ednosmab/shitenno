@@ -512,7 +512,7 @@ describe("backlog-core", () => {
       expect(result.message).toContain("not found");
     });
 
-    it("marks as Done with date when transitioning to concluído", () => {
+    it("writes the canonical status when transitioning to concluído", () => {
       const backlogPath = join(testDir, "ACTIVE.md");
       writeFileSync(
         backlogPath,
@@ -520,11 +520,12 @@ describe("backlog-core", () => {
         "utf-8",
       );
 
-      const result = transitionItem(backlogPath, "BACKLOG-001", "concluído", { date: "2026-07-23" });
+      const result = transitionItem(backlogPath, "BACKLOG-001", "concluído");
       expect(result.success).toBe(true);
 
       const content = readFileSync(backlogPath, "utf-8");
-      expect(content).toContain("Done — 2026-07-23");
+      expect(content).toContain("| **Status** | concluído |");
+      expect(content).not.toContain("Done —");
     });
 
     it("rejects adiado → planeado without [REVISIT:] tag", () => {

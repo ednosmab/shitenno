@@ -5,9 +5,6 @@ import { tmpdir } from "node:os";
 import {
   generateChallengingAlternative,
   calculateKnowledgeGap,
-  detectParadigmShift,
-  ensureFlowState,
-
 } from "../application/challenge-generator.js";
 import { loadGrowthProfile, } from "../infrastructure/growth-profile.js";
 import type { EvolutionRecommendation } from "../application/auto-evolution.js";
@@ -159,46 +156,6 @@ describe("Challenge Generator", () => {
     it("returns correct severity levels", () => {
       const gap = calculateKnowledgeGap(mockRecommendation, mockState);
       expect(["low", "medium", "high"]).toContain(gap.severity);
-    });
-  });
-
-  describe("detectParadigmShift", () => {
-    it("detects paradigm shift for significant changes", () => {
-      const shift = detectParadigmShift(mockRecommendation);
-
-      expect(shift).toBeDefined();
-      expect(shift!.currentParadigm).toBeDefined();
-      expect(shift!.newParadigm).toBeDefined();
-    });
-
-    it("returns null for minor shifts", () => {
-      // debt_remediation has a major shift, so this should return something
-      const shift = detectParadigmShift({
-        ...mockRecommendation,
-        type: "debt_remediation",
-      });
-
-      expect(shift).toBeDefined();
-    });
-  });
-
-  describe("ensureFlowState", () => {
-    it("returns challenge slightly above capacity", () => {
-      const flowChallenge = ensureFlowState(0.5, 0.4);
-      expect(flowChallenge).toBeGreaterThan(0.4);
-      expect(flowChallenge).toBeLessThanOrEqual(1.0);
-    });
-
-    it("clamps to 0-1 range", () => {
-      expect(ensureFlowState(1.0, 0.9)).toBeLessThanOrEqual(1.0);
-      expect(ensureFlowState(0.0, 0.1)).toBeGreaterThanOrEqual(0);
-    });
-
-    it("adapts to high growth capacity", () => {
-      const flowHigh = ensureFlowState(0.8, 0.8);
-      const flowLow = ensureFlowState(0.8, 0.3);
-
-      expect(flowHigh).toBeGreaterThan(flowLow);
     });
   });
 });

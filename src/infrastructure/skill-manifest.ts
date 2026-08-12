@@ -12,7 +12,6 @@
 import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 import {
-  resolveEntries,
   partitionEntries,
   type ManifestEntry,
   type TaskMetadata,
@@ -24,17 +23,6 @@ export type SkillManifestEntry = ManifestEntry;
 export function loadSkillManifest(manifestPath: string): SkillManifestEntry[] {
   const raw = readFileSync(manifestPath, "utf-8");
   return (parseYaml(raw) as { skills: SkillManifestEntry[] }).skills;
-}
-
-/**
- * Resolve which skills apply to a task, ordered by priority (0 = highest).
- * Mandatory skills still need `when` to match (unlike rules).
- */
-export function resolveSkills(
-  manifest: SkillManifestEntry[],
-  taskMeta: TaskMetadata
-): SkillManifestEntry[] {
-  return resolveEntries(manifest, taskMeta, { unconditionalMandatory: false });
 }
 
 /**

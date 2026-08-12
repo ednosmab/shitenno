@@ -187,21 +187,3 @@ export function generateContextRules(
     return true;
   });
 }
-
-export function contextRulesToMarkdown(rules: ContextRule[]): string {
-  if (rules.length === 0) return "";
-
-  const lines = ["## Context-Aware Rules (Auto-Generated)", ""];
-  lines.push("*These rules are generated based on your project's specific characteristics.*");
-  lines.push("");
-
-  for (const rule of rules) {
-    lines.push(`### ${rule.id}`);
-    lines.push(`**Rule:** ${rule.rule}`);
-    lines.push(`**Rationale:** ${rule.rationale}`);
-    lines.push(`**Area:** \`${rule.area}\` | **Priority:** ${rule.priority} | **Based on:** ${rule.basedOn}`);
-    lines.push("");
-  }
-
-  return lines.join("\n");
-}

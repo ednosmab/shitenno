@@ -28,42 +28,6 @@ export interface HealthScoreResult {
 
 // ── Code Security Score ────────────────────────────────────────────────────
 
-/**
- * Calculate Code Security score using the dampened bounded formula.
- * Sample floor of 10 files prevents small projects from zeroing by noise.
- */
-export function getCodeSecurityScore(
-  issues: { severity: string }[],
-  totalFiles: number
-): HealthScoreResult {
-  if (totalFiles === 0) {
-    return {
-      type: "code_security",
-      label: "Code Health",
-      score: 100,
-      maxScore: 100,
-      formula: "No files to audit",
-    };
-  }
-
-  const bySeverity: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
-  for (const i of issues) bySeverity[i.severity] = (bySeverity[i.severity] ?? 0) + 1;
-  const buckets: SeverityBucket[] = Object.entries(HEALTH_SCORE_DEDUCTIONS).map(([key, weight]) => ({
-    key,
-    weight,
-    count: bySeverity[key] ?? 0,
-  }));
-  const score = calculateBoundedHealthScore({ buckets, sampleSize: totalFiles, minSampleSize: 10 });
-
-  return {
-    type: "code_security",
-    label: "Code Health",
-    score,
-    maxScore: 100,
-    formula: "dampened: sqrt(count) per severity, sample floor = 10 files",
-  };
-}
-
 // ── Engineering Risk Score ─────────────────────────────────────────────────
 
 /**
@@ -120,32 +84,5 @@ export function getKnowledgeHealthScore(
     score: Math.max(0, Math.min(100, score)),
     maxScore: 100,
     formula: "debt*0.4 + graph*0.3 + (100-entropy)*0.3",
-  };
-}
-
-// ── Overall Health Score ───────────────────────────────────────────────────
-
-/**
- * Combine all three scores into an overall health score.
- * Uses configurable weights.
- */
-export function getOverallHealth(
-  codeSecurity: HealthScoreResult,
-  engineeringRisk: HealthScoreResult,
-  knowledgeHealth: HealthScoreResult,
-  weights = { codeSecurity: 0.35, engineeringRisk: 0.35, knowledgeHealth: 0.3 }
-): HealthScoreResult {
-  const score = Math.round(
-    codeSecurity.score * weights.codeSecurity +
-    engineeringRisk.score * weights.engineeringRisk +
-    knowledgeHealth.score * weights.knowledgeHealth
-  );
-
-  return {
-    type: "code_security",
-    label: "Overall Health",
-    score: Math.max(0, Math.min(100, score)),
-    maxScore: 100,
-    formula: "code*0.35 + risk*0.35 + knowledge*0.3",
   };
 }

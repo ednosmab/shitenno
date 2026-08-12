@@ -204,8 +204,3 @@ export function getCapabilityMapping(capability: Capability): CapabilityMapping 
 export function getCapabilityFiles(capability: Capability): CapabilityFile[] {
   return CAPABILITY_MAPPINGS[capability].files;
 }
-
-/** Obtém os directórios de uma capacidade. */
-export function getCapabilityDirectories(capability: Capability): string[] {
-  return CAPABILITY_MAPPINGS[capability].directories;
-}

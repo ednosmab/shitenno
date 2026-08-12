@@ -10,13 +10,11 @@
 import { updateCurrentTask, addCompletedTask } from "./context-buffer-writer.js";
 import {
   type BacklogState,
-  type BacklogItem,
   type TransitionResult,
   resolveBacklogPaths,
   parseBacklogItems,
   findItem,
   transitionItem,
-  findShortestPath,
 } from "./backlog-core.js";
 
 // ── Re-exports (backwards-compatible aliases) ──────────────────────────────
@@ -27,20 +25,6 @@ export {
   isValidTransition,
   getAllowedTransitions,
 } from "./backlog-core.js";
-
-/** Backwards-compatible alias: parseBacklogItems with a single path arg */
-export function parseBacklog(filePath: string): BacklogItem[] {
-  return parseBacklogItems(filePath);
-}
-
-/** Backwards-compatible alias: findItem using items array parsed from a file path */
-export function findBacklogItem(
-  backlogPath: string,
-  taskId: string,
-): BacklogItem | null {
-  const items = parseBacklogItems(backlogPath);
-  return findItem(items, taskId);
-}
 
 // ── Convenience Wrappers ───────────────────────────────────────────────────
 
@@ -88,52 +72,4 @@ export function transitionTask(
   }
 
   return result;
-}
-
-/**
- * Transition task to "concluído" (convenience function).
- * Finds the shortest path from current state to "concluído".
- */
-export function completeTask(
-  shitennoDir: string,
-  taskId: string,
-): TransitionResult {
-  const { active: backlogPath } = resolveBacklogPaths(shitennoDir);
-  const items = parseBacklogItems(backlogPath);
-  const item = findItem(items, taskId);
-
-  if (!item) {
-    return {
-      success: false,
-      message: `Task ${taskId} not found in backlog`,
-    };
-  }
-
-  if (item.state === "concluído") {
-    return {
-      success: true,
-      message: `Task ${taskId} is already "concluído"`,
-      previousState: item.state,
-      newState: item.state,
-    };
-  }
-
-  const path = findShortestPath(item.state, "concluído");
-  if (!path || path.length === 0) {
-    return {
-      success: false,
-      message: `No path from "${item.state}" to "concluído"`,
-    };
-  }
-
-  let lastResult: TransitionResult = { success: true, message: "Initial state" };
-
-  for (const nextState of path) {
-    lastResult = transitionItem(backlogPath, taskId, nextState);
-    if (!lastResult.success) {
-      return lastResult;
-    }
-  }
-
-  return lastResult;
 }

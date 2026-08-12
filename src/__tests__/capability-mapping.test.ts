@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   getCapabilityMapping,
   getCapabilityFiles,
-  getCapabilityDirectories,
 } from "../domain/types/capability-mapping.js";
 import type { Capability } from "../application/maturity-profile.js";
 
@@ -103,37 +102,6 @@ describe("getCapabilityFiles", () => {
   });
 });
 
-// ── getCapabilityDirectories ───────────────────────────────────────────────
-
-describe("getCapabilityDirectories", () => {
-  it("returns directories for core", () => {
-    const dirs = getCapabilityDirectories("core");
-    expect(dirs.length).toBeGreaterThan(0);
-    expect(dirs).toContain(".shitenno");
-    expect(dirs).toContain(".shitenno/docs");
-  });
-
-  it("core directories include governance", () => {
-    const dirs = getCapabilityDirectories("core");
-    expect(dirs).toContain(".shitenno/governance");
-  });
-
-  it("ai directories include cognition", () => {
-    const dirs = getCapabilityDirectories("ai");
-    expect(dirs).toContain(".shitenno/cognition");
-  });
-
-  it("quality includes pipelines directory", () => {
-    const dirs = getCapabilityDirectories("quality");
-    expect(dirs).toContain(".shitenno/docs/pipelines");
-  });
-
-  it("operations includes runbooks", () => {
-    const dirs = getCapabilityDirectories("operations");
-    expect(dirs).toContain(".shitenno/docs/runbooks");
-  });
-});
-
 // ── Cross-validation ──────────────────────────────────────────────────────
 
 describe("capability mapping cross-validation", () => {
@@ -165,12 +133,6 @@ describe("capability mapping cross-validation", () => {
   it("getCapabilityFiles returns same as getCapabilityMapping().files", () => {
     for (const cap of allCapabilities) {
       expect(getCapabilityFiles(cap)).toEqual(getCapabilityMapping(cap).files);
-    }
-  });
-
-  it("getCapabilityDirectories returns same as getCapabilityMapping().directories", () => {
-    for (const cap of allCapabilities) {
-      expect(getCapabilityDirectories(cap)).toEqual(getCapabilityMapping(cap).directories);
     }
   });
 });
