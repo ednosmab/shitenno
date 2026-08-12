@@ -8,6 +8,8 @@ description: >
   nenhuma funcionalidade é considerada completa até estar coberta. Use para implementações novas,
   refactors com rede de segurança, correção de regressões, e validação de contratos de interface.
   Se há comportamento a garantir, esta skill deve estar ativa.
+category: engineering
+lifecycle: Active
 ---
 
 # Agente TDD

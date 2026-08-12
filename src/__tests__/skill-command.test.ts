@@ -59,6 +59,15 @@ describe("skill command utilities", () => {
       expect(content).toContain("## When to Use");
       expect(content).toContain("## Instructions");
     });
+
+    it("should include governance frontmatter (category, lifecycle) in template", () => {
+      const result = createSkillFile(skillsDir, "gov-template-test", "Test skill");
+
+      expect(result.success).toBe(true);
+      const content = readFileSync(result.filePath!, "utf-8");
+      expect(content).toContain("category: engineering");
+      expect(content).toContain("lifecycle: Active");
+    });
   });
 
   describe("listSkillFiles", () => {
@@ -132,6 +141,49 @@ describe("skill command utilities", () => {
       const result = validateSkillFile(filePath);
       expect(result.valid).toBe(false);
       expect(result.errors.some((e: string) => e.includes("body"))).toBe(true);
+    });
+
+    it("should detect missing category field", () => {
+      const filePath = join(skillsDir, "missing-category.md");
+      writeFileSync(filePath, "---\nname: missing-category\ndescription: >\n  Has desc\nlifecycle: Active\n---\n\n# Content", "utf-8");
+
+      const result = validateSkillFile(filePath);
+      expect(result.valid).toBe(false);
+      expect(result.errors.some((e: string) => e.includes("category"))).toBe(true);
+    });
+
+    it("should detect missing lifecycle field", () => {
+      const filePath = join(skillsDir, "missing-lifecycle.md");
+      writeFileSync(filePath, "---\nname: missing-lifecycle\ndescription: >\n  Has desc\ncategory: engineering\n---\n\n# Content", "utf-8");
+
+      const result = validateSkillFile(filePath);
+      expect(result.valid).toBe(false);
+      expect(result.errors.some((e: string) => e.includes("lifecycle"))).toBe(true);
+    });
+
+    it("should reject invalid lifecycle value", () => {
+      const filePath = join(skillsDir, "invalid-lifecycle.md");
+      writeFileSync(filePath, "---\nname: invalid-lifecycle\ndescription: >\n  Has desc\ncategory: engineering\nlifecycle: Forever\n---\n\n# Content", "utf-8");
+
+      const result = validateSkillFile(filePath);
+      expect(result.valid).toBe(false);
+      expect(result.errors.some((e: string) => e.includes("lifecycle"))).toBe(true);
+    });
+
+    it("should validate a skill with governance frontmatter", () => {
+      const filePath = join(skillsDir, "governed-skill.md");
+      writeFileSync(filePath, "---\nname: governed-skill\ndescription: Has full frontmatter\ncategory: engineering\nlifecycle: Active\n---\n\n# Content\n\n## Purpose\n\nInstructions here.", "utf-8");
+
+      const result = validateSkillFile(filePath);
+      expect(result.valid).toBe(true);
+    });
+
+    it("should validate a skill with folded (YAML >) description", () => {
+      const filePath = join(skillsDir, "folded-desc-skill.md");
+      writeFileSync(filePath, "---\nname: folded-desc-skill\ndescription: >\n  First folded line\n  Second folded line\ncategory: engineering\nlifecycle: Active\n---\n\n# Content\n\n## Purpose\n\nInstructions here.", "utf-8");
+
+      const result = validateSkillFile(filePath);
+      expect(result.valid).toBe(true);
     });
   });
 });

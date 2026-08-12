@@ -4,6 +4,8 @@ description: >
   Padrões de tratamento de erros e observabilidade. Use quando o agente for implementar
   tratamento de exceções, logging estruturado, métricas, ou qualquer funcionalidade que
   envolva visibilidade do comportamento do sistema em produção.
+category: engineering
+lifecycle: Active
 ---
 
 # Error Handling & Observability

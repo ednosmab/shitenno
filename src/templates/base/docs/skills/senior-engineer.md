@@ -8,6 +8,8 @@ description: >
   seja a seguir um plano estruturado (ficheiro .md com steps) ou a trabalhar de forma mais livre.
   A skill aplica-se igualmente a código novo, refactors, migrações, correção de bugs e documentação.
   Se houver código envolvido, esta skill deve estar activa.
+category: engineering
+lifecycle: Active
 ---
 
 # Agente Engenheiro Sénior

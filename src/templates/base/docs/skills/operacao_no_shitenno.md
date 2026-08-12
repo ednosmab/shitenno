@@ -1,3 +1,12 @@
+---
+category: engineering
+name: operacao_no_shitenno
+description: >
+  Operação no Shitenno — como trabalhar no projeto: comandos disponíveis,
+  fluxo de tarefas e regras de governação.
+lifecycle: Active
+---
+
 # Skill: Operação no Shitenno
 
 Esta skill é portável — copiável para qualquer projeto que use o Shugo, sem adaptação. Ela descreve **como agir dentro desta estrutura de pastas**, não decisões específicas de nenhum projeto.

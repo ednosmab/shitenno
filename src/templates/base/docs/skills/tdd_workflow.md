@@ -3,6 +3,8 @@ name: tdd_workflow
 description: >
   Workflow TDD completo — ciclo Red-Green-Refactor aplicado a qualquer tarefa de implementação.
   Use quando o agente precisa de um guia passo a passo para aplicar TDD de forma consistente.
+category: engineering
+lifecycle: Active
 ---
 
 # TDD Workflow

@@ -1,5 +1,9 @@
 ---
 category: engineering
+name: codebase_hygiene_git
+description: >
+  Higiene de código e workflow git — regras de organização, estruturas de branches,
+  e convenções de commit e push.
 lifecycle: Active
 ---
 

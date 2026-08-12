@@ -1,5 +1,9 @@
 ---
 category: engineering
+name: mcp-interaction
+description: >
+  Interação com o servidor MCP do Shitenno — usar node scripts/mcp-client.mjs
+  para aceder a briefing, regras, skills e estado do projeto.
 lifecycle: Active
 ---
 

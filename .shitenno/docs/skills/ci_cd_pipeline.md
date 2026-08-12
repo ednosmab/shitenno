@@ -1,5 +1,9 @@
 ---
 category: engineering
+name: ci_cd_pipeline
+description: >
+  Workflow CI/CD completo — integração contínua e deploy contínuo com GitHub Actions.
+  Padroniza pipelines, cache e segurança antes de merge.
 lifecycle: Active
 ---
 

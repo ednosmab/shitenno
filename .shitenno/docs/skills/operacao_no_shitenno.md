@@ -1,5 +1,9 @@
 ---
 category: engineering
+name: operacao_no_shitenno
+description: >
+  Operação no Shitenno — como trabalhar no projeto: comandos disponíveis,
+  fluxo de tarefas e regras de governação.
 lifecycle: Active
 ---
 

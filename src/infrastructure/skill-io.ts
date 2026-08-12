@@ -48,9 +48,16 @@ function parseFrontmatter(raw: string): { meta: Record<string, string>; body: st
   const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) return { meta: {}, body: raw };
   const meta: Record<string, string> = {};
-  for (const line of match[1]!.split("\n")) {
-    const [key, ...rest] = line.split(":");
-    if (key && rest.length) meta[key.trim()] = rest.join(":").trim().replace(/^>\s*/, "");
+  const lines = match[1]!.split("\n");
+  let currentKey: string | undefined;
+  for (const line of lines) {
+    const pair = line.match(/^([a-zA-Z0-9_-]+):\s*(.*)$/);
+    if (pair) {
+      currentKey = pair[1]!;
+      meta[currentKey] = pair[2]!.trim().replace(/^>\s*/, "");
+    } else if (currentKey && line.trim()) {
+      meta[currentKey] = `${meta[currentKey]} ${line.trim()}`.trim();
+    }
   }
   return { meta, body: match[2]!.trim() };
 }
@@ -62,13 +69,17 @@ function generateSkillTemplate(name: string, description: string): string {
   return `---
 name: ${kebabName}
 description: ${description}
+category: engineering
+lifecycle: Active
 ---
 
 # ${titleName}
 
 Describe what this skill does and when it should be activated.
 
----
+## Purpose
+
+Explain the problem this skill solves and its intended effect on agent behavior.
 
 ## When to Use
 
@@ -165,6 +176,23 @@ export function validateSkillFile(filePath: string): SkillValidationResult {
   // Check description
   if (!meta.description) {
     errors.push("Missing required field 'description' in frontmatter.");
+  }
+
+  // Check category
+  if (!meta.category) {
+    errors.push("Missing required field 'category' in frontmatter.");
+  }
+
+  // Check lifecycle
+  if (!meta.lifecycle) {
+    errors.push("Missing required field 'lifecycle' in frontmatter.");
+  } else {
+    const VALID_LIFECYCLES = ["Draft", "Active", "Deprecated", "Historical", "Archived"];
+    if (!VALID_LIFECYCLES.includes(meta.lifecycle)) {
+      errors.push(
+        `Invalid lifecycle '${meta.lifecycle}'. Allowed: ${VALID_LIFECYCLES.join(", ")}.`
+      );
+    }
   }
 
   // Check body
