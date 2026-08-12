@@ -619,3 +619,18 @@ lifecycle: Active
 | **Fonte** | pre-commit hook (F-06) + risk map critical |
 | **Descricao** | Regra F-06 (Forbidden Operations) violada: src/infrastructure/analyser.ts (326L), src/application/briefing.ts (305L), src/domain/rules/doc-sync-significance.ts (302L). Pre-commit hook sinaliza e bloqueia merge para main. Refactorar seguindo o padrão dos PLAN-FILE-REFACTOR anteriores (split em módulos coerentes <300L), com TDD. Manter ADR-007 e docs atualizados. |
 
+
+
+### BACKLOG-2026_08_11_DEAD_CODE_CLEANUP_REMOVE_ORPHANED_MODULES_DUPLICAT — Dead code cleanup — remove orphaned modules, duplicate files and dead events
+
+| Campo | Valor |
+|---|---|
+| **Status** | planeado |
+| **Severidade** | Medio |
+| **Prioridade** | P1 |
+| **Owner** | executor |
+| **Data** | 2026-08-11 |
+| **Fonte** | shugo plan md prepare |
+| **Modulos** | governance/plans/ |
+| **Descricao** | Dead code cleanup — remove orphaned modules, duplicate files and dead events |
+| **Correcao** | Verificar checklist no plano `governance/plans/2026-08-11-dead-code-cleanup-remove-orphaned-modules-duplicat.md` |

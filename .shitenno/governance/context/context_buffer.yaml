@@ -56,13 +56,13 @@ session:
   status: active
 
 current_task:
-  id: plano-unico-consolidado-final
-  description: "PLANO-UNICO-CONSOLIDADO final — Fases B/C/D: dead code removal, 8 observability handlers, regression tests"
-  status: "completed"
-  started_at: "2026-08-01T02:25:00.000Z"
-  completed_at: "2026-08-01T02:35:00.000Z"
+  id: dead-code-cleanup-2026-08-11
+  description: "DEAD-CODE-CLEANUP (2026-08-11) — remover 16 ficheiros órfãos, 2 eventos mortos (challenge.resolved/resolution_undone), 28 exports test-only. Plano: governance/plans/2026-08-11-dead-code-cleanup-remove-orphaned-modules-duplicat.md (backlog BACKLOG-2026_08_11_DEAD_CODE_CLEANUP_REMOVE_ORPHANED_MODULES_DUPLICAT, P1). Executar por fases 1-6; cada fase com lint+typecheck+test:unit; pipeline full no fim."
+  status: "planeado"
+  started_at: null
+  completed_at: null
 
-next_p0: "SA7 — God modules refactoring (rule-engine 1307L, scorer 947L, engineering-state 908L, feedback-engine 756L). No P0 items exist; SA7 is highest-impact P1."
+next_p0: "BACKLOG-2026_08_11_DEAD_CODE_CLEANUP_REMOVE_ORPHANED_MODULES_DUPLICAT — dead code cleanup (P1, plano salvo 2026-08-11). Sem P0 ativos."
 
 documents_loaded:
   - docs/BACKLOG.md
@@ -102,8 +102,4 @@ completed_tasks:
   - PLANO-EVOLUCAO-AUDIT-SEGURANCA-v4 (Items 0-8: fixtures corpus, findTaintSink suffix, WeakCrypto fix, XSS sinks, req.file, deserialize separation, CORS+secrets, srcDir auto-detect, SCA skip signal, regex multiline fix, taint 2-pass, self-mutation script)
   - PLANO-UNICO-CONSOLIDADO-FINAL: pipeline.started removal, 8 observability handlers, 15 regression tests
 
-impediments:
-  - description: "Retroactive sync failed for TEST-FILE-WATCHER-001: 2 errors"
-    priority: "high"
-    createdAt: "2026-07-18T12:56:07.978Z"
-    category: "plan_sync"
+impediments: []

@@ -203,6 +203,7 @@
 │   governance/last-verify.json
 │   governance/MANDATORY_CONTEXT.md
 │   governance/plans/
+│   governance/plans/2026-08-11-dead-code-cleanup-remove-orphaned-modules-duplicat.md
 │   governance/plans/done/
 │   governance/plans/done/2026-07-02-init-audit-dashboard.md
 │   governance/plans/done/2026-07-02-init-audit-dashboard.verification.json
@@ -599,6 +600,7 @@
 │   reports/doc-sync-2026-08-08.json
 │   reports/doc-sync-2026-08-10.json
 │   reports/doc-sync-2026-08-11.json
+│   reports/doc-sync-2026-08-12.json
 │   reports/evolution-2026-07-18.json
 │   reports/evolution-2026-07-25.json
 │   reports/health-2026-07-16.json
@@ -642,6 +644,7 @@
 │   reports/patterns-2026-08-08.json
 │   reports/patterns-2026-08-10.json
 │   reports/patterns-2026-08-11.json
+│   reports/patterns-2026-08-12.json
 │   reports/pipeline-history.json
 │   scripts/
 │   scripts/add-frontmatter.ts
